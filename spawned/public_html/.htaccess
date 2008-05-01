@@ -1,0 +1,16 @@
+
+RewriteEngine on
+RewriteBase /knowing/public_html/
+
+#RewriteRule ^admin/* index.php?module=admin
+
+RewriteRule ^([_a-z0-9-]/*)*$ index.php
+
+
+
+
+
+
+
+
+

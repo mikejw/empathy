@@ -1,0 +1,28 @@
+<?php
+// site wide controller costomisation goes in this file
+
+require('empathy/include/Controller.php');
+
+class CustomController extends Controller
+{	
+  public function __construct($error, $internal)
+  {
+    parent::__construct($error, $internal);  
+    // put custom routines here
+
+    if($this->module == "admin")
+      {
+	require("empathy/include/EntityDBMS.php");
+	require(DOC_ROOT."/storage/User.php");
+	
+	$u = new User($this);
+	
+	if((!(isset($_SESSION['user_id']))) || (!($u->getAdmin($_SESSION['user_id']))))
+	  {
+	    $this->redirect("misc/login");
+	  }	
+      }
+  }
+  // custom functions can go here   
+}
+?>

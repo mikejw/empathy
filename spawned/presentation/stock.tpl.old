@@ -1,0 +1,73 @@
+
+{include file="header.tpl"}
+
+{include file="comp_admin.tpl"}
+
+
+<div class="contain_center">
+<div class="product">
+<img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/img/{if $product->image eq ''}spacer.gif{else}uploads/{$product->image}{/if}" alt="" width=150 height=150 />
+<h2><span class="light">{$product->id}.</span> {$product->name}</h2>
+<p>({$product->category_id})</p>
+{$product->description}
+<p>&pound;{$product->price}</p>
+<div class="clear">&nbsp;</div>
+</div>
+</div>
+
+{if sizeof($stock) < 1}
+<p>No stock items to display.</p>
+{else}
+<table border=0>
+<tr>
+<th>Size</th><th>Colour 1</th><th>Colour 2</th><th>Quantity</th>
+</tr>
+{section name=stock_item loop=$stock}
+<tr>
+<td>{$stock[stock_item].size_lbl}</td>
+<td>{$stock[stock_item].colour1_lbl}</td>
+<td>{$stock[stock_item].colour2_lbl}</td>
+<td>
+<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/stock/update" method="post">
+<input type="text" class="input_small" value="{$stock[stock_item].qty}" name="qty" />
+<input type="hidden" name="product_id" value="{$product->id}" />
+<input type="hidden" name="size" value="{$stock[stock_item].size}" />
+<input type="hidden" name="colour1" value="{$stock[stock_item].colour1}" />
+<input type="hidden" name="colour2" value="{$stock[stock_item].colour2}" />
+<input type="submit" name="update_stock" value="Update" />
+</form></td>
+
+</tr>
+{/section}
+</table>
+{/if}
+
+<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/stock/add" method="post">
+<table>
+<tr>
+<td><label for="size">Size</label>
+<select name="size">
+{html_options options=$sizes}
+</select>
+</td>
+<td><label for="colour1">Colour 1</label>
+<select name="colour1">
+{html_options options=$colours}
+</select>
+</td>
+<td><label for="colour2">Colour 2</label>
+<select name="colour2">
+{html_options options=$colours}
+</select>
+</td>
+<td><label for="qty">Quantity</label><input type="text" class="input_small" value=1 name="qty" />
+<input type="hidden" name="product_id" value="{$product->id}" />
+<input type="submit" name="add_stock" value="Add" /></td>
+</tr>
+</table>
+</form>
+
+
+
+
+{include file="footer.tpl"}

@@ -1,0 +1,33 @@
+
+body { background-color: #fff;
+	margin: 0; text-align: center;
+	}
+
+#page { width: 600px; margin: 2em auto; text-align: left; }
+
+#logo { margin: 1em 0; }
+#logo p { text-align: center; margin: 0; }
+#logo p a img { border: 0; }
+
+#content { background-color: transparent; padding: 1em; margin: 0; }
+#content p { margin: 0.5em 0 0.5em 0; text-indent: 2em; }
+#content h1 { margin: 0 0 0.5em 0; }
+#content h2 { margin: 1em 0 1em 0; }
+
+#content ul { list-style: square; padding: 0 0 0 2em;}
+
+#footer { text-align: center; margin: 6em 0; }
+#error { background-color: #fafafa; border: 1px solid #ccc; padding: 1em; }
+
+p.retry { text-align: center; }
+
+/* typography */
+
+body { font-family: sans-serif; }
+
+#content h1 { color: #ccc; font-size: 1.6em; }
+#content h2 { color: #999; font-size: 1.2em; }
+#content p a, #content ul li a { color: #666; }
+
+#footer p { color: #ccc; font-size: 0.7em; }
+#footer p a { color: #666; }

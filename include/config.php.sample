@@ -1,0 +1,27 @@
+<?php
+// about
+define('NAME', 'Empathy');
+define('TITLE', 'Empathy - A lightweight MVC Framework for PHP 5');
+define('AUTHOR', 'Mike Whiting');
+define('SUB_TITLE', '');
+
+// locations
+define('DBMS', 'MySQL');
+define('DOC_ROOT', '/Users/mike/Sites/empathy');
+define('WEB_ROOT', 'localhost/~mike/empathy');
+define('PUBLIC_DIR', '/public_html');
+define('SMARTY_PATH', '/Users/mike/Sites/empathy/include/third_party/Smarty');
+
+// database
+define('DB_SERVER', 'localhost');
+define('DB_USER', 'ai_em');
+define('DB_PASS', 'ai_em');
+define('DB_NAME', 'ai_em');
+define('TBL_PREFIX', 'table');
+
+// modules / sections / session vars
+$module = array("empathy");
+$moduleIsDynamic = array(0);
+
+$sessionVar = array("app_error", "user_id", "failed_uri", "cookies");
+?>
