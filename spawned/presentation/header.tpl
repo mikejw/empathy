@@ -26,22 +26,5 @@
 <link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/{$module}.css" type="text/css" media="all" />
 </head>
 
-<body id="ai-em">
+<body>
 <div id="page">
-
-<p class="logo"><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/"><img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/img/yell_small.png" alt="" /></a></p>
-<!--<p class="sub_title">Intimacy with medium.</p>-->
-
-
-<ul id="nav">
-<li><a {if $module eq 'news'}class="selected" {/if}href="http://{$WEB_ROOT}{$PUBLIC_DIR}/">News</a></li>
-<li><a {if $module eq 'reviews'}class="selected" {/if}href="http://{$WEB_ROOT}{$PUBLIC_DIR}/reviews/">Reviews</a></li>
-<li><a {if $module eq 'events'}class="selected" {/if}href="http://{$WEB_ROOT}{$PUBLIC_DIR}/events">Events</a></li>
-<li><a {if $module eq 'podcast'}class="selected" {/if}href="http://{$WEB_ROOT}{$PUBLIC_DIR}/podcast">Podcast</a></li>
-<li><a {if $module eq 'people'}class="selected" {/if}href="http://{$WEB_ROOT}{$PUBLIC_DIR}/people">People</a></li>
-<li><a {if $module eq 'stores'}class="selected" {/if}href="http://{$WEB_ROOT}{$PUBLIC_DIR}/stores">Stores</a></li>
-<li><a {if $module eq 'help'}class="selected" {/if}href="http://{$WEB_ROOT}{$PUBLIC_DIR}/help">Help</a></li>
-</ul>
-
-<div id="content">
-
