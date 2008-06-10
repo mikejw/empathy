@@ -1,43 +1,30 @@
 <?php
-  // Copyright 2008 Mike Whiting (mail@mikejw.co.uk).
-  // This file is part of the Empathy MVC framework.
-
-  // Empathy is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Lesser General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-
-  // Empathy is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Lesser General Public License for more details.
-
-  // You should have received a copy of the GNU Lesser General Public License
-  // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
+date_default_timezone_set('Europe/London');
 
 // about
-define('NAME', 'Empathy');
-define('TITLE', 'Empathy - A lightweight MVC Framework for PHP 5');
-define('AUTHOR', 'Mike Whiting');
+define('NAME', 'spawned');
+define('TITLE', '');
+define('AUTHOR', '');
 define('SUB_TITLE', '');
 
 // locations
-define('DBMS', 'MySQL');
-define('DOC_ROOT', '/Users/mike/Sites/empathy');
-define('WEB_ROOT', 'localhost/~mike/empathy');
+define('DBMS', 'MYSQL');
+define('DOC_ROOT', '/var/www/localhost/htdocs/spawned');
+define('WEB_ROOT', '192.168.0.6/spawned');
 define('PUBLIC_DIR', '/public_html');
-define('SMARTY_PATH', '/Users/mike/Sites/empathy/include/third_party/Smarty');
 
 // database
 define('DB_SERVER', 'localhost');
-define('DB_USER', 'ai_em');
-define('DB_PASS', 'ai_em');
-define('DB_NAME', 'ai_em');
-define('TBL_PREFIX', 'table');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', '');
+define('TBL_PREFIX', '');
 
 // modules / sections / session vars
-$module = array("empathy");
+define('TPL_BY_CLASS', 1); // looks for teplates with same name as current class
+define('DEF_MOD', 0);
+$module = array('front');
 $moduleIsDynamic = array(0);
 
-$sessionVar = array("app_error", "user_id", "failed_uri", "cookies");
+$sessionVar = array('cookies');
 ?>

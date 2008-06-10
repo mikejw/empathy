@@ -1,0 +1,14 @@
+
+RewriteEngine on
+RewriteBase /spawned/public_html/
+
+RewriteRule ^([_a-z0-9-]/*)*$ index.php
+
+
+
+
+
+
+
+
+
