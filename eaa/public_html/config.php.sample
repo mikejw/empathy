@@ -2,15 +2,15 @@
 date_default_timezone_set('Europe/London');
 
 // about
-define('NAME', 'spawned');
+define('NAME', 'eaa');
 define('TITLE', '');
 define('AUTHOR', '');
 define('SUB_TITLE', '');
 
 // locations
 define('DBMS', 'MYSQL');
-define('DOC_ROOT', '/var/www/localhost/htdocs/spawned');
-define('WEB_ROOT', '192.168.0.6/spawned');
+define('DOC_ROOT', '/var/www/localhost/htdocs/eaa');
+define('WEB_ROOT', 'localhost/eaa');
 define('PUBLIC_DIR', '/public_html');
 
 // database
