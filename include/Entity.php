@@ -231,8 +231,17 @@ abstract class  Entity
     return $nav;
   }
 
+
+  public function addTablePrefix($table)
+  {
+    return TBL_PREFIX.$table;
+  }
+
+
+
   public function getAllCustomPaginate($table, $sql_string, $page, $per_page)
   {   
+    $table = $this->addTablePrefix($table);
     $all = array();
     $start = ($page - 1) * $per_page;
     $sql = 'SELECT * FROM '.$table.' '.$sql_string.' LIMIT '.$start.', '.$per_page;
