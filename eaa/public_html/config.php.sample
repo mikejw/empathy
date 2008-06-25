@@ -26,5 +26,5 @@ define('DEF_MOD', 0);
 $module = array('front');
 $moduleIsDynamic = array(0);
 
-$sessionVar = array('cookies');
+$sessionVar = array('cookies', 'failed_uri');
 ?>

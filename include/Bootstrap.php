@@ -159,7 +159,7 @@ class Bootstrap
   private function processRequest($module)
   {    
     #$this->incPlugin('force_www');
-    $this->incPlugin('force_endslash');
+    #$this->incPlugin('force_endslash');
     
     $fullURI = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
