@@ -45,6 +45,7 @@ abstract class  Entity
   
   public function load($table)
   {
+    $table = $this->appendPrefix($table);
     $sql = "SELECT * FROM $table WHERE id = $this->id";
     $error = "Could not load record from $table.";
     //    $result = self::query($sql, $error);
@@ -85,6 +86,7 @@ abstract class  Entity
   
   public function save($table, $format, $sanitize)
   {
+    $table = $this->appendPrefix($table);
     $this->toXHTML($format);
     $this->stripMSWordChars();
     if($sanitize == 1)
@@ -127,6 +129,7 @@ abstract class  Entity
   
   public function insert($table, $id, $format, $sanitize)
   {
+    $table = $this->appendPrefix($table);
     $this->toXHTML($format);
     $this->stripMSWordChars();
     if($sanitize == 1)
@@ -191,6 +194,7 @@ abstract class  Entity
 
   public function getAllCustom($table, $sql_string)
   {
+    $table = $this->appendPrefix($table);
     $all = array();
     $sql = 'SELECT * FROM '.$table.' '.$sql_string;
     $error = 'Could not get all rows from '.$table;
