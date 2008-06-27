@@ -314,6 +314,27 @@ abstract class  Entity
 	  }
       }
   }    
+
+
+
+  public function buildUnionString($ids)
+  {
+    $str = '(0,';
+    $i = 0;
+    foreach($ids as $id)
+      {
+	$str .= $id;
+	if(($i + 1) != sizeof($ids))
+	  {
+	    $str .= ',';
+	  }
+	$i++;
+      }
+    $str .= ')';
+    
+    return $str;  
+  }
+
   
   public function stripMSWordChars()
   {   
