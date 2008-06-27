@@ -164,11 +164,21 @@ class Controller
     $_SESSION['failed_uri'] = $uri;
   }
 
-  public function error($message)
+  public function error($message, $fourohfour)
   {
-    $this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
-    $_SESSION['app_error'] = array($this->module, $this->class, $message, date('U'));
-    $this->redirect('empathy/error/');   
+    if($fourohfour)
+      {	
+	header('HTTP/1.0 404 Not Found');
+	$this->presenter->assign('fourohfourmessage', $message);
+	$this->presenter->display('404.tpl');
+	exit();
+      }
+    else
+      {
+	$this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+	$_SESSION['app_error'] = array($this->module, $this->class, $message, date('U'));
+	$this->redirect('empathy/error/');   
+      }
   }
 
     
