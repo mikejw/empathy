@@ -181,6 +181,20 @@ class Controller
       }
   }
 
+  public function loadUIVars($ui, $ui_array)
+  {
+    foreach($ui_array as $setting)
+      {
+	if(isset($_GET[$setting]))
+	  {
+	    $_SESSION[$ui][$setting] = $_GET[$setting];	    
+	  }
+	else
+	  {
+	    $_GET[$setting] = $_SESSION[$ui][$setting];
+	  }
+      }
+  }
     
 }
 ?>

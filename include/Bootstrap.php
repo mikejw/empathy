@@ -15,6 +15,24 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
+
+function my_spl_autoload($class)
+{
+  $i = 0;
+  $error = 1;
+  $location = array(DOC_ROOT.'/storage', 'empathy/include');
+
+  while($i < sizeof($location) && $error == 1)
+    {
+      $class_file = $location[$i].'/'.$class.'.php';     
+      if(!@include($class_file))
+	{	
+	  $error == 0;
+	}
+      $i++;
+    }
+}
+
 class Bootstrap
 {
   private $internalController = false;
@@ -23,9 +41,11 @@ class Bootstrap
   private $controller = null;
   private $controllerError = 0;
 
+
   public function __construct($module, $moduleIsDynamic)
   {
-    #incPlugin('no_cache');
+    spl_autoload_register('my_spl_autoload');
+    $this->incPlugin('no_cache');
 
     array_push($module, 'empathy');
     array_push($moduleIsDynamic, 0);
