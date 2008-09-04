@@ -189,7 +189,7 @@ class Controller
 	  {
 	    $_SESSION[$ui][$setting] = $_GET[$setting];	    
 	  }
-	else
+	elseif(isset($_SESSION[$ui][$setting]))
 	  {
 	    $_GET[$setting] = $_SESSION[$ui][$setting];
 	  }
