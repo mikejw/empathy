@@ -51,9 +51,9 @@ abstract class  Entity
     //    $result = self::query($sql, $error);
     
     $result = $this->query($sql, $error);
-    $row = mysql_fetch_array($result);
-    if(mysql_num_rows() > 0)
+    if(mysql_num_rows($result) > 0)
       {
+	$row = mysql_fetch_array($result);
 	foreach($row as $index => $value)
 	  {
 	    $this->$index = $value;
