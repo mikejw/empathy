@@ -52,9 +52,12 @@ abstract class  Entity
     
     $result = $this->query($sql, $error);
     $row = mysql_fetch_array($result);
-    foreach($row as $index => $value)
+    if(mysql_num_rows() > 0)
       {
-	$this->$index = $value;
+	foreach($row as $index => $value)
+	  {
+	    $this->$index = $value;
+	  }
       }
   }
   
