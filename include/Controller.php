@@ -80,7 +80,7 @@ class Controller
 	
 	if($this->initError != 0)
 	  {
-	    $this->error($message);
+	    $this->error($message, 0);
 	  }
 
     
