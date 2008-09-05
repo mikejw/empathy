@@ -51,7 +51,7 @@ class EntityDBMS extends Entity
     }
     if(false == @mysql_select_db($database))
     {
-      $this->controller->error("Could not select database: ".mysql_error());
+      $this->controller->error("Could not select database: ".mysql_error(), 0);
     }
     $this->controller->connected = true;
   }
