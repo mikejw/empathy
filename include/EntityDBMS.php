@@ -47,7 +47,7 @@ class EntityDBMS extends Entity
 
     if(false == @mysql_connect($server,$mysqlUser,$mysqlPass))
     {
-      $this->controller->error("Could not connect to database server: ".mysql_error());
+      $this->controller->error("Could not connect to database server: ".mysql_error(), 0);
     }
     if(false == @mysql_select_db($database))
     {
