@@ -68,7 +68,7 @@ class EntityDBMS extends Entity
 	$result = @mysql_query($sql);
 	if($result == false)
 	  {
-	    $this->controller->error("[$sql]<br /><strong>MySQL</strong>: ($error): ".mysql_error());
+	    $this->controller->error("[$sql]<br /><strong>MySQL</strong>: ($error): ".mysql_error(), 0);
 	  }
 	else
 	  {
