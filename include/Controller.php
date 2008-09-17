@@ -102,7 +102,7 @@ class Controller
   {
     if(!$this->presenter->templateExists($this->templateFile))
       {
-	$this->error('Missing template file: '.$this->templateFile);
+	$this->error('Missing template file: '.$this->templateFile, 0);
       }
     else
       {	
