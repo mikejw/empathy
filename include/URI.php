@@ -34,7 +34,6 @@ class URI
   public $controllerPath = '';
   public $controllerName = '';
 
-
   public function __construct($module, $moduleIsDynamic)
   {
     $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
@@ -49,12 +48,8 @@ class URI
 
     if($this->error == 1)
       {
-	$this->dynamicSection();
-	$this->printRouting();
-	//exit();
-	$this->error = 0;
+	$this->dynamicSection();	
       }
-
     $this->setController();    
     $this->assertEventIsSet();
   }
@@ -63,7 +58,7 @@ class URI
   {
     echo $_GET['module'].'<br />';
     echo $_GET['class'].'<br />';
-    echo $_GET['event'].'<br />';   
+    echo $_GET['event'].'<br /><br />';   
     echo $this->controllerPath.'<br />';
     echo $this->controllerName.'<br />';
     echo $this->error;
@@ -218,26 +213,21 @@ class URI
 	    $this->error = MISSING_CLASS;
 	  }
       }
-    
+ 
     if(!$this->error)
       {
-	@require($this->controllerPath);
-	if(!class_exists($_GET['class']))
+	require($this->controllerPath);		
+	if(!class_exists($this->controllerName))
 	  {
-	    $this->error = MISSING_CLASS;
+	    $this->error = MISSING_CLASS_DEF;
 	  }
       }	  
-
-    if(!$this->error && !class_exists($this->controllerName))
-      {
-	$this->error = MISSING_CLASS_DEF; 
-      }
 
     if($this->error)
       {
 	$this->controllerPath = 'empathy/include/CustomController.php';
 	$this->controllerName = 'CustomController';
-      }
+      }   
   }
 
   public function assertEventIsSet()
@@ -246,40 +236,6 @@ class URI
       {
 	$_GET['event'] = 'default_event';
       }       
-  }
-
-
-
-
-
-
-
-  public function dynamicModule()
-  {
-    $moduleIndex = 0;
-
-    if((!(isset($_GET['module']))) || (!(in_array($_GET['module'], $this->module))))
-      {
-	$_GET['module'] = $this->module[$moduleIndex];
-      }
-    else
-      {
-	$i = 0;
-	while($_GET['module'] != $this->module[$i])
-	  {
-	    $i++;
-	  }
-	$moduleIndex = $i;
-      }
-
-    if($this->moduleIsDynamic[$moduleIndex])
-      {
-	$c = new Controller();
-	$section = new SectionItem($c);
-	$section->module = $_GET['module'];
-	$this->controllerName = $this->dynamicSection($section, $uri);
-	$this->controllerPath = DOC_ROOT."/application/default/$controllerName.php";
-      } 
   }
 
   private function dynamicSection()
@@ -368,9 +324,8 @@ class URI
 	  }   
       }
     
-    $this->controllerName = $controllerName;
-    $this->controllerPath = DOC_ROOT."/application/default/$controllerName.php";
-
+    $_GET['class'] = $controllerName;
+    $this->error = 0;
   }
 
 
