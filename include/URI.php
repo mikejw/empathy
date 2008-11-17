@@ -46,10 +46,17 @@ class URI
     $this->error = 0;
 
     $this->processRequest();
+
+    if($this->error == 1)
+      {
+	$this->dynamicSection();
+	$this->printRouting();
+	//exit();
+	$this->error = 0;
+      }
+
     $this->setController();    
     $this->assertEventIsSet();
-
-    // $this->printRouting();
   }
 
   public function printRouting()
@@ -60,7 +67,6 @@ class URI
     echo $this->controllerPath.'<br />';
     echo $this->controllerName.'<br />';
     echo $this->error;
-    exit();
   }
 
   public function processRequest()
@@ -276,19 +282,22 @@ class URI
       } 
   }
 
-
-  private function dynamicSection($section, $uri)
+  private function dynamicSection()
   {
     // code to assert correct section path - else throw 404
-    
-    if(sizeof($uri) > 0)
+   
+    $section = new SectionItemStandAlone();
+    $section->module = $_GET['module']; // assuming dynamic module is always defualt
+                                        // and already set
+  
+    if(sizeof($this->uri) > 0)
       {
-	$section_index = (sizeof($uri) - 1);
-	if(is_numeric($uri[$section_index]))
+	$section_index = (sizeof($this->uri) - 1);
+	if(is_numeric($this->uri[$section_index]))
 	  {
-	    $_GET['id'] = $uri[$section_index--];
+	    $_GET['id'] = $this->uri[$section_index--];
 	  }
-	$section_uri = $uri[$section_index];		       
+	$section_uri = $this->uri[$section_index];		       
       }
     
     if(!(isset($section_uri)))
@@ -297,6 +306,7 @@ class URI
       }  
     
     $rows = $section->getURIData();
+   
     for($i = 0; $i < sizeof($rows); $i++)
       {
 	if($rows[$i]['friendly_url'] != NULL)
@@ -357,7 +367,10 @@ class URI
 	    $controllerName = "layout".$section->layout;
 	  }   
       }
-    return $controllerName;
+    
+    $this->controllerName = $controllerName;
+    $this->controllerPath = DOC_ROOT."/application/default/$controllerName.php";
+
   }
 
 
