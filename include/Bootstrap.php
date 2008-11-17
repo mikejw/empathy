@@ -53,11 +53,6 @@ class Bootstrap
     
     $u = new URI($module, $moduleIsDynamic);
 
-    $u->doStuff();
-    //print_r($u);
-    //$u->printRoute();
-
-
     $this->controller = new $u->controllerName($u->error, $u->internal, 0);
     $this->controller->$_GET['event']();
     
@@ -70,7 +65,5 @@ class Bootstrap
   {
     require('empathy/include/plugin/empathy.'.$name.'.php');
   }
-  
-
 }
 ?>

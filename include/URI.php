@@ -32,7 +32,7 @@ class URI
   public $error;
   public $internal = false;
   public $controllerPath = '';
-  public $controllerName;
+  public $controllerName = '';
 
 
   public function __construct($module, $moduleIsDynamic)
@@ -44,31 +44,18 @@ class URI
     $this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     $this->uriString = substr($this->full, $removeLength + 1);
     $this->error = 0;
+
+    $this->processRequest();
+    $this->setController();    
+    $this->assertEventIsSet();
   }
 
   public function printRoute()
   {
-//    echo $_GET['module'].'<br />';
-    //   echo $_GET['class'].'<br />';
-    //  echo $_GET['event'].'<br />';
-    
-    echo $this->controllerName.'<br />';
-    // echo $this->error;
+    echo $_GET['module'].'<br />';
+    echo $_GET['class'].'<br />';
+    echo $_GET['event'].'<br />';   
     exit();
-  }
-
-  public function doStuff()
-  {
-    $this->processRequest();
-
-    $this->assertClassIsSet();
-
-    $this->doOtherStuff();
-
-    //$this->printRoute();
-
-    $this->assertEventIsSet();
-  
   }
 
   public function processRequest()
@@ -118,7 +105,6 @@ class URI
     return $vars;
   }
 
-
   public function analyzeURI()
   {    
     $modIndex = 0;
@@ -165,22 +151,7 @@ class URI
 	
 	if(!isset($_GET['class']))
 	  {	    
-	    /*
-	    $class_error = $this->invalidClass($current);
-	    
-	    if($class_error)
-	      {
-		$this->error = $class_error;
-		$_GET['class'] = $_GET['module'];	  
-	      }
-	    else
-	      {
-		$_GET['class'] = $current;
-	      }
-	    */
-
 	    $_GET['class'] = $current;
-
 	    $i++;
 	    continue;
 	  }
@@ -192,58 +163,81 @@ class URI
 	$i++;
       }
   }        
-
-  public function doOtherStuff()
+   
+  private function setModule($module)
   {
-    $this->error = $this->invalidClass();
-    
+    $_GET['module'] = $module;
+    if($_GET['module'] == 'empathy')
+      {
+	$this->internal = true;
+      }
+  }
+  
+  public function setControllerPath()
+  {
+    if(!$this->internal)
+      {
+	$this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
+      }
+    else
+      {
+	$pathToEmp = explode('empathy', __FILE__);	
+	$this->controllerPath = $pathToEmp[0].'empathy/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
+      }
+  }
 
-    /*
+  private function setController()
+  {      
+    if(!(isset($_GET['class'])))
+      {
+	$_GET['class'] = $_GET['module'];
+      }
+
     $this->controllerName = $_GET['class'];
-    if(!class_exists($this->controllerName))
-      {       
-	if(!$this->internal)
+    $this->setControllerPath();
+   
+    if(!is_file($this->controllerPath))
+      {
+	$_GET['event'] = $_GET['class'];
+	$_GET['class'] = $_GET['module'];
+	$this->controllerName = $_GET['module'];
+	$this->setControllerPath();
+	if(!is_file($this->controllerPath))
 	  {
-	    $this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$this->controllerName.'.php';
-	  }
-	else
-	  {
-	    $this->controllerPath = 'empathy/application/'.$_GET['module'].'/'.$this->controllerName.'.php';
-	  }       
-
-	$inc = @require($this->controllerPath); // attempt to include controller   
-	
-	if($inc != 1) // try again supposing the module has not been specified in the url
-	  {	   
-	    $_GET['event'] = $_GET['class'];
-	    $_GET['class'] = $_GET['module'];
-	    $this->controllerName = $_GET['module'];	
-	    if(!$u->internal)
-	      {
-		$this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/$controllerName.php';
-	      }
-	    else
-	      {
-		$this->controllerPath = 'empathy/application/'.$_GET['module'].'/$controllerName.php';
-	      }
-	    $inc2 = @require($this->controllerPath);
-	    if($inc == 1 || $inc2 == 1)
-	      {
-		$this->error = MISSING_CLASS;
-	      }
+	    $this->error = MISSING_CLASS;
 	  }
       }
-           
-    if(!class_exists($this->controllerName) && $this->error == 0)
+    
+    if(!$this->error)
+      {
+	@require($this->controllerPath);
+	if(!class_exists($_GET['class']))
+	  {
+	    $this->error = MISSING_CLASS;
+	  }
+      }	  
+
+    if(!$this->error && !class_exists($this->controllerName))
       {
 	$this->error = MISSING_CLASS_DEF; 
 	$this->controllerPath = 'empathy/include/CustomController.php';
 	$this->controllerName = 'CustomController';
       }
-    */
+  }
 
-    }
-    
+  public function assertEventIsSet()
+  {
+    if(!(isset($_GET['event'])))
+      {
+	$_GET['event'] = 'default_event';
+      }       
+  }
+
+
+
+
+
+
 
   public function dynamicModule()
   {
@@ -272,7 +266,6 @@ class URI
 	$this->controllerPath = DOC_ROOT."/application/default/$controllerName.php";
       } 
   }
-
 
 
   private function dynamicSection($section, $uri)
@@ -357,83 +350,7 @@ class URI
       }
     return $controllerName;
   }
-  
-  
-  private function setModule($module)
-  {
-    $_GET['module'] = $module;
-    if($_GET['module'] == 'empathy')
-      {
-	$this->internal = true;
-      }
-  }
-  
-  public function getClassPath()
-  {
-    if(!$this->internal)
-      {
-	$this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
-      }
-    else
-      {
-	$pathToEmp = explode('empathy', __FILE__);	
-	$this->controllerPath = $pathToEmp[0].'empathy/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
-      }
-  }
 
-  private function invalidClass()
-  {
-    $class_error = 0;
-
-    $this->controllerName = $_GET['class'];
-    $this->getClassPath();
-   
-    if(!is_file($this->controllerPath))
-      {
-	$_GET['event'] = $_GET['class'];
-	$_GET['class'] = $_GET['module'];
-	$this->controllerName = $_GET['module'];
-	$this->getClassPath();
-	if(!is_file($this->controllerPath))
-	  {
-	    $class_error = MISSING_CLASS;
-	  }
-      }
-    
-    if(!$class_error)
-      {
-	@require($this->controllerPath);
-	if(!class_exists($_GET['class']))
-	  {
-	    $class_error = MISSING_CLASS;
-	  }
-      }	  
-
-    if(!$class_error && !class_exists($this->controllerName))
-      {
-	$class_error = MISSING_CLASS_DEF; 
-	$this->controllerPath = 'empathy/include/CustomController.php';
-	$this->controllerName = 'CustomController';
-      }
-    
-    return $class_error;
-  }
-
-  public function assertClassIsSet()
-  {
-    if(!(isset($_GET['class'])))
-      {
-	$_GET['class'] = $_GET['module'];
-      }
-  }
-
-  public function assertEventIsSet()
-  {
-    if(!(isset($_GET['event'])))
-      {
-	$_GET['event'] = 'default_event';
-      }       
-  }
 
 }
 ?>
