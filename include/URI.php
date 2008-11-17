@@ -48,13 +48,18 @@ class URI
     $this->processRequest();
     $this->setController();    
     $this->assertEventIsSet();
+
+    // $this->printRouting();
   }
 
-  public function printRoute()
+  public function printRouting()
   {
     echo $_GET['module'].'<br />';
     echo $_GET['class'].'<br />';
     echo $_GET['event'].'<br />';   
+    echo $this->controllerPath.'<br />';
+    echo $this->controllerName.'<br />';
+    echo $this->error;
     exit();
   }
 
@@ -142,7 +147,7 @@ class URI
 	    if($modIndex == sizeof($this->module))
 	      {
 		$modIndex = DEF_MOD;
-		//$this->error = MISSING_CLASS;
+		$this->error = MISSING_CLASS;
 	      }
 	    $this->setModule($this->module[$modIndex]);
 	    $i++;
@@ -220,6 +225,10 @@ class URI
     if(!$this->error && !class_exists($this->controllerName))
       {
 	$this->error = MISSING_CLASS_DEF; 
+      }
+
+    if($this->error)
+      {
 	$this->controllerPath = 'empathy/include/CustomController.php';
 	$this->controllerName = 'CustomController';
       }
