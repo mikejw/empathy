@@ -32,7 +32,7 @@ class URI
   public $error;
   public $internal = false;
   public $controllerPath = '';
-  public $controllerName = '';
+  public $controllerName;
 
 
   public function __construct($module, $moduleIsDynamic)
@@ -48,22 +48,27 @@ class URI
 
   public function printRoute()
   {
-    echo $_GET['module'].'<br />';
-    echo $_GET['class'].'<br />';
-    echo $_GET['event'].'<br />';
-    echo $this->error;
+//    echo $_GET['module'].'<br />';
+    //   echo $_GET['class'].'<br />';
+    //  echo $_GET['event'].'<br />';
+    
+    echo $this->controllerName.'<br />';
+    // echo $this->error;
     exit();
   }
 
   public function doStuff()
-  {   
+  {
     $this->processRequest();
 
     $this->assertClassIsSet();
 
     $this->doOtherStuff();
 
+    //$this->printRoute();
+
     $this->assertEventIsSet();
+  
   }
 
   public function processRequest()
@@ -159,8 +164,10 @@ class URI
 	  }
 	
 	if(!isset($_GET['class']))
-	  {
+	  {	    
+	    /*
 	    $class_error = $this->invalidClass($current);
+	    
 	    if($class_error)
 	      {
 		$this->error = $class_error;
@@ -170,6 +177,10 @@ class URI
 	      {
 		$_GET['class'] = $current;
 	      }
+	    */
+
+	    $_GET['class'] = $current;
+
 	    $i++;
 	    continue;
 	  }
@@ -184,6 +195,10 @@ class URI
 
   public function doOtherStuff()
   {
+    $this->error = $this->invalidClass();
+    
+
+    /*
     $this->controllerName = $_GET['class'];
     if(!class_exists($this->controllerName))
       {       
@@ -225,6 +240,8 @@ class URI
 	$this->controllerPath = 'empathy/include/CustomController.php';
 	$this->controllerName = 'CustomController';
       }
+    */
+
     }
     
 
@@ -351,32 +368,54 @@ class URI
       }
   }
   
-
-  private function invalidClass($class)
+  public function getClassPath()
   {
-    $class_error = 0;
     if(!$this->internal)
       {
-	$classPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$class.'.php';
+	$this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
       }
     else
       {
 	$pathToEmp = explode('empathy', __FILE__);	
-	$classPath = $pathToEmp[0].'empathy/application/'.$_GET['module'].'/'.$class.'.php';
+	$this->controllerPath = $pathToEmp[0].'empathy/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
       }
+  }
+
+  private function invalidClass()
+  {
+    $class_error = 0;
+
+    $this->controllerName = $_GET['class'];
+    $this->getClassPath();
    
-    if(!is_file($classPath))
+    if(!is_file($this->controllerPath))
       {
-	$class_error = MISSING_CLASS;
-      }
-    else
-      {
-	require($classPath);
-	if(!class_exists($class))
+	$_GET['event'] = $_GET['class'];
+	$_GET['class'] = $_GET['module'];
+	$this->controllerName = $_GET['module'];
+	$this->getClassPath();
+	if(!is_file($this->controllerPath))
 	  {
-	    $class_error = MISSING_CLASS_DEF;
+	    $class_error = MISSING_CLASS;
 	  }
-      }  
+      }
+    
+    if(!$class_error)
+      {
+	@require($this->controllerPath);
+	if(!class_exists($_GET['class']))
+	  {
+	    $class_error = MISSING_CLASS;
+	  }
+      }	  
+
+    if(!$class_error && !class_exists($this->controllerName))
+      {
+	$class_error = MISSING_CLASS_DEF; 
+	$this->controllerPath = 'empathy/include/CustomController.php';
+	$this->controllerName = 'CustomController';
+      }
+    
     return $class_error;
   }
 
