@@ -296,6 +296,8 @@ class URI
 	$section->layout = REGULAR_LAYOUT;
       }
     
+    $_GET['section_uri'] = $section->url_name;
+
     if($section->layout == "")
       {
 	$end_uri = $section->buildURL($section->getFirstChild($section->id));

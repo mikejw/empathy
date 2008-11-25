@@ -94,6 +94,11 @@ class Controller
 	$this->presenter->assign('class', $this->class);
 	$this->presenter->assign('event', $_GET['event']);
 	$this->presenter->assign('TITLE', TITLE);	
+
+	if(isset($_GET['section_uri']))
+	  {
+	    $this->presenter->assign('section', $_GET['section_uri']);
+	  }
       }
   }
 
