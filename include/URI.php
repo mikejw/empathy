@@ -39,7 +39,7 @@ class URI
     $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
 
     $this->module = $module;
-    $this->moduleIsDynamic;
+    $this->moduleIsDynamic = $moduleIsDynamic;
     $this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     $this->uriString = substr($this->full, $removeLength + 1);
     $this->error = 0;
@@ -243,9 +243,16 @@ class URI
     // code to assert correct section path - else throw 404
    
     $section = new SectionItemStandAlone();
-    $section->module = $_GET['module']; // assuming dynamic module is always defualt
-                                        // and already set
-  
+
+    // find dynamic module
+    // needs error handling when dynamic module does not exist or is not set
+    $i = 0;
+    while($this->moduleIsDynamic[$i] == 0 && $i < sizeof($this->moduleIsDynamic))
+      {
+	$i++;
+      }    
+    $_GET['module'] = $this->module[$i];
+
     if(sizeof($this->uri) > 0)
       {
 	$section_index = (sizeof($this->uri) - 1);
