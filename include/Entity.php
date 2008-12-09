@@ -90,8 +90,8 @@ abstract class  Entity
   public function save($table, $format, $sanitize)
   {
     $table = $this->appendPrefix($table);
-    $this->toXHTML($format);
-    $this->stripMSWordChars();
+    $this->toXHTMLChris($format);
+    //$this->stripMSWordChars();
     if($sanitize == 1)
       {
 	$this->sanitize();
@@ -296,6 +296,35 @@ abstract class  Entity
     return $option;
   }
  
+
+  public function toXHTMLChris($formatting)
+  {
+    $markup = '';
+    $vars = array_keys(get_class_vars(get_class($this)));
+    foreach($vars as $property)
+      {
+	if(!is_numeric($property) && in_array($property, $formatting))	    
+	  {	     	    
+	    $markup = $this->$property;
+	    $markup = str_replace("\r", "\n", $markup);
+	    $markup = preg_replace("!\n\n+!", "\n", $markup);
+	    
+	    $markup = htmlentities($markup, ENT_QUOTES, 'UTF-8');
+
+	    $markup = preg_replace('!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m',
+				   '<a href="$1" title="$2">$3</a>', $markup);
+	    
+	    $lines = explode("\n", $markup);
+	    foreach($lines as $key => $line)
+	      {
+		$lines[$key] = "<p>{$line}</p>";
+	      }
+	    $markup = implode("\n", $lines);	   
+	    $this->$property = $markup;
+	  }
+      }
+  }
+  
 
   public function toXHTML($formatting)
   {
