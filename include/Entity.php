@@ -49,7 +49,7 @@ abstract class  Entity
     $sql = "SELECT * FROM $table WHERE id = $this->id";
     $error = "Could not load record from $table.";
     //    $result = self::query($sql, $error);
-    
+ 
     $result = $this->query($sql, $error);
     if(mysql_num_rows($result) > 0)
       {
@@ -133,8 +133,8 @@ abstract class  Entity
   public function insert($table, $id, $format, $sanitize)
   {
     $table = $this->appendPrefix($table);
-    $this->toXHTML($format);
-    $this->stripMSWordChars();
+    $this->toXHTMLChris($format);
+    //$this->stripMSWordChars();
     if($sanitize == 1)
       {
 	$this->sanitize();
@@ -263,6 +263,26 @@ abstract class  Entity
       }
     return $all;    
   }
+
+  public function getAllCustomPaginateSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page)
+  {   
+    //$table = $this->addTablePrefix($table);
+    $all = array();
+    $start = ($page - 1) * $per_page;
+    $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2 '.$sql_string.' LIMIT '.$start.', '.$per_page;
+    $error = 'Could not get rows from '.$table1;
+
+    $result = $this->query($sql, $error);
+    $i = 0;
+    while($row = mysql_fetch_array($result))
+      {
+	$all[$i] = $row;
+	$i++;
+      }
+    return $all;    
+  }
+
+
 
 
   public function assignFromPost($ignore)
