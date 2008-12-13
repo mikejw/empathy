@@ -15,9 +15,8 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
+require('empathy/include/Controller.php');
 require(DOC_ROOT.'/application/CustomController.php');
-require('empathy/include/SmartyPresenter.php');    
-require('empathy/include/URI.php');
 
 function my_spl_autoload($class)
 {

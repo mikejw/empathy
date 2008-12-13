@@ -15,8 +15,6 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
-require("empathy/include/Entity.php");
-
 class EntityDBMS extends Entity
 {
   protected $sql;

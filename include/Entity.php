@@ -17,22 +17,18 @@
 
 abstract class  Entity
 {
+  public $val;
   protected $controller;
   
-  /* dodgey code */
+  abstract public function dbConnect();
+  abstract public function query($sql, $error);
   
-  private $table = "";
-  
-  public static function appendPrefix($table)
-  {
-    return TBL_PREFIX.$table;
-  }
-  /* end dodgey code */
-  
-  
+
   public function __construct(&$controller)
   // needs optimisation!?
   {
+    $this->val = new Validate();
+    
     $this->controller = $controller;
     if($this->controller->connected == false)
       {
@@ -40,9 +36,17 @@ abstract class  Entity
       }
   }  
   
-  abstract public function dbConnect();
-  abstract public function query($sql, $error);
+
+  /* dodgy code */
+  private $table = "";
   
+  public static function appendPrefix($table)
+  {
+    return TBL_PREFIX.$table;
+  }
+  /* end dodgy code */
+
+
   public function load($table)
   {
     $table = $this->appendPrefix($table);
@@ -106,7 +110,7 @@ abstract class  Entity
     $i = 0;
     foreach($vars as $property)
       {
-	if($property != "id" && $property != "table")
+	if($property != 'id' && $property != 'table' && $property != 'val')
 	  {
 	    $sql .= "$property = ";
 	    if(is_numeric($this->$property))
@@ -118,7 +122,7 @@ abstract class  Entity
 		$sql .= "'".$this->$property."'";
 	      }
 	    
-	    if(($i+2) != sizeof($vars))
+	    if(($i+3) != sizeof($vars))
 	      {
 		$sql .= ", ";
 	      }
@@ -155,7 +159,7 @@ abstract class  Entity
     
     foreach($vars as $property)
       {
-	if($property != "id" && $property != "table")
+	if($property != 'id' && $property != 'table' && $property != 'val')
 	  {
 	    if(is_numeric($this->$property))
 	      {
@@ -166,7 +170,7 @@ abstract class  Entity
 		$sql .= "'".$this->$property."'";
 	      }
 	    
-	    if(($i+2) != sizeof($vars))
+	    if(($i+3) != sizeof($vars))
 	      {
 		$sql .= ", ";
 	      }
@@ -174,6 +178,7 @@ abstract class  Entity
 	$i++;
       }
     $sql .= ")";
+    
     $error = "Could not insert to table '$table'";
     $this->query($sql, $error);
     return mysql_insert_id();
@@ -290,7 +295,7 @@ abstract class  Entity
     $vars = array_keys(get_class_vars(get_class($this)));   
     foreach($vars as $property)
       {
-	if($property != 'id' && $property != 'table'
+	if($property != 'id' && $property != 'table' && $property != 'val'
 	   && !in_array($property, $ignore))
 	  {
 	    $this->$property = $_POST[$property];	  
