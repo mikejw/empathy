@@ -18,6 +18,9 @@
 abstract class  Entity
 {
   public $val;
+  private $globally_ignored_property = array('id', 'table', 'val', 'sql', 'error', 'result',
+					   'rows', 'controller');
+
   protected $controller;
   
   abstract public function dbConnect();
@@ -110,19 +113,19 @@ abstract class  Entity
     $i = 0;
     foreach($vars as $property)
       {
-	if($property != 'id' && $property != 'table' && $property != 'val')
+	if(!in_array($property, $this->globally_ignored_property))
 	  {
 	    $sql .= "$property = ";
 	    if(is_numeric($this->$property))
 	      {
 		$sql .= $this->$property;
 	      }
-	    else
+	    elseif(is_string($this->$property))
 	      {
 		$sql .= "'".$this->$property."'";
 	      }
 	    
-	    if(($i+3) != sizeof($vars))
+	    if(($i + sizeof($this->globally_ignored_property)) != sizeof($vars))
 	      {
 		$sql .= ", ";
 	      }
@@ -159,18 +162,18 @@ abstract class  Entity
     
     foreach($vars as $property)
       {
-	if($property != 'id' && $property != 'table' && $property != 'val')
-	  {
+	if(!in_array($property, $this->globally_ignored_property))
+	  {	    
 	    if(is_numeric($this->$property))
 	      {
 		$sql .= $this->$property;
 	      }
-	    else
+	    elseif(is_string($this->$property))
 	      {
 		$sql .= "'".$this->$property."'";
 	      }
 	    
-	    if(($i+3) != sizeof($vars))
+	    if(($i + sizeof($this->globally_ignored_property)) != sizeof($vars))
 	      {
 		$sql .= ", ";
 	      }
@@ -178,7 +181,7 @@ abstract class  Entity
 	$i++;
       }
     $sql .= ")";
-    
+   
     $error = "Could not insert to table '$table'";
     $this->query($sql, $error);
     return mysql_insert_id();
@@ -289,13 +292,12 @@ abstract class  Entity
 
 
 
-
   public function assignFromPost($ignore)
   {
     $vars = array_keys(get_class_vars(get_class($this)));   
     foreach($vars as $property)
       {
-	if($property != 'id' && $property != 'table' && $property != 'val'
+	if(!in_array($property, $this->globally_ignored_property)
 	   && !in_array($property, $ignore))
 	  {
 	    $this->$property = $_POST[$property];	  
