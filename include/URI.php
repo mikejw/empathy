@@ -148,7 +148,9 @@ class URI
 	    if($modIndex == sizeof($this->module))
 	      {
 		$modIndex = DEF_MOD;
-		$this->error = MISSING_CLASS;
+		$_GET['class'] = $current;
+
+		//$this->error = MISSING_CLASS;
 	      }
 	    $this->setModule($this->module[$modIndex]);
 	    $i++;
@@ -247,9 +249,13 @@ class URI
     // find dynamic module
     // needs error handling when dynamic module does not exist or is not set
     $i = 0;
-    while($this->moduleIsDynamic[$i] == 0 && $i < sizeof($this->moduleIsDynamic))
+    while($this->moduleIsDynamic[$i] == 0)
       {
 	$i++;
+	if($i < sizeof($this->moduleIsDynamic) - 1)
+	  {
+	    die("Regerence to a dynamic module was searched for but not found.");
+	  }
       }    
     $_GET['module'] = $this->module[$i];
 
