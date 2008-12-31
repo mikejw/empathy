@@ -22,7 +22,7 @@ class Controller
   protected $event;
   protected $templateFile;
   protected $title;
-  protected $presenter;
+  public $presenter;
   public $connected;
   private $initError;
   private $internal;

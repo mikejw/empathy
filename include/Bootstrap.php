@@ -54,9 +54,11 @@ class Bootstrap
 
     $this->controller = new $u->controllerName($u->error, $u->internal, 0);
     $this->controller->$_GET['event']();
-    
-    //$presenter->smarty->load_filter('output', 'png_image');
 
+    if(PNG_OUTPUT == 1)
+    {
+      $this->controller->presenter->smarty->load_filter('output', 'png_image');
+    }
     $this->controller->initDisplay();
   } 
 
