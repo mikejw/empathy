@@ -78,10 +78,15 @@ class URI
     else
       {
 	$this->formURI();
+	// detectVars is now obsolete
+	// will attempt to find correct route when args are present
+	/*
 	if(!$this->detectVars())
 	  {
 	    $this->analyzeURI();
-	  }
+	  }	
+	*/
+	$this->analyzeURI();
       }
   }
 
@@ -124,10 +129,16 @@ class URI
       {
 	$length = MAX_COMP;
       }
-	 
+	        
     while($i < $length)
-      { 
+      {        
 	$current = $this->uri[$i];
+
+	if(preg_match('/\?/', $current))
+	  {
+	    $start_args = strpos($current, '?');
+	    $current = substr($current, 0, $start_args);	    
+	  }
 	
 	if(!isset($_GET['id']) && is_numeric($current))
 	  {
