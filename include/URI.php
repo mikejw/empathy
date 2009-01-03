@@ -138,6 +138,11 @@ class URI
 	  {
 	    $start_args = strpos($current, '?');
 	    $current = substr($current, 0, $start_args);	    
+	    if($current == '')
+              {
+		$i++;
+                continue;
+              }
 	  }
 	
 	if(!isset($_GET['id']) && is_numeric($current))
