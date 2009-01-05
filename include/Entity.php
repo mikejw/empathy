@@ -247,6 +247,34 @@ abstract class  Entity
   }
 
 
+
+  public function getPaginatePagesSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page)
+  {
+    $nav = array();
+    $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2'.$sql_string;
+    $error = 'Could not get rows from '.$table1;
+    $result = $this->query($sql, $error);   
+    $rows = mysql_num_rows($result);
+    $p_rows = $rows;
+    $pages = ceil($rows / $per_page);
+    $i = 1;
+    while($i <= $pages)
+      {
+	if($i == $page)
+	  {
+	    $nav[$i] = 1;
+	  }
+	else
+	  {
+	    $nav[$i] = 0;
+	  }
+	$i++;
+      }
+    return $nav;
+  }
+
+
+
   public function addTablePrefix($table)
   {
     return TBL_PREFIX.$table;
