@@ -120,7 +120,7 @@ abstract class  Entity
 	      {
 		$sql .= $this->$property;
 	      }
-	    elseif(is_string($this->$property))
+	    else
 	      {
 		$sql .= "'".$this->$property."'";
 	      }
@@ -168,7 +168,7 @@ abstract class  Entity
 	      {
 		$sql .= $this->$property;
 	      }
-	    elseif(is_string($this->$property))
+	    else
 	      {
 		$sql .= "'".$this->$property."'";
 	      }
