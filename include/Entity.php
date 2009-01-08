@@ -368,6 +368,10 @@ abstract class  Entity
 
 	    $markup = preg_replace('!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m',
 				   '<a href="$1" title="$2">$3</a>', $markup);
+	  	    
+	    $markup = preg_replace('!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m', '<img src="$1" id="$2" alt="$3" />', $markup);
+	    $markup = preg_replace('/ +id=""/', '', $markup);
+
 	    
 	    $lines = explode("\n", $markup);
 	    foreach($lines as $key => $line)
