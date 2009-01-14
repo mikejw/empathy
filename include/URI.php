@@ -45,23 +45,19 @@ class URI
     $this->error = 0;
 
     $this->processRequest();
-
-    if($this->error == 1)
-      {
-	$this->dynamicSection();	
-      }
     $this->setController();    
     $this->assertEventIsSet();
   }
 
   public function printRouting()
   {
-    echo $_GET['module'].'<br />';
-    echo $_GET['class'].'<br />';
-    echo $_GET['event'].'<br /><br />';   
-    echo $this->controllerPath.'<br />';
-    echo $this->controllerName.'<br />';
-    echo $this->error;
+    echo "<pre>\n";
+    echo "Module:\t\t\t".$_GET['module']."\n";
+    echo "Class:\t\t\t".$_GET['class']."\n";
+    echo "Event:\t\t\t".$_GET['event']."\n\n";   
+    echo "Controller Path:\t".$this->controllerPath."\n";
+    echo "Controller Name:\t".$this->controllerName."\n";
+    echo "Error:\t\t\t".$this->error."\n</pre>";
   }
 
   public function processRequest()
@@ -250,13 +246,13 @@ class URI
 
   public function assertEventIsSet()
   {
-    if(!(isset($_GET['event'])))
+    if(!(isset($_GET['event'])) || $_GET['event'] == '')
       {
 	$_GET['event'] = 'default_event';
       }       
   }
 
-  private function dynamicSection()
+  public function dynamicSection($specialised = array())
   {
     // code to assert correct section path - else throw 404
    
@@ -268,9 +264,9 @@ class URI
     while($this->moduleIsDynamic[$i] == 0)
       {
 	$i++;
-	if($i < sizeof($this->moduleIsDynamic) - 1)
+	if($i > sizeof($this->moduleIsDynamic) - 1)
 	  {
-	    die("Regerence to a dynamic module was searched for but not found.");
+	    die("Reference to a dynamic module was searched for but not found.");
 	  }
       }    
     $_GET['module'] = $this->module[$i];
@@ -342,9 +338,7 @@ class URI
 	exit();
       }
     else
-      {
-	$specialised = array();
-	
+      {	
 	if(in_array($section->id, $specialised))
 	  {
 	    $controllerName = "layout".$section->id;
@@ -357,6 +351,10 @@ class URI
     
     $_GET['class'] = $controllerName;
     $this->error = 0;
+
+    $_GET['event'] = 'default_event';
+
+    $this->setController();
   }
 
 

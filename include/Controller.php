@@ -50,7 +50,8 @@ class Controller
     if(!$secondary)
       {
 	$this->sessionUp($GLOBALS['sessionVar']);
-         
+
+	/*
 	if($this->initError == 0 && (!(method_exists($this, $_GET['event']))))
 	  {
 	    $this->initError = 3;
@@ -59,6 +60,7 @@ class Controller
 	  {
 	    $this->initError = 0;
 	  }
+	*/
 	
 	//    echo $this->initError;
 	
@@ -138,7 +140,7 @@ class Controller
   
   public function sessionUp($sessionVar)
   {    
-    session_start();
+    @session_start();
 
     for($i = 0; $i < sizeof($sessionVar); $i++)
     {

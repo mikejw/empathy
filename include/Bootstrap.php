@@ -39,7 +39,7 @@ class Bootstrap
 {
   private $controller = null;
 
-  public function __construct($module, $moduleIsDynamic)
+  public function __construct($module, $moduleIsDynamic, $specialised)
   {
     spl_autoload_register('my_spl_autoload');
 
@@ -52,14 +52,29 @@ class Bootstrap
     
     $u = new URI($module, $moduleIsDynamic);
 
-    $this->controller = new $u->controllerName($u->error, $u->internal, 0);
-    $this->controller->$_GET['event']();
+    
+    $test = new $u->controllerName(0, 0, 0);  
+    if(!method_exists($test, $_GET['event']))
+      {
+	$u->dynamicSection($specialised);
+      }
+    
 
+
+
+    // dispatch
+    
+    $this->controller = new $u->controllerName($u->error, $u->internal, 0); 
+    $this->controller->$_GET['event']();
+    
+   
     if(PNG_OUTPUT == 1)
-    {
-      $this->controller->presenter->smarty->load_filter('output', 'png_image');
-    }
+      {
+	$this->controller->presenter->smarty->load_filter('output', 'png_image');
+      }
     $this->controller->initDisplay();
+    
+
   } 
 
   private function incPlugin($name)
