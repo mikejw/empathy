@@ -168,6 +168,14 @@ abstract class  Entity
 	      {
 		$sql .= $this->$property;
 	      }
+	    elseif($this->$property == '')
+	      {
+		$sql .= 'NULL';
+	      }	    
+	    elseif($this->$property == 'DEFAULT')
+	      { 
+		$sql .= 'DEFAULT';
+	      }
 	    else
 	      {
 		$sql .= "'".$this->$property."'";
@@ -183,6 +191,7 @@ abstract class  Entity
     $sql .= ")";
    
     $error = "Could not insert to table '$table'";
+    //echo $sql;exit();
     $this->query($sql, $error);
     return mysql_insert_id();
   }
