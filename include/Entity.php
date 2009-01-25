@@ -115,19 +115,22 @@ abstract class  Entity
       {
 	if(!in_array($property, $this->globally_ignored_property))
 	  {
-	    $sql .= "$property = ";
-	    if(is_numeric($this->$property))
+	    if($this->$property != '')
 	      {
-		$sql .= $this->$property;
-	      }
-	    else
-	      {
-		$sql .= "'".$this->$property."'";
-	      }
-	    
-	    if(($i + sizeof($this->globally_ignored_property)) != sizeof($vars))
-	      {
-		$sql .= ", ";
+	 	$sql .= "$property = ";
+		if(is_numeric($this->$property))
+		  {
+		    $sql .= $this->$property;
+		  }
+		else
+		  {
+		    $sql .= "'".$this->$property."'";
+		  }
+		
+		if(($i + sizeof($this->globally_ignored_property)) != sizeof($vars))
+		  {
+		    $sql .= ", ";
+		  }
 	      }
 	  }
 	$i++;
