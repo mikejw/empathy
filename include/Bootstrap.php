@@ -22,7 +22,7 @@ function my_spl_autoload($class)
 {
   $i = 0;
   $load_error = 1;
-  $location = array(DOC_ROOT.'/storage', 'empathy/include');
+  $location = array(DOC_ROOT.'/storage', 'empathy/include', DOC_ROOT.'/application');
 
   while($i < sizeof($location) && $load_error == 1)
     {
