@@ -202,6 +202,16 @@ class Controller
 	  }
       }
   }
-    
+
+  public function isXMLHttpRequest()
+  {
+    $request = 0;
+    if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+       ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'))
+      {
+	$request = 1;
+      }
+    return $request;
+  }
 }
 ?>
