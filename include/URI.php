@@ -89,10 +89,22 @@ class URI
   public function formURI()
   {
     $uri = explode('/', $this->uriString);
+    $size = sizeof($uri) - 1; 
     // remove empty element caused by trailing slash
-    if($uri[(sizeof($uri) -1)] == '')
+    if($uri[$size] == '')
       {
 	array_pop($uri);
+	$size--;
+      }
+    // ignore any args
+    if(preg_match('/\?/', $uri[$size]))
+      {
+	$start_args = strpos($uri[$size], '?');
+	$uri[$size] = substr($uri[$size], 0, $start_args);	    
+	if($uri[$size] == '')
+	  {
+	    array_pop($uri);
+	  }      
       }
     $this->uri = $uri;
   }
@@ -129,17 +141,6 @@ class URI
     while($i < $length)
       {        
 	$current = $this->uri[$i];
-
-	if(preg_match('/\?/', $current))
-	  {
-	    $start_args = strpos($current, '?');
-	    $current = substr($current, 0, $start_args);	    
-	    if($current == '')
-              {
-		$i++;
-                continue;
-              }
-	  }
 	
 	if(!isset($_GET['id']) && is_numeric($current))
 	  {
