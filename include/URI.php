@@ -353,6 +353,7 @@ class URI
     $this->error = 0;
 
     $_GET['event'] = 'default_event';
+    $_GET['id'] = $section->id;
 
     $this->setController();
   }
