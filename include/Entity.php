@@ -492,5 +492,13 @@ abstract class  Entity
 	  }
       }
   }
+
+  public function delete($table)
+  {
+    $sql = 'DELETE FROM '.$table.' WHERE id = '.$this->id;
+    $error = 'Could not delete row.';
+    $this->query($sql, $error);
+  }
+
 }
 ?>
