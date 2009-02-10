@@ -86,7 +86,7 @@ abstract class  Entity
     $vars = array_keys(get_class_vars(get_class($this)));
     foreach($vars as $property)
       {
-	if(!(is_numeric($property)))
+	if(!in_array($property, $this->globally_ignored_property) && !is_numeric($property))
 	  {
 	    $this->$property = mysql_escape_string($this->$property);
 	  }
