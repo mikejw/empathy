@@ -137,6 +137,19 @@ class Controller
     header($location);
     exit();
   }
+
+  public function redirect_cgi($endString)
+  {
+    session_write_close();    
+    $location = 'Location: ';
+    $location .= 'http://'.CGI.'/';
+    if($endString != '')
+      {
+	$location .= $endString;
+      }
+    header($location);
+    exit();
+  }
   
   public function sessionUp($sessionVar)
   {    
