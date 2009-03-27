@@ -55,6 +55,11 @@ class SmartyPresenter extends Presenter
     $this->smarty->assign($name, $data);
   }
 
+  public function clear_assign($name)
+  {
+    $this->smarty->clear_assign($name);
+  }
+
   public function display($template)
   {
     $this->smarty->display($this->smarty->template_dir.'/'.$template);
