@@ -204,6 +204,7 @@ class Controller
     $this->presenter->assign('message', $message);
     $this->presenter->assign('code', $type);
     $this->presenter->display('http_error.tpl');
+    exit();
   }
 
 
