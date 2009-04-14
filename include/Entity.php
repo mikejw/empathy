@@ -52,6 +52,7 @@ abstract class  Entity
 
   public function load($table)
   {
+    $loaded = true;
     $table = $this->appendPrefix($table);
     $sql = "SELECT * FROM $table WHERE id = $this->id";
     $error = "Could not load record from $table.";
@@ -66,6 +67,11 @@ abstract class  Entity
 	    $this->$index = $value;
 	  }
       }
+    else
+      {
+	$loaded = false;
+      }
+    return $loaded;
   }
   
   public function sanitize()

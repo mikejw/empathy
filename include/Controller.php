@@ -184,6 +184,29 @@ class Controller
     $_SESSION['failed_uri'] = $uri;
   }
 
+
+  public function http_error($type)
+  {
+    $response = '';
+    $message = '';
+    switch($type)
+      {
+      case 400:
+	$response = 'HTTP/1.1 400 bad request';
+	$message = 'Bad request';
+	break;
+      case 404:
+	$response = 'HTTP/1.0 404 Not Found';
+	$message = 'Page does not exist';
+	break;	
+      }
+    header($response);
+    $this->presenter->assign('message', $message);
+    $this->presenter->assign('code', $type);
+    $this->presenter->display('http_error.tpl');
+  }
+
+
   public function error($message, $fourohfour)
   {
     if($fourohfour)
@@ -226,5 +249,22 @@ class Controller
       }
     return $request;
   }
+
+  public function initID($id, $def)
+  {
+    $valid = true;
+    if(!isset($_GET[$id]))
+      {
+	$_GET[$id] = $def;
+      }
+    elseif(!((string) $_GET[$id] === (string)(int) $_GET[$id]) || $_GET[$id] == 0)
+      {
+	$_GET[$id] = $def;
+	$valid = false;
+      }    
+    return $valid;
+  }
+
+
 }
 ?>

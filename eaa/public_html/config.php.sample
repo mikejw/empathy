@@ -27,4 +27,8 @@ $module = array('front');
 $moduleIsDynamic = array(0);
 
 $sessionVar = array('cookies', 'failed_uri');
+
+// misc
+define('PNG_OUTPUT', 0);
+define('SMARTY_DEBUGGING', false);
 ?>

@@ -24,7 +24,7 @@ class SmartyPresenter extends Presenter
   public function __construct($internal)
   {
     $this->smarty = new Smarty();
-    $this->smarty->debugging = false;
+    $this->smarty->debugging = SMARTY_DEBUGGING;
     if($internal)
       {
 	$pathToEmp = explode('empathy', __FILE__);
