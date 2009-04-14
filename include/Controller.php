@@ -209,7 +209,7 @@ class Controller
 
 
   public function error($message, $fourohfour)
-  {
+  {    
     if($fourohfour)
       {	
 	header('HTTP/1.0 404 Not Found');
@@ -251,7 +251,7 @@ class Controller
     return $request;
   }
 
-  public function initID($id, $def) // when $def is 0, valid is true when id is 0
+  public function initID($id, $def, $assertSet=false) // when $def is 0, valid is true when id is 0
   {
     $valid = true;
     $assign_def = false;
@@ -259,6 +259,10 @@ class Controller
     if(!isset($_GET[$id]))
       {
 	$assign_def = true;
+	if($assertSet)
+	  {
+	    $valid = false;
+	  }
       }
     elseif(!((string) $_GET[$id] === (string)(int) $_GET[$id]) || ($_GET[$id] == 0 && $def != 0)
 	   || $_GET[$id] < 0)
