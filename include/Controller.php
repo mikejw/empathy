@@ -251,18 +251,27 @@ class Controller
     return $request;
   }
 
-  public function initID($id, $def)
+  public function initID($id, $def) // when $def is 0, valid is true when id is 0
   {
     $valid = true;
+    $assign_def = false;
+
     if(!isset($_GET[$id]))
+      {
+	$assign_def = true;
+      }
+    elseif(!((string) $_GET[$id] === (string)(int) $_GET[$id]) || ($_GET[$id] == 0 && $def != 0)
+	   || $_GET[$id] < 0)
+      {
+	$assign_def = true;
+	$valid = false;
+      }
+
+    if($assign_def)
       {
 	$_GET[$id] = $def;
       }
-    elseif(!((string) $_GET[$id] === (string)(int) $_GET[$id]) || $_GET[$id] == 0)
-      {
-	$_GET[$id] = $def;
-	$valid = false;
-      }    
+
     return $valid;
   }
 
