@@ -15,9 +15,6 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
-require('empathy/include/Controller.php');
-require(DOC_ROOT.'/application/CustomController.php');
-
 function my_spl_autoload($class)
 {
   $i = 0;
