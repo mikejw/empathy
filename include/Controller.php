@@ -48,8 +48,9 @@ class Controller
       }
 
     if(!$secondary)
-      {
-	$this->sessionUp($GLOBALS['sessionVar']);
+      {	
+	$config = $GLOBALS['config'];
+	$this->sessionUp($config['session_var']);
 
 	/*
 	if($this->initError == 0 && (!(method_exists($this, $_GET['event']))))
@@ -280,5 +281,11 @@ class Controller
   }
 
 
+  public function execScript($script, $args)
+  {    
+    $exec = 'cd '.DOC_ROOT.'/scripts; ';
+    $exec .= PERL.' '.DOC_ROOT.'/scripts/'.$script.' '.implode(' ', $args);
+    exec($exec);
+  }
 }
 ?>
