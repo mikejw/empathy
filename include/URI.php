@@ -319,34 +319,25 @@ class URI
     
     if(isset($_GET['id']))
       {
-	$section->layout = REGULAR_LAYOUT;
+	$section->template = REGULAR_LAYOUT;
       }
     
     $_GET['section_uri'] = $section->url_name;
 
-    if($section->layout == "")
+    if($section->template == "")
       {
-	$end_uri = $section->buildURL($section->getFirstChild($section->id));
-	$j = (sizeof($end_uri) - 1);
-	$k = 0;
-	$full_url = "http://".WEB_ROOT."/";
-	while($j >= $k)
-	  {
-	    $full_url .= str_replace(" ", "", strtolower($end_uri[$j]))."/";
-	    $j--;    
-	  }
-	header("Location: $full_url");
-	exit();
+	echo 'no template.';
+	exit();	
       }
     else
       {	
 	if(in_array($section->id, $specialised))
 	  {
-	    $controllerName = "layout".$section->id;
+	    $controllerName = "template".$section->id;
 	  }
 	else
 	  {
-	    $controllerName = "layout".$section->layout;
+	    $controllerName = "template".$section->template;
 	  }   
       }
     
