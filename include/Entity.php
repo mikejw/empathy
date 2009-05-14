@@ -116,30 +116,35 @@ abstract class  Entity
 
     $sql = "UPDATE $table SET ";
     $vars = array_keys(get_class_vars(get_class($this)));
-    $i = 0;
+
+    $properties = array();
+    
     foreach($vars as $property)
       {
-	if(!in_array($property, $this->globally_ignored_property))
+	if(!in_array($property, $this->globally_ignored_property) && $this->$property != '')
 	  {
-	    if($this->$property != '')
-	      {
-	 	$sql .= "$property = ";
-		if(is_numeric($this->$property))
-		  {
-		    $sql .= $this->$property;
-		  }
-		else
-		  {
-		    $sql .= "'".$this->$property."'";
-		  }
-		
-		if(($i + sizeof($this->globally_ignored_property)) != sizeof($vars))
-		  {
-		    $sql .= ", ";
-		  }
-	      }
+	    array_push($properties, $property);
 	  }
-	$i++;
+      }
+
+    $i = 0;
+    foreach($properties as $property)
+      {
+	$sql .= "$property = ";
+	if(is_numeric($this->$property))
+	  {
+	    $sql .= $this->$property;
+	  }
+	else
+	  {
+	    $sql .= "'".$this->$property."'";
+	  }	
+       
+	if($i + 1 < sizeof($properties))
+	  {
+	    $sql .= ", ";
+	  }
+	$i++;	
       }
     $sql .= " WHERE id = $this->id";
     $error = "Could not update table '$table'";
