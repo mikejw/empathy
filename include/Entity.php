@@ -15,20 +15,16 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
-abstract class  Entity
+class  EntityNew
 {
-  public $val;
-  private $globally_ignored_property = array('id', 'table', 'val', 'sql', 'error', 'result',
-					   'rows', 'controller');
+  private $val;
+  private $controller;
+  private $rows;
+  private $result;
+  private $globally_ignored_property = array('id', 'table');
 
-  protected $controller;
-  
-  abstract public function dbConnect();
-  abstract public function query($sql, $error);
-  
 
   public function __construct(&$controller)
-  // needs optimisation!?
   {
     $this->val = new Validate();
     
@@ -39,24 +35,51 @@ abstract class  Entity
       }
   }  
   
-
-  /* dodgy code */
-  private $table = "";
-  
-  public static function appendPrefix($table)
+  public function dbConnect()
   {
-    return TBL_PREFIX.$table;
+    if(!(DBMS == "MYSQL"))
+    {
+      $this->controller->error("Empathy does not yet support other database management systems to MySQL.");
+    }
+    $server    = DB_SERVER;
+    $database  = DB_NAME;
+    $mysqlUser = DB_USER;
+    $mysqlPass = DB_PASS;
+
+    if(false == @mysql_connect($server,$mysqlUser,$mysqlPass))
+    {
+      $this->controller->error("Could not connect to database server: ".mysql_error(), 0);
+    }
+    if(false == @mysql_select_db($database))
+    {
+      $this->controller->error("Could not select database: ".mysql_error(), 0);
+    }
+    $this->controller->connected = true;
   }
-  /* end dodgy code */
+  
+  public function query($sql, $error)    
+  {
+    $result = NULL;
+    
+    $result = @mysql_query($sql);
+    if($result == false)
+      {
+	$this->controller->error("[$sql]<br /><strong>MySQL</strong>: ($error): ".mysql_error(), 0);
+      }
+    else
+      {
+	$this->result = $result;
+      }      
+    return $result;
+  }
 
-
+  
   public function load($table)
   {
     $loaded = true;
     $table = $this->appendPrefix($table);
     $sql = "SELECT * FROM $table WHERE id = $this->id";
     $error = "Could not load record from $table.";
-    //    $result = self::query($sql, $error);
  
     $result = $this->query($sql, $error);
     if(mysql_num_rows($result) > 0)
@@ -86,7 +109,6 @@ abstract class  Entity
       }
   }
 
-  
   public function sanitizeNoPost()
   {
     $vars = array_keys(get_class_vars(get_class($this)));
@@ -104,7 +126,6 @@ abstract class  Entity
   {
     $table = $this->appendPrefix($table);
     $this->toXHTMLChris($format);
-    //$this->stripMSWordChars();
     if($sanitize == 1)
       {
 	$this->sanitize();
@@ -155,7 +176,6 @@ abstract class  Entity
   {
     $table = $this->appendPrefix($table);
     $this->toXHTMLChris($format);
-    //$this->stripMSWordChars();
     if($sanitize == 1)
       {
 	$this->sanitize();
@@ -205,11 +225,21 @@ abstract class  Entity
     $sql .= ")";
    
     $error = "Could not insert to table '$table'";
-    //echo $sql;exit();
     $this->query($sql, $error);
     return mysql_insert_id();
   }
   
+  public function appendPrefix($table)
+  {
+    return TBL_PREFIX.$table;
+  }
+
+  public function getRows(&$result)
+  {
+    $this->rows = mysql_num_rows($result);   
+  }
+
+
   public function getAll($table)
   {
     $all = array();
@@ -325,7 +355,6 @@ abstract class  Entity
 
   public function getAllCustomPaginateSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page)
   {   
-    //$table = $this->addTablePrefix($table);
     $all = array();
     $start = ($page - 1) * $per_page;
     $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2 '.$sql_string.' LIMIT '.$start.', '.$per_page;
@@ -340,8 +369,6 @@ abstract class  Entity
       }
     return $all;    
   }
-
-
 
   public function assignFromPost($ignore)
   {
@@ -397,9 +424,6 @@ abstract class  Entity
 
 	    $markup = preg_replace('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup); 
 	    $markup = preg_replace('!&lt;em&gt;(.*?)&lt;/em&gt;!m', '<em>$1</em>', $markup); 
-
-
-
 	    
 	    $lines = explode("\n", $markup);
 	    foreach($lines as $key => $line)
@@ -514,6 +538,21 @@ abstract class  Entity
     $sql = 'DELETE FROM '.$table.' WHERE id = '.$this->id;
     $error = 'Could not delete row.';
     $this->query($sql, $error);
+  }
+
+  public function hasValErrors()
+  {
+    return $this->val->hasErrors();
+  }
+
+  public function getValErrors()
+  {
+    return $this->val->errors;
+  }
+
+  public function addValError($error)
+  {
+    $this->val->addError($error);
   }
 
 }
