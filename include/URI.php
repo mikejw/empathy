@@ -28,11 +28,10 @@ class URI
   private $uri;
   private $module;
   private $moduleIsDynamic;
-
-  public $error;
-  public $internal = false;
-  public $controllerPath = '';
-  public $controllerName = '';
+  private $error;
+  private $internal = false;
+  private $controllerPath = '';
+  private $controllerName = '';
 
   public function __construct($module, $moduleIsDynamic)
   {
@@ -46,7 +45,21 @@ class URI
 
     $this->processRequest();
     $this->setController();    
-    $this->assertEventIsSet();
+  }
+
+  public function getError()
+  {
+    return $this->error;
+  }
+
+  public function getControllerName()
+  {
+    return $this->controllerName;
+  }
+
+  public function getInternal()
+  {
+    return $this->internal;
   }
 
   public function printRouting()
@@ -163,7 +176,7 @@ class URI
 		$modIndex = DEF_MOD;
 		$_GET['class'] = $current;
 
-		//$this->error = MISSING_CLASS;
+		$this->error = MISSING_CLASS;
 	      }
 	    $this->setModule($this->module[$modIndex]);
 	    $i++;
@@ -229,6 +242,7 @@ class URI
 	  }
       }
  
+
     if(!$this->error)
       {
 	require($this->controllerPath);		
@@ -237,6 +251,18 @@ class URI
 	    $this->error = MISSING_CLASS_DEF;
 	  }
       }	  
+
+    if(!$this->error)
+      {
+	$this->assertEventIsSet();
+
+	$test = new $this->controllerName(0, 0);  
+	if(!method_exists($test, $_GET['event']))
+	  {
+	    $this->error = MISSING_EVENT_DEF;
+	  }        
+      }
+
 
     if($this->error)
       {

@@ -21,7 +21,7 @@
 // is parsed to generate an array containing countries with country codes as references
 define('SOURCE', 'empathy/storage/countries.html');
 
-class Country extends EntityDBMS
+class Country extends Entity
 {   
   public static function build()
   {   

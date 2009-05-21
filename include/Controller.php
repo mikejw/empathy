@@ -27,14 +27,14 @@ class Controller
   private $initError;
   private $internal;
   
-
-  public function __construct($error, $i, $secondary)
+  public function __construct($error, $i)
   {
     $this->initError = $error;
     $this->internal = $i;
     $this->connected = false;
     $this->module = $_GET['module'];
     $this->class = $_GET['class'];
+    $this->event = $_GET['event'];
     $this->title = TITLE;
     $this->presenter = new SmartyPresenter($i);
     
@@ -47,70 +47,49 @@ class Controller
 	$this->templateFile = $this->class.'.tpl';
       }
 
-    if(!$secondary)
-      {	
-	$config = $GLOBALS['config'];
-	$this->sessionUp($config['session_var']);
-
-	/*
-	if($this->initError == 0 && (!(method_exists($this, $_GET['event']))))
-	  {
-	    $this->initError = 3;
-	  }
-	elseif($this->initError == 1 && method_exists($this, $_GET['event']))
-	  {
-	    $this->initError = 0;
-	  }
-	*/
-	
-	//    echo $this->initError;
-	
-	$message = '';
-	switch($this->initError)
-	  {
-	  case 1:
-	    $message = 'Missing class file.';
-	    break;
-	  case 2:
-	    $message = 'Missing class definition.';
-	    break;
-	  case 3:
-	    $message = 'Controller event '.$_GET['event'].' has not been defined.';
-	    break;
-	  default:
-	    break;     
-	  }
-	
-	if($this->initError != 0)
-	  {
-	    $this->error($message, 0);
-	  }
-
-    
-
-	/* authentication (admin etc) */
-	
-	$this->assignSessionVar();
-	
-	/* assign other data */
-	$this->presenter->assign('module', $this->module);
-	$this->presenter->assign('class', $this->class);
-	$this->presenter->assign('event', $_GET['event']);
-	$this->presenter->assign('TITLE', TITLE);	
-
-	if(isset($_GET['section_uri']))
-	  {
-	    $this->presenter->assign('section', $_GET['section_uri']);
-	  }
+    $config = $GLOBALS['config'];
+    $this->sessionUp($config['session_var']);
+		
+    $message = '';
+    switch($this->initError)
+      {
+      case 1:
+	$message = 'Missing class file.';
+	break;
+      case 2:
+	$message = 'Missing class definition.';
+	break;
+      case 3:	    
+	$message = 'Controller event '.$this->event.' has not been defined.';	    
+	break;
+      default:
+	break;     
       }
+	
+    if($this->initError != 0)
+      {
+	$this->error($message);
+      }   
+    
+    $this->assignSessionVar();
+	
+    $this->presenter->assign('module', $this->module);
+    $this->presenter->assign('class', $this->class);
+    $this->presenter->assign('event', $this->event);
+    $this->presenter->assign('TITLE', TITLE);	
+    
+    if(isset($_GET['section_uri']))
+      {
+	$this->presenter->assign('section', $_GET['section_uri']);
+      }      
   }
 
-    
+ 
   public function initDisplay()
   {
     if(!$this->presenter->templateExists($this->templateFile))
       {
-	$this->error('Missing template file: '.$this->templateFile, 0);
+	$this->error('Missing template file: '.$this->templateFile);
       }
     else
       {	
@@ -209,21 +188,11 @@ class Controller
   }
 
 
-  public function error($message, $fourohfour)
+  public function error($message)
   {    
-    if($fourohfour)
-      {	
-	header('HTTP/1.0 404 Not Found');
-	$this->presenter->assign('fourohfourmessage', $message);
-	$this->presenter->display('404.tpl');
-	exit();
-      }
-    else
-      {
-	$this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
-	$_SESSION['app_error'] = array($this->module, $this->class, $message, date('U'));
-	$this->redirect('empathy/error/');   
-      }
+    $this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+    $_SESSION['app_error'] = array($this->module, $this->class, $message, date('U'));
+    $this->redirect('empathy/error/');       
   }
 
   public function loadUIVars($ui, $ui_array)

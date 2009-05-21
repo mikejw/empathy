@@ -19,7 +19,8 @@ function my_spl_autoload($class)
 {
   $i = 0;
   $load_error = 1;
-  $location = array(DOC_ROOT.'/storage', 'empathy/include', DOC_ROOT.'/application');
+  $location = array(DOC_ROOT.'/storage', DOC_ROOT.'/application',
+		    'empathy/include', 'empathy/storage');
 
   while($i < sizeof($location) && $load_error == 1)
     {
@@ -49,25 +50,24 @@ class Bootstrap
     
     $u = new URI($module, $moduleIsDynamic);
 
-    
-    $test = new $u->controllerName(0, 0, 0);  
-    if(!method_exists($test, $_GET['event']))
+    if(in_array(1, $moduleIsDynamic))
       {
-	$u->dynamicSection($specialised);
+	if($u->getError() == MISSING_CLASS)
+	  {
+	    $u->dynamicSection($specialised);
+	  }
       }
-    
 
 
-
-    // dispatch
-    
-    $this->controller = new $u->controllerName($u->error, $u->internal, 0); 
+    // dispatch    
+    $controller_name = $u->getControllerName();
+    $this->controller = new $controller_name($u->getError(), $u->getInternal()); 
     $this->controller->$_GET['event']();
     
    
     if(PNG_OUTPUT == 1)
       {
-	$this->controller->presenter->smarty->load_filter('output', 'png_image');
+	$this->controller->presenter->loadFilter('output', 'png_image');
       }
     $this->controller->initDisplay();
     

@@ -17,9 +17,9 @@
 
 require("Smarty/Smarty.class.php");
 
-class SmartyPresenter extends Presenter
+class SmartyPresenter
 {
-  public $smarty;
+  private $smarty;
 
   public function __construct($internal)
   {
@@ -65,6 +65,10 @@ class SmartyPresenter extends Presenter
     $this->smarty->display($this->smarty->template_dir.'/'.$template);
   }
 
+  public function loadFilter($type, $name)
+  {
+    $this->smarty->load_filter($type, $name);
+  }
 
 }
 

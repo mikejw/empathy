@@ -142,7 +142,8 @@ class Entity
     
     foreach($vars as $property)
       {
-	if(!in_array($property, $this->globally_ignored_property) && $this->$property != '')
+	//	if(!in_array($property, $this->globally_ignored_property) && $this->$property != '')
+	if(!in_array($property, $this->globally_ignored_property))
 	  {
 	    array_push($properties, $property);
 	  }
