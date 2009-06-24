@@ -98,7 +98,8 @@ class Country extends Entity
     
     foreach($country['code'] as $index => $value)
       {
-	$built[$value] = $country['name'][$index];
+	$stripped = preg_replace('/\s+/', '', $value); // not sure why this isn't done
+	$built[$stripped] = $country['name'][$index];
       }
     
     return $built;
