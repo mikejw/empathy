@@ -157,6 +157,10 @@ class Entity
 	  {
 	    $sql .= $this->$property;
 	  }
+	elseif($this->$property == '')
+	  {
+	    $sql .= 'NULL';
+	  }
 	else
 	  {
 	    $sql .= "'".$this->$property."'";
