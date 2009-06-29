@@ -1,0 +1,3 @@
+
+ - URI.php L179 => if method exists remove class error
+   => different behaviour depending on dynamic module
