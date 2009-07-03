@@ -38,6 +38,11 @@ class SmartyPresenter
     $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
     $this->smarty->config_dir = DOC_ROOT."/tpl/configs";   
 
+    if(defined('SMARTY_CACHING') && SMARTY_CACHING == true)
+      {
+	$this->smarty->caching = 1; 
+      }
+
     // assign constants
     $this->assign("NAME", NAME);
     $this->assign("WEB_ROOT", WEB_ROOT);
