@@ -309,7 +309,7 @@ class Entity
   public function getPaginatePagesSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page)
   {
     $nav = array();
-    $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2'.$sql_string;
+    $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2 '.$sql_string;
     $error = 'Could not get rows from '.$table1;
     $result = $this->query($sql, $error);   
     $rows = mysql_num_rows($result);
@@ -330,6 +330,34 @@ class Entity
       }
     return $nav;
   }
+
+
+  public function getPaginatePagesMultiJoin($select, $table1, $table2, $table3, $sql_string, $page, $per_page)
+  {
+    $nav = array();
+    $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string;
+    $error = 'Could not get rows from '.$table1;
+    $result = $this->query($sql, $error);   
+    $rows = mysql_num_rows($result);
+    $p_rows = $rows;
+    $pages = ceil($rows / $per_page);
+    $i = 1;
+    while($i <= $pages)
+      {
+	if($i == $page)
+	  {
+	    $nav[$i] = 1;
+	  }
+	else
+	  {
+	    $nav[$i] = 0;
+	  }
+	$i++;
+      }
+    return $nav;
+  }
+
+
 
 
 
@@ -374,6 +402,25 @@ class Entity
       }
     return $all;    
   }
+
+  public function getAllCustomPaginateMultiJoin($select, $table1, $table2, $table3, $sql_string, $page, $per_page)
+  {   
+    $all = array();
+    $start = ($page - 1) * $per_page;
+    $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string.' LIMIT '.$start.', '.$per_page;
+    $error = 'Could not get rows from '.$table1;
+    $result = $this->query($sql, $error);
+    $i = 0;
+    while($row = mysql_fetch_array($result))
+      {
+	$all[$i] = $row;
+	$i++;
+      }
+    return $all;    
+  }
+
+
+
 
   public function assignFromPost($ignore)
   {
