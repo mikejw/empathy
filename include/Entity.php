@@ -359,6 +359,36 @@ class Entity
 
 
 
+  public function getPaginatePagesMultiJoinGroup($select, $table1, $table2, $table3, $sql_string, $page, $per_page, $group, $order)
+  {
+    $nav = array();
+    $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string;
+    $sql .= ' GROUP BY '.$group.' ORDER BY '.$order;
+    $error = 'Could not get rows from '.$table1;
+    $result = $this->query($sql, $error);   
+    $rows = mysql_num_rows($result);
+    $p_rows = $rows;
+    $pages = ceil($rows / $per_page);
+    $i = 1;
+    while($i <= $pages)
+      {
+	if($i == $page)
+	  {
+	    $nav[$i] = 1;
+	  }
+	else
+	  {
+	    $nav[$i] = 0;
+	  }
+	$i++;
+      }
+    return $nav;
+  }
+
+
+
+
+
 
 
   public function addTablePrefix($table)
@@ -418,6 +448,25 @@ class Entity
       }
     return $all;    
   }
+
+
+  public function getAllCustomPaginateMultiJoinGroup($select, $table1, $table2, $table3, $sql_string, $page, $per_page, $group, $order)
+  {   
+    $all = array();
+    $start = ($page - 1) * $per_page;
+    $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string.' GROUP BY '.$group
+      .' ORDER BY '.$order.' LIMIT '.$start.', '.$per_page;
+    $error = 'Could not get rows from '.$table1;
+    $result = $this->query($sql, $error);
+    $i = 0;
+    while($row = mysql_fetch_array($result))
+      {
+	$all[$i] = $row;
+	$i++;
+      }
+    return $all;    
+  }
+
 
 
 
