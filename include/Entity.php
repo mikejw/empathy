@@ -227,7 +227,7 @@ class Entity
 		$sql .= "'".$this->$property."'";
 	      }
 	    
-	    if(($i + sizeof($this->globally_ignored_property)) != sizeof($vars))
+	    if(($i + sizeof($this->globally_ignored_property)) != sizeof($this->properties))
 	      {
 		$sql .= ", ";
 	      }
