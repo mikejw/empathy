@@ -22,18 +22,29 @@ class Entity
   private $rows;
   private $result;
   private $globally_ignored_property = array('id', 'table');
-
+  private $properties;
 
   public function __construct(&$controller)
   {
     $this->val = new Validate();
+    $this->properties = array();
     
     $this->controller = $controller;
     if($this->controller->connected == false)
       {
 	$this->dbConnect();
       }
+    $this->loadProperties();
   }  
+
+  private function loadProperties()
+  {
+    $r = new ReflectionClass(get_class($this));
+    foreach($r->getProperties() as $item)
+      {
+	array_push($this->properties, $item->name);
+      }
+  }
   
   public function dbConnect()
   {
@@ -99,8 +110,7 @@ class Entity
   
   public function sanitize()
   {
-    $vars = array_keys(get_class_vars(get_class($this)));
-    foreach($vars as $property)
+    foreach($this->properties as $property)
       {
 	if(isset($_POST[$property]) && !(is_numeric($property))) // && ($this->$property == $_POST[$property])) -> breaking where single quotes and break tags
 	  {
@@ -111,8 +121,7 @@ class Entity
 
   public function sanitizeNoPost()
   {
-    $vars = array_keys(get_class_vars(get_class($this)));
-    foreach($vars as $property)
+    foreach($this->properties as $property)
       {
 	if(!in_array($property, $this->globally_ignored_property) && !is_numeric($property))
 	  {
@@ -136,11 +145,10 @@ class Entity
       }
 
     $sql = "UPDATE $table SET ";
-    $vars = array_keys(get_class_vars(get_class($this)));
 
     $properties = array();
     
-    foreach($vars as $property)
+    foreach($this->properties as $property)
       {
 	//	if(!in_array($property, $this->globally_ignored_property) && $this->$property != '')
 	if(!in_array($property, $this->globally_ignored_property))
@@ -195,11 +203,10 @@ class Entity
       {
 	$sql .= 'NULL, ';
       }
-    $vars = array_keys(get_class_vars(get_class($this)));
+
     $i = 0;
-    $id = 0;
-    
-    foreach($vars as $property)
+    $id = 0;    
+    foreach($this->properties as $property)
       {
 	if(!in_array($property, $this->globally_ignored_property))
 	  {	    
@@ -473,8 +480,7 @@ class Entity
 
   public function assignFromPost($ignore)
   {
-    $vars = array_keys(get_class_vars(get_class($this)));   
-    foreach($vars as $property)
+    foreach($this->properties as $property)
       {
 	if(!in_array($property, $this->globally_ignored_property)
 	   && !in_array($property, $ignore))
@@ -506,8 +512,7 @@ class Entity
   public function toXHTMLChris($formatting)
   {
     $markup = '';
-    $vars = array_keys(get_class_vars(get_class($this)));
-    foreach($vars as $property)
+    foreach($this->properties as $property)
       {
 	if(!is_numeric($property) && in_array($property, $formatting))	    
 	  {	     	    
@@ -540,8 +545,7 @@ class Entity
 
   public function toXHTML($formatting)
   {
-    $vars = array_keys(get_class_vars(get_class($this)));
-    foreach($vars as $property)
+    foreach($this->properties as $property)
       {
 	if(!(is_numeric($property)))
 	  {
@@ -582,8 +586,7 @@ class Entity
   
   public function stripMSWordChars()
   {   
-    $vars = array_keys(get_class_vars(get_class($this)));
-    foreach($vars as $property)
+    foreach($this->properties as $property)
       {
 	if(!(is_numeric($property)))
 	  {
