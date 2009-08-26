@@ -255,9 +255,9 @@ class URI
     if(!$this->error)
       {
 	$this->assertEventIsSet();
-
-	$test = new $this->controllerName(0, 0);  
-	if(!method_exists($test, $_GET['event']))
+	
+	$r = new ReflectionClass($this->controllerName);
+	if(!$r->hasMethod($_GET['event']))	       
 	  {
 	    $this->error = MISSING_EVENT_DEF;
 	  }        
