@@ -177,7 +177,7 @@ class Controller
 	break;
       case 404:
 	$response = 'HTTP/1.0 404 Not Found';
-	$message = 'Page does not exist';
+	$message = 'Sorry this page does not exist or is out of date.';
 	break;	
       }
     header($response);
@@ -190,9 +190,16 @@ class Controller
 
   public function error($message)
   {    
-    $this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
-    $_SESSION['app_error'] = array($this->module, $this->class, $message, date('U'));
-    $this->redirect('empathy/error/');       
+    if(DEBUG_MODE == 0)
+      {
+	$this->http_error(404);
+      }
+    else
+      {
+	$this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+	$_SESSION['app_error'] = array($this->module, $this->class, $message, date('U'));
+	$this->redirect('empathy/error/');       
+      }
   }
 
   public function loadUIVars($ui, $ui_array)
