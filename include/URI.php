@@ -18,6 +18,7 @@
 define('MISSING_CLASS', 1);
 define('MISSING_CLASS_DEF', 2);
 define('MISSING_EVENT_DEF', 3);
+define('ERROR_404', 4);
 define('MAX_COMP', 4); // maxium relevant info stored in a URI
                        // ie module, class, event, id
 
@@ -339,8 +340,9 @@ class URI
     // section id is not set / found
     if(!(is_numeric($section->id)))
       {
-	header("Location: http://".WEB_ROOT);
-	exit();
+	//	header("Location: http://".WEB_ROOT);
+	//exit();
+	$this->error = ERROR_404;
       }
     
     if(isset($_GET['id']))
@@ -348,12 +350,15 @@ class URI
 	$section->template = REGULAR_LAYOUT;
       }
     
-    $_GET['section_uri'] = $section->url_name;
+    if(isset($section->url_name))
+      {
+	$_GET['section_uri'] = $section->url_name;
+      }
 
     if($section->template == "")
       {
-	echo 'no template.';
-	exit();	
+	//echo 'no template.';
+	//exit();	
       }
     else
       {	
@@ -367,8 +372,11 @@ class URI
 	  }   
       }
     
-    $_GET['class'] = $controllerName;
-    $this->error = 0;
+    if(isset($controllerName))
+      {
+	$_GET['class'] = $controllerName;
+	$this->error = 0;
+      }
 
     $_GET['event'] = 'default_event';
     $_GET['id'] = $section->id;
