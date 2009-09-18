@@ -47,8 +47,7 @@ class Controller
 	$this->templateFile = $this->class.'.tpl';
       }
 
-    $config = $GLOBALS['config'];
-    $this->sessionUp($config['session_var']);
+    $this->sessionUp();
 		
     $message = '';
     switch($this->initError)
@@ -131,14 +130,9 @@ class Controller
     exit();
   }
   
-  public function sessionUp($sessionVar)
+  public function sessionUp()
   {    
     @session_start();
-
-    for($i = 0; $i < sizeof($sessionVar); $i++)
-    {
-      session_register($sessionVar[$i]);
-    }
   }
   
   public function sessionDown()
