@@ -1,0 +1,28 @@
+---
+name: eaa
+title: 
+author: ai-em
+sub_title: 
+dbms: MYSQL
+doc_root: /opt/local/apache2/htdocs/eaa
+web_root: bastian/eaa
+public_dir: /public_html
+mysql: /opt/local/bin/mysql5
+mysql_dump: /opt/local/bin/mysqldump5
+perl: /opt/local/bin/perl
+ffmpeg: /opt/local/bin/ffmpeg
+db_server: localhost
+db_user: root
+db_pass: 
+db_name: 
+tbl_prefix: 
+tpl_by_class: 1
+def_mod: 0
+module: 
+    - front
+module_is_dynamic: 
+    - 0
+specialised: 
+smarty_debugging: 0
+png_output: 0
+debug_mode: 1

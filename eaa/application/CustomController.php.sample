@@ -17,13 +17,12 @@
 
 
 // Site-wide controller customisation goes in this file.
-require('empathy/include/Controller.php');
 
 class CustomController extends Controller
 {	
-  public function __construct($error, $internal, $secondary)
+  public function __construct($error, $internal)
   {
-    parent::__construct($error, $internal, $secondary);  
+    parent::__construct($error, $internal);  
     // put custom routines here
   }
   
