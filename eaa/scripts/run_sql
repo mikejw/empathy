@@ -1,0 +1,48 @@
+##!/usr/bin/perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+
+BEGIN { do "read_config"; }
+
+use constant MYSQL => $mysql;
+use constant MYSQL_DUMP => $mysql_dump;
+use constant DB_PASS => $db_pass;
+
+
+sub execute()
+{
+    my ($command) = @_;
+    my @output = `$command`;
+}
+
+my $command;
+
+chdir "../";    
+
+if(@ARGV > 0)
+{
+    if($ARGV[0] eq 'setup')
+    {
+	&execute(MYSQL.' -u root --password='.DB_PASS.' < setup.sql');
+	&execute(MYSQL.' -u root --password='.DB_PASS.' < inserts.sql');
+    }
+    elsif($ARGV[0] eq 'populate')
+    {
+	&execute(MYSQL.' -u root --password='.DB_PASS.' < setup.sql');
+	&execute(MYSQL.' -u root --password='.DB_PASS.' proper < dump.sql');	
+    }
+    elsif($ARGV[0] eq 'dump')
+    {
+	&execute(MYSQL_DUMP.' -u root --no-create-info --complete-insert proper > dump.sql');
+    }
+    else
+    {
+	print "No valid argument.\n";
+    }
+}
+
+
+
+
