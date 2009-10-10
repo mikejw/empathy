@@ -651,12 +651,12 @@ class Entity
 
   public function getValErrors()
   {
-    return $this->val->errors;
+    return $this->val->getErrors();
   }
 
-  public function addValError($error)
+  public function addValError($error, $field='')
   {
-    $this->val->addError($error);
+    $this->val->addError($error, $field);
   }
 
 }

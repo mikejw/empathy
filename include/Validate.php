@@ -2,18 +2,35 @@
 
 class Validate
 {  
-  public $errors = array();
+  public $error = array();
   
-
-  public function addError($message)
+  public function addError($message, $field)
   {
-    array_push($this->errors, $message);
+    if($field != '')
+      {
+	if(isset($this->error['field']))
+	  {
+	    die('Attempt to overwrite error field.');
+	  }
+	else
+	  {
+	    $this->error[$field] = $message;
+	  }	  
+      }
+    else
+      {
+	array_push($this->error, $message);
+      }
   }
 
   public function hasErrors()
   {
-    return (sizeof($this->errors) > 0);
+    return (sizeof($this->error) > 0);
   }
 
+  public function getErrors()
+  {
+    return $this->error;
+  }
 }
 ?>
