@@ -659,5 +659,10 @@ class Entity
     $this->val->addError($error, $field);
   }
 
+  public function doValType($type, $field, $data, $optional)
+  {
+    $this->val->valType($type, $field, $data, $optional);
+  }
+
 }
 ?>
