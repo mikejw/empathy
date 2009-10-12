@@ -661,7 +661,7 @@ class Entity
 
   public function doValType($type, $field, $data, $optional)
   {
-    $this->val->valType($type, $field, $data, $optional);
+    return $this->val->valType($type, $field, $data, $optional);
   }
 
 }
