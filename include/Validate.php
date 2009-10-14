@@ -42,7 +42,7 @@ class Validate
 	      }	
 	    break;
 	  case VAL_TYPE_NUM:
-	    if(!ctype_digit($data))
+	    if(!is_numeric($data))
 	      {
 		$this->addError('Invalid '.$field, $field);		
 		$valid = false;
