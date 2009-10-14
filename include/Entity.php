@@ -161,7 +161,7 @@ class Entity
     foreach($properties as $property)
       {
 	$sql .= "$property = ";
-	if(is_numeric($this->$property))
+	if(is_numeric($this->$property) && !is_string($this->$property))
 	  {
 	    $sql .= $this->$property;
 	  }
@@ -210,7 +210,7 @@ class Entity
       {
 	if(!in_array($property, $this->globally_ignored_property))
 	  {	    
-	    if(is_numeric($this->$property))
+	    if(is_numeric($this->$property) && !is_string($this->$property))
 	      {
 		$sql .= $this->$property;
 	      }
