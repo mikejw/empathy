@@ -15,17 +15,16 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace empathy;
+
 function my_spl_autoload($class)
 {
+  $class = substr($class, 8); // hack around file structure
+                              // not matching namespaces
   $i = 0;
   $load_error = 1;
   $location = array('empathy/include', DOC_ROOT.'/application',
-		    'empathy/storage');
-  //  if(!(isset($_SERVER['argc']) && $_SERVER['argc'] > 1))
-  // {
-      array_push($location, DOC_ROOT.'/storage');      
-      //  }
-
+		    'empathy/storage', DOC_ROOT.'/storage');
   
   while($i < sizeof($location) && $load_error == 1)
     {
@@ -37,33 +36,10 @@ function my_spl_autoload($class)
 	}
       else
 	{
-	  //echo $class_file;
+	  //echo $class_file."\n";
 	}	
       $i++;
     }
-
-
-  /*
-  
-  if($load_error == 1 && USE_DOCTRINE == true)
-    {
-      if(@Doctrine::autoLoad($class))
-	{
-	  $load_error = 0;
-	}
-    }
-  
-
-  
-  if($load_error == 1 && USE_ZEND == true)
-    {
-      if(!(@Zend_Loader::loadClass($class) == false))
-	{
-	  $load_error = 0;
-	}
-    }
-  */
- 
 }
 
 class Bootstrap
@@ -72,21 +48,18 @@ class Bootstrap
 
   public function __construct($module, $moduleIsDynamic, $specialised)
   {
-
-    
+    spl_autoload_register('empathy\my_spl_autoload');
     if(USE_DOCTRINE == true)
       {
 	require('Doctrine.php');
-	//spl_autoload_register(array('Doctrine', 'autoload'));
+	spl_autoload_register(array('\Doctrine', 'autoload'));
       }
     if(USE_ZEND == true)
       {
 	require('Zend/Loader.php');
-	//spl_autoload_register(array('Zend_Loader', 'loadClass'));
+	spl_autoload_register(array('\Zend_Loader', 'loadClass'));
       }
-    
-    spl_autoload_register('my_spl_autoload');
-
+  
     $this->incPlugin('no_cache');
     #$this->incPlugin('force_www');
     #$this->incPlugin('force_endslash');
@@ -109,9 +82,8 @@ class Bootstrap
     $controller_name = $u->getControllerName();
 
     //    echo $controller_name.
-    //print_r($u);
-    //exit();
-
+    //    print_r($u);
+    //exit();   
     $this->controller = new $controller_name($u->getError(), $u->getInternal()); 
     
 

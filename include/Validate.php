@@ -1,4 +1,7 @@
 <?php
+
+namespace empathy;
+
 define('VAL_TYPE_TEXT', 1);
 define('VAL_TYPE_ALNUM', 2);
 define('VAL_TYPE_NUM', 3);

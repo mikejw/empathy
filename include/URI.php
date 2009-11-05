@@ -15,6 +15,8 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace empathy;
+
 define('MISSING_CLASS', 1);
 define('MISSING_CLASS_DEF', 2);
 define('MISSING_EVENT_DEF', 3);
@@ -40,7 +42,10 @@ class URI
 
     $this->module = $module;
     $this->moduleIsDynamic = $moduleIsDynamic;
-    $this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+    if(isset($_SERVER['HTTP_HOST']))
+      {
+	$this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+      }
     $this->uriString = substr($this->full, $removeLength + 1);
     $this->error = 0;
 
@@ -265,6 +270,7 @@ class URI
 	  }
       }
  
+    $this->controllerName = '\\empathy\\'.$this->controllerName;
 
     if(!$this->error)
       {
@@ -279,7 +285,7 @@ class URI
 
     if(!$this->error)
       {	
-	$r = new ReflectionClass($this->controllerName);
+	$r = new \ReflectionClass($this->controllerName);
 	if(!$r->hasMethod($_GET['event']))	       
 	  {
 	    $this->error = MISSING_EVENT_DEF;
@@ -289,7 +295,7 @@ class URI
     if($this->error)
       {
 	$this->controllerPath = 'empathy/include/CustomController.php';
-	$this->controllerName = 'CustomController';
+	$this->controllerName = 'empathy\\CustomController';
       }
   }
 

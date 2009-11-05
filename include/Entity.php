@@ -15,6 +15,8 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace empathy;
+
 class Entity
 {
   private $val;
@@ -46,7 +48,7 @@ class Entity
 
   private function loadProperties()
   {
-    $r = new ReflectionClass(get_class($this));
+    $r = new \ReflectionClass(get_class($this));
     foreach($r->getProperties() as $item)
       {
 	array_push($this->properties, $item->name);
@@ -57,7 +59,7 @@ class Entity
   public function dbConnectNew()
   {
     try{
-      $this->dbh = new PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
+      $this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
 			   DB_USER, DB_PASS);
     }
     catch (PDOException $e) {

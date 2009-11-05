@@ -15,6 +15,7 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace empathy;
 require("Smarty/Smarty.class.php");
 
 class SmartyPresenter
@@ -23,7 +24,7 @@ class SmartyPresenter
 
   public function __construct($internal)
   {
-    $this->smarty = new Smarty();
+    $this->smarty = new \Smarty();
     $this->smarty->debugging = SMARTY_DEBUGGING;
     if($internal)
       {
