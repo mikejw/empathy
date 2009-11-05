@@ -44,8 +44,11 @@ class URI
     $this->uriString = substr($this->full, $removeLength + 1);
     $this->error = 0;
 
+    //    echo $this->uriString;
+
     $this->processRequest();
-    $this->setController();    
+    $this->setController(); 
+    //$this->printRouting();
   }
 
   public function getError()
@@ -82,7 +85,7 @@ class URI
       }
     
     if($this->uriString == '')
-      {	
+      {		
 	$this->setModule($this->module[DEF_MOD]);
       }
     else
@@ -162,9 +165,11 @@ class URI
 	    $i++;
 	    continue;
 	  }      
-	
+       
+
 	if(!isset($_GET['module']))
 	  {
+
 	    while($j < sizeof($this->module) && $current != $this->module[$j])
 	      {
 		$j++;
@@ -197,6 +202,12 @@ class URI
 	  }   
 	$i++;
       }
+    if(!isset($_GET['module']))
+      {	
+	// only url param is an id
+	$this->setModule($this->module[DEF_MOD]);
+	$this->error = MISSING_CLASS;
+      }
   }        
    
   private function setModule($module)
@@ -223,20 +234,31 @@ class URI
 
   private function setController()
   {      
-    if(!(isset($_GET['class'])))
+    if(!(isset($_GET['class'])) && isset($_GET['module']))
       {
 	$_GET['class'] = $_GET['module'];
       }
 
-    $this->controllerName = $_GET['class'];
-    $this->setControllerPath();
+    if(isset($_GET['class']))
+      {
+	$this->controllerName = $_GET['class'];
+	$this->setControllerPath();
+      }
    
     if(!is_file($this->controllerPath))
       {
-	$_GET['event'] = $_GET['class'];
-	$_GET['class'] = $_GET['module'];
-	$this->controllerName = $_GET['module'];
-	$this->setControllerPath();
+	if(isset($_GET['class']))
+	  {
+	    $_GET['event'] = $_GET['class'];
+	  }
+
+	// module must be set?
+	if(isset($_GET['module']))
+	  {
+	    $_GET['class'] = $_GET['module'];
+	    $this->controllerName = $_GET['module'];
+	    $this->setControllerPath();
+	  }
 	if(!is_file($this->controllerPath))
 	  {
 	    $this->error = MISSING_CLASS;
@@ -253,10 +275,10 @@ class URI
 	  }
       }	  
 
+    $this->assertEventIsSet();   
+
     if(!$this->error)
-      {
-	$this->assertEventIsSet();
-	
+      {	
 	$r = new ReflectionClass($this->controllerName);
 	if(!$r->hasMethod($_GET['event']))	       
 	  {
@@ -264,12 +286,11 @@ class URI
 	  }        
       }
 
-
     if($this->error)
       {
 	$this->controllerPath = 'empathy/include/CustomController.php';
 	$this->controllerName = 'CustomController';
-      }   
+      }
   }
 
   public function assertEventIsSet()

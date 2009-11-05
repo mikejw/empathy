@@ -19,23 +19,51 @@ function my_spl_autoload($class)
 {
   $i = 0;
   $load_error = 1;
-  $location = array(DOC_ROOT.'/storage', DOC_ROOT.'/application',
-		    'empathy/include', 'empathy/storage');
+  $location = array('empathy/include', DOC_ROOT.'/application',
+		    'empathy/storage');
+  //  if(!(isset($_SERVER['argc']) && $_SERVER['argc'] > 1))
+  // {
+      array_push($location, DOC_ROOT.'/storage');      
+      //  }
 
+  
   while($i < sizeof($location) && $load_error == 1)
     {
-      $class_file = $location[$i].'/'.$class.'.php';     
-      if(!@include($class_file))
-	{	
-	  $load_error == 0;
+      $class_file = $location[$i].'/'.$class.'.php';           
+      if(@include($class_file))
+	{		
+	  //echo $class_file;	
+	  $load_error = 0;
 	}
+      else
+	{
+	  //echo $class_file;
+	}	
       $i++;
     }
 
+
+  /*
+  
+  if($load_error == 1 && USE_DOCTRINE == true)
+    {
+      if(@Doctrine::autoLoad($class))
+	{
+	  $load_error = 0;
+	}
+    }
+  
+
+  
   if($load_error == 1 && USE_ZEND == true)
     {
-      Zend_Loader::loadClass($class);
+      if(!(@Zend_Loader::loadClass($class) == false))
+	{
+	  $load_error = 0;
+	}
     }
+  */
+ 
 }
 
 class Bootstrap
@@ -44,10 +72,19 @@ class Bootstrap
 
   public function __construct($module, $moduleIsDynamic, $specialised)
   {
+
+    
+    if(USE_DOCTRINE == true)
+      {
+	require('Doctrine.php');
+	//spl_autoload_register(array('Doctrine', 'autoload'));
+      }
     if(USE_ZEND == true)
       {
 	require('Zend/Loader.php');
+	//spl_autoload_register(array('Zend_Loader', 'loadClass'));
       }
+    
     spl_autoload_register('my_spl_autoload');
 
     $this->incPlugin('no_cache');
@@ -70,17 +107,24 @@ class Bootstrap
 
     // dispatch    
     $controller_name = $u->getControllerName();
+
+    //    echo $controller_name.
+    //print_r($u);
+    //exit();
+
     $this->controller = new $controller_name($u->getError(), $u->getInternal()); 
-    $this->controller->$_GET['event']();
     
-   
+
+
+    $this->controller->$_GET['event']();
+
+
+       
     if(PNG_OUTPUT == 1)
       {
 	$this->controller->presenter->loadFilter('output', 'png_image');
       }
     $this->controller->initDisplay();
-    
-
   } 
 
   private function incPlugin($name)
