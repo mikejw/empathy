@@ -59,10 +59,9 @@ class Bootstrap
 	require('Zend/Loader.php');
 	spl_autoload_register(array('\Zend_Loader', 'loadClass'));
       }
-  
-    $this->incPlugin('no_cache');
-    #$this->incPlugin('force_www');
-    #$this->incPlugin('force_endslash');
+
+    header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+    header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
     array_push($module, 'empathy');
     array_push($moduleIsDynamic, 0);
