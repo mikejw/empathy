@@ -17,30 +17,6 @@
 
 namespace empathy;
 
-function my_spl_autoload($class)
-{
-  $class = substr($class, 8); // hack around file structure
-                              // not matching namespaces
-  $i = 0;
-  $load_error = 1;
-  $location = array('empathy/include', DOC_ROOT.'/application',
-		    'empathy/storage', DOC_ROOT.'/storage');
-  
-  while($i < sizeof($location) && $load_error == 1)
-    {
-      $class_file = $location[$i].'/'.$class.'.php';           
-      if(@include($class_file))
-	{		
-	  //echo $class_file;	
-	  $load_error = 0;
-	}
-      else
-	{
-	  //echo $class_file."\n";
-	}	
-      $i++;
-    }
-}
 
 class Bootstrap
 {
@@ -48,7 +24,7 @@ class Bootstrap
 
   public function __construct($module, $moduleIsDynamic, $specialised)
   {
-    spl_autoload_register('empathy\my_spl_autoload');
+    spl_autoload_register('\empathy\Bootstrap::loadClass');
     if(USE_DOCTRINE == true)
       {
 	require('Doctrine.php');
@@ -102,5 +78,31 @@ class Bootstrap
   {
     require('empathy/include/plugin/empathy.'.$name.'.php');
   }
+
+  public static function loadClass($class)
+  {
+    $class = substr($class, 8); // hack around file structure
+    // not matching namespaces
+    $i = 0;
+    $load_error = 1;
+    $location = array('empathy/include', DOC_ROOT.'/application',
+		      'empathy/storage', DOC_ROOT.'/storage');
+    
+    while($i < sizeof($location) && $load_error == 1)
+      {
+	$class_file = $location[$i].'/'.$class.'.php';           
+	if(@include($class_file))
+	  {		
+	    //echo $class_file;	
+	    $load_error = 0;
+	  }
+	else
+	  {
+	    //echo $class_file."\n";
+	  }	
+	$i++;
+      }
+  }
+
 }
 ?>
