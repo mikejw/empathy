@@ -1,6 +1,6 @@
 <?php
 
-namespace empathy;
+namespace Empathy;
 
 define('VAL_TYPE_TEXT', 1);
 define('VAL_TYPE_ALNUM', 2);

@@ -256,7 +256,7 @@ class URI
 	  }
       }
  
-    $this->controllerName = '\\Empathy\\Controller\\'.$this->controllerName;
+    $this->controllerName = 'Empathy\\Controller\\'.$this->controllerName;
 
     if(!$this->error)
       {
@@ -277,13 +277,13 @@ class URI
 	  }        
       }
 
-    /*
     if($this->error)
       {
-	$this->controllerPath = 'empathy/include/CustomController.php';
-	$this->controllerName = 'empathy\\CustomController';
+	throw new Exception('Error during URI stage: '.$this->getErrorMessage());
+	//$this->controllerPath = 'empathy/include/CustomController.php';
+	//$this->controllerName = 'empathy\\CustomController';
       }
-    */
+    
   }
 
   public function assertEventIsSet()

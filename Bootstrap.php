@@ -51,23 +51,24 @@ class Bootstrap
       }
     catch(Exception $e)
       {
+	//echo $e->getMessage();exit();
+       
 	$this->controller = new Controller($this->uri->getError(), false);
 	$this->controller->setTemplate('empathy.tpl');
 	$this->controller->assign('error', $e->getMessage());
 	$this->display(true);	
-      }    
+	
+      }
   } 
 
   private function dispatch()
   {
     $this->uri = new URI($this->module, $this->moduleIsDynamic);
-
     $error = $this->uri->getError();
     if($error > 0)
       {
 	throw new Exception('Some error trying to dispatch: '.$this->uri->getErrorMessage());
       }
-
     // attempting to leave in support for dsection
     if(in_array(1, $this->moduleIsDynamic))
       {
@@ -116,13 +117,13 @@ class Bootstrap
     //    if(!strpos($class, '\\'))
     //    if(strpos($class, 'CustomController'))
     if(strpos($class, 'Controller\\')
-       || strpos($class, 'Models\\'))
+       || strpos($class, 'Model\\'))
       {
 	$class_arr = explode('\\', $class);
         $class = $class_arr[sizeof($class_arr)-1];
 	$location = array(DOC_ROOT.'/application/',
 			  DOC_ROOT.'/application/'.$_GET['module'].'/',
-			  DOC_ROOT.'/storage');	
+			  DOC_ROOT.'/storage/');	
       }
     else
       {
@@ -140,12 +141,12 @@ class Bootstrap
 
 	if(@include($class_file))
 	  {		
-	    //echo $class_file.": 1<br />\n";	
+	    $class_file.": 1<br />\n";	
 	    $load_error = 0;
 	  }
 	else
 	  {
-	    //echo $class_file.": 0<br />\n";
+	    $class_file.": 0<br />\n";
 	  }	
 	$i++;
       }    

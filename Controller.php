@@ -125,7 +125,8 @@ class Controller
     $this->presenter->switchInternal($i);    
     if(!$this->presenter->templateExists($this->templateFile))
       {
-	die('Missing template file: '.$this->templateFile);
+	throw new Exception('Missing template file: '.$this->templateFile);
+	//die('Missing template file: '.$this->templateFile);
 	//$this->error('Missing template file: '.$this->templateFile);
       }
     else
