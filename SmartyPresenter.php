@@ -15,7 +15,7 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace empathy;
+namespace Empathy;
 require("Smarty/Smarty.class.php");
 
 class SmartyPresenter
@@ -64,6 +64,15 @@ class SmartyPresenter
   public function clear_assign($name)
   {
     $this->smarty->clear_assign($name);
+  }
+
+  public function switchInternal($i)
+  {
+    if($i)
+      {
+	$pathToEmp = explode('Empathy', __FILE__);
+	$this->smarty->template_dir = $pathToEmp[0]."Empathy";
+      }
   }
 
   public function display($template)

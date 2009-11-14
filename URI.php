@@ -15,17 +15,17 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace empathy;
-
-define('MISSING_CLASS', 1);
-define('MISSING_CLASS_DEF', 2);
-define('MISSING_EVENT_DEF', 3);
-define('ERROR_404', 4);
-define('MAX_COMP', 4); // maxium relevant info stored in a URI
-                       // ie module, class, event, id
+namespace Empathy;
 
 class URI
 {
+  const MISSING_CLASS = 1;
+  const MISSING_CLASS_DEF = 2;
+  const MISSING_EVENT_DEF = 3;
+  const ERROR_404 = 4;
+  const MAX_COMP = 4; // maxium relevant info stored in a URI
+                      // ie module, class, event, id
+
   private $full;
   private $uriString;
   private $uri;
@@ -49,8 +49,6 @@ class URI
     $this->uriString = substr($this->full, $removeLength + 1);
     $this->error = 0;
 
-    //    echo $this->uriString;
-
     $this->processRequest();
     $this->setController(); 
     //$this->printRouting();
@@ -64,11 +62,6 @@ class URI
   public function getControllerName()
   {
     return $this->controllerName;
-  }
-
-  public function getInternal()
-  {
-    return $this->internal;
   }
 
   public function printRouting()
@@ -155,9 +148,9 @@ class URI
     $current = '';
 
     $length = sizeof($this->uri);
-    if($length > MAX_COMP)
+    if($length > URI::MAX_COMP)
       {
-	$length = MAX_COMP;
+	$length = URI::MAX_COMP;
       }
 	        
     while($i < $length)
@@ -187,7 +180,7 @@ class URI
 		$modIndex = DEF_MOD;
 		$_GET['class'] = $current;
 
-		$this->error = MISSING_CLASS;
+		$this->error = URI::MISSING_CLASS;
 	      }
 	    $this->setModule($this->module[$modIndex]);
 	    $i++;
@@ -211,7 +204,7 @@ class URI
       {	
 	// only url param is an id
 	$this->setModule($this->module[DEF_MOD]);
-	$this->error = MISSING_CLASS;
+	$this->error = URI::MISSING_CLASS;
       }
   }        
    
@@ -226,16 +219,9 @@ class URI
   
   public function setControllerPath()
   {
-    if(!$this->internal)
-      {
-	$this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
-      }
-    else
-      {
-	$pathToEmp = explode('empathy', __FILE__);	
-	$this->controllerPath = $pathToEmp[0].'empathy/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
-      }
+    $this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
   }
+
 
   private function setController()
   {      
@@ -266,18 +252,17 @@ class URI
 	  }
 	if(!is_file($this->controllerPath))
 	  {
-	    $this->error = MISSING_CLASS;
+	    $this->error = URI::MISSING_CLASS;
 	  }
       }
  
-    $this->controllerName = '\\empathy\\'.$this->controllerName;
+    $this->controllerName = '\\Empathy\\Controller\\'.$this->controllerName;
 
     if(!$this->error)
       {
-	require($this->controllerPath);		
 	if(!class_exists($this->controllerName))
 	  {
-	    $this->error = MISSING_CLASS_DEF;
+	    $this->error = URI::MISSING_CLASS_DEF;
 	  }
       }	  
 
@@ -288,15 +273,17 @@ class URI
 	$r = new \ReflectionClass($this->controllerName);
 	if(!$r->hasMethod($_GET['event']))	       
 	  {
-	    $this->error = MISSING_EVENT_DEF;
+	    $this->error = URI::MISSING_EVENT_DEF;
 	  }        
       }
 
+    /*
     if($this->error)
       {
 	$this->controllerPath = 'empathy/include/CustomController.php';
 	$this->controllerName = 'empathy\\CustomController';
       }
+    */
   }
 
   public function assertEventIsSet()
@@ -369,7 +356,7 @@ class URI
       {
 	//	header("Location: http://".WEB_ROOT);
 	//exit();
-	$this->error = ERROR_404;
+	$this->error = URI::ERROR_404;
       }
     
     if(isset($_GET['id']))
@@ -410,6 +397,29 @@ class URI
 
     $this->setController();
   }
+
+
+
+  public function getErrorMessage()
+  {
+    $message = '';
+    switch($this->error)
+      {
+      case 1:
+	$message = 'Missing class file.';
+	break;
+      case 2:
+	$message = 'Missing class definition.';
+	break;
+      case 3:	    
+	$message = 'Controller event '.$this->event.' has not been defined.';	    
+	break;
+      default:
+	break;     
+      }
+    return $message;
+  }
+
 
 
 }
