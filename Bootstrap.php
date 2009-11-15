@@ -51,13 +51,14 @@ class Bootstrap
       }
     catch(Exception $e)
       {
-	//echo $e->getMessage();exit();
-       
+	echo $e->getMessage();exit();
+	
+	/*
 	$this->controller = new Controller($this->uri->getError(), false);
 	$this->controller->setTemplate('empathy.tpl');
 	$this->controller->assign('error', $e->getMessage());
 	$this->display(true);	
-	
+	*/
       }
   } 
 
@@ -65,17 +66,18 @@ class Bootstrap
   {
     $this->uri = new URI($this->module, $this->moduleIsDynamic);
     $error = $this->uri->getError();
-    if($error > 0)
-      {
-	throw new Exception('Some error trying to dispatch: '.$this->uri->getErrorMessage());
-      }
+
     // attempting to leave in support for dsection
     if(in_array(1, $this->moduleIsDynamic))
       {
-	if($u->getError() == MISSING_CLASS)
-	  {
-	    $u->dynamicSection($specialised);
+	if($this->uri->getError() == URI::MISSING_CLASS)
+	  {	    
+	    $error = $this->uri->dynamicSection($this->specialised);
 	  }
+      }    
+    if($error > 0)
+      {
+	throw new Exception('Some error trying to dispatch: '.$error.' - '.$this->uri->getErrorMessage());
       }
     $controller_name = $this->uri->getControllerName();
     $this->controller = new $controller_name($this->uri->getError(), false);     

@@ -27,16 +27,15 @@ class Entity
   private $properties;
   private $dbh;
 
-  public function __construct(&$controller)
+  public function __construct($controller)
   {
     $this->val = new Validate();
     $this->properties = array();
-    
     $this->controller = $controller;
-    if($this->controller->connected == false)
-      {
-	//$this->dbConnect();
-	$this->dbConnectNew();
+
+    if(!is_object($controller) || $this->controller->connected == false)
+      {	
+	$this->dbConnectNew();	
       }
     $this->loadProperties();
   }  
@@ -95,10 +94,12 @@ class Entity
   {
     $result = NULL;
    
+    /*
     if(is_object($this->result))
       {
 	$this->result->closeCursor();
       }
+    */
     if(($result = $this->dbh->query($sql)) == false)  
       {
 	$errors = $this->dbh->errorInfo();
@@ -338,7 +339,7 @@ class Entity
     $sql = 'SELECT * FROM '.$table.' '.$sql_string;
     $error = 'Could not get rows from '.$table;
     $result = $this->query($sql, $error);   
-    $rows = mysql_num_rows($result);
+    $rows = $result->rowCount();
     $p_rows = $rows;
     $pages = ceil($rows / $per_page);
     $i = 1;
@@ -461,7 +462,7 @@ class Entity
 
     $result = $this->query($sql, $error);
     $i = 0;
-    while($row = mysql_fetch_array($result))
+    foreach($result as $row)
       {
 	$all[$i] = $row;
 	$i++;

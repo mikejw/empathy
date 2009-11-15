@@ -235,7 +235,7 @@ class URI
 	$this->controllerName = $_GET['class'];
 	$this->setControllerPath();
       }
-   
+
     if(!is_file($this->controllerPath))
       {
 	if(isset($_GET['class']))
@@ -255,11 +255,11 @@ class URI
 	    $this->error = URI::MISSING_CLASS;
 	  }
       }
- 
+    
     $this->controllerName = 'Empathy\\Controller\\'.$this->controllerName;
 
     if(!$this->error)
-      {
+      {	
 	if(!class_exists($this->controllerName))
 	  {
 	    $this->error = URI::MISSING_CLASS_DEF;
@@ -267,7 +267,6 @@ class URI
       }	  
 
     $this->assertEventIsSet();   
-
     if(!$this->error)
       {	
 	$r = new \ReflectionClass($this->controllerName);
@@ -279,11 +278,10 @@ class URI
 
     if($this->error)
       {
-	throw new Exception('Error during URI stage: '.$this->getErrorMessage());
+	//throw new Exception('Error during URI stage: '.$this->getErrorMessage());
 	//$this->controllerPath = 'empathy/include/CustomController.php';
 	//$this->controllerName = 'empathy\\CustomController';
       }
-    
   }
 
   public function assertEventIsSet()
@@ -344,8 +342,8 @@ class URI
 	  {
 	    $_GET['section'] = $rows[$i]['id'];
 	  }
-      }
-    
+      }    
+
     if(isset($_GET['section']))
       {
 	$section->getItem($_GET['section']);
@@ -384,8 +382,8 @@ class URI
 	  {
 	    $controllerName = "template".$section->template;
 	  }   
-      }
-    
+      }   
+
     if(isset($controllerName))
       {
 	$_GET['class'] = $controllerName;
@@ -395,7 +393,8 @@ class URI
     $_GET['event'] = 'default_event';
     $_GET['id'] = $section->id;
 
-    $this->setController();
+    $this->setController();    
+    return $this->error;
   }
 
 
@@ -405,14 +404,17 @@ class URI
     $message = '';
     switch($this->error)
       {
-      case 1:
+      case URI::MISSING_CLASS:
 	$message = 'Missing class file.';
 	break;
-      case 2:
+      case URI::MISSING_CLASS_DEF:
 	$message = 'Missing class definition.';
 	break;
-      case 3:	    
-	$message = 'Controller event '.$this->event.' has not been defined.';	    
+      case URI::MISSING_EVENT_DEF:	    
+	$message = 'Controller event '.$_GET['event'].' has not been defined.';	    
+	break;
+      case URI::ERROR_404:
+	$message = 'Error 404.';
 	break;
       default:
 	break;     
