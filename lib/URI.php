@@ -23,6 +23,7 @@ class URI
   const MISSING_CLASS_DEF = 2;
   const MISSING_EVENT_DEF = 3;
   const ERROR_404 = 4;
+  const NO_TEMPLATE = 5;
   const MAX_COMP = 4; // maxium relevant info stored in a URI
                       // ie module, class, event, id
 
@@ -51,7 +52,6 @@ class URI
 
     $this->processRequest();
     $this->setController(); 
-    //$this->printRouting();
   }
 
   public function getError()
@@ -89,14 +89,6 @@ class URI
     else
       {
 	$this->formURI();
-	// detectVars is now obsolete
-	// will attempt to find correct route when args are present
-	/*
-	if(!$this->detectVars())
-	  {
-	    $this->analyzeURI();
-	  }	
-	*/
 	$this->analyzeURI();
       }
   }
@@ -122,21 +114,6 @@ class URI
 	  }      
       }
     $this->uri = $uri;
-  }
-
-  public function detectVars()
-  {
-    $vars = false;
-    $i = 0;
-    while($vars == false && $i < sizeof($this->uri))
-      {	
-	if(eregi('=', $this->uri[$i]))
-	  {
-	    $vars = true; 
-	  }
-	$i++;
-      }
-    return $vars;
   }
 
   public function analyzeURI()
@@ -202,9 +179,8 @@ class URI
       }
     if(!isset($_GET['module']))
       {	
-	// only url param is an id
-	$this->setModule($this->module[DEF_MOD]);
-	$this->error = URI::MISSING_CLASS;
+	// only present url param is an id
+	$this->setModule($this->module[DEF_MOD]);	
       }
   }        
    
@@ -218,7 +194,7 @@ class URI
   }
   
   public function setControllerPath()
-  {
+  {   
     $this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
   }
 
@@ -275,13 +251,6 @@ class URI
 	    $this->error = URI::MISSING_EVENT_DEF;
 	  }        
       }
-
-    if($this->error)
-      {
-	//throw new Exception('Error during URI stage: '.$this->getErrorMessage());
-	//$this->controllerPath = 'empathy/include/CustomController.php';
-	//$this->controllerName = 'empathy\\CustomController';
-      }
   }
 
   public function assertEventIsSet()
@@ -294,19 +263,17 @@ class URI
 
   public function dynamicSection($specialised = array())
   {
-    // code to assert correct section path - else throw 404
-   
+    // code still needed to assert correct section path - else throw 404
+    $this->error = 0;
     $section = new SectionItemStandAlone();
 
-    // find dynamic module
-    // needs error handling when dynamic module does not exist or is not set
     $i = 0;
     while($this->moduleIsDynamic[$i] == 0)
       {
 	$i++;
 	if($i > sizeof($this->moduleIsDynamic) - 1)
 	  {
-	    die("Reference to a dynamic module was searched for but not found.");
+	    throw new Exception("Reference to a dynamic module was searched for but not found.");
 	  }
       }    
     $_GET['module'] = $this->module[$i];
@@ -318,31 +285,31 @@ class URI
 	  {
 	    $_GET['id'] = $this->uri[$section_index--];
 	  }
-	$section_uri = $this->uri[$section_index];		       
+	if($section_index >= 0)
+	  {
+	    $section_uri = $this->uri[$section_index];
+	  }
       }
-    
-    if(!(isset($section_uri)))
-      {
-	$section_uri = "home";
-      }  
-    
+        
     $rows = $section->getURIData();
-   
-    for($i = 0; $i < sizeof($rows); $i++)
+    if(isset($section_uri))
       {
-	if($rows[$i]['friendly_url'] != NULL)
+	for($i = 0; $i < sizeof($rows); $i++)
 	  {
-	    $comp = str_replace(" ", "", strtolower($rows[$i]['friendly_url']));
-	  }
-	else
-	  {
-	    $comp = str_replace(" ", "", strtolower($rows[$i]['label']));
-	  }
-	if($comp == $section_uri)
-	  {
-	    $_GET['section'] = $rows[$i]['id'];
-	  }
-      }    
+	    if($rows[$i]['friendly_url'] != NULL)
+	      {
+		$comp = str_replace(" ", "", strtolower($rows[$i]['friendly_url']));
+	      }
+	    else
+	      {
+		$comp = str_replace(" ", "", strtolower($rows[$i]['label']));
+	      }
+	    if($comp == $section_uri)
+	      {
+		$_GET['section'] = $rows[$i]['id'];
+	      }
+	  }    
+      }
 
     if(isset($_GET['section']))
       {
@@ -352,52 +319,47 @@ class URI
     // section id is not set / found
     if(!(is_numeric($section->id)))
       {
-	//	header("Location: http://".WEB_ROOT);
-	//exit();
 	$this->error = URI::ERROR_404;
       }
-    
-    if(isset($_GET['id']))
-      {
-	$section->template = REGULAR_LAYOUT;
-      }
-    
+
     if(isset($section->url_name))
       {
 	$_GET['section_uri'] = $section->url_name;
       }
 
-    if($section->template == "")
+    if($this->error < 1)
       {
-	//echo 'no template.';
-	//exit();	
-      }
-    else
-      {	
-	if(in_array($section->id, $specialised))
+	if($section->template == "")
 	  {
-	    $controllerName = "template".$section->id;
+	    $this->error = URI::NO_TEMPLATE;
 	  }
 	else
-	  {
-	    $controllerName = "template".$section->template;
-	  }   
-      }   
+	  {	
+	    if(in_array($section->id, $specialised))
+	      {
+		$controllerName = "template".$section->id;
+	      }
+	    else
+	      {
+		$controllerName = "template".$section->template;
+	      }   
+	  }
+      }
 
     if(isset($controllerName))
       {
 	$_GET['class'] = $controllerName;
-	$this->error = 0;
       }
 
     $_GET['event'] = 'default_event';
     $_GET['id'] = $section->id;
 
-    $this->setController();    
+    if($this->error < 1)
+      {
+	$this->setController();    
+      }
     return $this->error;
   }
-
-
 
   public function getErrorMessage()
   {
@@ -405,24 +367,24 @@ class URI
     switch($this->error)
       {
       case URI::MISSING_CLASS:
-	$message = 'Missing class file.';
+	$message = 'Missing class file';
 	break;
       case URI::MISSING_CLASS_DEF:
-	$message = 'Missing class definition.';
+	$message = 'Missing class definition';
 	break;
       case URI::MISSING_EVENT_DEF:	    
-	$message = 'Controller event '.$_GET['event'].' has not been defined.';	    
+	$message = 'Controller event '.$_GET['event'].' has not been defined';	    
 	break;
       case URI::ERROR_404:
-	$message = 'Error 404.';
+	$message = 'Error 404';
+	break;
+      case URI::NO_TEMPLATE:
+	$message = 'No DSection template specified';
 	break;
       default:
 	break;     
       }
     return $message;
   }
-
-
-
 }
 ?>

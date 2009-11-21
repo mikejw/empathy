@@ -25,49 +25,20 @@ class Bootstrap
   private $specialised;
   private $uri;
 
-  public function __construct($module, $moduleIsDynamic, $specialised)
-  {
-    $this->module = $module;
-    $this->moduleIsDynamic = $moduleIsDynamic;
-    $this->specialised = $specialised;
-    spl_autoload_register('\Empathy\Bootstrap::loadClass');
-    set_exception_handler('\Empathy\Bootstrap::exception_handler');
-    if(USE_DOCTRINE == true)
-      {
-	require('Doctrine.php');
-	spl_autoload_register(array('\Doctrine', 'autoload'));
-      }
-    if(USE_ZEND == true)
-      {
-	require('Zend/Loader.php');
-	spl_autoload_register(array('\Zend_Loader', 'loadClass'));
-      }
+  public function __construct($bootOptions)
+  {    
+    $this->module = $bootOptions['module'];
+    $this->moduleIsDynamic = $bootOptions['module_is_dynamic'];
+    $this->specialised = $bootOptions['specialised'];
     header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
     header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
-
-    try
-      {
-	$this->dispatch();
-      }
-    catch(Exception $e)
-      {
-	echo $e->getMessage();exit();
-	
-	/*
-	$this->controller = new Controller($this->uri->getError(), false);
-	$this->controller->setTemplate('empathy.tpl');
-	$this->controller->assign('error', $e->getMessage());
-	$this->display(true);	
-	*/
-      }
   } 
 
-  private function dispatch()
+  public function dispatch()
   {
     $this->uri = new URI($this->module, $this->moduleIsDynamic);
     $error = $this->uri->getError();
 
-    // attempting to leave in support for dsection
     if(in_array(1, $this->moduleIsDynamic))
       {
 	if($this->uri->getError() == URI::MISSING_CLASS)
@@ -77,15 +48,22 @@ class Bootstrap
       }    
     if($error > 0)
       {
-	throw new Exception('Some error trying to dispatch: '.$error.' - '.$this->uri->getErrorMessage());
+	throw new Exception('Dispatch error: '.$this->uri->getErrorMessage());
       }
     $controller_name = $this->uri->getControllerName();
     $this->controller = new $controller_name($this->uri->getError(), false);     
     $this->controller->$_GET['event']();
     $this->display(false);
   }
-  
 
+  public function dispatchException($e)
+  {    
+    $this->controller = new Controller(0, false);    
+    $this->controller->setTemplate('empathy.tpl');
+    $this->controller->assign('error', $e->getMessage());    
+    $this->display(true);    
+  }
+  
   private function display($i)
   {
     if(PNG_OUTPUT == 1)
@@ -94,90 +72,5 @@ class Bootstrap
       }
     $this->controller->initDisplay($i);
   }
-
-  private function incPlugin($name)
-  {
-    require('empathy/include/plugin/empathy.'.$name.'.php');
-  }
-
-  public static function exception_handler($e)
-  {
-    // echo $e->getMessage()."\n";
-  }
-  
-
-  public static function loadClass($class)
-  {
-    //echo $class."<br />\n";
-    // $class = substr($class, 8); // hack around file structure
-    // not matching namespaces
-    $i = 0;
-    $load_error = 1;
-
-    //    echo $class."<br />";
-
-    //    if(!strpos($class, '\\'))
-    //    if(strpos($class, 'CustomController'))
-    if(strpos($class, 'Controller\\')
-       || strpos($class, 'Model\\'))
-      {
-	$class_arr = explode('\\', $class);
-        $class = $class_arr[sizeof($class_arr)-1];
-	$location = array(DOC_ROOT.'/application/',
-			  DOC_ROOT.'/application/'.$_GET['module'].'/',
-			  DOC_ROOT.'/storage/');	
-      }
-    else
-      {
-	$class = str_replace('\\', '/', $class);	
-	$location = array('');
-      }
-    
-    //    $location = array('empathy/include', DOC_ROOT.'/application',
-    //	      'empathy/storage', DOC_ROOT.'/storage');
-
-    while($i < sizeof($location) && $load_error == 1)
-      {
-	//$class_file = $location[$i].'/'.$class.'.php';           
-	$class_file = $location[$i].$class.'.php';           
-
-	if(@include($class_file))
-	  {		
-	    $class_file.": 1<br />\n";	
-	    $load_error = 0;
-	  }
-	else
-	  {
-	    $class_file.": 0<br />\n";
-	  }	
-	$i++;
-      }    
-
-    
-    /* old shizz
-    $class = substr($class, 8);
-
-    $i = 0;
-    $load_error = 1;
-    $location = array('empathy/include', DOC_ROOT.'/application',
-		      'empathy/storage', DOC_ROOT.'/storage');
-    
-    while($i < sizeof($location) && $load_error == 1)
-      {
-	$class_file = $location[$i].'/'.$class.'.php';           
-	if(@include($class_file))
-	  {		
-
-	    $load_error = 0;
-	  }
-	else
-	  {
-
-	  }	
-	$i++;
-      }
-    */
-  }
-
 }
 ?>
