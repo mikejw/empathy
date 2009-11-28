@@ -35,7 +35,7 @@ class Entity
 
     if(!is_object($controller) || $this->controller->connected == false)
       {	
-	$this->dbConnectNew();	
+	$this->dbConnect();	
       }
     $this->loadProperties();
   }  
@@ -55,40 +55,20 @@ class Entity
   }
 
   
-  public function dbConnectNew()
+  public function dbConnect()
   {
-    try{
+    //    try{
       $this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
 			   DB_USER, DB_PASS);
-    }
+      // }
+      /*
     catch (PDOException $e) {
       print "Error!: " . $e->getMessage() . "<br/>";
       die();
     }
+      */
   }
 
-  
-  public function dbConnect()
-  {
-    if(!(DBMS == "MYSQL"))
-    {
-      $this->controller->error("Empathy does not yet support other database management systems to MySQL.");
-    }
-    $server    = DB_SERVER;
-    $database  = DB_NAME;
-    $mysqlUser = DB_USER;
-    $mysqlPass = DB_PASS;
-
-    if(false == @mysql_connect($server,$mysqlUser,$mysqlPass))
-    {
-      $this->controller->error("Could not connect to database server: ".mysql_error(), 0);
-    }
-    if(false == @mysql_select_db($database))
-    {
-      $this->controller->error("Could not select database: ".mysql_error(), 0);
-    }
-    $this->controller->connected = true;
-  }
   
   public function query($sql, $error)    
   {

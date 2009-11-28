@@ -51,14 +51,7 @@ class Controller
 	$this->templateFile = $this->class.'.tpl';
       }
 
-    $this->sessionUp();
-	
-    /*
-    if($this->initError != 0)
-      {
-	$this->error($message);
-      }
-    */   
+    $this->sessionUp();	
     
     $this->assignSessionVar();
 	
