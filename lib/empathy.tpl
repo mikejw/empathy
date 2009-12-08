@@ -79,9 +79,9 @@ h1 { color: #00cdcd; font-size: 24px;
 </style>
 </head>
 <body>
-
+<!-- MVC Version: {$MVC_VERSION} -->
 <div id="page">
-<h1>Empathy</h1>
+<h1>Empathy {$MVC_VERSION}</h1>
 <div id="messages">
 <h2>{$error}</h2>
 </div>

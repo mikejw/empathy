@@ -48,7 +48,7 @@ class Bootstrap
       }    
     if($error > 0)
       {
-	throw new Exception('Dispatch error: '.$this->uri->getErrorMessage());
+	throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
       }
     $controller_name = $this->uri->getControllerName();
     $this->controller = new $controller_name($this->uri->getError(), false);     

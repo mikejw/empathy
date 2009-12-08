@@ -45,10 +45,11 @@ class SmartyPresenter
       }
 
     // assign constants
-    $this->assign("NAME", NAME);
-    $this->assign("WEB_ROOT", WEB_ROOT);
-    $this->assign("PUBLIC_DIR", PUBLIC_DIR);
-    $this->assign("DOC_ROOT", DOC_ROOT);
+    $this->assign('NAME', NAME);
+    $this->assign('WEB_ROOT', WEB_ROOT);
+    $this->assign('PUBLIC_DIR', PUBLIC_DIR);
+    $this->assign('DOC_ROOT', DOC_ROOT);
+    $this->assign('MVC_VERSION', MVC_VERSION);
   } 
 
   public function templateExists($template)

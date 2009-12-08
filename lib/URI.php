@@ -40,16 +40,18 @@ class URI
   public function __construct($module, $moduleIsDynamic)
   {
     $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
-
     $this->module = $module;
     $this->moduleIsDynamic = $moduleIsDynamic;
     if(isset($_SERVER['HTTP_HOST']))
-      {
+      {       
 	$this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+	$this->uriString = substr($this->full, $removeLength + 1);
       }
-    $this->uriString = substr($this->full, $removeLength + 1);
+    elseif(isset($_SERVER['REQUEST_URI'])) // request has been faked
+      {
+	$this->uriString = $_SERVER['REQUEST_URI'];	
+      }
     $this->error = 0;
-
     $this->processRequest();
     $this->setController(); 
   }

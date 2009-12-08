@@ -17,6 +17,8 @@
 
 use Empathy as Empathy;
 
+const MVC_VERSION = '1.0';
+
 require('spyc/spyc.php');
 
 class Empathy
@@ -27,7 +29,6 @@ class Empathy
   public function __construct($configDir)
   {
     date_default_timezone_set('Europe/London');
-    set_exception_handler(array($this, 'exceptionHandler'));
     spl_autoload_register(array($this, 'loadClass'));
 
     $this->loadConfig($configDir);
@@ -43,15 +44,20 @@ class Empathy
 	spl_autoload_register(array('\Zend_Loader', 'loadClass'));
       }
     $this->boot = new Empathy\Bootstrap($this->bootOptions);
-    $this->boot->dispatch();
+    try
+      {
+	$this->boot->dispatch();
+      }
+    catch(Exception $e)
+      {
+	$this->exceptionHandler($e);
+      }
   }
 
-
-  public function exceptionHandler($e)
+  private function exceptionHandler($e)
   {
     $this->boot->dispatchException($e);
   }
-
 
   private function loadConfig($configDir)
   {
