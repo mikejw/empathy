@@ -15,7 +15,9 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
-class front extends Controller
+namespace Empathy\Controller;
+
+class front extends CustomController
 { 
   public function default_event()
   {

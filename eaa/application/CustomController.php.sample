@@ -18,6 +18,9 @@
 
 // Site-wide controller customisation goes in this file.
 
+namespace Empathy\Controller;
+use Empathy\Controller as Controller;
+
 class CustomController extends Controller
 {	
   public function __construct($error, $internal)
