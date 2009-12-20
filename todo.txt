@@ -1,3 +1,14 @@
 
- - URI.php L179 => if method exists remove class error
+Y - URI.php L179 => if method exists remove class error
    => different behaviour depending on dynamic module
+Y - Make dependencies configurable in new local config
+   => path, class and autoload function name specified in an
+      array for each external lib.
+  - sanity checks for boot options
+  - give site specific config a setting to determine mode
+    => ie. switching local configs on the fly
+    => mode ideas: slim, full, smarty?
+  - what's going to happen to zend/doctrine setup stuff?
+  - other bootstrap stuff => default headers, default timezone etc
+  - write default tests
+

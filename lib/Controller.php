@@ -66,7 +66,7 @@ class Controller
       }      
 
     // doctrine stuff            
-    if(USE_DOCTRINE == true)
+    if(defined('USE_DOCTRINE') && USE_DOCTRINE == true)
       {
 	$this->d_man = \Doctrine_Manager::getInstance();
 	$dsn = 'mysql://'.DB_USER.':'.DB_PASS.'@'.DB_SERVER.'/'.DB_NAME;

@@ -31,18 +31,9 @@ class Empathy
     date_default_timezone_set('Europe/London');
     spl_autoload_register(array($this, 'loadClass'));
 
-    $this->loadConfig($configDir);
+    $this->loadConfig($configDir);    
+    $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
 
-    if(USE_DOCTRINE == true)
-      {
-	require('Doctrine.php');
-	spl_autoload_register(array('\Doctrine', 'autoload'));
-      }
-    if(USE_ZEND == true)
-      {
-	require('Zend/Loader.php');
-	spl_autoload_register(array('\Zend_Loader', 'loadClass'));
-      }
     $this->boot = new Empathy\Bootstrap($this->bootOptions);
     try
       {
@@ -56,7 +47,15 @@ class Empathy
 
   private function exceptionHandler($e)
   {
-    $this->boot->dispatchException($e);
+    switch(get_class($e))
+      {
+      case 'Empathy\SafeException':
+	echo $e->getMessage();
+	break;
+      default:
+	$this->boot->dispatchException($e);
+	break;
+      }
   }
 
   private function loadConfig($configDir)
@@ -69,10 +68,19 @@ class Empathy
 	  {
 	    define(strtoupper($index), $item);
 	  }
+      }   
+    if(isset($config['boot_options']))
+      {
+	$this->bootOptions = $config['boot_options'];
       }
-    $this->bootOptions = array('module' => $config['module'],
-		 'module_is_dynamic' => $config['module_is_dynamic'],
-		 'specialised' => $config['specialised']);
+    if(isset($config['dependency']))
+      {
+	foreach($config['dependency'] as $item)
+	  {
+	    require($item['path']);
+	    spl_autoload_register(array($item['class'], $item['loader']));
+	  }
+      }
   }
 
 

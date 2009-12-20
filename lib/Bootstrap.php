@@ -20,31 +20,34 @@ namespace Empathy;
 class Bootstrap
 {
   private $controller = null;
-  private $module;
-  private $moduleIsDynamic;
-  private $specialised;
+  private $defaultModule;
+  private $dynamicModule;
   private $uri;
 
   public function __construct($bootOptions)
   {    
-    $this->module = $bootOptions['module'];
-    $this->moduleIsDynamic = $bootOptions['module_is_dynamic'];
-    $this->specialised = $bootOptions['specialised'];
+    if(isset($bootOptions['default_module']))
+      {
+	$this->defaultModule = $bootOptions['default_module'];
+      }
+    if(isset($bootOptions['dynamic_module']))
+      {
+	$this->dynamicModule = $bootOptions['dynamic_module'];
+      }
     header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
     header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
   } 
 
   public function dispatch()
   {
-    $this->uri = new URI($this->module, $this->moduleIsDynamic);
+    $this->uri = new URI($this->defaultModule, $this->dynamicModule);
     $error = $this->uri->getError();
 
-    if(in_array(1, $this->moduleIsDynamic))
-      {
-	if($this->uri->getError() == URI::MISSING_CLASS)
-	  {	    
-	    $error = $this->uri->dynamicSection($this->specialised);
-	  }
+    if($error == URI::MISSING_CLASS
+       && isset($this->dynamicModule)
+       && $this->dynamicModule != '')
+      {	
+	    $error = $this->uri->dynamicSection();	
       }    
     if($error > 0)
       {

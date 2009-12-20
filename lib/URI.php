@@ -30,18 +30,19 @@ class URI
   private $full;
   private $uriString;
   private $uri;
-  private $module;
-  private $moduleIsDynamic;
+  private $defaultModule;
+  private $dynamicModule;
   private $error;
   private $internal = false;
   private $controllerPath = '';
   private $controllerName = '';
 
-  public function __construct($module, $moduleIsDynamic)
-  {
+  public function __construct($default_module, $dynamic_module)
+  {        
+    $this->sanity($default_module);    
     $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
-    $this->module = $module;
-    $this->moduleIsDynamic = $moduleIsDynamic;
+    $this->defaultModule = $default_module;
+    $this->dynamicModule = $dynamic_module;
     if(isset($_SERVER['HTTP_HOST']))
       {       
 	$this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
@@ -86,7 +87,7 @@ class URI
     
     if($this->uriString == '')
       {		
-	$this->setModule($this->module[DEF_MOD]);
+	$this->setModule($this->defaultModule);
       }
     else
       {
@@ -147,13 +148,15 @@ class URI
 	if(!isset($_GET['module']))
 	  {
 
+
+	    /*
 	    while($j < sizeof($this->module) && $current != $this->module[$j])
 	      {
 		$j++;
 	      }
 	    $modIndex = $j;
 	    
-	    // current is not a module so set to default
+
 	    if($modIndex == sizeof($this->module))
 	      {
 		$modIndex = DEF_MOD;
@@ -161,7 +164,9 @@ class URI
 
 		$this->error = URI::MISSING_CLASS;
 	      }
-	    $this->setModule($this->module[$modIndex]);
+	    */
+
+	    $this->setModule($current);
 	    $i++;
 	    continue;
 	  }
@@ -182,7 +187,7 @@ class URI
     if(!isset($_GET['module']))
       {	
 	// only present url param is an id
-	$this->setModule($this->module[DEF_MOD]);	
+	$this->setModule($this->defaultModule);	
       }
   }        
    
@@ -263,22 +268,19 @@ class URI
       }       
   }
 
-  public function dynamicSection($specialised = array())
+  public function dynamicSection()
   {
     // code still needed to assert correct section path - else throw 404
     $this->error = 0;
     $section = new SectionItemStandAlone();
-
-    $i = 0;
-    while($this->moduleIsDynamic[$i] == 0)
+    if(!isset($this->dynamicModule) || $this->dynamicModule == '')
       {
-	$i++;
-	if($i > sizeof($this->moduleIsDynamic) - 1)
-	  {
-	    throw new Exception("Reference to a dynamic module was searched for but not found.");
-	  }
+	throw new Exception("Failed to find name of dynamic module.");
       }    
-    $_GET['module'] = $this->module[$i];
+    else
+      {
+	$_GET['module'] = $this->dynamicModule;
+      }
 
     if(sizeof($this->uri) > 0)
       {
@@ -336,8 +338,8 @@ class URI
 	    $this->error = URI::NO_TEMPLATE;
 	  }
 	else
-	  {	
-	    if(in_array($section->id, $specialised))
+	  {		    
+	    if($section->template == '0') // section in 'specialised'
 	      {
 		$controllerName = "template".$section->id;
 	      }
@@ -372,7 +374,7 @@ class URI
 	$message = 'Missing class file';
 	break;
       case URI::MISSING_CLASS_DEF:
-	$message = 'Missing class definition';
+	$message = 'Missing or incorrect class definition';
 	break;
       case URI::MISSING_EVENT_DEF:	    
 	$message = 'Controller event '.$_GET['event'].' has not been defined';	    
@@ -387,6 +389,27 @@ class URI
 	break;     
       }
     return $message;
+  }
+
+
+  public function sanity($default_module)
+  {
+    if(!isset($default_module))
+      {
+	throw new SafeException('Dispatch error: No default module specified');
+      }
+    if(!defined('WEB_ROOT'))
+      {
+	throw new SafeException('Dispatch error: Web root is not defined');
+      }
+    if(!defined('PUBLIC_DIR'))
+      {
+	throw new SafeException('Dispatch error: Public dir is not defined');
+      }
+    if(!defined('DOC_ROOT'))
+      {
+	throw new SafeException('Dispatch error: Doc root is not defined');
+      }
   }
 }
 ?>
