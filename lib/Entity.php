@@ -57,6 +57,23 @@ class Entity
   
   public function dbConnect()
   {
+    if(!defined('DB_SERVER'))
+      {
+	throw new SafeException('DB Error: No database host given');
+      }
+    if(!defined('DB_NAME'))
+      {
+	throw new SafeException('DB Error: No database name');
+      }
+    if(!defined('DB_USER'))
+      {
+	throw new SafeException('DB Error: No database username');
+      }
+    if(!defined('DB_PASS'))
+      {
+	throw new SafeException('DB Error: No database password');
+      }
+
     //    try{
       $this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
 			   DB_USER, DB_PASS);

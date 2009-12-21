@@ -410,6 +410,22 @@ class URI
       {
 	throw new SafeException('Dispatch error: Doc root is not defined');
       }
+    if(!defined('SMARTY_DEBUGGING'))
+      {
+	throw new SafeException('Dispatch error: Smarty debugging is not defined');
+      }
+    if(!defined('TITLE'))
+      {
+	throw new SafeException('Dispatch error: No fallback title is defined');
+      }
+    if(!defined('NAME'))
+      {
+	throw new SafeException('Dispatch error: Web application needs a name');
+      }
+    if(!defined('TPL_BY_CLASS'))
+      {
+	throw new SafeException('Dispatch error: TPL_BY_CLASS is not defined');
+      }
   }
 }
 ?>
