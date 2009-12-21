@@ -1,30 +1,19 @@
 ---
 name: eaa
 title: 
-author: ai-em
-sub_title: 
 doc_root: /var/www/sites/eaa
 web_root: atreyu/sites/eaa
 public_dir: /public_html
-mysql: /usr/bin/mysql
-mysql_dump: /usr/bin/mysqldump
-perl: /usr/bin/perl
-ffmpeg: /usr/bin/ffmpeg
 db_server: localhost
 db_user: root
 db_pass: 
 db_name: 
 tbl_prefix: 
-tpl_by_class: 1
-def_mod: 0
-module: 
-    - front
-    - test
-module_is_dynamic: 
-    - 0
-specialised: 
-smarty_debugging: 0
-png_output: 0
-debug_mode: 1
-use_doctrine: no
-use_zend: no
+tpl_by_class: true
+boot_options:
+  default_module: front
+  dynamic_module:
+smarty_debugging: false
+
+#png_output: 0
+#debug_mode: true
