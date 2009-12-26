@@ -31,6 +31,11 @@ function my_spl_autoload($class)
 	}
       $i++;
     }
+
+  if($load_error == 1 && USE_ZEND == true)
+    {
+      Zend_Loader::loadClass($class);
+    }
 }
 
 class Bootstrap
@@ -39,6 +44,10 @@ class Bootstrap
 
   public function __construct($module, $moduleIsDynamic, $specialised)
   {
+    if(USE_ZEND == true)
+      {
+	require('Zend/Loader.php');
+      }
     spl_autoload_register('my_spl_autoload');
 
     $this->incPlugin('no_cache');

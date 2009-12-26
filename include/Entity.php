@@ -161,7 +161,7 @@ class Entity
     foreach($properties as $property)
       {
 	$sql .= "$property = ";
-	if(is_numeric($this->$property))
+	if(is_numeric($this->$property) && !is_string($this->$property))
 	  {
 	    $sql .= $this->$property;
 	  }
@@ -210,7 +210,7 @@ class Entity
       {
 	if(!in_array($property, $this->globally_ignored_property))
 	  {	    
-	    if(is_numeric($this->$property))
+	    if(is_numeric($this->$property) && !is_string($this->$property))
 	      {
 		$sql .= $this->$property;
 	      }
@@ -651,12 +651,17 @@ class Entity
 
   public function getValErrors()
   {
-    return $this->val->errors;
+    return $this->val->getErrors();
   }
 
-  public function addValError($error)
+  public function addValError($error, $field='')
   {
-    $this->val->addError($error);
+    $this->val->addError($error, $field);
+  }
+
+  public function doValType($type, $field, $data, $optional)
+  {
+    return $this->val->valType($type, $field, $data, $optional);
   }
 
 }
