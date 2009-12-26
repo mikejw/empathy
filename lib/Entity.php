@@ -15,6 +15,8 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace Empathy;
+
 class Entity
 {
   private $val;
@@ -23,59 +25,84 @@ class Entity
   private $result;
   private $globally_ignored_property = array('id', 'table');
   private $properties;
+  private $dbh;
 
-  public function __construct(&$controller)
+  public function __construct($controller)
   {
     $this->val = new Validate();
     $this->properties = array();
-    
     $this->controller = $controller;
-    if($this->controller->connected == false)
-      {
-	$this->dbConnect();
+
+    if(!is_object($controller) || $this->controller->connected == false)
+      {	
+	$this->dbConnect();	
       }
     $this->loadProperties();
   }  
 
+  protected function insertId()
+  {
+    return $this->dbh->lastInsertId();
+  }
+
   private function loadProperties()
   {
-    $r = new ReflectionClass(get_class($this));
+    $r = new \ReflectionClass(get_class($this));
     foreach($r->getProperties() as $item)
       {
 	array_push($this->properties, $item->name);
       }
   }
+
   
   public function dbConnect()
   {
-    if(!(DBMS == "MYSQL"))
-    {
-      $this->controller->error("Empathy does not yet support other database management systems to MySQL.");
-    }
-    $server    = DB_SERVER;
-    $database  = DB_NAME;
-    $mysqlUser = DB_USER;
-    $mysqlPass = DB_PASS;
+    if(!defined('DB_SERVER'))
+      {
+	throw new SafeException('DB Error: No database host given');
+      }
+    if(!defined('DB_NAME'))
+      {
+	throw new SafeException('DB Error: No database name');
+      }
+    if(!defined('DB_USER'))
+      {
+	throw new SafeException('DB Error: No database username');
+      }
+    if(!defined('DB_PASS'))
+      {
+	throw new SafeException('DB Error: No database password');
+      }
 
-    if(false == @mysql_connect($server,$mysqlUser,$mysqlPass))
-    {
-      $this->controller->error("Could not connect to database server: ".mysql_error(), 0);
+    //    try{
+      $this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
+			   DB_USER, DB_PASS);
+      // }
+      /*
+    catch (PDOException $e) {
+      print "Error!: " . $e->getMessage() . "<br/>";
+      die();
     }
-    if(false == @mysql_select_db($database))
-    {
-      $this->controller->error("Could not select database: ".mysql_error(), 0);
-    }
-    $this->controller->connected = true;
+      */
   }
+
   
   public function query($sql, $error)    
   {
     $result = NULL;
-    
-    $result = @mysql_query($sql);
-    if($result == false)
+   
+    /*
+    if(is_object($this->result))
       {
-	$this->controller->error("[$sql]<br /><strong>MySQL</strong>: ($error): ".mysql_error(), 0);
+	$this->result->closeCursor();
+      }
+    */
+    if(($result = $this->dbh->query($sql)) == false)  
+      {
+	$errors = $this->dbh->errorInfo();
+	$this->controller->error("[".htmlentities($sql)
+				 ."]<br /><strong>MySQL</strong>: ($error): "
+				 .htmlentities($errors[2]), 0);       
       }
     else
       {
@@ -91,11 +118,11 @@ class Entity
     $table = $this->appendPrefix($table);
     $sql = "SELECT * FROM $table WHERE id = $this->id";
     $error = "Could not load record from $table.";
- 
-    $result = $this->query($sql, $error);
-    if(mysql_num_rows($result) > 0)
+
+    $result = $this->query($sql, $error);    
+    if($result->rowCount() > 0)
       {
-	$row = mysql_fetch_array($result);
+	$row = $result->fetch();
 	foreach($row as $index => $value)
 	  {
 	    $this->$index = $value;
@@ -182,7 +209,13 @@ class Entity
       }
     $sql .= " WHERE id = $this->id";
     $error = "Could not update table '$table'";
-    $this->query($sql, $error);
+    if($this->dbh->exec($sql) === false)
+      {
+	$errors = $this->dbh->errorInfo();
+	$this->controller->error("[".htmlentities($sql)
+				 ."]<br /><strong>MySQL</strong>: ($error): "
+				 .htmlentities($errors[2]), 0);       
+      }
   }  
   
   public function insert($table, $id, $format, $sanitize)
@@ -236,9 +269,20 @@ class Entity
       }
     $sql .= ")";
    
-    $error = "Could not insert to table '$table'";
-    $this->query($sql, $error);
-    return mysql_insert_id();
+    $error = "Could not insert to table '$table'";                
+
+
+    if(($result = $this->query($sql, $error)) === false)
+      {
+	$errors = $this->dbh->errorInfo();
+	$this->controller->error("[".htmlentities($sql)
+				 ."]<br /><strong>MySQL</strong>: ($error): "
+				 .htmlentities($errors[2]), 0);       
+      }
+    else
+      {
+	return $this->insertId();
+      }    
   }
   
   public function appendPrefix($table)
@@ -277,7 +321,7 @@ class Entity
     $result = $this->query($sql, $error);
     
     $i = 0;
-    while($row = mysql_fetch_array($result))
+    foreach($result as $row)
       {
 	$all[$i] = $row;
 	$i++;
@@ -292,7 +336,7 @@ class Entity
     $sql = 'SELECT * FROM '.$table.' '.$sql_string;
     $error = 'Could not get rows from '.$table;
     $result = $this->query($sql, $error);   
-    $rows = mysql_num_rows($result);
+    $rows = $result->rowCount();
     $p_rows = $rows;
     $pages = ceil($rows / $per_page);
     $i = 1;
@@ -319,7 +363,7 @@ class Entity
     $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2 '.$sql_string;
     $error = 'Could not get rows from '.$table1;
     $result = $this->query($sql, $error);   
-    $rows = mysql_num_rows($result);
+    $rows = $result->rowCount();
     $p_rows = $rows;
     $pages = ceil($rows / $per_page);
     $i = 1;
@@ -415,7 +459,7 @@ class Entity
 
     $result = $this->query($sql, $error);
     $i = 0;
-    while($row = mysql_fetch_array($result))
+    foreach($result as $row)
       {
 	$all[$i] = $row;
 	$i++;
@@ -432,7 +476,8 @@ class Entity
 
     $result = $this->query($sql, $error);
     $i = 0;
-    while($row = mysql_fetch_array($result))
+    //while($row = mysql_fetch_array($result))
+    foreach($result as $row)
       {
 	$all[$i] = $row;
 	$i++;

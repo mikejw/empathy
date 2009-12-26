@@ -15,6 +15,7 @@
   // You should have received a copy of the GNU Lesser General Public License
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace Empathy;
 require("Smarty/Smarty.class.php");
 
 class SmartyPresenter
@@ -23,7 +24,7 @@ class SmartyPresenter
 
   public function __construct($internal)
   {
-    $this->smarty = new Smarty();
+    $this->smarty = new \Smarty();
     $this->smarty->debugging = SMARTY_DEBUGGING;
     if($internal)
       {
@@ -44,10 +45,11 @@ class SmartyPresenter
       }
 
     // assign constants
-    $this->assign("NAME", NAME);
-    $this->assign("WEB_ROOT", WEB_ROOT);
-    $this->assign("PUBLIC_DIR", PUBLIC_DIR);
-    $this->assign("DOC_ROOT", DOC_ROOT);
+    $this->assign('NAME', NAME);
+    $this->assign('WEB_ROOT', WEB_ROOT);
+    $this->assign('PUBLIC_DIR', PUBLIC_DIR);
+    $this->assign('DOC_ROOT', DOC_ROOT);
+    $this->assign('MVC_VERSION', MVC_VERSION);
   } 
 
   public function templateExists($template)
@@ -63,6 +65,15 @@ class SmartyPresenter
   public function clear_assign($name)
   {
     $this->smarty->clear_assign($name);
+  }
+
+  public function switchInternal($i)
+  {
+    if($i)
+      {
+	$pathToEmp = explode('Empathy', __FILE__);
+	$this->smarty->template_dir = $pathToEmp[0]."Empathy";
+      }
   }
 
   public function display($template)
