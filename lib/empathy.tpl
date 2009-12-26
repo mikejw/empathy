@@ -55,7 +55,9 @@ border-collapse: collapse;
 border-spacing: 0;
 }
 
-html, body { height: 100%; background-color: #111;
+html, body { height: 100%;
+/*background-color: #111;*/
+background-color: #ccc; 
 position: relative; }
 #page { width: 600px; height: 460px;
   -moz-border-radius: 25px;
