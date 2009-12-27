@@ -5,6 +5,7 @@ Y - Make dependencies configurable in new local config
    => path, class and autoload function name specified in an
       array for each external lib.
   - sanity checks for boot options
+  => db config checks happen in one place (taking into account stand alone section class).
   - give site specific config a setting to determine mode
     => ie. switching local configs on the fly
     => mode ideas: slim, full, smarty?

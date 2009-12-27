@@ -70,9 +70,8 @@ class SmartyPresenter
   public function switchInternal($i)
   {
     if($i)
-      {
-	$pathToEmp = explode('Empathy', __FILE__);
-	$this->smarty->template_dir = $pathToEmp[0]."Empathy";
+      {        
+	$this->smarty->template_dir = realpath(dirname(__FILE__));
       }
   }
 

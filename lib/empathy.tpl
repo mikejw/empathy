@@ -56,26 +56,29 @@ border-spacing: 0;
 }
 
 html, body { height: 100%;
-/*background-color: #111;*/
-background-color: #ccc; 
+background-color: #111;
 position: relative; }
 #page { width: 600px; height: 460px;
   -moz-border-radius: 25px;
+  -webkit-border-radius: 25px;
   background-color: #222;
   position: absolute; top: 50%; left: 50%;
   margin: -230px 0 0 -300px; }
 
 h1 { margin: 20px 0 0 0;
-  border-bottom: 2px solid #003131; }
+  border-bottom: 2px solid #003131; text-align: center; }
 
-h1, h2 { text-align: center; }
 
-#messages { padding: 20px 0 200px 0; background-color: #000; } 
+#messages { padding: 20px 10px 200px 10px; background-color: #000;
+overflow-y: scroll; height: 100px; }
 
 /* typography */
 h1 { color: #00cdcd; font-size: 24px;
   font-family: futura, arial, sans-serif; }
+#messages h2 { font-family: verdana, arial, sans-serif;
+font-size: 12px; font-weight: normal; line-height: 1.5em; }
 #messages { color: #ccc; }
+#messages a { color: #ccc; }
 
 {/literal}
 </style>
@@ -86,6 +89,16 @@ h1 { color: #00cdcd; font-size: 24px;
 <h1>Empathy {$MVC_VERSION}</h1>
 <div id="messages">
 <h2>{$error}</h2>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
 </div>
 </div>
 

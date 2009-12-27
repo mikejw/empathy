@@ -23,9 +23,11 @@ class Bootstrap
   private $defaultModule;
   private $dynamicModule;
   private $uri;
+  private $mvc;
 
-  public function __construct($bootOptions)
+  public function __construct($bootOptions, $e)
   {    
+    $this->mvc = $e;
     if(isset($bootOptions['default_module']))
       {
 	$this->defaultModule = $bootOptions['default_module'];
@@ -56,7 +58,14 @@ class Bootstrap
     $controller_name = $this->uri->getControllerName();
     $this->controller = new $controller_name($this->uri->getError(), false);     
     $this->controller->$_GET['event']();
-    $this->display(false);
+    if($this->mvc->hasErrors())
+      {	
+	throw new ErrorException($this->mvc->errorsToString());
+      }
+    else
+      {
+	$this->display(false);    
+      }
   }
 
   public function dispatchException($e)
@@ -68,7 +77,7 @@ class Bootstrap
   }
   
   private function display($i)
-  {
+  {    
     /*
     if(PNG_OUTPUT == 1)
       {

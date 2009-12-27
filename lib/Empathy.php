@@ -17,7 +17,7 @@
 
 use Empathy as Empathy;
 
-const MVC_VERSION = '1.0';
+const MVC_VERSION = '0.9';
 
 require('spyc/spyc.php');
 
@@ -25,16 +25,18 @@ class Empathy
 {
   private $boot;
   private $bootOptions;
+  private $errors;
 
   public function __construct($configDir)
   {
     date_default_timezone_set('Europe/London');
     spl_autoload_register(array($this, 'loadClass'));
-
+    set_error_handler(array($this, 'errorHandler'));
+    
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
 
-    $this->boot = new Empathy\Bootstrap($this->bootOptions);
+    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this);
     try
       {
 	$this->boot->dispatch();
@@ -45,8 +47,67 @@ class Empathy
       }
   }
 
+
+  public function getErrors()
+  {
+    return $this->errors;
+  }
+
+  public function hasErrors()
+  {
+    return (sizeof($this->errors) > 0);
+  }
+
+  public function errorsToString()
+  {
+    return implode('</h2><h2>&nbsp;</h2><h2>', $this->getErrors());
+  }
+
+
+  public function errorHandler($errno, $errstr, $errfile, $errline)
+  {  
+    if(error_reporting())
+      {
+	$msg = '';
+	switch ($errno)
+	  {
+	  case E_ERROR:	
+	  case E_USER_ERROR:
+	    $msg = "Error: [$errno] $errstr";
+	    $msg .= "  Fatal error on line $errline in file $errfile";
+	    $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
+	    $msg .= " Aborting...";
+	    die($msg);
+	    break;	
+	  case E_WARNING:
+	  case E_USER_WARNING:
+	    $msg = "Warning: [$errno] $errstr";
+	    break;	    
+	  case E_NOTICE:
+	  case E_USER_NOTICE:
+	    $msg = "Notice: [$errno] $errstr";
+	    break;	           
+	  case E_DEPRECATED:
+	  case E_STRICT:
+	    $msg = "Strict/Deprecated notice: [$errno] $errstr";	
+	    break;
+	  default:
+	    $msg = "Unknown error type: [$errno] $errstr";
+	    break;
+	  }
+	$msg .= " on line $errline in file $errfile";
+	//$msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
+	$this->errors[] = $msg;
+      }
+    return true;
+  }
+
   private function exceptionHandler($e)
   {
+    if($this->hasErrors())
+      {
+	$e = new ErrorException($this->errorsToString());
+      }
     switch(get_class($e))
       {
       case 'Empathy\SafeException':
@@ -60,8 +121,13 @@ class Empathy
 
   private function loadConfig($configDir)
   {
+    $configFile = $configDir.'/config.yml';
+    if(!file_exists($configFile))
+      {
+	die('Config error: '.$configFile.' does not exist');
+      }
     $s = new \Spyc();
-    $config = $s->YAMLLoad($configDir.'/config.yml');      
+    $config = $s->YAMLLoad($configFile);      
     foreach($config as $index => $item)
       {
 	if(!is_array($item))
