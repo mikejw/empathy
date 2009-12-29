@@ -17,7 +17,7 @@
 
 use Empathy as Empathy;
 
-const MVC_VERSION = '0.9';
+const MVC_VERSION = '0.9.4';
 
 require('spyc/spyc.php');
 
