@@ -27,7 +27,7 @@ class Entity
   private $properties;
   private $dbh;
 
-  public function __construct($controller)
+  public function __construct($controller = NULL)
   {
     $this->val = new Validate();
     $this->properties = array();

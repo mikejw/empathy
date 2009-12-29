@@ -12,4 +12,6 @@ Y - Make dependencies configurable in new local config
   - what's going to happen to zend/doctrine setup stuff?
   - other bootstrap stuff => default headers, default timezone etc
   - write default tests
+  - dsection
+  => proper dsection URL resolution => duplicate sections?
 

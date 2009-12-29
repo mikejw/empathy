@@ -2,7 +2,7 @@
 
 namespace Empathy;
 
-class SectionItemStandAlone
+class SectionItemStandAlone extends Entity
 {
   public $id;
   public $module;
@@ -15,50 +15,8 @@ class SectionItemStandAlone
   public $hidden;
   public $owns_inline;
   public $link;
-  private $result;
 
   public static $table = "section_item";
-
-  public function __construct()
-  {
-    $this->dbConnect();
-  }
-
-  private function dbConnect()
-  {
-    try
-      {
-	$this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
-			   DB_USER, DB_PASS);
-      }
-    catch (PDOException $e)
-      {
-	print "Error!: " . $e->getMessage() . "<br/>";
-	die();
-      }
-  }
-
-  private function query($sql, $error)
-  {
-    $result = NULL;
-    
-    if(is_object($this->result))
-      {
-	$this->result->closeCursor();
-      }
-    if(($result = $this->dbh->query($sql)) == false)  
-      {
-	$errors = $this->dbh->errorInfo();
-	$this->controller->error("[".htmlentities($sql)
-				 ."]<br /><strong>MySQL</strong>: ($error): "
-				 .htmlentities($errors[2]), 0);       
-      }
-    else
-      {
-	$this->result = $result;
-      }      
-    return $result;
-  }
 
   public function getURIData()
   {
@@ -94,8 +52,6 @@ class SectionItemStandAlone
       //echo "Whoops!";
     }
   }
-
-  
   
 }
 ?>
