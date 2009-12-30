@@ -57,46 +57,30 @@ class Entity
   
   public function dbConnect()
   {
-    if(!defined('DB_SERVER'))
+    if(!defined('DB_SERVER') || DB_SERVER == '')
       {
 	throw new SafeException('DB Error: No database host given');
       }
-    if(!defined('DB_NAME'))
+    if(!defined('DB_NAME') || DB_NAME == '')
       {
 	throw new SafeException('DB Error: No database name');
       }
-    if(!defined('DB_USER'))
+    if(!defined('DB_USER') || DB_USER == '')
       {
 	throw new SafeException('DB Error: No database username');
       }
-    if(!defined('DB_PASS'))
+    if(!defined('DB_PASS') || DB_PASS == '')
       {
 	throw new SafeException('DB Error: No database password');
       }
-
-    //    try{
-      $this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
-			   DB_USER, DB_PASS);
-      // }
-      /*
-    catch (PDOException $e) {
-      print "Error!: " . $e->getMessage() . "<br/>";
-      die();
-    }
-      */
+    $this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
+			   DB_USER, DB_PASS);    
   }
 
   
   public function query($sql, $error)    
   {
     $result = NULL;
-   
-    /*
-    if(is_object($this->result))
-      {
-	$this->result->closeCursor();
-      }
-    */
     if(($result = $this->dbh->query($sql)) == false)  
       {
 	$errors = $this->dbh->errorInfo();
