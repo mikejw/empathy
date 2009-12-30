@@ -36,9 +36,11 @@ class URI
   private $internal = false;
   private $controllerPath = '';
   private $controllerName = '';
+  private $cli_mode_detected;
 
   public function __construct($default_module, $dynamic_module)
   {        
+    $this->cli_mode_detected = false;
     $this->sanity($default_module);    
     $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
     $this->defaultModule = $default_module;
@@ -48,13 +50,27 @@ class URI
 	$this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 	$this->uriString = substr($this->full, $removeLength + 1);
       }
-    elseif(isset($_SERVER['REQUEST_URI'])) // request has been faked
+    else
       {
-	$this->uriString = $_SERVER['REQUEST_URI'];	
+	if(isset($_SERVER['REQUEST_URI'])) // request has been faked
+	  {
+	    $this->uriString = $_SERVER['REQUEST_URI'];	
+	  }
+	else
+	  {
+	    $this->cli_mode_detected = true;
+	  }
       }
+
     $this->error = 0;
     $this->processRequest();
     $this->setController(); 
+  }
+
+
+  public function getCliMode()
+  {
+    return $this->cli_mode_detected;
   }
 
   public function getError()

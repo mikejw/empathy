@@ -27,20 +27,20 @@ class Controller
   public $presenter;
   public $connected;
   private $initError;
-  private $internal;
   protected $d_man;
   protected $d_conn;
+  protected $cli_mode;
   
-  public function __construct($error, $i)
+  public function __construct($error, $cli_mode)
   {
+    $this->cli_mode = $cli_mode;
     $this->initError = $error;
-    $this->internal = $i;
     $this->connected = false;
     $this->module = $_GET['module'];
     $this->class = $_GET['class'];
     $this->event = $_GET['event'];
     $this->title = TITLE;
-    $this->presenter = new SmartyPresenter($i);
+    $this->presenter = new SmartyPresenter();
     
     if(TPL_BY_CLASS == 0)
       {
@@ -123,7 +123,7 @@ class Controller
 	//$this->error('Missing template file: '.$this->templateFile);
       }
     else
-      {	
+      {			
 	$this->presenter->display($this->templateFile);   
       }
   }

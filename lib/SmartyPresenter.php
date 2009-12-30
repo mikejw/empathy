@@ -22,19 +22,11 @@ class SmartyPresenter
 {
   private $smarty;
 
-  public function __construct($internal)
+  public function __construct()
   {
     $this->smarty = new \Smarty();
     $this->smarty->debugging = SMARTY_DEBUGGING;
-    if($internal)
-      {
-	$pathToEmp = explode('empathy', __FILE__);
-	$this->smarty->template_dir = $pathToEmp[0]."empathy/presentation";
-      }
-    else
-      {
-	$this->smarty->template_dir = DOC_ROOT."/presentation";
-      }
+    $this->smarty->template_dir = DOC_ROOT."/presentation";
     $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
     $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
     $this->smarty->config_dir = DOC_ROOT."/tpl/configs";   

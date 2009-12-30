@@ -56,7 +56,7 @@ class Bootstrap
 	throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
       }
     $controller_name = $this->uri->getControllerName();
-    $this->controller = new $controller_name($this->uri->getError(), false);     
+    $this->controller = new $controller_name($this->uri->getError(), $this->uri->getCliMode());     
     $this->controller->$_GET['event']();
     if($this->mvc->hasErrors())
       {	
