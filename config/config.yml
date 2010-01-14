@@ -6,7 +6,10 @@ perl: /usr/bin/perl
 ffmpeg: /usr/bin/ffmpeg
 use_doctrine: false
 use_zend: true
+
 dependency:
+#  - Doctrine
+#  - Dummy
   - path: Doctrine.php
     class: \Doctrine
     loader: autoload

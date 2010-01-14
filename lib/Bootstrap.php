@@ -56,7 +56,7 @@ class Bootstrap
 	throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
       }
     $controller_name = $this->uri->getControllerName();
-    $this->controller = new $controller_name($this->uri->getError(), $this->uri->getCliMode());     
+    $this->controller = new $controller_name($this->uri->getError(), $this->uri->getCliMode(), false);     
     $this->controller->$_GET['event']();
     if($this->mvc->hasErrors())
       {	
@@ -70,7 +70,7 @@ class Bootstrap
 
   public function dispatchException($e)
   {    
-    $this->controller = new Controller(0, false);    
+    $this->controller = new Controller(0, false, true);    
     $this->controller->setTemplate('empathy.tpl');
     $this->controller->assign('error', $e->getMessage());    
     $this->display(true);    

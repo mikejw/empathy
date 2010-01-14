@@ -30,9 +30,20 @@ class Controller
   protected $d_man;
   protected $d_conn;
   protected $cli_mode;
+  protected $plugin_manager;
   
-  public function __construct($error, $cli_mode)
+  public function __construct($error, $cli_mode, $e)
   {
+    if(!$e)
+      {
+	/*
+	$this->plugin_manager = new PluginManager($this);
+	$d = new Plugin\Doctrine();
+	$this->plugin_manager->register($d);
+	$d = new Plugin\Dummy();
+	$this->plugin_manager->register($d);
+	*/
+      }
     $this->cli_mode = $cli_mode;
     $this->initError = $error;
     $this->connected = false;
@@ -65,7 +76,12 @@ class Controller
 	$this->presenter->assign('section', $_GET['section_uri']);
       }      
 
-    // doctrine stuff            
+    if(!$e)
+      {
+	//$this->plugin_manager->preDispatch();
+      }
+
+    /*
     if(defined('USE_DOCTRINE') && USE_DOCTRINE == true)
       {
 	$this->d_man = \Doctrine_Manager::getInstance();
@@ -76,7 +92,7 @@ class Controller
 	$this->d_man->setAttribute(\Doctrine::ATTR_MODEL_LOADING, \Doctrine::MODEL_LOADING_CONSERVATIVE);
 	$this->d_man->setAttribute(\Doctrine::ATTR_AUTO_ACCESSOR_OVERRIDE, true);
 
-	// doctrine operations	       
+      
 	if(isset($_SERVER['argc']) && $_SERVER['argc'] > 1)
 	  {
 	    switch($_SERVER['argv'][1])
@@ -105,7 +121,8 @@ class Controller
 	  {
 	    \Doctrine::loadModels(DOC_ROOT.'/models');	
 	  }    
-      }    
+      }
+    */
   }
 
   public function setTemplate($tpl)

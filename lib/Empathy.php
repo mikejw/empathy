@@ -159,7 +159,8 @@ class Empathy
       {
 	$class_arr = explode('\\', $class);
         $class = $class_arr[sizeof($class_arr)-1];
-	$location = array(DOC_ROOT.'/application/',
+	$location = array(
+			  DOC_ROOT.'/application/',
 			  DOC_ROOT.'/application/'.$_GET['module'].'/',
 			  DOC_ROOT.'/storage/');	
       }
