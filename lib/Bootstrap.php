@@ -71,7 +71,7 @@ class Bootstrap
   public function dispatchException($e)
   {    
     $this->controller = new Controller(0, false, true);    
-    $this->controller->setTemplate('empathy.tpl');
+    $this->controller->setTemplate('../empathy.tpl');
     $this->controller->assign('error', $e->getMessage());    
     $this->display(true);    
   }

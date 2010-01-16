@@ -15,7 +15,6 @@ class Doctrine extends Plugin implements PreDispatch
 
   public function onPreDispatch($c)
   {
-    echo '123...';
     if(defined('USE_DOCTRINE') && USE_DOCTRINE == true)
       {
 	$this->d_man = \Doctrine_Manager::getInstance();
