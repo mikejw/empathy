@@ -1,18 +1,5 @@
 ---
-author: ai-em
 mysql: /usr/bin/mysql
 mysql_dump: /usr/bin/mysqldump
 perl: /usr/bin/perl
 ffmpeg: /usr/bin/ffmpeg
-use_doctrine: false
-use_zend: true
-
-dependency:
-#  - Doctrine
-#  - Dummy
-  - path: Doctrine.php
-    class: \Doctrine
-    loader: autoload
-  - path: Zend/Loader.php
-    class: \Zend_Loader
-    loader: loadClass

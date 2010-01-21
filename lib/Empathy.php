@@ -25,6 +25,7 @@ class Empathy
 {
   private $boot;
   private $bootOptions;
+  private $plugins;
   private $errors;
 
   public function __construct($configDir)
@@ -36,7 +37,7 @@ class Empathy
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
 
-    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this);
+    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);
     try
       {
 	$this->boot->dispatch();
@@ -108,6 +109,10 @@ class Empathy
       {
 	$e = new ErrorException($this->errorsToString());
       }
+
+    // force safe exceptions (useful when debugging plugins).
+    // $e = new Empathy\SafeException($e->getMessage());
+
     switch(get_class($e))
       {
       case 'Empathy\SafeException':
@@ -139,13 +144,10 @@ class Empathy
       {
 	$this->bootOptions = $config['boot_options'];
       }
-    if(isset($config['dependency']))
+
+    if(isset($config['plugins']))
       {
-	foreach($config['dependency'] as $item)
-	  {
-	    require($item['path']);
-	    spl_autoload_register(array($item['class'], $item['loader']));
-	  }
+	$this->plugins = $config['plugins'];
       }
   }
 
