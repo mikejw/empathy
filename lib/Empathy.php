@@ -30,13 +30,10 @@ class Empathy
 
   public function __construct($configDir)
   {
-    date_default_timezone_set('Europe/London');
     spl_autoload_register(array($this, 'loadClass'));
-    set_error_handler(array($this, 'errorHandler'));
-    
+    set_error_handler(array($this, 'errorHandler'));    
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
-
     $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);
     try
       {

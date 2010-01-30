@@ -57,11 +57,14 @@ class Controller
 	$this->plugin_manager = new PluginManager($this);    
 	foreach($plugins as $p)
 	  {
-	    require($p['class_path']);
-	    if(isset($p['loader']) && $p['loader'] != '')
+	    if(isset($p['class_path']))
 	      {
-		spl_autoload_register(array($p['class_name'], $p['loader']));	
-	      }	
+		require($p['class_path']);
+		if(isset($p['loader']) && $p['loader'] != '')
+		  {
+		    spl_autoload_register(array($p['class_name'], $p['loader']));	
+		  }
+	      }	    	
 	    $plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
 	    if(file_exists($plugin_path))
 	      {

@@ -16,6 +16,8 @@ boot_options:
 smarty_debugging: false
 
 plugins:
+  - name: EDefault
+    version: 1.0
   - name: Smarty
     version: 1.0
     class_path: Smarty/Smarty.class.php
