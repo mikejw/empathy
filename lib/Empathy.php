@@ -25,26 +25,24 @@ class Empathy
 {
   private $boot;
   private $bootOptions;
+  private $plugins;
   private $errors;
 
   public function __construct($configDir)
   {
-    date_default_timezone_set('Europe/London');
     spl_autoload_register(array($this, 'loadClass'));
-    set_error_handler(array($this, 'errorHandler'));
-    
+    set_error_handler(array($this, 'errorHandler'));    
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
-
-    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this);
+    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);
     try
       {
 	$this->boot->dispatch();
-      }
-    catch(Exception $e)
+      }        
+    catch(\Exception $e)
       {
 	$this->exceptionHandler($e);
-      }
+      }    
   }
 
 
@@ -108,10 +106,14 @@ class Empathy
       {
 	$e = new ErrorException($this->errorsToString());
       }
+
+    // force safe exception
+    //$e = new Empathy\SafeException($e->getMessage());
+
     switch(get_class($e))
       {
       case 'Empathy\SafeException':
-	echo $e->getMessage();
+	echo 'Safe exception: '.$e->getMessage();
 	break;
       default:
 	$this->boot->dispatchException($e);
@@ -139,13 +141,10 @@ class Empathy
       {
 	$this->bootOptions = $config['boot_options'];
       }
-    if(isset($config['dependency']))
+
+    if(isset($config['plugins']))
       {
-	foreach($config['dependency'] as $item)
-	  {
-	    require($item['path']);
-	    spl_autoload_register(array($item['class'], $item['loader']));
-	  }
+	$this->plugins = $config['plugins'];
       }
   }
 
@@ -159,7 +158,8 @@ class Empathy
       {
 	$class_arr = explode('\\', $class);
         $class = $class_arr[sizeof($class_arr)-1];
-	$location = array(DOC_ROOT.'/application/',
+	$location = array(
+			  DOC_ROOT.'/application/',
 			  DOC_ROOT.'/application/'.$_GET['module'].'/',
 			  DOC_ROOT.'/storage/');	
       }

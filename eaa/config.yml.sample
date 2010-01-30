@@ -1,10 +1,10 @@
 ---
 name: eaa
 title: 
-doc_root: /var/www/sites/eaa
-web_root: atreyu/sites/eaa
+doc_root: /opt/local/apache2/htdocs/eaa
+web_root: bastian/eaa
 public_dir: /public_html
-db_server: localhost
+db_server: 127.0.0.1
 db_user: root
 db_pass: 
 db_name: 
@@ -15,5 +15,16 @@ boot_options:
   dynamic_module:
 smarty_debugging: false
 
-#png_output: 0
-#debug_mode: true
+plugins:
+  - name: EDefault
+    version: 1.0
+  - name: Smarty
+    version: 1.0
+    class_path: Smarty/Smarty.class.php
+    class_name: \Smarty
+    loader:
+  - name: Doctrine
+    version: 1.0
+    class_path: Doctrine.php
+    class_name: \Doctrine
+    loader: autoload

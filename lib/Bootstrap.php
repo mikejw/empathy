@@ -24,10 +24,14 @@ class Bootstrap
   private $dynamicModule;
   private $uri;
   private $mvc;
+  private $plugins;
+  private $issuingException;
 
-  public function __construct($bootOptions, $e)
+  public function __construct($bootOptions, $plugins, $mvc)
   {    
-    $this->mvc = $e;
+    $this->issuingException = false;
+    $this->mvc = $mvc;
+    $this->plugins = $plugins;
     if(isset($bootOptions['default_module']))
       {
 	$this->defaultModule = $bootOptions['default_module'];
@@ -36,8 +40,6 @@ class Bootstrap
       {
 	$this->dynamicModule = $bootOptions['dynamic_module'];
       }
-    header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-    header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
   } 
 
   public function dispatch()
@@ -56,7 +58,7 @@ class Bootstrap
 	throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
       }
     $controller_name = $this->uri->getControllerName();
-    $this->controller = new $controller_name($this->uri->getError(), $this->uri->getCliMode());     
+    $this->controller = new $controller_name($this);     
     $this->controller->$_GET['event']();
     if($this->mvc->hasErrors())
       {	
@@ -70,8 +72,9 @@ class Bootstrap
 
   public function dispatchException($e)
   {    
-    $this->controller = new Controller(0, false);    
-    $this->controller->setTemplate('empathy.tpl');
+    $this->issuingException = true;
+    $this->controller = new Controller($this);
+    $this->controller->setTemplate('../empathy.tpl');
     $this->controller->assign('error', $e->getMessage());    
     $this->display(true);    
   }
@@ -86,5 +89,28 @@ class Bootstrap
     */
     $this->controller->initDisplay($i);
   }
+
+
+  public function getIssuingException()
+  {
+    return $this->issuingException;
+  }
+
+  public function getURIError()
+  {
+    return $this->uri->getError();
+  }
+
+  public function getURICliMode()
+  {
+    return $this->uri->getCliMode();
+  }
+
+  public function getPlugins()
+  {
+    return $this->plugins;
+  }
+
+
 }
 ?>

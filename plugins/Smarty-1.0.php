@@ -1,30 +1,20 @@
 <?php
-  // Copyright 2008 Mike Whiting (mail@mikejw.co.uk).
-  // This file is part of the Empathy MVC framework.
 
-  // Empathy is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Lesser General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
+namespace Empathy\Plugin;
+use Empathy\Plugin as Plugin;
 
-  // Empathy is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Lesser General Public License for more details.
-
-  // You should have received a copy of the GNU Lesser General Public License
-  // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
-
-namespace Empathy;
-require("Smarty/Smarty.class.php");
-
-class SmartyPresenter
+class Smarty extends Plugin implements PreDispatch, Presentation
 {
   private $smarty;
 
   public function __construct()
   {
     $this->smarty = new \Smarty();
+  }
+
+
+  public function onPreDispatch($c)
+  {
     $this->smarty->debugging = SMARTY_DEBUGGING;
     $this->smarty->template_dir = DOC_ROOT."/presentation";
     $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
@@ -42,7 +32,8 @@ class SmartyPresenter
     $this->assign('PUBLIC_DIR', PUBLIC_DIR);
     $this->assign('DOC_ROOT', DOC_ROOT);
     $this->assign('MVC_VERSION', MVC_VERSION);
-  } 
+  }
+
 
   public function templateExists($template)
   {
@@ -77,6 +68,8 @@ class SmartyPresenter
     $this->smarty->load_filter($type, $name);
   }
 
-}
 
+
+
+}
 ?>

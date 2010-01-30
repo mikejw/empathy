@@ -30,18 +30,17 @@ class Controller
   protected $d_man;
   protected $d_conn;
   protected $cli_mode;
+  protected $plugin_manager;
   
-  public function __construct($error, $cli_mode)
+  public function __construct($boot)
   {
-    $this->cli_mode = $cli_mode;
-    $this->initError = $error;
+    $this->cli_mode = $boot->getURICliMode();
+    $this->initError = $boot->getURIError();
     $this->connected = false;
     $this->module = $_GET['module'];
     $this->class = $_GET['class'];
     $this->event = $_GET['event'];
-    $this->title = TITLE;
-    $this->presenter = new SmartyPresenter();
-    
+    $this->title = TITLE; 
     if(TPL_BY_CLASS == 0)
       {
 	$this->templateFile = $this->module.'.tpl';
@@ -50,63 +49,67 @@ class Controller
       {
 	$this->templateFile = $this->class.'.tpl';
       }
-
     $this->sessionUp();	
     
-    $this->assignSessionVar();
-	
-    $this->presenter->assign('module', $this->module);
-    $this->presenter->assign('class', $this->class);
-    $this->presenter->assign('event', $this->event);
-    $this->presenter->assign('TITLE', TITLE);	
+    try
+      {    
+	$plugins = $boot->getPlugins();
+	$this->plugin_manager = new PluginManager($this);    
+	foreach($plugins as $p)
+	  {
+	    if(isset($p['class_path']))
+	      {
+		require($p['class_path']);
+		if(isset($p['loader']) && $p['loader'] != '')
+		  {
+		    spl_autoload_register(array($p['class_name'], $p['loader']));	
+		  }
+	      }	    	
+	    $plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
+	    if(file_exists($plugin_path))
+	      {
+		require($plugin_path);
+		$plugin = 'Empathy\\Plugin\\'.$p['name'];
+		$n = new $plugin();
+		$this->plugin_manager->register($n);
+	      }
+	  }               
+	$this->plugin_manager->preDispatch();	
+	$this->presenter = $this->plugin_manager->getView();   
+      }
+    catch(\Exception $e)
+      {		
+	throw new \Empathy\SafeException($e->getMessage());       
+      }
     
+    $this->assignSessionVar();
+    $this->assignControllerInfo();
+    $this->assignConstants();
     if(isset($_GET['section_uri']))
       {
-	$this->presenter->assign('section', $_GET['section_uri']);
-      }      
-
-    // doctrine stuff            
-    if(defined('USE_DOCTRINE') && USE_DOCTRINE == true)
-      {
-	$this->d_man = \Doctrine_Manager::getInstance();
-	$dsn = 'mysql://'.DB_USER.':'.DB_PASS.'@'.DB_SERVER.'/'.DB_NAME;
-	$this->d_conn = \Doctrine_Manager::connection($dsn, 'c_'.NAME);
-	$this->d_man->setAttribute(\Doctrine::ATTR_VALIDATE, \Doctrine::VALIDATE_ALL);
-	$this->d_man->setAttribute(\Doctrine::ATTR_EXPORT, \Doctrine::EXPORT_ALL);
-	$this->d_man->setAttribute(\Doctrine::ATTR_MODEL_LOADING, \Doctrine::MODEL_LOADING_CONSERVATIVE);
-	$this->d_man->setAttribute(\Doctrine::ATTR_AUTO_ACCESSOR_OVERRIDE, true);
-
-	// doctrine operations	       
-	if(isset($_SERVER['argc']) && $_SERVER['argc'] > 1)
-	  {
-	    switch($_SERVER['argv'][1])
-	      {
-	      case 'doctrine_models':
-		\Doctrine::generateModelsFromDb(DOC_ROOT.'/models', array('c_'.NAME), array('generateTableClasses' => true));
-		exit(1);
-		break;
-	      case 'doctrine_yaml':
-		\Doctrine::generateYamlFromModels(DOC_ROOT.'/schema.yml', DOC_ROOT.'/models');
-		exit(1);
-		break;
-	      case 'doctrine_generate':
-		\Doctrine::dropDatabases();
-		\Doctrine::createDatabases();
-		\Doctrine::generateModelsFromYaml(DOC_ROOT.'/schema.yml', DOC_ROOT.'/models');
-		\Doctrine::createTablesFromModels(DOC_ROOT.'/models');		
-		exit(1);
-		break;
-	      default:
-		die('No valid command line operation specified.'."\n");
-		break;
-	      }	    
-	  }
-	else
-	  {
-	    \Doctrine::loadModels(DOC_ROOT.'/models');	
-	  }    
-      }    
+	$this->assign('section', $_GET['section_uri']);
+      }
   }
+
+
+  public function assignConstants()
+  {
+    $this->assign('NAME', NAME);
+    $this->assign('WEB_ROOT', WEB_ROOT);
+    $this->assign('PUBLIC_DIR', PUBLIC_DIR);
+    $this->assign('DOC_ROOT', DOC_ROOT);
+    $this->assign('MVC_VERSION', MVC_VERSION);
+    $this->assign('TITLE', TITLE);	
+  }
+
+
+  public function assignControllerInfo()
+  {
+    $this->assign('module', $this->module);
+    $this->assign('class', $this->class);
+    $this->assign('event', $this->event);
+  }
+
 
   public function setTemplate($tpl)
   {
