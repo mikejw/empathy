@@ -36,8 +36,6 @@ class Controller
   {
     $this->cli_mode = $boot->getURICliMode();
     $this->initError = $boot->getURIError();
-    
-
     $this->connected = false;
     $this->module = $_GET['module'];
     $this->class = $_GET['class'];
@@ -52,27 +50,35 @@ class Controller
 	$this->templateFile = $this->class.'.tpl';
       }
     $this->sessionUp();	
-
-    $plugins = $boot->getPlugins();
-    $this->plugin_manager = new PluginManager($this);    
-    foreach($plugins as $p)
-      {
-	require($p['class_path']);
-	if(isset($p['loader']) && $p['loader'] != '')
+    
+    try
+      {    
+	$plugins = $boot->getPlugins();
+	$this->plugin_manager = new PluginManager($this);    
+	foreach($plugins as $p)
 	  {
-	    spl_autoload_register(array($p['class_name'], $p['loader']));	
-	  }	
-	$plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
-	if(file_exists($plugin_path))
-	  {
-	    require($plugin_path);
-	    $plugin = 'Empathy\\Plugin\\'.$p['name'];
-	    $n = new $plugin();
-	    $this->plugin_manager->register($n);
-	  }
-      }         
-    $this->plugin_manager->preDispatch();	
-    $this->presenter = $this->plugin_manager->getView();   
+	    require($p['class_path']);
+	    if(isset($p['loader']) && $p['loader'] != '')
+	      {
+		spl_autoload_register(array($p['class_name'], $p['loader']));	
+	      }	
+	    $plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
+	    if(file_exists($plugin_path))
+	      {
+		require($plugin_path);
+		$plugin = 'Empathy\\Plugin\\'.$p['name'];
+		$n = new $plugin();
+		$this->plugin_manager->register($n);
+	      }
+	  }               
+	$this->plugin_manager->preDispatch();	
+	$this->presenter = $this->plugin_manager->getView();   
+      }
+    catch(\Exception $e)
+      {		
+	throw new \Empathy\SafeException($e->getMessage());       
+      }
+    
     $this->assignSessionVar();
     $this->assignControllerInfo();
     $this->assignConstants();

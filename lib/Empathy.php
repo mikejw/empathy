@@ -41,11 +41,11 @@ class Empathy
     try
       {
 	$this->boot->dispatch();
-      }
-    catch(Exception $e)
+      }        
+    catch(\Exception $e)
       {
 	$this->exceptionHandler($e);
-      }
+      }    
   }
 
 
@@ -110,13 +110,13 @@ class Empathy
 	$e = new ErrorException($this->errorsToString());
       }
 
-    // force safe exceptions (useful when debugging plugins).
-    // $e = new Empathy\SafeException($e->getMessage());
+    // force safe exception
+    //$e = new Empathy\SafeException($e->getMessage());
 
     switch(get_class($e))
       {
       case 'Empathy\SafeException':
-	echo $e->getMessage();
+	echo 'Safe exception: '.$e->getMessage();
 	break;
       default:
 	$this->boot->dispatchException($e);
