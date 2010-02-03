@@ -8,14 +8,22 @@ class PluginManager
   private $plugins;
   private $controller;
   private $view_plugin;
+  private $initialised;
   
 
-  public function __construct($c)
+  public function __construct()
   {
-    $this->controller = $c;
+    $this->initialised = 0;   
     $this->plugins = array();
+    $this->view_plugin = NULL;
   }
   
+  public function init($c)
+  {
+    $this->initialised = 1;
+    $this->controller = $c;
+  }
+
   public function register($p)
   {
     $this->plugins[] = $p;
@@ -37,9 +45,21 @@ class PluginManager
       }
   }
 
+  public function getInitialised()
+  {
+    return $this->initialised;
+  }
+
   public function getView()
   {
-    return $this->view_plugin;
+    if($this->view_plugin === NULL)
+      {
+	throw new \Exception('No plugin loaded for view.');
+      }
+    else
+      {
+	return $this->view_plugin;
+      }
   }
   
 

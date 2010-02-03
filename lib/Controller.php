@@ -50,37 +50,43 @@ class Controller
 	$this->templateFile = $this->class.'.tpl';
       }
     $this->sessionUp();	
-    
+
+    $plugins = $boot->getPlugins();
+    $plugin_manager = $boot->getPluginManager();
+
     try
-      {    
-	$plugins = $boot->getPlugins();
-	$this->plugin_manager = new PluginManager($this);    
-	foreach($plugins as $p)
+      {
+	if(!$plugin_manager->getInitialised())
 	  {
-	    if(isset($p['class_path']))
+	    $plugin_manager->init($this);
+	    foreach($plugins as $p)
 	      {
-		require($p['class_path']);
-		if(isset($p['loader']) && $p['loader'] != '')
+		if(isset($p['class_path']))
 		  {
-		    spl_autoload_register(array($p['class_name'], $p['loader']));	
+		    require($p['class_path']);
+		    if(isset($p['loader']) && $p['loader'] != '')
+		      {
+			spl_autoload_register(array($p['class_name'], $p['loader']));	
+		      }
+		  }	    	
+		$plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
+		if(file_exists($plugin_path))
+		  {
+		    require($plugin_path);
+		    $plugin = 'Empathy\\Plugin\\'.$p['name'];
+		    $n = new $plugin();
+		    $plugin_manager->register($n);
 		  }
-	      }	    	
-	    $plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
-	    if(file_exists($plugin_path))
-	      {
-		require($plugin_path);
-		$plugin = 'Empathy\\Plugin\\'.$p['name'];
-		$n = new $plugin();
-		$this->plugin_manager->register($n);
-	      }
-	  }               
-	$this->plugin_manager->preDispatch();	
-	$this->presenter = $this->plugin_manager->getView();   
+	      }               
+	    $plugin_manager->preDispatch();	
+	  }
+	$this->presenter = $plugin_manager->getView();   
       }
     catch(\Exception $e)
       {		
-	throw new \Empathy\SafeException($e->getMessage());       
+	    throw new \Empathy\SafeException($e->getMessage());       
       }
+    
     
     $this->assignSessionVar();
     $this->assignControllerInfo();
@@ -135,7 +141,7 @@ class Controller
   {
     foreach($_SESSION as $index => $value)
     {
-      $this->presenter->assign($index, $value);
+      $this->assign($index, $value);
     }
   }
    

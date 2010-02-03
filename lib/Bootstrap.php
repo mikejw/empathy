@@ -25,6 +25,7 @@ class Bootstrap
   private $uri;
   private $mvc;
   private $plugins;
+  private $plugin_manager;
   private $issuingException;
 
   public function __construct($bootOptions, $plugins, $mvc)
@@ -32,6 +33,8 @@ class Bootstrap
     $this->issuingException = false;
     $this->mvc = $mvc;
     $this->plugins = $plugins;
+    $this->plugin_manager = new PluginManager();    
+
     if(isset($bootOptions['default_module']))
       {
 	$this->defaultModule = $bootOptions['default_module'];
@@ -111,6 +114,10 @@ class Bootstrap
     return $this->plugins;
   }
 
+  public function getPluginManager()
+  {
+    return $this->plugin_manager;
+  }
 
 }
 ?>
