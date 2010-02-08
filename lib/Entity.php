@@ -276,7 +276,7 @@ class Entity
 
   public function getRows(&$result)
   {
-    $this->rows = mysql_num_rows($result);   
+    $this->rows = $result->rowCount();   
   }
 
 
@@ -288,7 +288,7 @@ class Entity
     $result = $this->query($sql, $error);
     
     $i = 0;
-    while($row = mysql_fetch_array($result))
+    foreach($result as $row)
       {
 	$all[$i] = $row;
 	$i++;
@@ -373,7 +373,7 @@ class Entity
     $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string;
     $error = 'Could not get rows from '.$table1;
     $result = $this->query($sql, $error);   
-    $rows = mysql_num_rows($result);
+    $rows = $result->rowCount();
     $p_rows = $rows;
     $pages = ceil($rows / $per_page);
     $i = 1;
@@ -401,7 +401,7 @@ class Entity
     $sql .= ' GROUP BY '.$group.' ORDER BY '.$order;
     $error = 'Could not get rows from '.$table1;
     $result = $this->query($sql, $error);   
-    $rows = mysql_num_rows($result);
+    $rows = $result->rowCount();
     $p_rows = $rows;
     $pages = ceil($rows / $per_page);
     $i = 1;
@@ -460,7 +460,6 @@ class Entity
 
     $result = $this->query($sql, $error);
     $i = 0;
-    //while($row = mysql_fetch_array($result))
     foreach($result as $row)
       {
 	$all[$i] = $row;
@@ -477,7 +476,7 @@ class Entity
     $error = 'Could not get rows from '.$table1;
     $result = $this->query($sql, $error);
     $i = 0;
-    while($row = mysql_fetch_array($result))
+    foreach($result as $row)
       {
 	$all[$i] = $row;
 	$i++;
@@ -495,7 +494,7 @@ class Entity
     $error = 'Could not get rows from '.$table1;
     $result = $this->query($sql, $error);
     $i = 0;
-    while($row = mysql_fetch_array($result))
+    foreach($result as $row)
       {
 	$all[$i] = $row;
 	$i++;

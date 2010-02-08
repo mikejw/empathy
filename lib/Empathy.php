@@ -106,7 +106,7 @@ class Empathy
       {
 	$e = new ErrorException($this->errorsToString());
       }
-
+   
     // force safe exception
     //$e = new Empathy\SafeException($e->getMessage());
 
