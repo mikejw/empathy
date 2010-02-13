@@ -119,6 +119,30 @@ class Entity
     return $loaded;
   }
   
+  
+  public function loadAsOptions($table, $field, $order = NULL)
+  {
+    $data = array();
+    $sql = 'SELECT id,'.$field.' FROM '.$table;
+    if($order !== NULL && $order != '')
+      {
+	$sql .= ' ORDER BY '.$order;
+      }
+    else
+      {
+	$sql .= ' ORDER BY '.$field;
+      }      
+    $error = 'Could not load '.$table.' as options';;
+    $result = $this->query($sql, $error);
+    foreach($result as $row)
+      {
+	$id = $row['id'];
+	$data[$id] = $row[$field];
+      }
+    return $data;
+  }
+
+
   public function sanitize()
   {
     foreach($this->properties as $property)
@@ -691,6 +715,5 @@ class Entity
   {
     return $this->val->valType($type, $field, $data, $optional);
   }
-
 }
 ?>
