@@ -65,6 +65,7 @@ class URI
     $this->error = 0;
     $this->processRequest();
     $this->setController(); 
+    //$this->printRouting();
   }
 
 
@@ -309,6 +310,10 @@ class URI
 	  {
 	    $section_uri = $this->uri[$section_index];
 	  }
+      }           
+    elseif(defined('DEFAULT_SECTION'))
+      {	
+	$section_uri = DEFAULT_SECTION;	 
       }
         
     $rows = $section->getURIData();
