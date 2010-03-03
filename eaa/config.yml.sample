@@ -23,8 +23,3 @@ plugins:
     class_path: Smarty/Smarty.class.php
     class_name: \Smarty
     loader:
-  - name: Doctrine
-    version: 1.0
-    class_path: Doctrine.php
-    class_name: \Doctrine
-    loader: autoload
