@@ -50,12 +50,6 @@ class Bootstrap
     $this->uri = new URI($this->defaultModule, $this->dynamicModule);
     $error = $this->uri->getError();
 
-    if($error == URI::MISSING_CLASS
-       && isset($this->dynamicModule)
-       && $this->dynamicModule != '')
-      {	
-	    $error = $this->uri->dynamicSection();	
-      }    
     if($error > 0)
       {
 	throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
