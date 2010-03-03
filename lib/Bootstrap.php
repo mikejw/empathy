@@ -78,12 +78,6 @@ class Bootstrap
   
   private function display($i)
   {    
-    /*
-    if(PNG_OUTPUT == 1)
-      {
-	$this->controller->presenter->loadFilter('output', 'png_image');
-      }
-    */
     $this->controller->initDisplay($i);
   }
 
