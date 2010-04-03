@@ -28,3 +28,9 @@ plugins:
     class_path: Doctrine.php
     class_name: \Doctrine
     loader: autoload
+  - name: Zend
+    version: 1.0
+    class_path: Zend/Loader.php
+    class_name: \Zend_Loader
+    loader: loadClass
+

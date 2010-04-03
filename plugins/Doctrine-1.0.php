@@ -5,13 +5,33 @@ use Empathy\Plugin as Plugin;
 
 class Doctrine extends Plugin implements PreDispatch
 {
-  
+  private $d_conn;
+  private $d_man;
+
   public function __construct()
   {
-    //
+    spl_autoload_register(array($this, 'loadModel'));
   }
 
-  
+  public function loadModel($class)
+  {
+    $location = array(
+		      DOC_ROOT.'/models',
+		      DOC_ROOT.'/models/generated'		
+		      );
+    $load_error = 1;
+    $i = 0;
+    while($i < sizeof($location) && $load_error == 1)
+      {
+	$class_file = $location[$i].'/'.$class.'.php';           	
+	if(@include($class_file))
+	  {		
+	    $load_error = 0;
+	  }
+	$i++;
+      }
+  }
+ 
   private function isIP($server)
   {
     $ip = false;
@@ -29,19 +49,14 @@ class Doctrine extends Plugin implements PreDispatch
   
 
   public function onPreDispatch($c)
-  {    
+  {       
     if(!$this->isIP(DB_SERVER))
       {	   
 	throw new \Empathy\Exception('Database server must be an IP address.');
       }	            
-     
-    if((defined(DB_USER) && DB_USER != '')
-      && (defined(DB_PASS) && DB_PASS != '')
-       && (defined(DB_NAME) && DB_NAME != ''))
-      {
-	$dsn = 'mysql://'.DB_USER.':'.DB_PASS.'@'.DB_SERVER.'/'.DB_NAME;
-	$this->d_conn = \Doctrine_Manager::connection($dsn, 'c_'.NAME);
-      }
+            
+    $dsn = 'mysql://'.DB_USER.':'.DB_PASS.'@'.DB_SERVER.'/'.DB_NAME;
+    $this->d_conn = \Doctrine_Manager::connection($dsn, 'c_'.NAME);
 
     $this->d_man = \Doctrine_Manager::getInstance();
     $this->d_man->setAttribute(\Doctrine::ATTR_VALIDATE, \Doctrine::VALIDATE_ALL);
@@ -74,13 +89,11 @@ class Doctrine extends Plugin implements PreDispatch
 	    break;
 	  }	    
       }
-    else
+
+    if(file_exists(DOC_ROOT.'/models'))
       {
-	if(file_exists(DOC_ROOT.'/models'))
-	  {
-	    \Doctrine::loadModels(DOC_ROOT.'/models');	
-	  }
-      }      
+	\Doctrine::loadModels(DOC_ROOT.'/models');	
+      }
   }
 }
 ?>

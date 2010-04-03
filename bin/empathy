@@ -10,41 +10,109 @@ use Getopt::Long;
 my %config = &read_global_config();
 my %app_config = &read_app_config();
 
-# initialise options
-my $mysql_setup = '';
-my $mysql_populate = '';
-my $mysql_dump = '';
-GetOptions(
-    'mysql_setup' => \$mysql_setup,
-    'mysql_populate' => \$mysql_populate,
-    'mysql_dump' => \$mysql_dump
+my %actions = (
+    mysql_setup => \&mysql_setup,
+    mysql_dump => \&mysql_dump,
+    mysql_populate => \&mysql_populate,
+    doctrine_gen_models => \&doctrine_gen_models,
+    doctrine_gen_yaml => \&doctrine_gen_yaml,
+    doctrine_generate => \&doctrine_generate
     );
 
-if($mysql_setup)
-{
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < inserts.sql'); 
+# initialise options
+my $mysql = '';
+my $doctrine = '';
+GetOptions(
+    'mysql=s' => \$mysql,
+    'doctrine=s' => \$doctrine
+    );
+
+my $call;
+if($mysql)
+{ 
+    $call = 'mysql_'.$mysql;
+    if(defined($actions{$call}))
+    {	
+	$actions{$call}->();
+    }
+    else
+    {
+	die "No can do. Exiting...\n";
+	exit();
+    }
 }
-elsif($mysql_populate)
+elsif($doctrine)
 {
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' proper < dump.sql');	
+    $call = 'doctrine_'.$doctrine;
+    if(defined($actions{$call}))
+    {
+	$actions{$call}->();
+    }
+    else
+    {
+	die "No can do. Exiting...\n";
+	exit();
+    }
 }
-elsif($mysql_dump)
-{
-    &execute($config{'mysql_dump'}.' -u root --no-create-info --complete-insert proper > dump.sql');
-}
+
+
+
 
 
 
 
 # functions...
 
+sub doctrine_generate()
+{
+    &exec_app('doctrine_generate');
+}
+
+
+sub doctrine_gen_models()
+{
+    &exec_app('doctrine_models');
+}
+
+sub doctrine_gen_yaml()
+{
+    if(!-d './models')
+    {
+	die("Doctrine models directory does not exist. Exiting...\n");
+    }
+    else
+    {    
+	&exec_app('doctrine_yaml');
+    }
+}
+
+sub mysql_setup()
+{
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < inserts.sql');     
+}
+sub mysql_populate()
+{
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' proper < dump.sql');	
+}
+sub mysql_dump()
+{
+    &execute($config{'mysql_dump'}.' -u root --password='.$app_config{'db_pass'}.' --no-create-info --complete-insert '.$app_config{'db_name'}.' > dump.sql');
+}
+
 sub execute()
 {
     my ($command) = @_;
     my @output = `$command`;
 }
+
+sub exec_app()
+{
+    my ($args) = @_;
+    my @output = &execute('php .'.$app_config{'public_dir'}.'/index.php '.$args);
+}
+
 
 # stores cwd temporarily, assumbed to be root of empathy app
 sub read_global_config
@@ -79,7 +147,7 @@ sub read_app_config
 	title => $yaml->[0]->{'title'},
 	doc_root => $yaml->[0]->{'doc_root'},
 	web_Root => $yaml->[0]->{'web_root'},
-	public_dor => $yaml->[0]->{'public_dir'},
+	public_dir => $yaml->[0]->{'public_dir'},
 	db_server => $yaml->[0]->{'db_server'},
 	db_user => $yaml->[0]->{'db_user'},
 	db_pass => $yaml->[0]->{'db_pass'},
