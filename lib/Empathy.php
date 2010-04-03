@@ -35,6 +35,11 @@ class Empathy
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
     $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);
+    if(isset($this->bootOptions['use_elib']) &&
+	     $this->bootOptions['use_elib'])
+      {
+	spl_autoload_register(array($this, 'loadELibClass'));
+      }
     try
       {
 	$this->boot->dispatch();
@@ -184,6 +189,16 @@ class Empathy
 	  }	
 	$i++;
       }        
+  }
+
+  public function loadELibClass($class)
+  {
+    $class = str_replace('\\', '/', $class);
+    $class_file = "ELib/$class.php";                             
+    if(!@include($class_file))
+      {
+	//throw new Exception('Could not include ELib class '.$class_file);
+      }
   }
 }
 ?>

@@ -1,0 +1,80 @@
+#!/opt/local/bin/perl
+use strict;
+use warnings;
+use Cwd;
+use Data::Dumper;
+use YAML::Tiny;
+use Getopt::Long;
+
+# get empathy config
+my %config = &read_global_config();
+my %app_config = &read_app_config();
+
+# initialise options
+my $mysql_setup = '';
+my $mysql_populate = '';
+my $mysql_dump = '';
+GetOptions(
+    'mysql_setup' => \$mysql_setup,
+    'mysql_populate' => \$mysql_populate,
+    'mysql_dump' => \$mysql_dump
+    );
+
+if($mysql_setup)
+{
+    print "setup\n";
+}
+elsif($mysql_populate)
+{
+    print "populate\n";
+}
+elsif($mysql_dump)
+{
+    print "dump\n";
+}
+
+
+
+
+
+sub read_global_config
+{
+    my %config;
+    my $dir = getcwd();
+    my @include_path = `php ./echo_include_path.php`;
+    chdir($include_path[0]);
+    my @empathy_arr = split('/', readlink('./Empathy'));
+    my $empathy = $empathy_arr[0];
+    my $yaml = YAML::Tiny->read($empathy.'/config/config.yml');
+    chdir($dir);
+    %config = (
+	mysql => $yaml->[0]->{'mysql'},
+        mysql_dump => $yaml->[0]->{'mysql_dump'},
+        ffmpeg => $yaml->[0]->{'ffmpeg'},
+	perl => $yaml->[0]->{'perl'}
+	);
+}
+sub read_app_config
+{
+    my %app_config;
+    my $config = './config.yml';
+    my $yaml = YAML::Tiny->read($config);
+    %app_config = (
+	name =>	$yaml->[0]->{'name'},
+	title => $yaml->[0]->{'title'},
+	doc_root => $yaml->[0]->{'doc_root'},
+	web_Root => $yaml->[0]->{'web_root'},
+	public_dor => $yaml->[0]->{'public_dir'},
+	db_server => $yaml->[0]->{'db_server'},
+	db_user => $yaml->[0]->{'db_user'},
+	db_pass => $yaml->[0]->{'db_pass'},
+	db_name => $yaml->[0]->{'db_name'},
+	tbl_prefix => $yaml->[0]->{'tbl_prefix'},
+	tpl_by_class => $yaml->[0]->{'tpl_by_class'},
+	boot_options => $yaml->[0]->{'boot_options'},
+	smarty_debugging => $yaml->[0]->{'smarty_debugging'},
+	plugins => $yaml->[0]->{'plugins'}
+	);   
+}
+
+
