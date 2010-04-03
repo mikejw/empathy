@@ -1,7 +1,7 @@
 #!/opt/local/bin/perl
 use strict;
 use warnings;
-use Cwd;
+use Cwd qw/abs_path getcwd/;
 use Data::Dumper;
 use YAML::Tiny;
 use Getopt::Long;
@@ -22,25 +22,40 @@ GetOptions(
 
 if($mysql_setup)
 {
-    print "setup\n";
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < inserts.sql'); 
 }
 elsif($mysql_populate)
 {
-    print "populate\n";
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' proper < dump.sql');	
 }
 elsif($mysql_dump)
 {
-    print "dump\n";
+    &execute($config{'mysql_dump'}.' -u root --no-create-info --complete-insert proper > dump.sql');
 }
 
 
 
 
+# functions...
 
+sub execute()
+{
+    my ($command) = @_;
+    my @output = `$command`;
+}
+
+# stores cwd temporarily, assumbed to be root of empathy app
 sub read_global_config
 {
     my %config;
     my $dir = getcwd();
+    my $e_dir = abs_path($0);
+    my @e_dir_arr = split('/', $e_dir);
+    pop @e_dir_arr;
+    $e_dir = join('/', @e_dir_arr);
+    chdir($e_dir);
     my @include_path = `php ./echo_include_path.php`;
     chdir($include_path[0]);
     my @empathy_arr = split('/', readlink('./Empathy'));
