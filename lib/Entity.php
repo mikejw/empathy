@@ -33,7 +33,8 @@ class Entity
     $this->properties = array();
     $this->controller = $controller;
 
-    if(!is_object($controller) || $this->controller->connected == false)
+    if(!is_object($controller) || !isset($this->controller->connected) ||
+					 $this->controller->connected == false)
       {	
 	$this->dbConnect();	
       }
