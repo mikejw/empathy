@@ -1,5 +1,17 @@
 <?php
 
+/*
+usage:
+<?php
+include('Empathy/Util/Test.php');
+$t = new Test('/var/www/proper/public_html/index.php');
+$req = 'blah';
+$t->setRequest($req, false);
+$t->process();
+echo $t;
+?>
+*/
+
 class Test
 {
   private $request;
