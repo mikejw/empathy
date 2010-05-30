@@ -15,7 +15,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
   public function onPreDispatch($c)
   {
-    $this->smarty->debugging = SMARTY_DEBUGGING;
+    $this->smarty->debugging = SMARTY_DEBUGGING;    
     $this->smarty->template_dir = DOC_ROOT."/presentation";
     $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
     $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
@@ -36,7 +36,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
 
   public function templateExists($template)
-  {
+  {	
     return file_exists($this->smarty->template_dir.'/'.$template);
   }
 
@@ -68,7 +68,10 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     $this->smarty->load_filter($type, $name);
   }
 
-
+  public function setTemplateDir($dir)
+  {
+	$this->smarty->template_dir = $dir;
+  }
 
 
 }
