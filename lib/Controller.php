@@ -31,13 +31,11 @@ class Controller
   protected $d_conn;
   protected $cli_mode;
   protected $plugin_manager;
-  protected $elib;
 
   public function __construct($boot)
   {
     $this->cli_mode = $boot->getURICliMode();
     $this->initError = $boot->getURIError();
-	$this->elib = $boot->getELib();
     $this->connected = false;
     $this->module = $_GET['module'];
     $this->class = $_GET['class'];
@@ -126,34 +124,8 @@ class Controller
  
   public function initDisplay($i)
   {		
-    $this->presenter->switchInternal($i);    
-    if(!$this->presenter->templateExists($this->templateFile))
-      {
-	if($this->elib)
-	  {
-	    $tpl_dir = \Empathy\Util\Elib::getLibLocation().'/tpl';
-	    $this->presenter->setTemplateDir($tpl_dir);
-	    
-	    if(!$this->presenter->templateExists($this->templateFile))
-	      {
-		throw new Exception('Missing template file: '.$this->templateFile);
-	      }
-	    else
-	      {
-		$this->presenter->display($this->templateFile);		
-	      }	    
-	  }
-	else
-	  {
-	    throw new Exception('Missing template file: '.$this->templateFile);
-	    //die('Missing template file: '.$this->templateFile);
-	    //$this->error('Missing template file: '.$this->templateFile);		
-	  }		
-      }
-    else
-      {			
-	$this->presenter->display($this->templateFile);   
-      }
+    $this->presenter->switchInternal($i);       
+    $this->presenter->display($this->templateFile);       
   }
   
   public function assignSessionVar()

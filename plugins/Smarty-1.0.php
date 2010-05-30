@@ -35,11 +35,6 @@ class Smarty extends Plugin implements PreDispatch, Presentation
   }
 
 
-  public function templateExists($template)
-  {	
-    return file_exists($this->smarty->template_dir.'/'.$template);
-  }
-
   public function assign($name, $data)
   {
     $this->smarty->assign($name, $data);
@@ -50,17 +45,9 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     $this->smarty->clear_assign($name);
   }
 
-  public function switchInternal($i)
-  {
-    if($i)
-      {        
-	$this->smarty->template_dir = realpath(dirname(__FILE__));
-      }
-  }
-
   public function display($template)
   {
-    $this->smarty->display($this->smarty->template_dir.'/'.$template);
+    $this->smarty->display($template);
   }
 
   public function loadFilter($type, $name)
@@ -68,11 +55,12 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     $this->smarty->load_filter($type, $name);
   }
 
-  public function setTemplateDir($dir)
+  public function switchInternal($i)
   {
-	$this->smarty->template_dir = $dir;
+    if($i)
+      {        
+	$this->smarty->template_dir = realpath(dirname(__FILE__));
+      }
   }
-
-
 }
 ?>

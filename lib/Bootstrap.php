@@ -27,12 +27,10 @@ class Bootstrap
   private $plugins;
   private $plugin_manager;
   private $issuingException;
-  private $elib;
 
   public function __construct($bootOptions, $plugins, $mvc)
   {    
     $this->issuingException = false;
-	$this->elib = false;
     $this->mvc = $mvc;
     $this->plugins = $plugins;
     $this->plugin_manager = new PluginManager();    
@@ -45,10 +43,6 @@ class Bootstrap
       {
 	$this->dynamicModule = $bootOptions['dynamic_module'];
       }
-    if(isset($bootOptions['use_elib']) && $bootOptions['use_elib'])
-	  {
-		$this->elib = true;
-	  }
   } 
 
   public function dispatch()
