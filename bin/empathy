@@ -94,7 +94,7 @@ sub mysql_setup()
 sub mysql_populate()
 {
     &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' proper < dump.sql');	
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' '.$app_config{'db_name'}.' < dump.sql');	
 }
 sub mysql_dump()
 {
