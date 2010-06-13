@@ -49,7 +49,8 @@ class Controller
       {
 	$this->templateFile = $this->class.'.tpl';
       }
-    $this->sessionUp();	
+    
+    Session::up();
 
     $plugins = $boot->getPlugins();
     $plugin_manager = $boot->getPluginManager();
@@ -162,15 +163,10 @@ class Controller
     exit();
   }
   
-  public function sessionUp()
-  {    
-    @session_start();
-  }
-  
+
   public function sessionDown()
   {
-    session_unset();
-    session_destroy();
+    Session::down();
   }
 
   public function toggleEditMode()
@@ -187,7 +183,7 @@ class Controller
   
   protected function setFailedURI($uri)
   {
-    $_SESSION['failed_uri'] = $uri;
+    Session::set('failed_uri', $uri);
   }
 
 
@@ -226,7 +222,7 @@ class Controller
 	  {
 	    $this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 	  }
-	$_SESSION['app_error'] = array($this->module, $this->class, $message, date('U'));
+	Session::set('app_error', array($this->module, $this->class, $message, date('U')));
 	//$this->redirect('empathy/error/');       
 	throw new Exception('Couldn\'t dispatch: '.$message);
       }
@@ -234,11 +230,23 @@ class Controller
 
   public function loadUIVars($ui, $ui_array)
   {
+    $new_app = Session::getNewApp();
     foreach($ui_array as $setting)
       {
 	if(isset($_GET[$setting]))
 	  {
-	    $_SESSION[$ui][$setting] = $_GET[$setting];	    
+	    if(!$new_app)
+	      {
+		$_SESSION[$ui][$setting] = $_GET[$setting];	    
+	      }
+	    else
+	      {
+		Session::setUISetting($ui, $setting, $_GET[$setting]);
+	      }
+	  }
+	elseif(Session::getUISetting($ui, $setting) !== false)
+	  {
+	    $_GET[$setting] = Session::getUISetting($ui, $setting);
 	  }
 	elseif(isset($_SESSION[$ui][$setting]))
 	  {
