@@ -31,11 +31,14 @@ class Controller
   protected $d_conn;
   protected $cli_mode;
   protected $plugin_manager;
+  protected $uri_data;
 
   public function __construct($boot)
   {
     $this->cli_mode = $boot->getURICliMode();
     $this->initError = $boot->getURIError();
+    $this->uri_data = $boot->getURIData();
+
     $this->connected = false;
     $this->module = $_GET['module'];
     $this->class = $_GET['class'];

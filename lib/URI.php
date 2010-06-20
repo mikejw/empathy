@@ -68,6 +68,10 @@ class URI
     //$this->printRouting();
   }
 
+  public function getData()
+  {
+    return $this->uri;
+  }
 
   public function getCliMode()
   {

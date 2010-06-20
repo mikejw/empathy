@@ -19,11 +19,13 @@ namespace Empathy;
 
 class Entity
 {
+  const TABLE = '';
+
   private $val;
   private $controller;
   private $rows;
   private $result;
-  private $globally_ignored_property = array('id', 'table');
+  private $globally_ignored_property = array('id');
   private $properties;
   private $dbh;
 
@@ -97,8 +99,14 @@ class Entity
   }
 
   
-  public function load($table)
+  public function load($table = null)
   {
+    if($table == null)
+      {
+	$c = get_class($this);
+	$table = $c::TABLE;	
+      }
+
     $loaded = true;
     $table = $this->appendPrefix($table);
     $sql = "SELECT * FROM $table WHERE id = $this->id";
@@ -690,8 +698,13 @@ class Entity
       }
   }
 
-  public function delete($table)
+  public function delete($table = null)
   {
+    if($table == null)
+      {
+	$c = get_class($this);
+	$table = $c::TABLE;
+      }
     $sql = 'DELETE FROM '.$table.' WHERE id = '.$this->id;
     $error = 'Could not delete row.';
     $this->query($sql, $error);

@@ -109,6 +109,11 @@ class Bootstrap
     return $this->uri->getCliMode();
   }
 
+  public function getURIData()
+  {
+    return $this->uri->getData();
+  }
+
   public function getPlugins()
   {
     return $this->plugins;
