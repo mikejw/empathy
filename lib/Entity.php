@@ -25,7 +25,7 @@ class Entity
   private $controller;
   private $rows;
   private $result;
-  private $globally_ignored_property = array('id');
+  private $globally_ignored_property = array('id', 'table'); // leaving in table to support old models
   private $properties;
   private $dbh;
 
