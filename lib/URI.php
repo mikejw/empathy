@@ -293,7 +293,9 @@ class URI
   {
     // code still needed to assert correct section path - else throw 404
     $this->error = 0;
-    $section = new SectionItemStandAlone();
+    // temporary hack to provide object so that entity will assume it has a controller
+    // and connect to database
+    $section = new SectionItemStandAlone(new \stdClass());
     if(!isset($this->dynamicModule) || $this->dynamicModule == '')
       {
 	throw new Exception("Failed to find name of dynamic module.");

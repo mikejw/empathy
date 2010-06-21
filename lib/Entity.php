@@ -29,17 +29,26 @@ class Entity
   private $properties;
   private $dbh;
 
+  protected static $table = '';
+
   public function __construct($controller = NULL)
   {
     $this->val = new Validate();
     $this->properties = array();
     $this->controller = $controller;
 
+    /*
     if(!is_object($controller) || !isset($this->controller->connected) ||
 					 $this->controller->connected == false)
       {	
 	$this->dbConnect();	
       }
+    */
+    if(is_object($controller))
+      {
+	$this->dbConnect();
+      }
+    
     $this->loadProperties();
   }  
 
@@ -80,16 +89,31 @@ class Entity
 			   DB_USER, DB_PASS);    
   }
 
+
+  public function setDBH($dbh)
+  {
+    $this->dbh = $dbh;
+  }
+
   
   public function query($sql, $error)    
-  {
+  { 
     $result = NULL;
     if(($result = $this->dbh->query($sql)) == false)  
       {
 	$errors = $this->dbh->errorInfo();
-	$this->controller->error("[".htmlentities($sql)
+	if(is_object($this->controller))
+	  {
+	    $this->controller->error("[".htmlentities($sql)
+				     ."]<br /><strong>MySQL</strong>: ($error): "
+				     .htmlentities($errors[2]), 0);       
+	  }
+	else
+	  {
+	    throw new \Exception("[".htmlentities($sql)
 				 ."]<br /><strong>MySQL</strong>: ($error): "
-				 .htmlentities($errors[2]), 0);       
+				 .htmlentities($errors[2]));       
+	  }
       }
     else
       {
