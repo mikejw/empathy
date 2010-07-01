@@ -36,9 +36,15 @@ class Model
     $class = '\Empathy\\Model\\'.$model;
     $storage_object = new $class();
 
-    self::conectModel($storage_object, $host);
+    self::connectModel($storage_object, $host);
 
     return $storage_object;
+  }
+
+  public static function getTable($model)
+  {
+    $class = '\\Empathy\\Model\\'.$model;
+    return $class::TABLE;
   }
 }
 ?>
