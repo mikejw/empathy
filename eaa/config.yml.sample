@@ -33,4 +33,7 @@ plugins:
     class_path: Zend/Loader.php
     class_name: \Zend_Loader
     loader: loadClass
+  - name: Pheanstalk
+    version: 1.0
+
 
