@@ -32,12 +32,15 @@ class Controller
   protected $cli_mode;
   protected $plugin_manager;
   protected $uri_data;
+  protected $stash;
 
   public function __construct($boot)
   {
     $this->cli_mode = $boot->getURICliMode();
     $this->initError = $boot->getURIError();
     $this->uri_data = $boot->getURIData();
+
+    $this->stash = new Stash();
 
     $this->connected = false;
     $this->module = $_GET['module'];
