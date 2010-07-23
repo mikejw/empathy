@@ -29,15 +29,14 @@ class Empathy
   private $errors;
   private static $elib;
 
-  public function __construct($configDir)
+  public function __construct($configDir, $override = null)
   {
     spl_autoload_register(array($this, 'loadClass'));
     set_error_handler(array($this, 'errorHandler'));    
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
-    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);        
     if(isset($this->bootOptions['use_elib']) &&
-	     $this->bootOptions['use_elib'])
+       $this->bootOptions['use_elib'])
       {
 	self::$elib = true;
       }
@@ -45,15 +44,19 @@ class Empathy
       {
 	self::$elib = false;
       }
-    
-    try
+
+    if($override !== true)
       {
-	$this->boot->dispatch();
-      }        
-    catch(\Exception $e)
-      {
-	$this->exceptionHandler($e);
-      }    
+	$this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
+	try
+	  {
+	    $this->boot->dispatch();
+	  }        
+	catch(\Exception $e)
+	  {
+	    $this->exceptionHandler($e);
+	  }    
+      }
   }
 
 
@@ -184,6 +187,8 @@ class Empathy
     while($i < sizeof($location) && $load_error == 1)
       {
 	$class_file = $location[$i].$class.'.php';           
+
+	//echo $class_file.'<br />';
 
 	if(@include($class_file))
 	  {		
