@@ -8,12 +8,13 @@ namespace Empathy\Util;
 
 class CLI
 {
-  public static function request($uri)
+  public static function request($e, $uri)
   {
     ob_start();
     $t_request_start = microtime();    
     $_SERVER['REQUEST_URI'] = $uri;
-    @include(DOC_ROOT.'/public_html/index.php');  
+
+    $e->beginDispatch();
     $t_request_finish = microtime();
     $response = ob_get_contents();    
     ob_end_clean();

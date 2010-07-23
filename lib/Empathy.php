@@ -47,18 +47,22 @@ class Empathy
 
     if($override !== true)
       {
-	$this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
-	try
-	  {
-	    $this->boot->dispatch();
-	  }        
-	catch(\Exception $e)
-	  {
-	    $this->exceptionHandler($e);
-	  }    
+	$this->beginDispatch();
       }
   }
 
+  public function beginDispatch()
+  {    
+    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
+    try
+      {
+	$this->boot->dispatch();
+      }        
+    catch(\Exception $e)
+      {
+	$this->exceptionHandler($e);
+      }    
+  }
 
   public function getErrors()
   {
