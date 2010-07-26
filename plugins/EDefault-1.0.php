@@ -10,7 +10,7 @@ class EDefault extends Plugin implements PreDispatch
     //
   }
 
-  public function onPreDispatch($c)
+  public function onPreDispatch()
   {    
     date_default_timezone_set('Europe/London');
     header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
