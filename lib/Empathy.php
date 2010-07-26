@@ -27,10 +27,12 @@ class Empathy
   private $bootOptions;
   private $plugins;
   private $errors;
+  private $persistent_mode;
   private static $elib;
-
-  public function __construct($configDir, $override = null)
+  
+  public function __construct($configDir, $persistent_mode = null)
   {
+    $this->persistent_mode = $persistent_mode;
     spl_autoload_register(array($this, 'loadClass'));
     set_error_handler(array($this, 'errorHandler'));    
     $this->loadConfig($configDir);    
@@ -45,17 +47,34 @@ class Empathy
 	self::$elib = false;
       }
 
-    if($override !== true)
+    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
+    
+    $this->initPlugins();
+    
+    if($this->persistent_mode !== true)
       {
 	$this->beginDispatch();
       }
   }
 
-  public function beginDispatch()
-  {    
-    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
+  
+  public function initPlugins()
+  {
     try
       {
+	$this->boot->initPlugins();
+      }
+    catch(\Exception $e)
+      {
+	$this->exceptionHandler($e);
+      }
+  }
+
+
+  public function beginDispatch()
+  {    
+    try
+      {       
 	$this->boot->dispatch();
       }        
     catch(\Exception $e)
@@ -63,6 +82,13 @@ class Empathy
 	$this->exceptionHandler($e);
       }    
   }
+
+
+  public function getPersistentMode()
+  {
+    return $this->persistent_mode;
+  }
+
 
   public function getErrors()
   {
@@ -132,6 +158,7 @@ class Empathy
       {
       case 'Empathy\SafeException':
 	echo 'Safe exception: '.$e->getMessage();
+	exit();
 	break;
       default:
 	$this->boot->dispatchException($e);

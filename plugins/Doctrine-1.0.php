@@ -48,7 +48,7 @@ class Doctrine extends Plugin implements PreDispatch
   }
   
 
-  public function onPreDispatch($c)
+  public function onPreDispatch()
   {       
     if(!$this->isIP(DB_SERVER))
       {	   

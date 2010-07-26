@@ -19,7 +19,9 @@ class CLI
     $response = ob_get_contents();    
     ob_end_clean();
     $t_elapsed = ($t_request_finish - $t_request_start);
+    $t_elapsed = number_format($t_elapsed, 4);
     return $t_elapsed;
+    //return $response;
   }
 
 

@@ -13,7 +13,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
   }
 
 
-  public function onPreDispatch($c)
+  public function onPreDispatch()
   {
     $this->smarty->debugging = SMARTY_DEBUGGING;    
     $this->smarty->template_dir = DOC_ROOT."/presentation";
