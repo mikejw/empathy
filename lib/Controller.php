@@ -33,9 +33,12 @@ class Controller
   protected $plugin_manager;
   protected $uri_data;
   protected $stash;
+  protected $boot;
 
   public function __construct($boot)
   {
+    $this->boot = $boot;
+
     $this->cli_mode = $boot->getURICliMode();
     $this->initError = $boot->getURIError();
     $this->uri_data = $boot->getURIData();
@@ -57,47 +60,17 @@ class Controller
       }
     
     Session::up();
+       
+    // get presenter
+    $this->presenter = $boot->getPresenter();
 
-    $plugins = $boot->getPlugins();
-    $plugin_manager = $boot->getPluginManager();
-
-    try
+    if($this->presenter !== null)
       {
-	if(!$plugin_manager->getInitialised())
-	  {
-	    $plugin_manager->init($this);
-	    foreach($plugins as $p)
-	      {
-		if(isset($p['class_path']))
-		  {
-		    require($p['class_path']);
-		    if(isset($p['loader']) && $p['loader'] != '')
-		      {
-			spl_autoload_register(array($p['class_name'], $p['loader']));	
-		      }
-		  }	    	
-		$plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
-		if(file_exists($plugin_path))
-		  {
-		    require($plugin_path);
-		    $plugin = 'Empathy\\Plugin\\'.$p['name'];
-		    $n = new $plugin();
-		    $plugin_manager->register($n);
-		  }
-	      }               
-	    $plugin_manager->preDispatch();	
-	  }
-	$this->presenter = $plugin_manager->getView();   
+	$this->assignSessionVar();
+	$this->assignControllerInfo();
+	$this->assignConstants();
       }
-    catch(\Exception $e)
-      {		
-	    throw new \Empathy\SafeException($e->getMessage());       
-      }
-    
-    
-    $this->assignSessionVar();
-    $this->assignControllerInfo();
-    $this->assignConstants();
+
     if(isset($_GET['section_uri']))
       {
 	$this->assign('section', $_GET['section_uri']);
@@ -131,8 +104,11 @@ class Controller
  
   public function initDisplay($i)
   {		
-    $this->presenter->switchInternal($i);       
-    $this->presenter->display($this->templateFile);       
+    if(!$this->boot->getPersistentMode())
+      {
+	$this->presenter->switchInternal($i);       
+	$this->presenter->display($this->templateFile);       
+      }
   }
   
   public function assignSessionVar()
@@ -144,16 +120,19 @@ class Controller
   }
    
   public function redirect($endString)
-  {
-    session_write_close();    
-    $location = 'Location: ';
-    $location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
-    if($endString != '')
+  {    
+    if(!$this->boot->getPersistentMode())
       {
-	$location .= $endString;
+	session_write_close();    
+	$location = 'Location: ';
+	$location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
+	if($endString != '')
+	  {
+	    $location .= $endString;
+	  }
+	header($location);
+	exit();       
       }
-    header($location);
-    exit();
   }
 
   public function redirect_cgi($endString)

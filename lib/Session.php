@@ -5,6 +5,7 @@ namespace Empathy;
 class Session
 {
   public static $app = NAME;
+  private static $up = false;
 
   public static function dump()
   {
@@ -18,13 +19,17 @@ class Session
 
   public static function up()
   {        
-    @session_start();        
-    if(!isset($_SESSION['app']) ||
-       !isset($_SESSION['app'][self::$app]))
-      {	
-	$_SESSION['app'][self::$app] = array();
+    if(self::$up === false)
+      {
+	@session_start();        
+	if(!isset($_SESSION['app']) ||
+	   !isset($_SESSION['app'][self::$app]))
+	  {	
+	    $_SESSION['app'][self::$app] = array();
+	  }
+	//self::dump();
+	self::$up = true;
       }
-    //self::dump();
   }
 
 
