@@ -104,7 +104,8 @@ class Controller
  
   public function initDisplay($i)
   {		
-    if(!$this->boot->getPersistentMode())
+    if(1 || !$this->boot->getPersistentMode())
+      // disabling this optimization for now
       {
 	$this->presenter->switchInternal($i);       
 	$this->presenter->display($this->templateFile);       
