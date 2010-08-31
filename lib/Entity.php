@@ -250,13 +250,8 @@ class Entity
       }
     $sql .= " WHERE id = $this->id";
     $error = "Could not update table '$table'";
-    if($this->dbh->exec($sql) === false)
-      {
-	$errors = $this->dbh->errorInfo();
-	$this->controller->error("[".htmlentities($sql)
-				 ."]<br /><strong>MySQL</strong>: ($error): "
-				 .htmlentities($errors[2]), 0);       
-      }
+
+    $this->query($sql, $error);
   }  
   
   public function insert($table, $id, $format, $sanitize)
