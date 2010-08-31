@@ -41,6 +41,7 @@ class Empathy
        $this->bootOptions['use_elib'])
       {
 	self::$elib = true;
+	\ELib\Config::load($configDir);
       }
     else
       {
