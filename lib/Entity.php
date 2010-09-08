@@ -237,6 +237,10 @@ class Entity
 	  {
 	    $sql .= 'NULL';
 	  }
+	elseif($this->$property == 'DEFAULT')
+	  { 
+	    $sql .= 'DEFAULT';
+	  }
 	else
 	  {
 	    $sql .= "'".$this->$property."'";
@@ -249,6 +253,7 @@ class Entity
 	$i++;	
       }
     $sql .= " WHERE id = $this->id";
+
     $error = "Could not update table '$table'";
 
     $this->query($sql, $error);
