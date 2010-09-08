@@ -3,3 +3,5 @@ mysql: /usr/bin/mysql
 mysql_dump: /usr/bin/mysqldump
 perl: /usr/bin/perl
 ffmpeg: /usr/bin/ffmpeg
+makepasswd: /usr/bin/makepasswd
+
