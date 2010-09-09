@@ -31,6 +31,14 @@ class Entity
 
   protected static $table = '';
 
+
+  public function MYSQLTime()
+  {
+    return '\''.date('Y:m:d H:i:s', time()).'\'';
+  }
+
+
+
   public function __construct($controller = NULL)
   {
     $this->val = new Validate();
@@ -241,6 +249,10 @@ class Entity
 	  { 
 	    $sql .= 'DEFAULT';
 	  }
+	elseif($this->$property == 'MYSQLTIME')
+	  { 
+	    $sql .= $this->MYSQLTime();
+	  }
 	else
 	  {
 	    $sql .= "'".$this->$property."'";
@@ -295,6 +307,10 @@ class Entity
 	    elseif($this->$property == 'DEFAULT')
 	      { 
 		$sql .= 'DEFAULT';
+	      }
+	    elseif($this->$property == 'MYSQLTIME')
+	      { 
+		$sql .= $this->MYSQLTime();
 	      }
 	    else
 	      {

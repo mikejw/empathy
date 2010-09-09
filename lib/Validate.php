@@ -15,6 +15,7 @@ class Validate
   private $email_pattern;
   private $allowed_pattern_1;
   private $unix_username_pattern;
+  private $twitter_style_username;
 
 
   public function __construct()
@@ -22,6 +23,7 @@ class Validate
     $this->email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
     $this->allowed_pattern_1 = '/["\/-\s]/';
     $this->unix_username_pattern = '/^[a-z][_a-zA-Z0-9-]{3,7}$/';
+    $this->twitter_style_username = '/^\w{1,15}$/';
   }
 
   public function valType($type, $field, $data, $optional)
@@ -67,7 +69,8 @@ class Validate
 	      }
 	    break;
 	  case self::USERNAME:
-	    if(!preg_match($this->unix_username_pattern, $data))
+	    //if(!preg_match($this->unix_username_pattern, $data))
+	    if(!preg_match($this->twitter_style_username, $data))
 	      {
 		$this->addError('Invalid '.$field, $field);
 		$valid = false;
