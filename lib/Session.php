@@ -116,6 +116,33 @@ class Session
 
 
 
+  // taken from controller
+  public static function loadUIVars($ui, $ui_array)
+  {
+    $new_app = self::getNewApp();
+    foreach($ui_array as $setting)
+      {
+	if(isset($_GET[$setting]))
+	  {
+	    if(!$new_app)
+	      {
+		$_SESSION[$ui][$setting] = $_GET[$setting];	    
+	      }
+	    else
+	      {
+		self::setUISetting($ui, $setting, $_GET[$setting]);
+	      }
+	  }
+	elseif(self::getUISetting($ui, $setting) !== false)
+	  {
+	    $_GET[$setting] = self::getUISetting($ui, $setting);
+	  }
+	elseif(isset($_SESSION[$ui][$setting]))
+	  {
+	    $_GET[$setting] = $_SESSION[$ui][$setting];
+	  }
+      }    
+  }
 
 }
 ?>
