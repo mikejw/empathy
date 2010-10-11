@@ -27,22 +27,67 @@ class Empathy
   private $bootOptions;
   private $plugins;
   private $errors;
-
-  public function __construct($configDir)
+  private $persistent_mode;
+  private static $elib;
+  
+  public function __construct($configDir, $persistent_mode = null)
   {
+    $this->persistent_mode = $persistent_mode;
     spl_autoload_register(array($this, 'loadClass'));
     set_error_handler(array($this, 'errorHandler'));    
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
-    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);
+    if(isset($this->bootOptions['use_elib']) &&
+       $this->bootOptions['use_elib'])
+      {
+	self::$elib = true;
+	\ELib\Config::load($configDir);
+      }
+    else
+      {
+	self::$elib = false;
+      }
+
+    $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
+    
+    $this->initPlugins();
+    
+    if($this->persistent_mode !== true)
+      {
+	$this->beginDispatch();
+      }
+  }
+
+  
+  public function initPlugins()
+  {
     try
       {
+	$this->boot->initPlugins();
+      }
+    catch(\Exception $e)
+      {
+	$this->exceptionHandler($e);
+      }
+  }
+
+
+  public function beginDispatch()
+  {    
+    try
+      {       
 	$this->boot->dispatch();
       }        
     catch(\Exception $e)
       {
 	$this->exceptionHandler($e);
       }    
+  }
+
+
+  public function getPersistentMode()
+  {
+    return $this->persistent_mode;
   }
 
 
@@ -114,6 +159,7 @@ class Empathy
       {
       case 'Empathy\SafeException':
 	echo 'Safe exception: '.$e->getMessage();
+	exit();
 	break;
       default:
 	$this->boot->dispatchException($e);
@@ -153,6 +199,7 @@ class Empathy
   {
     $i = 0;
     $load_error = 1;
+    $location = array('');
     if(strpos($class, 'Controller\\')
        || strpos($class, 'Model\\'))
       {
@@ -162,16 +209,18 @@ class Empathy
 			  DOC_ROOT.'/application/',
 			  DOC_ROOT.'/application/'.$_GET['module'].'/',
 			  DOC_ROOT.'/storage/');	
-      }
-    else
+      }         
+    elseif(strpos($class, 'Empathy') === 0 ||
+	   (strpos($class, 'ELib') === 0 && self::$elib))
       {
 	$class = str_replace('\\', '/', $class);	
-	$location = array('');
       }
     
     while($i < sizeof($location) && $load_error == 1)
       {
 	$class_file = $location[$i].$class.'.php';           
+
+	//echo $class_file.'<br />';
 
 	if(@include($class_file))
 	  {		

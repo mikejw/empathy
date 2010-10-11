@@ -19,13 +19,25 @@ namespace Empathy;
 
 class Entity
 {
+  const TABLE = '';
+
   private $val;
   private $controller;
   private $rows;
   private $result;
-  private $globally_ignored_property = array('id', 'table');
+  private $globally_ignored_property = array('id', 'table'); // leaving in table to support old models
   private $properties;
   private $dbh;
+
+  protected static $table = '';
+
+
+  public function MYSQLTime()
+  {
+    return '\''.date('Y:m:d H:i:s', time()).'\'';
+  }
+
+
 
   public function __construct($controller = NULL)
   {
@@ -33,10 +45,18 @@ class Entity
     $this->properties = array();
     $this->controller = $controller;
 
-    if(!is_object($controller) || $this->controller->connected == false)
+    /*
+    if(!is_object($controller) || !isset($this->controller->connected) ||
+					 $this->controller->connected == false)
       {	
 	$this->dbConnect();	
       }
+    */
+    if(is_object($controller))
+      {
+	$this->dbConnect();
+      }
+    
     $this->loadProperties();
   }  
 
@@ -77,16 +97,31 @@ class Entity
 			   DB_USER, DB_PASS);    
   }
 
+
+  public function setDBH($dbh)
+  {
+    $this->dbh = $dbh;
+  }
+
   
   public function query($sql, $error)    
-  {
+  { 
     $result = NULL;
     if(($result = $this->dbh->query($sql)) == false)  
       {
 	$errors = $this->dbh->errorInfo();
-	$this->controller->error("[".htmlentities($sql)
+	if(is_object($this->controller))
+	  {
+	    $this->controller->error("[".htmlentities($sql)
+				     ."]<br /><strong>MySQL</strong>: ($error): "
+				     .htmlentities($errors[2]), 0);       
+	  }
+	else
+	  {
+	    throw new \Exception("[".htmlentities($sql)
 				 ."]<br /><strong>MySQL</strong>: ($error): "
-				 .htmlentities($errors[2]), 0);       
+				 .htmlentities($errors[2]));       
+	  }
       }
     else
       {
@@ -96,8 +131,14 @@ class Entity
   }
 
   
-  public function load($table)
+  public function load($table = null)
   {
+    if($table == null)
+      {
+	$c = get_class($this);
+	$table = $c::TABLE;	
+      }
+
     $loaded = true;
     $table = $this->appendPrefix($table);
     $sql = "SELECT * FROM $table WHERE id = $this->id";
@@ -185,6 +226,7 @@ class Entity
     
     foreach($this->properties as $property)
       {
+	//	if(!in_array($property, $this->globally_ignored_property) && $this->$property != '')
 	if(!in_array($property, $this->globally_ignored_property))
 	  {
 	    array_push($properties, $property);
@@ -203,6 +245,14 @@ class Entity
 	  {
 	    $sql .= 'NULL';
 	  }
+	elseif($this->$property == 'DEFAULT')
+	  { 
+	    $sql .= 'DEFAULT';
+	  }
+	elseif($this->$property == 'MYSQLTIME')
+	  { 
+	    $sql .= $this->MYSQLTime();
+	  }
 	else
 	  {
 	    $sql .= "'".$this->$property."'";
@@ -215,14 +265,10 @@ class Entity
 	$i++;	
       }
     $sql .= " WHERE id = $this->id";
+
     $error = "Could not update table '$table'";
-    if($this->dbh->exec($sql) === false)
-      {
-	$errors = $this->dbh->errorInfo();
-	$this->controller->error("[".htmlentities($sql)
-				 ."]<br /><strong>MySQL</strong>: ($error): "
-				 .htmlentities($errors[2]), 0);       
-      }
+
+    $this->query($sql, $error);
   }  
   
   public function insert($table, $id, $format, $sanitize)
@@ -261,6 +307,10 @@ class Entity
 	    elseif($this->$property == 'DEFAULT')
 	      { 
 		$sql .= 'DEFAULT';
+	      }
+	    elseif($this->$property == 'MYSQLTIME')
+	      { 
+		$sql .= $this->MYSQLTime();
 	      }
 	    else
 	      {
@@ -560,6 +610,62 @@ class Entity
   }
  
 
+  public function toXHTMLChris($formatting)
+  {
+    $markup = '';
+    foreach($this->properties as $property)
+      {
+	if(!is_numeric($property) && in_array($property, $formatting))	    
+	  {	     	    
+	    $markup = $this->$property;
+	    $markup = str_replace("\r", "\n", $markup);
+	    $markup = preg_replace("!\n\n+!", "\n", $markup);
+	    
+	    $markup = htmlentities($markup, ENT_QUOTES, 'UTF-8');
+
+	    $markup = preg_replace('!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m',
+				   '<a href="$1" title="$2">$3</a>', $markup);
+	  	    
+	    $markup = preg_replace('!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m', '<img src="$1" id="$2" alt="$3" />', $markup);
+	    $markup = preg_replace('/ +id=""/', '', $markup);
+
+	    $markup = preg_replace('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup); 
+	    $markup = preg_replace('!&lt;em&gt;(.*?)&lt;/em&gt;!m', '<em>$1</em>', $markup); 
+	    
+	    $lines = explode("\n", $markup);
+	    foreach($lines as $key => $line)
+	      {
+		$lines[$key] = "<p>{$line}</p>";
+	      }
+	    $markup = implode("\n", $lines);	   
+	    $this->$property = $markup;
+	  }
+      }
+  }
+  
+
+  public function toXHTML($formatting)
+  {
+    foreach($this->properties as $property)
+      {
+	if(!(is_numeric($property)))
+	  {
+	    //$this->$property = ereg_replace(38, "&amp;", $this->$property);
+
+	    if(in_array($property, $formatting))	    
+	      {		
+		$this->$property = str_replace("\r\n", '<br />', $this->$property);
+	      }
+	    else
+	      {
+		$this->$property = str_replace("\r\n", ' ', $this->$property);
+	      }
+	  }
+      }
+  }    
+
+
+
   public function buildUnionString($ids)
   {
     $str = '(0,';
@@ -578,9 +684,67 @@ class Entity
     return $str;  
   }
 
- 
-  public function delete($table)
+  
+  public function stripMSWordChars()
+  {   
+    foreach($this->properties as $property)
+      {
+	if(!(is_numeric($property)))
+	  {
+	    /*
+	    $this->$property = ereg_replace(133, "&#133;", $this->$property); // ellipses
+	    $this->$property = ereg_replace(8226, "&#8243;", $this->$property); // double prime
+	    $this->$property = ereg_replace(8216, "&#039;", $this->$property); // left single quote
+	    $this->$property = ereg_replace(145, "&#039;", $this->$property); // left single quote
+	    $this->$property = ereg_replace(8217, "&#039;", $this->$property); // right single quote
+	    $this->$property = ereg_replace(146, "&#039;", $this->$property); // right single quote
+	    $this->$property = ereg_replace(8220, "&#034;", $this->$property); // left double quote
+	    $this->$property = ereg_replace(147, "&#034;", $this->$property); // left double quote
+	    $this->$property = ereg_replace(8221, "&#034;", $this->$property); // right double quote
+	    $this->$property = ereg_replace(148, "&#034;", $this->$property); // right double quote
+	    $this->$property = ereg_replace(8226, "&#149;", $this->$property); // bullet
+	    $this->$property = ereg_replace(149, "&#149;", $this->$property); // bullet
+	    $this->$property = ereg_replace(8211, "&#150;", $this->$property); // en dash
+	    $this->$property = ereg_replace(150, "&#150;", $this->$property); // en dash
+	    $this->$property = ereg_replace(8212, "&#151;", $this->$property); // em dash
+	    $this->$property = ereg_replace(151, "&#151;", $this->$property); // em dash
+	    $this->$property = ereg_replace(8482, "&#153;", $this->$property); // trademark
+	    $this->$property = ereg_replace(153, "&#153;", $this->$property); // trademark
+	    $this->$property = ereg_replace(169, "&copy;", $this->$property); // copyright mark
+	    $this->$property = ereg_replace(174, "&reg;", $this->$property); // registration mark	
+	    */
+
+	    $this->$property = ereg_replace(133, "", $this->$property); // ellipses
+	    $this->$property = ereg_replace(8226, "", $this->$property); // double prime
+	    $this->$property = ereg_replace(8216, "", $this->$property); // left single quote
+	    $this->$property = ereg_replace(145, "", $this->$property); // left single quote
+	    $this->$property = ereg_replace(8217, "", $this->$property); // right single quote
+	    $this->$property = ereg_replace(146, "", $this->$property); // right single quote
+	    $this->$property = ereg_replace(8220, "", $this->$property); // left double quote
+	    $this->$property = ereg_replace(147, "", $this->$property); // left double quote
+	    $this->$property = ereg_replace(8221, "", $this->$property); // right double quote
+	    $this->$property = ereg_replace(148, "", $this->$property); // right double quote
+	    $this->$property = ereg_replace(8226, "", $this->$property); // bullet
+	    $this->$property = ereg_replace(149, "", $this->$property); // bullet
+	    $this->$property = ereg_replace(8211, "", $this->$property); // en dash
+	    $this->$property = ereg_replace(150, "", $this->$property); // en dash
+	    $this->$property = ereg_replace(8212, "", $this->$property); // em dash
+	    $this->$property = ereg_replace(151, "", $this->$property); // em dash
+	    $this->$property = ereg_replace(8482, "", $this->$property); // trademark
+	    $this->$property = ereg_replace(153, "", $this->$property); // trademark
+	    $this->$property = ereg_replace(169, "", $this->$property); // copyright mark
+	    $this->$property = ereg_replace(174, "", $this->$property); // registration mark	
+	  }
+      }
+  }
+
+  public function delete($table = null)
   {
+    if($table == null)
+      {
+	$c = get_class($this);
+	$table = $c::TABLE;
+      }
     $sql = 'DELETE FROM '.$table.' WHERE id = '.$this->id;
     $error = 'Could not delete row.';
     $this->query($sql, $error);

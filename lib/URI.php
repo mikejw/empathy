@@ -65,8 +65,13 @@ class URI
     $this->error = 0;
     $this->processRequest();
     $this->setController(); 
+    //$this->printRouting();
   }
 
+  public function getData()
+  {
+    return $this->uri;
+  }
 
   public function getCliMode()
   {
@@ -282,6 +287,109 @@ class URI
       {
 	$_GET['event'] = 'default_event';
       }       
+  }
+
+  public function dynamicSection()
+  {
+    // code still needed to assert correct section path - else throw 404
+    $this->error = 0;
+    // temporary hack to provide object so that entity will assume it has a controller
+    // and connect to database
+    $section = new SectionItemStandAlone(new \stdClass());
+    if(!isset($this->dynamicModule) || $this->dynamicModule == '')
+      {
+	throw new Exception("Failed to find name of dynamic module.");
+      }    
+    else
+      {
+	$_GET['module'] = $this->dynamicModule;
+      }
+
+    if(sizeof($this->uri) > 0)
+      {
+	$section_index = (sizeof($this->uri) - 1);
+	if(is_numeric($this->uri[$section_index]))
+	  {
+	    $_GET['id'] = $this->uri[$section_index--];
+	  }
+	if($section_index >= 0)
+	  {
+	    $section_uri = $this->uri[$section_index];
+	  }
+      }           
+    elseif(defined('DEFAULT_SECTION'))
+      {	
+	$section_uri = DEFAULT_SECTION;	 
+      }
+        
+    $rows = $section->getURIData();
+    if(isset($section_uri))
+      {
+	for($i = 0; $i < sizeof($rows); $i++)
+	  {
+	    if($rows[$i]['friendly_url'] != NULL)
+	      {
+		$comp = str_replace(" ", "", strtolower($rows[$i]['friendly_url']));
+	      }
+	    else
+	      {
+		$comp = str_replace(" ", "", strtolower($rows[$i]['label']));
+	      }
+	    if($comp == $section_uri)
+	      {
+		$_GET['section'] = $rows[$i]['id'];
+	      }
+	  }    
+      }
+
+    if(isset($_GET['section']))
+      {
+	$section->getItem($_GET['section']);
+      }
+    
+    // section id is not set / found
+    if(!(is_numeric($section->id)))
+      {
+	$this->error = URI::ERROR_404;
+      }
+
+    if(isset($section->url_name))
+      {
+	$_GET['section_uri'] = $section->url_name;
+      }
+
+    if($this->error < 1)
+      {
+	if($section->template == "")
+	  {
+	    $this->error = URI::NO_TEMPLATE;
+	  }
+	else
+	  {		    
+	    if($section->template == '0') // section in 'specialised'
+	      {
+		$controllerName = "template".$section->id;
+	      }
+	    else
+	      {
+		$controllerName = "template".$section->template;
+	      }   
+	  }
+      }
+
+    if(isset($controllerName))
+      {
+	$_GET['class'] = $controllerName;
+      }
+
+    $_GET['event'] = 'default_event';
+    $_GET['id'] = $section->id;
+
+    if($this->error < 1)
+      {
+	$this->setController();    
+      }
+    return $this->error;
   }
 
   public function getErrorMessage()

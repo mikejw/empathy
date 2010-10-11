@@ -23,3 +23,17 @@ plugins:
     class_path: Smarty/Smarty.class.php
     class_name: \Smarty
     loader:
+  - name: Doctrine
+    version: 1.0
+    class_path: Doctrine.php
+    class_name: \Doctrine
+    loader: autoload
+  - name: Zend
+    version: 1.0
+    class_path: Zend/Loader.php
+    class_name: \Zend_Loader
+    loader: loadClass
+  - name: Pheanstalk
+    version: 1.0
+
+

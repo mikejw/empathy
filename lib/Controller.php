@@ -31,11 +31,20 @@ class Controller
   protected $d_conn;
   protected $cli_mode;
   protected $plugin_manager;
-  
+  protected $uri_data;
+  protected $stash;
+  protected $boot;
+
   public function __construct($boot)
   {
+    $this->boot = $boot;
+
     $this->cli_mode = $boot->getURICliMode();
     $this->initError = $boot->getURIError();
+    $this->uri_data = $boot->getURIData();
+
+    $this->stash = new Stash();
+
     $this->connected = false;
     $this->module = $_GET['module'];
     $this->class = $_GET['class'];
@@ -49,48 +58,19 @@ class Controller
       {
 	$this->templateFile = $this->class.'.tpl';
       }
-    $this->sessionUp();	
+    
+    Session::up();
+       
+    // get presenter
+    $this->presenter = $boot->getPresenter();
 
-    $plugins = $boot->getPlugins();
-    $plugin_manager = $boot->getPluginManager();
-
-    try
+    if($this->presenter !== null)
       {
-	if(!$plugin_manager->getInitialised())
-	  {
-	    $plugin_manager->init($this);
-	    foreach($plugins as $p)
-	      {
-		if(isset($p['class_path']))
-		  {
-		    require($p['class_path']);
-		    if(isset($p['loader']) && $p['loader'] != '')
-		      {
-			spl_autoload_register(array($p['class_name'], $p['loader']));	
-		      }
-		  }	    	
-		$plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
-		if(file_exists($plugin_path))
-		  {
-		    require($plugin_path);
-		    $plugin = 'Empathy\\Plugin\\'.$p['name'];
-		    $n = new $plugin();
-		    $plugin_manager->register($n);
-		  }
-	      }               
-	    $plugin_manager->preDispatch();	
-	  }
-	$this->presenter = $plugin_manager->getView();   
+	$this->assignSessionVar();
+	$this->assignControllerInfo();
+	$this->assignConstants();
       }
-    catch(\Exception $e)
-      {		
-	    throw new \Empathy\SafeException($e->getMessage());       
-      }
-    
-    
-    $this->assignSessionVar();
-    $this->assignControllerInfo();
-    $this->assignConstants();
+
     if(isset($_GET['section_uri']))
       {
 	$this->assign('section', $_GET['section_uri']);
@@ -123,17 +103,12 @@ class Controller
   }
  
   public function initDisplay($i)
-  {
-    $this->presenter->switchInternal($i);    
-    if(!$this->presenter->templateExists($this->templateFile))
+  {		
+    if(1 || !$this->boot->getPersistentMode())
+      // disabling this optimization for now
       {
-	throw new Exception('Missing template file: '.$this->templateFile);
-	//die('Missing template file: '.$this->templateFile);
-	//$this->error('Missing template file: '.$this->templateFile);
-      }
-    else
-      {			
-	$this->presenter->display($this->templateFile);   
+	$this->presenter->switchInternal($i);       
+	$this->presenter->display($this->templateFile);       
       }
   }
   
@@ -146,16 +121,19 @@ class Controller
   }
    
   public function redirect($endString)
-  {
-    session_write_close();    
-    $location = 'Location: ';
-    $location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
-    if($endString != '')
+  {    
+    if(!$this->boot->getPersistentMode())
       {
-	$location .= $endString;
+	session_write_close();    
+	$location = 'Location: ';
+	$location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
+	if($endString != '')
+	  {
+	    $location .= $endString;
+	  }
+	header($location);
+	exit();       
       }
-    header($location);
-    exit();
   }
 
   public function redirect_cgi($endString)
@@ -171,15 +149,10 @@ class Controller
     exit();
   }
   
-  public function sessionUp()
-  {    
-    @session_start();
-  }
-  
+
   public function sessionDown()
   {
-    session_unset();
-    session_destroy();
+    Session::down();
   }
 
   public function toggleEditMode()
@@ -196,7 +169,7 @@ class Controller
   
   protected function setFailedURI($uri)
   {
-    $_SESSION['failed_uri'] = $uri;
+    Session::set('failed_uri', $uri);
   }
 
 
@@ -235,7 +208,7 @@ class Controller
 	  {
 	    $this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 	  }
-	$_SESSION['app_error'] = array($this->module, $this->class, $message, date('U'));
+	Session::set('app_error', array($this->module, $this->class, $message, date('U')));
 	//$this->redirect('empathy/error/');       
 	throw new Exception('Couldn\'t dispatch: '.$message);
       }
@@ -243,11 +216,23 @@ class Controller
 
   public function loadUIVars($ui, $ui_array)
   {
+    $new_app = Session::getNewApp();
     foreach($ui_array as $setting)
       {
 	if(isset($_GET[$setting]))
 	  {
-	    $_SESSION[$ui][$setting] = $_GET[$setting];	    
+	    if(!$new_app)
+	      {
+		$_SESSION[$ui][$setting] = $_GET[$setting];	    
+	      }
+	    else
+	      {
+		Session::setUISetting($ui, $setting, $_GET[$setting]);
+	      }
+	  }
+	elseif(Session::getUISetting($ui, $setting) !== false)
+	  {
+	    $_GET[$setting] = Session::getUISetting($ui, $setting);
 	  }
 	elseif(isset($_SESSION[$ui][$setting]))
 	  {

@@ -6,7 +6,6 @@ namespace Empathy;
 class PluginManager
 {
   private $plugins;
-  private $controller;
   private $view_plugin;
   private $initialised;
   
@@ -18,10 +17,9 @@ class PluginManager
     $this->view_plugin = NULL;
   }
   
-  public function init($c)
+  public function init()
   {
     $this->initialised = 1;
-    $this->controller = $c;
   }
 
   public function register($p)
@@ -36,7 +34,7 @@ class PluginManager
 	$r = new \ReflectionClass(get_class($p));	
 	if(in_array('Empathy\Plugin\PreDispatch', $r->getInterfaceNames()))
 	  {
-	    $p->onPreDispatch($this->controller);
+	    $p->onPreDispatch();
 	  }
 	if(in_array('Empathy\Plugin\Presentation', $r->getInterfaceNames()))
 	  {

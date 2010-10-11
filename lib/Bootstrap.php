@@ -27,9 +27,12 @@ class Bootstrap
   private $plugins;
   private $plugin_manager;
   private $issuingException;
+  private $presenter;
+  private $persistent_mode;
 
   public function __construct($bootOptions, $plugins, $mvc)
   {    
+    $this->persistent_mode = $mvc->getPersistentMode();
     $this->issuingException = false;
     $this->mvc = $mvc;
     $this->plugins = $plugins;
@@ -50,6 +53,12 @@ class Bootstrap
     $this->uri = new URI($this->defaultModule, $this->dynamicModule);
     $error = $this->uri->getError();
 
+    if($error == URI::MISSING_CLASS
+       && isset($this->dynamicModule)
+       && $this->dynamicModule != '')
+      {	
+	    $error = $this->uri->dynamicSection();	
+      }    
     if($error > 0)
       {
 	throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
@@ -70,15 +79,72 @@ class Bootstrap
   public function dispatchException($e)
   {    
     $this->issuingException = true;
-    $this->controller = new Controller($this);
+    $this->controller = new Controller($this);   
     $this->controller->setTemplate('../empathy.tpl');
     $this->controller->assign('error', $e->getMessage());    
-    $this->display(true);    
+    $this->display(true);  
   }
   
   private function display($i)
   {    
+    /*
+    if(PNG_OUTPUT == 1)
+      {
+	$this->controller->presenter->loadFilter('output', 'png_image');
+      }
+    */
     $this->controller->initDisplay($i);
+  }
+
+
+  public function initPlugins()
+  {    
+    $plugin_manager = $this->plugin_manager;
+    $plugins = $this->plugins;
+
+    try
+      {
+	if(!$plugin_manager->getInitialised())
+	  {
+	    $plugin_manager->init();
+	    foreach($plugins as $p)
+	      {
+		if(isset($p['class_path']))
+		  {
+		    require($p['class_path']);
+		    if(isset($p['loader']) && $p['loader'] != '')
+		      {
+			spl_autoload_register(array($p['class_name'], $p['loader']));	
+		      }
+		  }	    	
+		$plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
+		if(file_exists($plugin_path))
+		  {
+		    require($plugin_path);
+		    $plugin = 'Empathy\\Plugin\\'.$p['name'];
+		    $n = new $plugin();
+		    $plugin_manager->register($n);
+		  }
+	      }               
+	    $plugin_manager->preDispatch();	
+	  }
+	$this->presenter = $plugin_manager->getView();   	
+      }
+    catch(\Exception $e)
+      {		
+	    throw new \Empathy\SafeException($e->getMessage());       
+      }
+  }
+
+
+  public function getPersistentMode()
+  {
+    return $this->persistent_mode;
+  }
+
+  public function getPresenter()
+  {
+    return $this->presenter;
   }
 
 
@@ -97,6 +163,11 @@ class Bootstrap
     return $this->uri->getCliMode();
   }
 
+  public function getURIData()
+  {
+    return $this->uri->getData();
+  }
+
   public function getPlugins()
   {
     return $this->plugins;
@@ -105,6 +176,11 @@ class Bootstrap
   public function getPluginManager()
   {
     return $this->plugin_manager;
+  }
+
+  public function getELib()
+  {
+	return $this->elib;
   }
 
 }

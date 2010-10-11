@@ -23,9 +23,9 @@ use Empathy\Controller as Controller;
 
 class CustomController extends Controller
 {	
-  public function __construct($error, $internal)
+  public function __construct($boot)
   {
-    parent::__construct($error, $internal);  
+    parent::__construct($boot);  
     // put custom routines here
   }
   

@@ -1,0 +1,165 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Cwd qw/abs_path getcwd/;
+use Data::Dumper;
+use YAML::Tiny;
+use Getopt::Long;
+
+# get empathy config
+my %config = &read_global_config();
+my %app_config = &read_app_config();
+
+my %actions = (
+    mysql_setup => \&mysql_setup,
+    mysql_dump => \&mysql_dump,
+    mysql_populate => \&mysql_populate,
+    doctrine_gen_models => \&doctrine_gen_models,
+    doctrine_gen_yaml => \&doctrine_gen_yaml,
+    doctrine_generate => \&doctrine_generate
+    );
+
+# initialise options
+my $mysql = '';
+my $doctrine = '';
+GetOptions(
+    'mysql=s' => \$mysql,
+    'doctrine=s' => \$doctrine
+    );
+
+my $call;
+if($mysql)
+{ 
+    $call = 'mysql_'.$mysql;
+    if(defined($actions{$call}))
+    {	
+	$actions{$call}->();
+    }
+    else
+    {
+	die "No can do. Exiting...\n";
+	exit();
+    }
+}
+elsif($doctrine)
+{
+    $call = 'doctrine_'.$doctrine;
+    if(defined($actions{$call}))
+    {
+	$actions{$call}->();
+    }
+    else
+    {
+	die "No can do. Exiting...\n";
+	exit();
+    }
+}
+
+
+
+
+
+
+
+# functions...
+
+sub doctrine_generate()
+{
+    &exec_app('doctrine_generate');
+}
+
+
+sub doctrine_gen_models()
+{
+    &exec_app('doctrine_models');
+}
+
+sub doctrine_gen_yaml()
+{
+    if(!-d './models')
+    {
+	die("Doctrine models directory does not exist. Exiting...\n");
+    }
+    else
+    {    
+	&exec_app('doctrine_yaml');
+    }
+}
+
+sub mysql_setup()
+{
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < inserts.sql');     
+}
+sub mysql_populate()
+{
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' '.$app_config{'db_name'}.' < dump.sql');	
+}
+sub mysql_dump()
+{
+    &execute($config{'mysql_dump'}.' -u root --password='.$app_config{'db_pass'}.' --no-create-info --complete-insert '.$app_config{'db_name'}.' > dump.sql');
+}
+
+sub execute()
+{
+    my ($command) = @_;
+    my @output = `$command`;
+}
+
+sub exec_app()
+{
+    my ($args) = @_;
+    my @output = &execute('php .'.$app_config{'public_dir'}.'/index.php '.$args);
+}
+
+
+# stores cwd temporarily, assumbed to be root of empathy app
+sub read_global_config
+{
+    my %config;
+    my $dir = getcwd();
+    my $e_dir = abs_path($0);
+    my @e_dir_arr = split('/', $e_dir);
+    pop @e_dir_arr;
+    $e_dir = join('/', @e_dir_arr);
+    chdir($e_dir);
+    my @include_path = `php ./echo_include_path.php`;
+    my @path_arr = split(':', $include_path[0]); # make sure we're dealing with the last path mentioned
+    my $path = $path_arr[@path_arr - 1];
+    chdir($path);
+    my @empathy_arr = split('/', readlink('./Empathy'));
+    my $empathy = $empathy_arr[0];
+    my $yaml = YAML::Tiny->read($empathy.'/config/config.yml');
+    chdir($dir);
+    %config = (
+	mysql => $yaml->[0]->{'mysql'},
+        mysql_dump => $yaml->[0]->{'mysql_dump'},
+        ffmpeg => $yaml->[0]->{'ffmpeg'},
+	perl => $yaml->[0]->{'perl'}
+	);
+}
+sub read_app_config
+{
+    my %app_config;
+    my $config = './config.yml';
+    my $yaml = YAML::Tiny->read($config);
+    %app_config = (
+	name =>	$yaml->[0]->{'name'},
+	title => $yaml->[0]->{'title'},
+	doc_root => $yaml->[0]->{'doc_root'},
+	web_Root => $yaml->[0]->{'web_root'},
+	public_dir => $yaml->[0]->{'public_dir'},
+	db_server => $yaml->[0]->{'db_server'},
+	db_user => $yaml->[0]->{'db_user'},
+	db_pass => $yaml->[0]->{'db_pass'},
+	db_name => $yaml->[0]->{'db_name'},
+	tbl_prefix => $yaml->[0]->{'tbl_prefix'},
+	tpl_by_class => $yaml->[0]->{'tpl_by_class'},
+	boot_options => $yaml->[0]->{'boot_options'},
+	smarty_debugging => $yaml->[0]->{'smarty_debugging'},
+	plugins => $yaml->[0]->{'plugins'}
+	);   
+}
+
+

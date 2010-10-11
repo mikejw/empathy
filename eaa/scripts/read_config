@@ -1,0 +1,21 @@
+
+use YAML::Tiny;
+use vars qw( $mysql $mysql_dump $doc_root $ffmpeg $db_name $db_user $db_pass $db_server $doc_root $web_root $public_dir);    
+
+my $yaml = YAML::Tiny->new;
+$yaml = YAML::Tiny->read('../config.yml');
+
+
+$mysql = $yaml->[0]->{'mysql'};
+$mysql_dump = $yaml->[0]->{'mysql_dump'};
+$doc_root = $yaml->[0]->{'doc_root'};
+$ffmpeg = $yaml->[0]->{'ffmpeg'};
+$db_name = $yaml->[0]->{'db_name'};
+$db_user = $yaml->[0]->{'db_user'};
+$db_pass = $yaml->[0]->{'db_pass'};
+$db_server = $yaml->[0]->{'db_server'};
+$doc_root = $yaml->[0]->{'doc_root'};
+$web_root = $yaml->[0]->{'web_root'};
+$public_dir = $yaml->[0]->{'public_dir'};
+
+
