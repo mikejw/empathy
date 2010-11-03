@@ -10,6 +10,7 @@ class Validate
   const EMAIL = 4;
   const TEL = 5;
   const USERNAME = 6;
+  const URL = 7;
  
   public $error = array();
   private $email_pattern;
@@ -21,9 +22,12 @@ class Validate
   public function __construct()
   {
     $this->email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
-    $this->allowed_pattern_1 = '/["\/-\s]/';
+    $this->allowed_pattern_1 = '/["\/-\s:,\']/';
     $this->unix_username_pattern = '/^[a-z][_a-zA-Z0-9-]{3,7}$/';
     $this->twitter_style_username = '/^\w{1,15}$/';
+
+    // taken from http://bit.ly/AQFAn
+    $this->url_pattern = '|https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?|';
   }
 
   public function valType($type, $field, $data, $optional)
@@ -71,6 +75,13 @@ class Validate
 	  case self::USERNAME:
 	    //if(!preg_match($this->unix_username_pattern, $data))
 	    if(!preg_match($this->twitter_style_username, $data))
+	      {
+		$this->addError('Invalid '.$field, $field);
+		$valid = false;
+	      }
+	    break;
+	  case self::URL:
+	    if(!preg_match($this->url_pattern, $data))
 	      {
 		$this->addError('Invalid '.$field, $field);
 		$valid = false;
