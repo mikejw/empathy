@@ -281,11 +281,18 @@ class Controller
   }
 
 
-  public function execScript($script, $args)
+  public function execScript($script, $args, $passthru=false)
   {    
     $exec = 'cd '.DOC_ROOT.'/scripts; ';
     $exec .= PERL.' '.DOC_ROOT.'/scripts/'.$script.' '.implode(' ', $args);
-    exec($exec);
+    if(!$passthru)
+      {
+	exec($exec);
+      }
+    else
+      {
+	passthru($exec);
+      }
   }
 
   public function assign($name, $data)
