@@ -34,7 +34,6 @@ class Empathy
   {
     $this->persistent_mode = $persistent_mode;
     spl_autoload_register(array($this, 'loadClass'));
-    set_error_handler(array($this, 'errorHandler'));    
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
     if(isset($this->bootOptions['use_elib']) &&
@@ -47,6 +46,13 @@ class Empathy
       {
 	self::$elib = false;
       }
+
+    if(isset($this->bootOptions['handle_errors']) &&
+       $this->bootOptions['handle_errors'])
+      {
+	set_error_handler(array($this, 'errorHandler'));    
+      }
+
 
     $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
     
