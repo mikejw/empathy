@@ -211,16 +211,20 @@ class Empathy
       {
 	$class_arr = explode('\\', $class);
         $class = $class_arr[sizeof($class_arr)-1];
-	$location = array(
-			  DOC_ROOT.'/application/',
-			  DOC_ROOT.'/application/'.$_GET['module'].'/',
-			  DOC_ROOT.'/storage/');	
+
+	if(isset($_GET['module']))
+	  {
+	    array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
+	  }
+	array_push($location, DOC_ROOT.'/storage/');
       }         
     elseif(strpos($class, 'Empathy') === 0 ||
 	   (strpos($class, 'ELib') === 0 && self::$elib))
       {
 	$class = str_replace('\\', '/', $class);	
       }
+    array_push($location, DOC_ROOT.'/application/');
+
     
     while($i < sizeof($location) && $load_error == 1)
       {
