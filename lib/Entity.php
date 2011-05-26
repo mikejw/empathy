@@ -16,6 +16,7 @@
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Empathy;
+use ELib\YAML;
 
 class Entity
 {
@@ -106,6 +107,12 @@ class Entity
   
   public function query($sql, $error)    
   { 
+    /* needs to be elib specific extention
+    $queries = YAML::load(DOC_ROOT.'/logs/sql_log');
+    $queries[] = $sql;
+    YAML::save($queries, DOC_ROOT.'/logs/sql_log');
+    */
+
     $result = NULL;
     if(($result = $this->dbh->query($sql)) == false)  
       {
@@ -681,6 +688,13 @@ class Entity
       }
     $str .= ')';
     
+    /* does this really fix anything?
+    if($str == '(0,)')
+      {
+	$str = '(0)';
+      }
+    */
+
     return $str;  
   }
 

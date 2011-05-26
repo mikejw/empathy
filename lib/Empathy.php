@@ -167,8 +167,15 @@ class Empathy
 	echo 'Safe exception: '.$e->getMessage();
 	exit();
 	break;
+
       default:
-	$this->boot->dispatchException($e);
+	// redispatch to error page 
+	$_GET['module'] = 'notfound';
+	$_GET['class'] = 'notfound';
+	$_GET['event'] = 'default_event';
+	$this->beginDispatch();
+
+	//$this->boot->dispatchException($e);
 	break;
       }
   }
