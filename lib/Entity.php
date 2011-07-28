@@ -68,11 +68,42 @@ class Entity
 
   private function loadProperties()
   {
-    $r = new \ReflectionClass(get_class($this));
-    foreach($r->getProperties() as $item)
+    $r = new \ReflectionClass(get_class($this));        
+
+    // get properties from all subclasses in the right order
+    // (with a bit of hackery to make 'table' last)
+    if($r->getParentClass()->getName() != 'Empathy\Entity')
       {
-	array_push($this->properties, $item->name);
+	$props = array();
+	while(($class = $r->getName()) != 'Empathy\Entity')
+	  {		   
+	    $props[] = $r->getProperties();
+	    $r = $r->getParentClass();	    
+	  }	  
+	$props = array_reverse($props);	
+	$properties = array();
+	foreach($props as $p)
+	  {	    
+	    foreach($p as $rp)
+	      {	    
+		$name = $rp->name;
+		if(!in_array($name, $properties) && $name != 'table')
+		  {
+		    $properties[] = $name;
+		  }
+	      }
+	  }
+	$properties[] = 'table';
+	$this->properties = $properties;   
+	//print_r($this->properties); exit();       
       }
+    else // it's a straightforward single subclass
+      {
+	foreach($r->getProperties() as $item)
+	  {
+	    array_push($this->properties, $item->name);
+	  }
+      }        
   }
 
   
@@ -299,6 +330,7 @@ class Entity
 
     $i = 0;
     $id = 0;    
+
     foreach($this->properties as $property)
       {
 	if(!in_array($property, $this->globally_ignored_property))
@@ -332,7 +364,7 @@ class Entity
 	$i++;
       }
     $sql .= ")";
-   
+
     $error = "Could not insert to table '$table'";                
 
 
