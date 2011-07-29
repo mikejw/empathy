@@ -180,8 +180,16 @@ class Bootstrap
 
   public function getELib()
   {
-	return $this->elib;
+    return $this->elib;
   }
+
+  /*
+  public function getMVC()
+  {
+    return $this->mvc;
+  }
+  */
+
 
 }
 ?>
