@@ -16,7 +16,6 @@
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Empathy;
-use ELib\YAML;
 
 class Entity
 {
@@ -138,6 +137,12 @@ class Entity
   
   public function query($sql, $error)    
   { 
+    if(defined('ELIB_SQL_LOGGING') &&
+       ELIB_SQL_LOGGING == true)
+      {
+	\ELib\Util\SQLLog::log($sql);
+      }
+
     /* needs to be elib specific extention
     $queries = YAML::load(DOC_ROOT.'/logs/sql_log');
     $queries[] = $sql;

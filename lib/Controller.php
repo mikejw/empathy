@@ -301,6 +301,18 @@ class Controller
   }
 
 
+  public function __destruct()
+  {     
+    if(defined('ELIB_SQL_LOGGING') &&
+       ELIB_SQL_LOGGING == true)
+      {
+	\ELib\Util\SQLLog::log('----------END OF REQUEST---------');
+      }
+  }
+  
+
+
+
   /*
   public function internalRequest($uri)
   {
