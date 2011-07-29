@@ -434,7 +434,8 @@ class Entity
   public function getPaginatePages($table, $sql_string, $page, $per_page)
   {
     $nav = array();
-    $sql = 'SELECT * FROM '.$table.' '.$sql_string;
+    //$sql = 'SELECT * FROM '.$table.' '.$sql_string;
+    $sql = 'SELECT FOUND_ROWS()';
     $error = 'Could not get rows from '.$table;
     $result = $this->query($sql, $error);   
     $rows = $result->rowCount();
@@ -555,7 +556,8 @@ class Entity
     $table = $this->addTablePrefix($table);
     $all = array();
     $start = ($page - 1) * $per_page;
-    $sql = 'SELECT * FROM '.$table.' '.$sql_string.' LIMIT '.$start.', '.$per_page;
+    //$sql = 'SELECT * FROM '.$table.' '.$sql_string.' LIMIT '.$start.', '.$per_page;
+    $sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM '.$table.' '.$sql_string.' LIMIT '.$start.', '.$per_page;
     $error = 'Could not get rows from '.$table;
 
     $result = $this->query($sql, $error);
