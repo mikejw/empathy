@@ -34,7 +34,6 @@ class Empathy
   {
     $this->persistent_mode = $persistent_mode;
     spl_autoload_register(array($this, 'loadClass'));
-    set_error_handler(array($this, 'errorHandler'));    
     $this->loadConfig($configDir);    
     $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
     if(isset($this->bootOptions['use_elib']) &&
@@ -47,6 +46,13 @@ class Empathy
       {
 	self::$elib = false;
       }
+
+    if(isset($this->bootOptions['handle_errors']) &&
+       $this->bootOptions['handle_errors'])
+      {
+	set_error_handler(array($this, 'errorHandler'));    
+      }
+
 
     $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
     
@@ -161,7 +167,16 @@ class Empathy
 	echo 'Safe exception: '.$e->getMessage();
 	exit();
 	break;
+
       default:
+	// redispatch to error page 
+	/*
+	$_GET['module'] = 'notfound';
+	$_GET['class'] = 'notfound';
+	$_GET['event'] = 'default_event';
+	$this->beginDispatch();
+	*/
+
 	$this->boot->dispatchException($e);
 	break;
       }
@@ -205,16 +220,20 @@ class Empathy
       {
 	$class_arr = explode('\\', $class);
         $class = $class_arr[sizeof($class_arr)-1];
-	$location = array(
-			  DOC_ROOT.'/application/',
-			  DOC_ROOT.'/application/'.$_GET['module'].'/',
-			  DOC_ROOT.'/storage/');	
+
+	if(isset($_GET['module']))
+	  {
+	    array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
+	  }
+	array_push($location, DOC_ROOT.'/storage/');
       }         
     elseif(strpos($class, 'Empathy') === 0 ||
 	   (strpos($class, 'ELib') === 0 && self::$elib))
       {
 	$class = str_replace('\\', '/', $class);	
       }
+    array_push($location, DOC_ROOT.'/application/');
+
     
     while($i < sizeof($location) && $load_error == 1)
       {

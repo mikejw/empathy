@@ -21,7 +21,8 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     $this->smarty->template_dir = DOC_ROOT."/presentation";
     $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
     $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
-    $this->smarty->config_dir = DOC_ROOT."/tpl/configs";   
+    $this->smarty->config_dir = DOC_ROOT."/tpl/configs";
+    $this->smarty->error_reporting = E_ALL & ~E_NOTICE;   
 
     if(defined('SMARTY_CACHING') && SMARTY_CACHING == true)
       {

@@ -52,7 +52,7 @@ class Validate
 	      }	
 	    break;
 	  case self::NUM:
-	    if(!is_numeric($data))
+	    if(!is_numeric($data)) // consider ctype_digit instead?
 	      {
 		$this->addError('Invalid '.$field, $field);		
 		$valid = false;

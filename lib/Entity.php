@@ -16,6 +16,7 @@
   // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Empathy;
+use ELib\YAML;
 
 class Entity
 {
@@ -67,11 +68,42 @@ class Entity
 
   private function loadProperties()
   {
-    $r = new \ReflectionClass(get_class($this));
-    foreach($r->getProperties() as $item)
+    $r = new \ReflectionClass(get_class($this));        
+
+    // get properties from all subclasses in the right order
+    // (with a bit of hackery to make 'table' last)
+    if($r->getParentClass()->getName() != 'Empathy\Entity')
       {
-	array_push($this->properties, $item->name);
+	$props = array();
+	while(($class = $r->getName()) != 'Empathy\Entity')
+	  {		   
+	    $props[] = $r->getProperties();
+	    $r = $r->getParentClass();	    
+	  }	  
+	$props = array_reverse($props);	
+	$properties = array();
+	foreach($props as $p)
+	  {	    
+	    foreach($p as $rp)
+	      {	    
+		$name = $rp->name;
+		if(!in_array($name, $properties) && $name != 'table')
+		  {
+		    $properties[] = $name;
+		  }
+	      }
+	  }
+	$properties[] = 'table';
+	$this->properties = $properties;   
+	//print_r($this->properties); exit();       
       }
+    else // it's a straightforward single subclass
+      {
+	foreach($r->getProperties() as $item)
+	  {
+	    array_push($this->properties, $item->name);
+	  }
+      }        
   }
 
   
@@ -106,6 +138,12 @@ class Entity
   
   public function query($sql, $error)    
   { 
+    /* needs to be elib specific extention
+    $queries = YAML::load(DOC_ROOT.'/logs/sql_log');
+    $queries[] = $sql;
+    YAML::save($queries, DOC_ROOT.'/logs/sql_log');
+    */
+
     $result = NULL;
     if(($result = $this->dbh->query($sql)) == false)  
       {
@@ -292,6 +330,7 @@ class Entity
 
     $i = 0;
     $id = 0;    
+
     foreach($this->properties as $property)
       {
 	if(!in_array($property, $this->globally_ignored_property))
@@ -325,7 +364,7 @@ class Entity
 	$i++;
       }
     $sql .= ")";
-   
+
     $error = "Could not insert to table '$table'";                
 
 
@@ -681,6 +720,13 @@ class Entity
       }
     $str .= ')';
     
+    /* does this really fix anything?
+    if($str == '(0,)')
+      {
+	$str = '(0)';
+      }
+    */
+
     return $str;  
   }
 
