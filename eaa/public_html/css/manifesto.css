@@ -1,0 +1,23 @@
+body { background-color: #000; 
+       margin: 0; text-align: center; }
+
+#page { width: 460px; margin: 100px auto; text-align: left; }
+
+
+#page h1 { text-align: center; }
+
+#page p { margin: 0 0 1em 0;
+	  line-height: 1.3em; }
+	  
+
+/* typography */
+body {
+    font-size: 62.5%; 
+    font-family: sans-serif; color: #fff; }
+
+#page p, #page h2 { font-size: 1.5em; }
+#page h2 { text-transform: uppercase; }
+
+#page h1 { font-size: 8em; }
+
+
