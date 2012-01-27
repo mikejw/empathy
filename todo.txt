@@ -16,3 +16,5 @@ Y - Make dependencies configurable in new local config
   - dsection
   => proper dsection URL resolution => duplicate sections?
 
+  - rename Store.php to something else. Or should the class become decprecated?  
+  => class name clashes with controllers of same name on case-insensitive filesystems.
