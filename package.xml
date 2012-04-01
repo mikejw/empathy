@@ -28,9 +28,9 @@
     <dir name="/">
       <file name="COPYING" role="doc" />
       <file name="README" role="doc" />
-    </dir>
-    <dir name="/bin">
-      <file baseinstalldir="/" name="empathy" role="script" />
+      <dir name="bin">
+	<file baseinstalldir="/" name="empathy" role="script" />
+      </dir>
     </dir>
   </contents>
   <dependencies>
