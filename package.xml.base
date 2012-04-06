@@ -30,6 +30,37 @@
 	<dir name="bin">
 	  <file name="echo_include_path.php" role="php" />
 	</dir>
+	<dir name="Plugin">
+	  <file name="Doctrine.php" role="php" />
+	  <file name="PreDispatch.php" role="php" /> 
+	  <file name="Presentation.php" role="php" />
+	  <file name="Smarty.php" role="php" />
+	</dir>
+	<dir name="Util">
+	  <file name="CLI.php" role="php" />
+	  <file name="ELib.php" role="php" />
+	  <file name="Test.php" role="php" />
+	  <file name="TestUnit.php" role="php" />
+	</dir>	
+	<file name="Bootstrap.php" role="php" />
+	<file name="Controller.php" role="php" />
+	<file name="DBC.php" role="php" />
+	<file name="DBPool.php" role="php" />
+	<file name="Empathy.php" role="php" />
+	<file name="Entity.php" role="php" />
+	<file name="ErrorException.php" role="php" />
+	<file name="Exception.php" role="php" />
+	<file name="Model.php" role="php" />
+	<file name="Plugin.php" role="php" />
+	<file name="PluginManager.php" role="php" />
+	<file name="SafeException.php" role="php" />
+	<file name="SectionItemStandAlone.php" role="php" />
+	<file name="Session.php" role="php" />
+	<file name="Stash.php" role="php" />
+	<file name="Store.php" role="php" />
+	<file name="URI.php" role="php" />
+	<file name="Validate.php" role="php" />
+	<file name="empathy.tpl" role="php" />
       </dir>
       <file name="config.yml" role="cfg" />
       <file name="eaa.zip" role="data" />
