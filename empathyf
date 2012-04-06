@@ -26,9 +26,11 @@ my %actions = (
 # initialise options
 my $mysql = '';
 my $doctrine = '';
+my $new_app = 0;
 GetOptions(
     'mysql=s' => \$mysql,
-    'doctrine=s' => \$doctrine
+    'doctrine=s' => \$doctrine,
+    'new_app' => \$new_app
     );
 
 my $call;
@@ -58,7 +60,23 @@ elsif($doctrine)
 	exit();
     }
 }
+elsif($new_app)
+{
+    my $name = '';
+    my $web_root = '';
+    my $doc_root = '';
 
+    print "New app name: ";
+    chomp ($name = <>);
+    print "Web root: ";
+    chomp ($web_root = <>);
+    
+    $doc_root = `pwd`.$name;
+    `cp $lib_path/data/Empathy/eaa.zip .`;
+    `unzip eaa.zip`;
+    `mv eaa $name`;
+
+}
 
 
 
