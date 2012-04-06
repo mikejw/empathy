@@ -22,7 +22,7 @@ fi
 cd ${CWD}
 
 # bundle up base app architype
-zip -r ./Empathy/eaa.zip eaa/
+zip -r ./eaa.zip ./eaa/
 
 # repackage and add back to channel
 cat ./package.xml.base | sed s/CURRENT_DATE/${DATE}/ | sed s/CURRENT_TIME/${TIME}/ > package.xml

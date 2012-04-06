@@ -27,17 +27,15 @@
   <contents>
     <dir name="/">
       <dir name="Empathy">
-	<file name="eaa.zip" baseinstalldir="/" role="data" />
 	<dir name="bin">
-	  <file name="echo_include_path.php" baseinstalldir="/" role="php" />
-	</dir>
-	<dir name="config">
-	  <file name="config.yml" baseinstalldir="/" role="cfg" />
+	  <file name="echo_include_path.php" role="php" />
 	</dir>
       </dir>
+      <file name="config.yml" role="cfg" />
+      <file name="eaa.zip" role="data" />
       <file name="COPYING" role="doc" />
       <file name="README" role="doc" />
-      <file baseinstalldir="/" name="empathyf" role="script">
+      <file  name="empathyf" role="script">
 	<tasks:replace from="@php_dir@" to="php_dir" type="pear-config" />
       </file>
     </dir>
