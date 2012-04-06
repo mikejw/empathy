@@ -12,9 +12,11 @@ export TIME=`date +%T`
 
 # removing package from channel
 cd ${CHANNEL_ROOT}
-rm ./get/${PACKAGE_NAME}-${VERSION}.tar
-rm ./get/${PACKAGE_NAME}-${VERSION}.tgz
-pirum build ${CHANNEL_ROOT}
+if [ -e ./get/${PACKAGE_NAME}-${VERSION}.tar ]; then
+    rm ./get/${PACKAGE_NAME}-${VERSION}.tar
+    rm ./get/${PACKAGE_NAME}-${VERSION}.tgz
+    pirum build ${CHANNEL_ROOT}
+fi
 
 # repackage and add back to channel
 cd CWD
