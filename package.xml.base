@@ -26,9 +26,14 @@
   <notes>-</notes>
   <contents>
     <dir name="/">
+      <dir name="bin">
+	<file name="echo_include_path.php" baseinstalldir="/" role="php" />
+      </dir>
       <file name="COPYING" role="doc" />
       <file name="README" role="doc" />
-      <file baseinstalldir="/" name="empathyf" role="script" />
+      <file baseinstalldir="/" name="empathyf" role="script">
+	<tasks:replace from="@php_bin@" to="php_bin" type="pear-config" />
+      </file>
     </dir>
   </contents>
   <dependencies>
