@@ -19,7 +19,7 @@ if [ -e ./get/${PACKAGE_NAME}-${VERSION}.tar ]; then
 fi
 
 # repackage and add back to channel
-cd CWD
+cd ${CWD}
 cat ./package.xml.base | sed s/CURRENT_DATE/${DATE}/ | sed s/CURRENT_TIME/${TIME}/ > package.xml
 pear package
 pirum add ${CHANNEL_ROOT} ${PACKAGE_NAME}-${VERSION}.tgz
