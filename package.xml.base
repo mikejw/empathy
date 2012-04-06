@@ -36,6 +36,7 @@
       </dir>
       <file name="COPYING" role="doc" />
       <file name="README" role="doc" />
+      <file name="eaa.zip" role="data" />
       <file baseinstalldir="/" name="empathyf" role="script">
 	<tasks:replace from="@php_dir@" to="php_dir" type="pear-config" />
       </file>
