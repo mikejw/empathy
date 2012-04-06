@@ -7,7 +7,7 @@ use YAML::Tiny;
 use Getopt::Long;
 
 
-my lib_path = "@php_bin@";
+my $lib_path = "@php_bin@";
 
 # get empathy config
 my %config = &read_global_config();
