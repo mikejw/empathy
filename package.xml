@@ -41,6 +41,7 @@
       </pearinstaller>
     </required>
   </dependencies>
+  <phprelease />
 <!--
   <phprelease>
     <installconditions>
