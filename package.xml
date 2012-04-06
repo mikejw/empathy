@@ -28,7 +28,7 @@
     <dir name="/">
       <file name="COPYING" role="doc" />
       <file name="README" role="doc" />
-      <file baseinstalldir="/" name="empathy" role="script" />
+      <file baseinstalldir="/" name="empathyf" role="script" />
     </dir>
   </contents>
   <dependencies>
