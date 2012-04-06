@@ -126,20 +126,7 @@ sub exec_app()
 sub read_global_config
 {
     my %config;
-    my $dir = getcwd();
-    my $e_dir = abs_path($0);
-    my @e_dir_arr = split('/', $e_dir);
-    pop @e_dir_arr;
-    $e_dir = join('/', @e_dir_arr);
-    chdir($e_dir);
-    my @include_path = `php $lib_path/Empathy/bin/echo_include_path.php`;
-    my @path_arr = split(':', $include_path[0]); # make sure we're dealing with the last path mentioned
-    my $path = $path_arr[@path_arr - 1];
-    chdir($path);
-    my @empathy_arr = split('/', readlink('./Empathy'));
-    my $empathy = $empathy_arr[0];
-    my $yaml = YAML::Tiny->read($empathy.'/config/config.yml');
-    chdir($dir);
+    my $yaml = YAML::Tiny->read($lib_path.'Empathy/config/config.yml');
     %config = (
 	mysql => $yaml->[0]->{'mysql'},
         mysql_dump => $yaml->[0]->{'mysql_dump'},

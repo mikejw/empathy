@@ -30,6 +30,9 @@
 	<dir name="bin">
 	  <file name="echo_include_path.php" baseinstalldir="/" role="php" />
 	</dir>
+	<dir name="config">
+	  <file name="config.yml.sample" baseinstalldir="/" role="config" />
+	</dir>
       </dir>
       <file name="COPYING" role="doc" />
       <file name="README" role="doc" />
