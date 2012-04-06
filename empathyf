@@ -126,7 +126,7 @@ sub exec_app()
 sub read_global_config
 {
     my %config;
-    my $yaml = YAML::Tiny->read($lib_path.'Empathy/config/config.yml');
+    my $yaml = YAML::Tiny->read($lib_path.'/Empathy/config/config.yml');
     %config = (
 	mysql => $yaml->[0]->{'mysql'},
         mysql_dump => $yaml->[0]->{'mysql_dump'},
