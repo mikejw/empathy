@@ -12,8 +12,8 @@
     <email>mail at mikejw.co.uk</email>
     <active>yes</active>
   </lead>
-  <date>2012-04-01</date>
-  <time>21:45:00</time>
+  <date>CURRENT_DATE</date>
+  <time>CURRENT_TIME</time>
   <version>
     <release>0.9.5</release>
     <api>0.9.5</api>
