@@ -1,6 +1,6 @@
 
 RewriteEngine on
-RewriteBase /eaa/public_html/
+RewriteBase /WEB_ROOT
 
 RewriteRule ^([_a-z0-9-]/*)*$ index.php
 
