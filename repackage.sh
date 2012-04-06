@@ -18,8 +18,7 @@ pirum build ${CHANNEL_ROOT}
 
 # repackage and add back to channel
 cd CWD
-cat ./package.xml | sed s/CURRENT_DATE/${DATE}/ | sed s/CURRENT_TIME/{$TIME}/ > package.xml.tmp
-mv ./package.xml.tmp ./package.xml
+cat ./package.xml.base | sed s/CURRENT_DATE/${DATE}/ | sed s/CURRENT_TIME/{$TIME}/ > package.xml
 pear package
 pirum add ${CHANNEL_ROOT} ${PACKAGE_NAME}-${VERSION}.tgz
 
