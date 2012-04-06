@@ -28,10 +28,8 @@
     <dir name="/">
       <file name="COPYING" role="doc" />
       <file name="README" role="doc" />
-      <dir name="bin">
-	<file baseinstalldir="/" name="empathy" role="script" />
-      </dir>
     </dir>
+    <file baseinstalldir="/" name="empathy" role="script" />
   </contents>
   <dependencies>
     <required>
@@ -43,6 +41,24 @@
       </pearinstaller>
     </required>
   </dependencies>
-  <phprelease />
+<!--
+  <phprelease>
+    <installconditions>
+      <os>
+	<name>windows</name>
+      </os>
+    </installconditions>
+    <filelist>
+      <install as="phpunit" name="phpunit.php" />
+      <install as="phpunit.bat" name="phpunit.bat" />
+    </filelist>
+  </phprelease>
+  <phprelease>
+    <filelist>
+      <install as="phpunit" name="phpunit.php" />
+      <ignore name="phpunit.bat" />
+    </filelist>
+  </phprelease>
+-->
 </package>
 
