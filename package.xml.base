@@ -26,8 +26,10 @@
   <notes>-</notes>
   <contents>
     <dir name="/">
-      <dir name="bin">
-	<file name="echo_include_path.php" baseinstalldir="/" role="php" />
+      <dir name="Empathy">
+	<dir name="bin">
+	  <file name="echo_include_path.php" baseinstalldir="/" role="php" />
+	</dir>
       </dir>
       <file name="COPYING" role="doc" />
       <file name="README" role="doc" />
