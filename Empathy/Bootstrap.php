@@ -29,6 +29,8 @@ class Bootstrap
   private $issuingException;
   private $presenter;
   private $persistent_mode;
+  private $debug_mode;
+  private $environment;
 
   public function __construct($bootOptions, $plugins, $mvc)
   {    
@@ -45,6 +47,21 @@ class Bootstrap
     if(isset($bootOptions['dynamic_module']))
       {
 	$this->dynamicModule = $bootOptions['dynamic_module'];
+      }
+    if(isset($bootOptions['debug_mode']))
+      {
+	$this->debug_mode = ($bootOptions['debug_mode'] === true);
+      }
+
+    $this->environment = 'dev';
+    $valid_env = array('dev', 'stag', 'prod');
+
+    if(isset($bootOptions['environment']))
+      {
+	if(in_array($bootOptions['environment'], $valid_env))
+	  {
+	    $this->environment = $bootOptions['environment'];
+	  }
       }
   } 
 
@@ -76,6 +93,39 @@ class Bootstrap
       }
   }
 
+
+  public function dispatchException($e)
+  {
+   
+    $this->issuingException = true;
+    $this->controller = new Controller($this);   
+
+
+    if($this->controller->getModule() != 'api')
+      {
+	// old handling
+	$this->controller->setTemplate('../empathy.tpl');
+	$this->controller->assign('error', $e->getMessage());    
+	$this->display(true);  
+      }
+    else
+      {      
+	if(!$this->debug_mode)
+	  {
+	    $r = new \EROb(\ReturnCodes::SERVER_ERROR, 'Server error.');	    
+	  }
+	else
+	  {
+	    $r = new \EROb(999, $e->getMessage(), 'SERVER_ERROR_EXPLICIT');
+	  }
+	
+	$this->controller->assign('default', $r);
+	$this->display(false);
+      }
+  }
+
+
+  /*
   public function dispatchException($e)
   {    
     $this->issuingException = true;
@@ -84,6 +134,7 @@ class Bootstrap
     $this->controller->assign('error', $e->getMessage());    
     $this->display(true);  
   }
+  */
   
   private function display($i)
   {    
@@ -122,13 +173,13 @@ class Bootstrap
 		  {
 		    require($plugin_path);
 		    $plugin = 'Empathy\\Plugin\\'.$p['name'];
-		    $n = new $plugin();
+		    $n = new $plugin($this);
 		    $plugin_manager->register($n);
 		  }
 	      }               
 	    $plugin_manager->preDispatch();	
 	  }
-	$this->presenter = $plugin_manager->getView();   	
+	//$this->presenter = $plugin_manager->getView();   	
       }
     catch(\Exception $e)
       {		
@@ -136,6 +187,11 @@ class Bootstrap
       }
   }
 
+
+  public function getEnvironment()
+  {
+    return $this->environment;
+  }
 
   public function getPersistentMode()
   {
@@ -182,6 +238,12 @@ class Bootstrap
   {
     return $this->elib;
   }
+
+  public function getDebugMode()
+  {
+    return $this->debug_mode;
+  }
+
 
   /*
   public function getMVC()

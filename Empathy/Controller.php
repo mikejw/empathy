@@ -34,6 +34,9 @@ class Controller
   protected $uri_data;
   protected $stash;
   protected $boot;
+  private $view_disabled;
+  protected $environment;
+
 
   public function __construct($boot)
   {
@@ -42,6 +45,10 @@ class Controller
     $this->cli_mode = $boot->getURICliMode();
     $this->initError = $boot->getURIError();
     $this->uri_data = $boot->getURIData();
+    $this->plugin_manager = $boot->getPluginManager();
+    $this->plugin_manager->setController($this);
+
+    $this->environment = $boot->getEnvironment();
 
     $this->stash = new Stash();
 
@@ -50,6 +57,10 @@ class Controller
     $this->class = $_GET['class'];
     $this->event = $_GET['event'];
     $this->title = TITLE; 
+    
+    $this->view_disabled = false;
+
+
     if(TPL_BY_CLASS == 0)
       {
 	$this->templateFile = $this->module.'.tpl';
@@ -62,7 +73,8 @@ class Controller
     Session::up();
        
     // get presenter
-    $this->presenter = $boot->getPresenter();
+    $this->presenter = $this->plugin_manager->getView();
+
 
     if($this->presenter !== null)
       {
@@ -78,7 +90,15 @@ class Controller
   }
 
 
-  public function assignConstants()
+  protected function disableView()
+  {
+    $this->view_disabled = true;
+  }
+
+
+
+
+  private function assignConstants()
   {
     $this->assign('NAME', NAME);
     $this->assign('WEB_ROOT', WEB_ROOT);
@@ -89,7 +109,7 @@ class Controller
   }
 
 
-  public function assignControllerInfo()
+  private function assignControllerInfo()
   {
     $this->assign('module', $this->module);
     $this->assign('class', $this->class);
@@ -104,7 +124,8 @@ class Controller
  
   public function initDisplay($i)
   {		
-    if(1 || !$this->boot->getPersistentMode())
+    if((1 || !$this->boot->getPersistentMode())
+       && !$this->view_disabled)
       // disabling this optimization for now
       {
 	$this->presenter->switchInternal($i);       
@@ -112,7 +133,7 @@ class Controller
       }
   }
   
-  public function assignSessionVar()
+  private function assignSessionVar()
   {
     foreach($_SESSION as $index => $value)
     {
@@ -136,7 +157,7 @@ class Controller
       }
   }
 
-  public function redirect_cgi($endString)
+  protected function redirect_cgi($endString)
   {
     session_write_close();    
     $location = 'Location: ';
@@ -150,12 +171,13 @@ class Controller
   }
   
 
-  public function sessionDown()
+  protected function sessionDown()
   {
     Session::down();
   }
 
-  public function toggleEditMode()
+
+  protected function toggleEditMode()
   {
     if($_SESSION['edit_mode'] != 1)
     {
@@ -173,7 +195,7 @@ class Controller
   }
 
 
-  public function http_error($type)
+  protected function http_error($type)
   {
     $response = '';
     $message = '';
@@ -196,7 +218,7 @@ class Controller
   }
 
 
-  public function error($message)
+  protected function error($message)
   {    
     if(DEBUG_MODE == 0)
       {
@@ -214,7 +236,8 @@ class Controller
       }
   }
 
-  public function loadUIVars($ui, $ui_array)
+
+  protected function loadUIVars($ui, $ui_array)
   {
     $new_app = Session::getNewApp();
     foreach($ui_array as $setting)
@@ -241,7 +264,7 @@ class Controller
       }
   }
 
-  public function isXMLHttpRequest()
+  protected function isXMLHttpRequest()
   {
     $request = 0;
     if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
@@ -252,7 +275,7 @@ class Controller
     return $request;
   }
 
-  public function initID($id, $def, $assertSet=false) // when $def is 0, valid is true when id is 0
+  protected function initID($id, $def, $assertSet=false) // when $def is 0, valid is true when id is 0
   {
     $valid = true;
     $assign_def = false;
@@ -281,7 +304,7 @@ class Controller
   }
 
 
-  public function execScript($script, $args, $passthru=false)
+  protected function execScript($script, $args, $passthru=false)
   {    
     $exec = 'cd '.DOC_ROOT.'/scripts; ';
     $exec .= PERL.' '.DOC_ROOT.'/scripts/'.$script.' '.implode(' ', $args);
@@ -322,5 +345,14 @@ class Controller
   */
 
 
+  public function getModule()
+  {
+    return $this->module;
+  }
+
+  public function getClass()
+  {
+    return $this->class;
+  }
 }
 ?>

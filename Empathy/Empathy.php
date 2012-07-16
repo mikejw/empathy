@@ -19,7 +19,7 @@ use Empathy as Empathy;
 
 const MVC_VERSION = '0.9.4';
 
-require('spyc/spyc.php');
+require_once('spyc/spyc.php');
 
 class Empathy
 {
@@ -29,13 +29,14 @@ class Empathy
   private $errors;
   private $persistent_mode;
   private static $elib;
+
   
   public function __construct($configDir, $persistent_mode = null)
   {
     $this->persistent_mode = $persistent_mode;
     spl_autoload_register(array($this, 'loadClass'));
     $this->loadConfig($configDir);    
-    $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../cfg/Empathy'));
+    $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
     if(isset($this->bootOptions['use_elib']) &&
        $this->bootOptions['use_elib'])
       {
@@ -47,12 +48,10 @@ class Empathy
 	self::$elib = false;
       }
 
-    if(isset($this->bootOptions['handle_errors']) &&
-       $this->bootOptions['handle_errors'])
+    if($this->getHandlingErrors())
       {
 	set_error_handler(array($this, 'errorHandler'));    
       }
-
 
     $this->boot = new Empathy\Bootstrap($this->bootOptions, $this->plugins, $this);	
     
@@ -64,30 +63,51 @@ class Empathy
       }
   }
 
+
+  private function getHandlingErrors()
+  {
+    return (isset($this->bootOptions['handle_errors']) &&
+      $this->bootOptions['handle_errors']);
+  }
+  
   
   public function initPlugins()
   {
-    try
+    if(!$this->getHandlingErrors())
       {
 	$this->boot->initPlugins();
       }
-    catch(\Exception $e)
+    else
       {
-	$this->exceptionHandler($e);
+	try
+	  {
+	    $this->boot->initPlugins();
+	  }
+	catch(\Exception $e)
+	  {
+	    $this->exceptionHandler($e);
+	  }
       }
   }
 
 
   public function beginDispatch()
   {    
-    try
-      {       
-	$this->boot->dispatch();
-      }        
-    catch(\Exception $e)
+    if(!$this->getHandlingErrors())
       {
-	$this->exceptionHandler($e);
-      }    
+	$this->boot->dispatch();
+      }
+    else
+      {
+	try
+	  {       
+	    $this->boot->dispatch();
+	  }        
+	catch(\Exception $e)
+	  {
+	    $this->exceptionHandler($e);
+	  }
+      }
   }
 
 

@@ -6,16 +6,24 @@ namespace Empathy;
 class PluginManager
 {
   private $plugins;
-  private $view_plugin;
+  private $view_plugins;
   private $initialised;
+  private $controller;
   
 
   public function __construct()
   {
     $this->initialised = 0;   
     $this->plugins = array();
-    $this->view_plugin = NULL;
+    $this->view_plugins = array();
   }
+
+  
+  public function setController($c)
+  {
+    $this->controller = $c;
+  }
+
   
   public function init()
   {
@@ -37,8 +45,8 @@ class PluginManager
 	    $p->onPreDispatch();
 	  }
 	if(in_array('Empathy\Plugin\Presentation', $r->getInterfaceNames()))
-	  {
-	    $this->view_plugin = $p;
+	  {	    
+	    $this->view_plugins[] = $p;
 	  }
       }
   }
@@ -50,13 +58,24 @@ class PluginManager
 
   public function getView()
   {
-    if($this->view_plugin === NULL)
+    if(sizeof($this->view_plugins) == 0)
       {
 	throw new \Exception('No plugin loaded for view.');
       }
     else
       {
-	return $this->view_plugin;
+	$module = $this->controller->getModule();
+	$class = $this->controller->getClass();
+
+	$plugin = 0;
+	if($module == 'api')
+	  {
+	    $plugin = 1;
+	  }
+
+	$view = $this->view_plugins[$plugin];
+	
+	return $view;	
       }
   }
   

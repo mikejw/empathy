@@ -105,7 +105,7 @@ class URI
       {
 	$this->setModule($_GET['module']); 	
       }    
-    elseif($this->uriString == '' || strpos($this->uriString, '.'))
+    elseif($this->uriString == '') // || strpos($this->uriString, '.'))
       {		
 	$this->setModule($this->defaultModule);
       }
