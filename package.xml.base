@@ -34,7 +34,7 @@
 	  <file name="Doctrine-1.0.php" role="php" />
 	  <file name="EDefault-1.0.php" role="php" />
 	  <file name="FacebookSDK-1.0.php" role="php" />
-	  <file name="JSBeautifer-1.0.php" role="php" />
+	  <file name="JSBeautifier-1.0.php" role="php" />
 	  <file name="JSONView-1.0.php" role="php" />
 	  <file name="Pheanstalk-1.0.php" role="php" />
 	  <file name="Phirehose-1.0.php" role="php" />
