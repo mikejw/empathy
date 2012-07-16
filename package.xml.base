@@ -31,10 +31,18 @@
 	  <file name="echo_include_path.php" role="php" />
 	</dir>
 	<dir name="Plugin">
-	  <file name="Doctrine.php" role="php" />
+	  <file name="Doctrine-1.0.php" role="php" />
+	  <file name="EDefault-1.0.php" role="php" />
+	  <file name="FacebookSDK-1.0.php" role="php" />
+	  <file name="JSBeautifer-1.0.php" role="php" />
+	  <file name="JSONView-1.0.php" role="php" />
+	  <file name="Pheanstalk-1.0.php" role="php" />
+	  <file name="Phirehose-1.0.php" role="php" />
 	  <file name="PreDispatch.php" role="php" /> 
 	  <file name="Presentation.php" role="php" />
-	  <file name="Smarty.php" role="php" />
+	  <file name="Redbean-1.0.php" role="php" />
+	  <file name="Smarty-1.0.php" role="php" />
+	  <file name="TwitterOAuth-1.0.php" role="php" />
 	</dir>
 	<dir name="Util">
 	  <file name="CLI.php" role="php" />
