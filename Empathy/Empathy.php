@@ -36,7 +36,8 @@ class Empathy
     $this->persistent_mode = $persistent_mode;
     spl_autoload_register(array($this, 'loadClass'));
     $this->loadConfig($configDir);    
-    $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../config'));
+    $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../cfg/Empathy'));
+
     if(isset($this->bootOptions['use_elib']) &&
        $this->bootOptions['use_elib'])
       {
