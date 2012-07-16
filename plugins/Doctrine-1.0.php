@@ -59,13 +59,14 @@ class Doctrine extends Plugin implements PreDispatch
     $this->d_conn = \Doctrine_Manager::connection($dsn, 'c_'.NAME);
 
     $this->d_man = \Doctrine_Manager::getInstance();
-    $this->d_man->setAttribute(\Doctrine::ATTR_VALIDATE, \Doctrine::VALIDATE_ALL);
+    //$this->d_man->setAttribute(\Doctrine::ATTR_VALIDATE, \Doctrine::VALIDATE_ALL);
     $this->d_man->setAttribute(\Doctrine::ATTR_EXPORT, \Doctrine::EXPORT_ALL);
     $this->d_man->setAttribute(\Doctrine::ATTR_MODEL_LOADING, \Doctrine::MODEL_LOADING_CONSERVATIVE);
     $this->d_man->setAttribute(\Doctrine::ATTR_AUTO_ACCESSOR_OVERRIDE, true);
+
     
     
-    if(isset($_SERVER['argc']) && $_SERVER['argc'] > 1)
+    if(isset($_SERVER['argc']) && $_SERVER['argc'] > 1 && in_array('DOCTRINE_OP', $_SERVER['argv']))
       {
 	switch($_SERVER['argv'][1])
 	  {
