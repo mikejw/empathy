@@ -168,7 +168,7 @@ class Bootstrap
 			spl_autoload_register(array($p['class_name'], $p['loader']));	
 		      }
 		  }	    	
-		$plugin_path = realpath(dirname(realpath(__FILE__)).'/../').'/plugins/'.$p['name'].'-'.$p['version'].'.php';
+		$plugin_path = realpath(dirname(realpath(__FILE__))).'/Plugin/'.$p['name'].'-'.$p['version'].'.php';
 		if(file_exists($plugin_path))
 		  {
 		    require($plugin_path);
