@@ -336,13 +336,7 @@ class Controller
 
 
 
-  /*
-  public function internalRequest($uri)
-  {
-    $_SERVER['REQUEST_URI'] = $uri;
-    $this->boot->getMVC()->beginDispatch();
-  }
-  */
+
 
 
   public function getModule()

@@ -43,14 +43,16 @@ class Bootstrap
   private $dynamicModule;
 
 
-  /** The URI object is used for determining 
+  /**
+   * The URI object is used for determining 
    * the correct application controller to dispatch to.
    * @var URI
    */
   private $uri;
 
 
-  /** This property is used to contain a reference to 
+  /**
+   * This property is used to contain a reference to 
    * the current instance of the web application.
    * @var Empathy
    */
@@ -66,23 +68,61 @@ class Bootstrap
   private $plugins;
 
 
-  /** This property contains a reference to 
+  /** 
+   * This property contains a reference to 
    * the plugin manager object.
    * @var PluginManager
    */
   private $plugin_manager;
 
 
-  private $issuingException;
-  private $presenter;
+  /**
+   * This value of this property is obtained
+   * from the (global) application object.
+   * When in persistent mode the application
+   * is initialised but dispatchment to a
+   * controller is prevented. Useful for testing etc.
+   * @var boolean
+   */
   private $persistent_mode;
+
+
+  /**
+   * New property as of 0.9.5.
+   * Introduced to prevent 
+   * low level error messages being returned in
+   * an application serving a JSON api.
+   * @var boolean
+   */
   private $debug_mode;
+
+
+  /**
+   * New property as of 0.9.5.
+   * Application can now run in different environment modes.
+   * Currently restricted (enumerated) to 'dev', 'stag', or 'live'.
+   * @var string
+   */
   private $environment;
 
+
+  /** 
+   * Creates the bootstrap object and passes boot options
+   * and plugin definition taken from the application config
+   * as well as reference to global application object.
+   *
+   * @param array $bootOptions boot options config
+   *
+   * @param array $plugins active plugin defination
+   *
+   * @param Empathy the application
+   *
+   * @return void
+   */
   public function __construct($bootOptions, $plugins, $mvc)
   {    
     $this->persistent_mode = $mvc->getPersistentMode();    
-    $this->issuingException = false;
+
     $this->mvc = $mvc;
     $this->plugins = $plugins;
     $this->plugin_manager = new PluginManager();    
@@ -112,16 +152,26 @@ class Bootstrap
       }
   } 
 
+
+  /**
+   * Create URI object which determines dispatch method and
+   * perform dispatch
+   * @param string $defaultModule default module taken from application config
+   * 
+   * @param string $dynamicModule dynamic module taken from application config (if using CMS)
+   *
+   * @return void
+   */
   public function dispatch()
   {
     $this->uri = new URI($this->defaultModule, $this->dynamicModule);
     $error = $this->uri->getError();
-
+    
     if($error == URI::MISSING_CLASS
        && isset($this->dynamicModule)
        && $this->dynamicModule != '')
       {	
-	    $error = $this->uri->dynamicSection();	
+	$error = $this->uri->dynamicSection();	
       }    
     if($error > 0)
       {
@@ -140,13 +190,20 @@ class Bootstrap
       }
   }
 
-
+  
+  /**
+   * If an exception is detected this is used to dispatch 
+   * to an internal controler and view
+   * @param Exception $e the exception object.
+   *
+   * @return void
+   */
+   
   public function dispatchException($e)
   {   
-    $this->issuingException = true;
     $this->controller = new Controller($this);   
 
-
+    
     if($this->controller->getModule() != 'api')
       {
 	// old handling
@@ -170,30 +227,30 @@ class Bootstrap
       }
   }
 
-
-  /*
-  public function dispatchException($e)
-  {    
-    $this->issuingException = true;
-    $this->controller = new Controller($this);   
-    $this->controller->setTemplate('../empathy.tpl');
-    $this->controller->assign('error', $e->getMessage());    
-    $this->display(true);  
-  }
-  */
   
+  /**
+   * Invoke the view through the controller
+   * @param boolean $i Whether the current template is internal 
+   * e.g. an exception has occurred.
+   *
+   * @return void
+   */
   private function display($i)
   {    
-    /*
-    if(PNG_OUTPUT == 1)
-      {
-	$this->controller->presenter->loadFilter('output', 'png_image');
-      }
-    */
     $this->controller->initDisplay($i);
   }
 
 
+  /**
+   * Cycle through the definition for active plugins
+   * and initialize them. Any excpetion that is thrown as
+   * a result is cast into an Empathy Safe Exception.
+   * This means error messages will be displayed 
+   * followed by the application dying silently with no attempt 
+   * to initialize the view.
+   * 
+   * @return void
+   */
   public function initPlugins()
   {    
     $plugin_manager = $this->plugin_manager;
@@ -225,78 +282,88 @@ class Bootstrap
 	      }               
 	    $plugin_manager->preDispatch();	
 	  }
-	//$this->presenter = $plugin_manager->getView();   	
       }
     catch(\Exception $e)
       {		
-	    throw new \Empathy\SafeException($e->getMessage());       
+	throw new \Empathy\SafeException($e->getMessage());       
       }
   }
+  
 
-
+  /**
+   * Returns the current environment.
+   * @return string $environment Environment, which is either 'dev', 'stag' or 'live'
+   */
   public function getEnvironment()
   {
     return $this->environment;
   }
 
+
+  /**
+   * Returns the persistent mode.
+   * @return boolean $persistentMode 
+   */
   public function getPersistentMode()
   {
     return $this->persistent_mode;
   }
 
-  public function getPresenter()
-  {
-    return $this->presenter;
-  }
 
-
-  public function getIssuingException()
-  {
-    return $this->issuingException;
-  }
-
+  /**
+   * Gets value of error property from URI object
+   * @return integer $error See error class constants in URI class
+   */
   public function getURIError()
   {
     return $this->uri->getError();
   }
 
+
+  /** 
+   * Gets value of cli mode detected during
+   * by URI object.
+   * i.e. the value of $_SERVER['HTTP_HOST'] is null
+   * and the value of $_SERVER['REQUEST_URI'] is also null
+   * 
+   * @return boolean $cli_mode Whether the application is running in cli mode.
+   */
   public function getURICliMode()
   {
     return $this->uri->getCliMode();
   }
 
+
+  /**
+   * Gets the URI data (data structure representing the current URI).
+   * @return array $uri_data
+   */
   public function getURIData()
   {
     return $this->uri->getData();
   }
 
-  public function getPlugins()
-  {
-    return $this->plugins;
-  }
 
+  /**
+   * Returns plugin manager object.
+   * @return PluginManager $plugin_manager
+   */
   public function getPluginManager()
   {
     return $this->plugin_manager;
   }
 
-  public function getELib()
-  {
-    return $this->elib;
-  }
-
+  
+  /** 
+   * Returns value of $debug_mode property.
+   * @return boolean $debug_mode.
+   */
   public function getDebugMode()
   {
     return $this->debug_mode;
   }
 
 
-  /*
-  public function getMVC()
-  {
-    return $this->mvc;
-  }
-  */
 
 
 }
