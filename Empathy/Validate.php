@@ -1,6 +1,18 @@
 <?php
+/**
+ * Empathy model validation
+ * @file			Empathy/Validate.php
+ * @description		Basic validation of Empathy models
+ * @author			Mike Whiting
+ * @license			LGPLv3
+ *
+ * (c) copyright Mike Whiting 
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the files COPYING/COPYING.LESSER 
+ */
 
 namespace Empathy;
+
 
 class Validate
 {  
@@ -19,6 +31,9 @@ class Validate
   private $twitter_style_username;
 
 
+  /**
+   * Creates validation object
+   */
   public function __construct()
   {
     $this->email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
@@ -30,6 +45,12 @@ class Validate
     $this->url_pattern = '|https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?|';
   }
 
+
+  /**
+   * Perform validation of data based on type spcified
+   *
+   * @return boolean $valid
+   */
   public function valType($type, $field, $data, $optional)
   {
     $valid = true;
@@ -95,6 +116,16 @@ class Validate
     return $valid;
   }
   
+
+  /**
+   * Associate error message with 
+   * data structure of object used for storing results of validation
+   * using name of field as index.
+   *
+   * @param string $message error message
+   * @param string $field the field to apply the error message to
+   * @return void
+   */
   public function addError($message, $field)
   {
     if($field != '')
@@ -114,11 +145,21 @@ class Validate
       }
   }
 
+
+  /**
+   * Returns whether the validation object has
+   * recorded errors.
+   * @return boolean $errors whether the error data structure is empty or not.
+   */
   public function hasErrors()
   {
     return (sizeof($this->error) > 0);
   }
 
+  /**
+   * Returns the error data structure
+   * @return array $error the error data structure belonging to the validation object
+   */ 
   public function getErrors()
   {
     return $this->error;
