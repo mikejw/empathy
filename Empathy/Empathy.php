@@ -107,6 +107,10 @@ class Empathy
   }
 
 
+  /** 
+   * Returns value of handle_errors setting from application config boot options.
+   * @return void
+   */
   private function getHandlingErrors()
   {
     return (isset($this->bootOptions['handle_errors']) &&
@@ -114,6 +118,13 @@ class Empathy
   }
   
   
+  /**
+   * Makes call to plugin initialization of boot object.
+   * If application has been configured to handle errors
+   * then calls are wrapped in try/catch blocks.
+   *
+   * @return void
+   */
   public function initPlugins()
   {
     if(!$this->getHandlingErrors())
@@ -134,6 +145,13 @@ class Empathy
   }
 
 
+  /**
+   * Dispatch to controller via boot object.
+   * If application has been configured to handle errors
+   * then calls are wrapped in try/catch blocks.
+   * @return void
+   *
+   */
   public function beginDispatch()
   {    
     if(!$this->getHandlingErrors())
@@ -154,28 +172,60 @@ class Empathy
   }
 
 
+  /** 
+   * Returns the $persistent_mode setting.
+   * @return boolean $persistent_mode
+   */
   public function getPersistentMode()
   {
     return $this->persistent_mode;
   }
 
 
+
+  /**
+   * Returns errors caught by error handler.
+   * @return array $errors
+   */
   public function getErrors()
   {
     return $this->errors;
   }
 
+  /**
+   * Returns whether error handler has caught anything or not.
+   * @return boolean 
+   */
   public function hasErrors()
   {
     return (sizeof($this->errors) > 0);
   }
 
+  
+  /**
+   * Return a concatenated string of all caught error messages.
+   * @return string $errors
+   */
   public function errorsToString()
   {
     return implode('</h2><h2>&nbsp;</h2><h2>', $this->getErrors());
   }
 
 
+  /**
+   * The error handling function.
+   *
+   * @param integer $errno the type of error.
+   *
+   * @param string $errstr the error message which has been produced
+   *
+   * @param string $errfile the name of the file which caused the error
+   *
+   * @param integer $errline the line number of the error
+   *
+   * @return boolean returns true to indicate the error has been handled.
+   *
+   */
   public function errorHandler($errno, $errstr, $errfile, $errline)
   {  
     if(error_reporting())
@@ -214,6 +264,15 @@ class Empathy
     return true;
   }
 
+
+  /**
+   * The exception handler.  Deals with any exception.
+   *
+   * @param Exception $e
+   *
+   * @return void
+   *
+   */
   private function exceptionHandler($e)
   {
     if($this->hasErrors())
