@@ -1,31 +1,78 @@
 <?php
-  // Copyright 2008 Mike Whiting (mail@mikejw.co.uk).
-  // This file is part of the Empathy MVC framework.
+/**
+ * Empathy Bootstrap
+ * @file			Empathy/Bootstrap.php
+ * @description		Bootstrap object for an application using Empathy.
+ * @author			Mike Whiting
+ * @license			LGPLv3
+ *
+ * (c) copyright Mike Whiting 
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 
-  // Empathy is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Lesser General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-
-  // Empathy is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Lesser General Public License for more details.
-
-  // You should have received a copy of the GNU Lesser General Public License
-  // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Empathy;
 
 class Bootstrap
 {
+
+  /**
+   * This is used to store a reference to the controller object
+   * which is instatiated before an action can be dispatchted.
+   * @var Controller
+   */
   private $controller = null;
+
+
+  /**
+   * Default module read from application config file.
+   * Used for resolving routes e.g. when URI is empty.
+   * @var string 
+   */
   private $defaultModule;
+
+  /** 
+   * Name of dynamic module, if any.
+   * (Usually called 'public_mod').
+   * A dynamic module is a module
+   * served through the DSection CMS, which 
+   * is available through ELib.
+   * @var string
+   */
   private $dynamicModule;
+
+
+  /** The URI object is used for determining 
+   * the correct application controller to dispatch to.
+   * @var URI
+   */
   private $uri;
+
+
+  /** This property is used to contain a reference to 
+   * the current instance of the web application.
+   * @var Empathy
+   */
   private $mvc;
+
+
+  /**
+   * This property contains a data structure
+   * that contains the descrition of plugins to be initialised.
+   * Read from the application config.
+   * @var array
+   */
   private $plugins;
+
+
+  /** This property contains a reference to 
+   * the plugin manager object.
+   * @var PluginManager
+   */
   private $plugin_manager;
+
+
   private $issuingException;
   private $presenter;
   private $persistent_mode;
@@ -34,7 +81,7 @@ class Bootstrap
 
   public function __construct($bootOptions, $plugins, $mvc)
   {    
-    $this->persistent_mode = $mvc->getPersistentMode();
+    $this->persistent_mode = $mvc->getPersistentMode();    
     $this->issuingException = false;
     $this->mvc = $mvc;
     $this->plugins = $plugins;
@@ -95,8 +142,7 @@ class Bootstrap
 
 
   public function dispatchException($e)
-  {
-   
+  {   
     $this->issuingException = true;
     $this->controller = new Controller($this);   
 
