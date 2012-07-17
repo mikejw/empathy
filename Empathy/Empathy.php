@@ -70,7 +70,7 @@ class Empathy
    * @param string $configDir the location of the application config file
    *
    * @param boolean $persistent_mode Whether the application is running in persistent mode.
-   * If ture this means there could be many requests following initialization.
+   * If true this means there could be many requests following initialization.
    * @return void
    */  
   public function __construct($configDir, $persistent_mode = null)
