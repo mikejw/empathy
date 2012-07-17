@@ -8,7 +8,7 @@
  *
  * (c) copyright Mike Whiting 
  * This source file is subject to the LGPLv3 License that is bundled
- * with this source code in the files COPYING/COPYING.LESSER 
+ * with this source code in the file licence.txt
  */
 
 namespace Empathy;
