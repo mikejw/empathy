@@ -7,13 +7,13 @@ class PluginManager
 {
   private $plugins;
   private $view_plugins;
-  private $initialised;
+  private $initialized;
   private $controller;
   
 
   public function __construct()
   {
-    $this->initialised = 0;   
+    $this->initialized = 0;   
     $this->plugins = array();
     $this->view_plugins = array();
   }
@@ -27,7 +27,7 @@ class PluginManager
   
   public function init()
   {
-    $this->initialised = 1;
+    $this->initialized = 1;
   }
 
   public function register($p)
@@ -51,9 +51,9 @@ class PluginManager
       }
   }
 
-  public function getInitialised()
+  public function getInitialized()
   {
-    return $this->initialised;
+    return $this->initialized;
   }
 
   public function getView()

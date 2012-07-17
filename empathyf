@@ -23,7 +23,7 @@ my %actions = (
     doctrine_generate => \&doctrine_generate
     );
 
-# initialise options
+# initialize options
 my $mysql = '';
 my $doctrine = '';
 my $new_app = 0;

@@ -1,21 +1,15 @@
 <?php
-  // Copyright 2008 Mike Whiting (mail@mikejw.co.uk).
-  // This file is part of the Empathy MVC framework.
-
-  // Empathy is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Lesser General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-
-  // Empathy is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Lesser General Public License for more details.
-
-  // You should have received a copy of the GNU Lesser General Public License
-  // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
-
-use Empathy as Empathy;
+/**
+ * Empathy 
+ * @file			Empathy/Empathy.php
+ * @description		Creates global object that initializes an Empathy application
+ * @author			Mike Whiting
+ * @license			LGPLv3
+ *
+ * (c) copyright Mike Whiting 
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 
 const MVC_VERSION = '0.9.4';
 
@@ -23,14 +17,62 @@ require_once('spyc/spyc.php');
 
 class Empathy
 {
+
+  /**
+   * Boot object created before dispatch
+   * @var Bootstrap
+   */
   private $boot;
+
+
+  /**
+   * Boot options read from application config file.
+   * @var array
+   */
   private $bootOptions;
+
+
+  /**
+   * Plugin definition read from application config file.
+   * @var array
+   */
   private $plugins;
-  private $errors;
-  private $persistent_mode;
-  private static $elib;
 
   
+  /**
+   * When application is set to handle errors
+   * this array is used to collect the error messages.
+   * @var array
+   */
+  private $errors;
+
+
+  /**
+   * Application persistent mode. Implies there could be multiple requests to handle
+   * following initialization. This flag is passed directly to the application.
+   * @var boolean
+   */
+  private $persistent_mode;
+
+  
+  /**
+   * This flag is read from the boot_options section of the application config.
+   * If it is true then the main autoload function will attempt to load ELib components
+   * when necessary.
+   * @var boolean
+   */
+  private $use_elib;
+
+
+
+  /**
+   * Create application object.
+   * @param string $configDir the location of the application config file
+   *
+   * @param boolean $persistent_mode Whether the application is running in persistent mode.
+   * If ture this means there could be many requests following initialization.
+   * @return void
+   */  
   public function __construct($configDir, $persistent_mode = null)
   {
     $this->persistent_mode = $persistent_mode;
@@ -41,12 +83,12 @@ class Empathy
     if(isset($this->bootOptions['use_elib']) &&
        $this->bootOptions['use_elib'])
       {
-	self::$elib = true;
+	$this->use_elib = true;
 	\ELib\Config::load($configDir);
       }
     else
       {
-	self::$elib = false;
+	$this->use_elib = false;
       }
 
     if($this->getHandlingErrors())
@@ -249,7 +291,7 @@ class Empathy
 	array_push($location, DOC_ROOT.'/storage/');
       }         
     elseif(strpos($class, 'Empathy') === 0 ||
-	   (strpos($class, 'ELib') === 0 && self::$elib))
+	   (strpos($class, 'ELib') === 0 && $this->use_elib))
       {
 	$class = str_replace('\\', '/', $class);	
       }

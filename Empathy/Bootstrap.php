@@ -61,7 +61,7 @@ class Bootstrap
 
   /**
    * This property contains a data structure
-   * that contains the descrition of plugins to be initialised.
+   * that contains the descrition of plugins to be initialized.
    * Read from the application config.
    * @var array
    */
@@ -80,7 +80,7 @@ class Bootstrap
    * This value of this property is obtained
    * from the (global) application object.
    * When in persistent mode the application
-   * is initialised but dispatchment to a
+   * is initialized but dispatchment to a
    * controller is prevented. Useful for testing etc.
    * @var boolean
    */
@@ -243,8 +243,8 @@ class Bootstrap
 
   /**
    * Cycle through the definition for active plugins
-   * and initialize them. Any excpetion that is thrown as
-   * a result is cast into an Empathy Safe Exception.
+   * and initialize them. Any excepetion that is thrown as
+   * a result is cast into an Empathy SafeException.
    * This means error messages will be displayed 
    * followed by the application dying silently with no attempt 
    * to initialize the view.
@@ -258,7 +258,7 @@ class Bootstrap
 
     try
       {
-	if(!$plugin_manager->getInitialised())
+	if(!$plugin_manager->getInitialized())
 	  {
 	    $plugin_manager->init();
 	    foreach($plugins as $p)
