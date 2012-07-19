@@ -1,4 +1,4 @@
 package.xml
 *.tgz
 eaa.zip
-docs
+docs/generated

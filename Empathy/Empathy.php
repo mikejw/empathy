@@ -275,6 +275,7 @@ class Empathy
    */
   private function exceptionHandler($e)
   {
+    // prioritise any caught errors over exceptions thrown
     if($this->hasErrors())
       {
 	$e = new ErrorException($this->errorsToString());
@@ -299,11 +300,20 @@ class Empathy
 	$this->beginDispatch();
 	*/
 
+	// TODO:: handling of errors/exceptions when in non debug modes / non-dev environments
+	// i.e. 404s when necessary otherwise server error pages?
+
 	$this->boot->dispatchException($e);
 	break;
       }
   }
 
+
+  /**
+   * read config file from specified location
+   * @param string $configDir
+   * @return void
+   */
   private function loadConfig($configDir)
   {
     $configFile = $configDir.'/config.yml';
@@ -331,7 +341,11 @@ class Empathy
       }
   }
 
-
+  /**
+   * the autoload function.
+   * @param string $class the name of class that PHP is attempting to load
+   * @return void
+   */
   public static function loadClass($class)
   {
     $i = 0;
