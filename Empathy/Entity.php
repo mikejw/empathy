@@ -1,76 +1,130 @@
 <?php
-  // Copyright 2008 Mike Whiting (mail@mikejw.co.uk).
-  // This file is part of the Empathy MVC framework.
-
-  // Empathy is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Lesser General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-
-  // Empathy is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Lesser General Public License for more details.
-
-  // You should have received a copy of the GNU Lesser General Public License
-  // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Empathy;
 
+
+/**
+ * Empathy Entity
+ * @package                     Empathy
+ * @file			Empathy/Entity.php
+ * @description		Simple "ORM style" model objects for Empathy.
+ * @author			Mike Whiting
+ * @license			LGPLv3
+ *
+ * (c) copyright Mike Whiting 
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class Entity
 {
+  /**
+   * The name of the database table the entity maps to.
+   */
   const TABLE = '';
 
+  /**
+   * Sanitize constant
+   */
+  const SANITIZE = 1;
+
+
+  /**
+   * Sanitize no post constant
+   */
+  const SANITIZE_NO_POST = 2;
+
+
+  /**
+   * Validation object for 'model'.
+   */
   private $val;
-  private $controller;
-  private $rows;
+
+
+  /**
+   * The last query results.
+   */
   private $result;
+
+  /** 
+   * Fields to ignore while creating/updating records. 
+   *
+   */
   private $globally_ignored_property = array('id', 'table'); // leaving in table to support old models
+
+  /**
+   * The current model properties/fields observed through reflrection.
+   */
   private $properties;
+
+
+  /**
+   * The PDO database connection handle.
+   */
   private $dbh;
 
+  
+  /**
+   * Older Empathy applications may rely on this property instead of class constants for table name definitions.
+   */
   protected static $table = '';
 
 
+  /**
+   * Get the current time in the form of a MySQL-friendly time and date stamp.
+   * 
+   * @return string date stamp
+   */
   public function MYSQLTime()
   {
     return '\''.date('Y:m:d H:i:s', time()).'\'';
   }
 
 
-
-  public function __construct($controller = NULL)
+  /**
+   * Instantiates validation object
+   * and loads model properties/fields.
+   * Connects to database by default.
+   *
+   * @param boolean $auto_connect Default overall behaviour is that
+   * entity object is created through Model, which handles the connection.
+   *
+   * @return void
+   */
+  public function __construct($auto_connect = true)
   {
     $this->val = new Validate();
     $this->properties = array();
     $this->controller = $controller;
-
-    /*
-    if(!is_object($controller) || !isset($this->controller->connected) ||
-					 $this->controller->connected == false)
-      {	
-	$this->dbConnect();	
-      }
-    */
-    if(is_object($controller))
+    $this->loadProperties();
+    if($auto_connect)
       {
 	$this->dbConnect();
       }
-    
-    $this->loadProperties();
   }  
 
+
+  /**
+   * Gets the last auto-incremented ID from MySQL.
+   * 
+   * @return integer $id
+   */
   protected function insertId()
   {
     return $this->dbh->lastInsertId();
   }
 
+
+  /**
+   * Loads the properties/fields of the current mode.
+   * Get properties from all subclasses in the right order
+   * (with a bit of hackery to make 'table' last)
+   *
+   * @return void
+   */
   private function loadProperties()
   {
     $r = new \ReflectionClass(get_class($this));        
-
-    // get properties from all subclasses in the right order
-    // (with a bit of hackery to make 'table' last)
+    
     if($r->getParentClass()->getName() != 'Empathy\Entity')
       {
 	$props = array();
@@ -94,7 +148,6 @@ class Entity
 	  }
 	$properties[] = 'table';
 	$this->properties = $properties;   
-	//print_r($this->properties); exit();       
       }
     else // it's a straightforward single subclass
       {
@@ -105,7 +158,12 @@ class Entity
       }        
   }
 
-  
+  /**
+   * Connect to database. Only used in old fashoined applications 
+   * where Entities are not loaded through the Model class.
+   *
+   * @return @void
+   */  
   public function dbConnect()
   {
     if(!defined('DB_SERVER') || DB_SERVER == '')
@@ -129,12 +187,28 @@ class Entity
   }
 
 
+  /**
+   * Set the model objects database connecion handler
+   * 
+   * @param PDO Handle $dbh
+   *
+   * @return void
+   */
   public function setDBH($dbh)
   {
     $this->dbh = $dbh;
   }
 
   
+  /**
+   * Perform MySQL query
+   *
+   * @param string $sql the SQL query
+   *
+   * @param string $error the error to product on failure
+   *
+   * @return void
+   */
   public function query($sql, $error)    
   { 
     if(defined('ELIB_SQL_LOGGING') &&
@@ -142,29 +216,15 @@ class Entity
       {
 	\ELib\Util\SQLLog::log($sql);
       }
-
-    /* needs to be elib specific extention
-    $queries = YAML::load(DOC_ROOT.'/logs/sql_log');
-    $queries[] = $sql;
-    YAML::save($queries, DOC_ROOT.'/logs/sql_log');
-    */
-
+    
     $result = NULL;
     if(($result = $this->dbh->query($sql)) == false)  
       {
 	$errors = $this->dbh->errorInfo();
-	if(is_object($this->controller))
-	  {
-	    $this->controller->error("[".htmlentities($sql)
-				     ."]<br /><strong>MySQL</strong>: ($error): "
-				     .htmlentities($errors[2]), 0);       
-	  }
-	else
-	  {
-	    throw new \Exception("[".htmlentities($sql)
-				 ."]<br /><strong>MySQL</strong>: ($error): "
-				 .htmlentities($errors[2]));       
-	  }
+	
+	throw new \Exception("[".htmlentities($sql)
+			     ."]<br /><strong>MySQL</strong>: ($error): "
+			     .htmlentities($errors[2]));
       }
     else
       {
@@ -174,6 +234,13 @@ class Entity
   }
 
   
+  /**
+   * Load a record from a table based on the current id
+   *
+   * @param string $table Older applications assume they need to pass their table names but this was worked around
+   *
+   * @return boolean success of load
+   */
   public function load($table = null)
   {
     if($table == null)
@@ -183,7 +250,6 @@ class Entity
       }
 
     $loaded = true;
-    $table = $this->appendPrefix($table);
     $sql = "SELECT * FROM $table WHERE id = $this->id";
     $error = "Could not load record from $table.";
 
@@ -204,6 +270,18 @@ class Entity
   }
   
   
+  /**
+   * Loads one column from all the rows from in a table and returns a data structure that 
+   * uses the row id as an index. Useful for building html select form elemements (hence the name).
+   *
+   * @param string $table the table to load data from
+   *
+   * @param string field the column to load
+   *
+   * @param string order the field to order the results by
+   *
+   * @return array data structure of 'options'   
+   */
   public function loadAsOptions($table, $field, $order = NULL)
   {
     $data = array();
@@ -227,17 +305,29 @@ class Entity
   }
 
 
+  /**
+   * Escape non-numeric fields after checking the field exists within the POST data.
+   *
+   * @return void
+   */
   public function sanitize()
   {
     foreach($this->properties as $property)
       {
-	if(isset($_POST[$property]) && !(is_numeric($property))) // && ($this->$property == $_POST[$property])) -> breaking where single quotes and break tags
+	if(isset($_POST[$property]) && !(is_numeric($property)))
 	  {
 	    $this->$property = mysql_escape_string($this->$property);
 	  }
       }
   }
 
+
+
+  /**
+   * Escape non-numeric fields.
+   *
+   * @return void
+   */
   public function sanitizeNoPost()
   {
     foreach($this->properties as $property)
@@ -249,16 +339,25 @@ class Entity
       }
   }
 
-  
+  /**
+   * Save object back to database (update query).
+   * 
+   * @param string $table the table to save to.
+   *
+   * @param array $format List of fields to apply HTML filtering to.
+   *
+   * @param integer $sanitize the form of anti-injection attack sanitization to apply. Either none, while checking POST data, while not checking POST data.
+   *
+   * @return void
+   */
   public function save($table, $format, $sanitize)
   {
-    $table = $this->appendPrefix($table);
     $this->toXHTMLChris($format);
-    if($sanitize == 1)
+    if($sanitize == SANITIZE)
       {
 	$this->sanitize();
       }
-    elseif($sanitize == 2)
+    elseif($sanitize == SANITIZE_NO_POST)
       {
 	$this->sanitizeNoPost();
       }
@@ -314,9 +413,23 @@ class Entity
     $this->query($sql, $error);
   }  
   
+
+  /**
+   * Insert object into database.
+   *
+   * @param string $table the table to save to.
+   *
+   * @param boolean $id Whether or not the table has an auto-increment id field.
+   *
+   * @param array $format List of fields to apply HTML filtering to.
+   *
+   * @param integer $sanitize the method of sanitization for non-numeric fields.
+   * Either none, while checking POST data, while not checking POST data.
+   *
+   * @return void
+   */
   public function insert($table, $id, $format, $sanitize)
   {
-    $table = $this->appendPrefix($table);
     $this->toXHTMLChris($format);
     if($sanitize == 1)
       {
@@ -326,7 +439,7 @@ class Entity
       {
 	$this->sanitizeNoPost();
       }
-
+    
     $sql = 'INSERT INTO '.$table.' VALUES(';
     if($id)
       {
@@ -372,31 +485,17 @@ class Entity
 
     $error = "Could not insert to table '$table'";                
 
-
-    if(($result = $this->query($sql, $error)) === false)
-      {
-	$errors = $this->dbh->errorInfo();
-	$this->controller->error("[".htmlentities($sql)
-				 ."]<br /><strong>MySQL</strong>: ($error): "
-				 .htmlentities($errors[2]), 0);       
-      }
-    else
-      {
-	return $this->insertId();
-      }    
-  }
-  
-  public function appendPrefix($table)
-  {
-    return TBL_PREFIX.$table;
-  }
-
-  public function getRows(&$result)
-  {
-    $this->rows = $result->rowCount();   
+    $this->query($sql, $error);
+    return $this->insertId();    
   }
 
 
+  /**
+   * Gets all rows from a table and returns array.*
+   * @param string $table the table to fetch from.
+   *
+   * @return array $all all rows from the table.
+   */
   public function getAll($table)
   {
     $all = array();
@@ -413,9 +512,19 @@ class Entity
     return $all;
   }
 
+
+
+  /**
+   * Similar to getAll but with custom SQL appended to the query.
+   *
+   * @param string $table the target table.
+   *
+   * @param string $sql_string the additional custom SQL.
+   *
+   * @return array $all the rows returned as a result of the query
+   */
   public function getAllCustom($table, $sql_string)
   {
-    $table = $this->appendPrefix($table);
     $all = array();
     $sql = 'SELECT * FROM '.$table.' '.$sql_string;
     $error = 'Could not get all rows from '.$table;
@@ -430,6 +539,8 @@ class Entity
     return $all;    
   }
 
+
+  
 
   public function getPaginatePages($table, $sql_string, $page, $per_page)
   {
@@ -538,16 +649,6 @@ class Entity
     return $nav;
   }
 
-
-
-
-
-
-
-  public function addTablePrefix($table)
-  {
-    return TBL_PREFIX.$table;
-  }
 
 
 

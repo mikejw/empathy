@@ -34,7 +34,7 @@ class Model
   public static function load($model, $host = null)
   {           
     $class = '\Empathy\\Model\\'.$model;
-    $storage_object = new $class();
+    $storage_object = new $class(false); // prevent auto-connecting
 
     self::connectModel($storage_object, $host);
 

@@ -1,4 +1,7 @@
 <?php
+
+namespace Empathy;
+
 /**
  * Empathy Bootstrap
  * @file			Empathy/Bootstrap.php
@@ -10,10 +13,6 @@
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
  */
-
-
-namespace Empathy;
-
 class Bootstrap
 {
 
@@ -115,7 +114,7 @@ class Bootstrap
    *
    * @param array $plugins active plugin defination
    *
-   * @param Empathy the application
+   * @param Empathy $mvc the application
    *
    * @return void
    */
@@ -193,7 +192,7 @@ class Bootstrap
   
   /**
    * If an exception is detected this is used to dispatch 
-   * to an internal controler and view
+   * to an internal controller and view
    * @param Exception $e the exception object.
    *
    * @return void

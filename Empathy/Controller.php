@@ -1,43 +1,101 @@
 <?php
-  // Copyright 2008 Mike Whiting (mail@mikejw.co.uk).
-  // This file is part of the Empathy MVC framework.
-
-  // Empathy is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Lesser General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-
-  // Empathy is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Lesser General Public License for more details.
-
-  // You should have received a copy of the GNU Lesser General Public License
-  // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Empathy;
 
+
+/**
+ * Empathy Controller
+ * @package                     Empathy
+ * @file			Empathy/Controller.php
+ * @description		        Controller superclass. Application controllers (found within modules) inherit from this class. Usually through CustomController.php which resides in the top-level applicaition directory. 
+ * @author			Mike Whiting
+ * @license			LGPLv3
+ *
+ * (c) copyright Mike Whiting 
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class Controller
 {
+
+  /** 
+   * The module the controller instance belongs to. (Established using the URI object.)
+   */
   protected $module;
+
+  /**
+   * The name of the class that the current controller instance belongs to as determined by the URI object.  The class will belong to an application module and may well be the same name as the current application module. (A default controller class.)
+   */
   protected $class;
+
+ 
+  /**
+   * The name of the current controller action/event. Often this is 'default_event'.
+   */
   protected $event;
+
+
+  /**
+   * The template file the view will attempt to render.
+   */
   private $templateFile;
+
+  
+  /**
+   * The default title of the page taken from the application config file.
+   */
   protected $title;
+
+
+  /**
+   * The view/presentation object that will be used to render the page.
+   */
   public $presenter;
-  public $connected;
-  private $initError;
-  protected $d_man;
-  protected $d_conn;
+
+
+  /**
+   * Whether the application has been detected to be running in command line mode.
+   */
   protected $cli_mode;
+
+
+  /**
+   * The plugin manager object created during booting.
+   */
   protected $plugin_manager;
+
+
+
+  /** 
+   * Data structure containing the processed URI
+   */
   protected $uri_data;
+
+
+  /**
+   * Stash object used for storing arbitrary object.
+   */  
   protected $stash;
+
+
+  /**
+   * The current bootstrap object.
+   */
   protected $boot;
-  private $view_disabled;
+
+
+  /**
+   * The applications current environment.
+   */
   protected $environment;
 
 
+  /**
+   * Controller constructor.  Grabs certain properties from the boot object, establishes the view
+   * from the plugin manager and assigns certain information to view making it available to templates.
+   *
+   * @param Bootstrap $boot the current bootstrap object
+   */   
   public function __construct($boot)
   {
     $this->boot = $boot;
@@ -58,9 +116,6 @@ class Controller
     $this->event = $_GET['event'];
     $this->title = TITLE; 
     
-    $this->view_disabled = false;
-
-
     if(TPL_BY_CLASS == 0)
       {
 	$this->templateFile = $this->module.'.tpl';
@@ -83,6 +138,7 @@ class Controller
 	$this->assignConstants();
       }
 
+    // if within CMS assign the current section name to the template
     if(isset($_GET['section_uri']))
       {
 	$this->assign('section', $_GET['section_uri']);
@@ -90,14 +146,11 @@ class Controller
   }
 
 
-  protected function disableView()
-  {
-    $this->view_disabled = true;
-  }
-
-
-
-
+  /**
+   * Assigns the value of some of the main settings from the application config to the view.
+   *
+   * @return void
+   */
   private function assignConstants()
   {
     $this->assign('NAME', NAME);
@@ -109,6 +162,12 @@ class Controller
   }
 
 
+  /**
+   * Assign key controller attributes to the view
+   *
+   * @return void
+   *
+   */
   private function assignControllerInfo()
   {
     $this->assign('module', $this->module);
@@ -117,30 +176,40 @@ class Controller
   }
 
 
+  /**
+   * Set the name of the current view template
+   *
+   * @param string $tpl tempalte name (including file extension.)
+   *
+   * @return void
+   */
   public function setTemplate($tpl)
   {
     $this->templateFile = $tpl;
   }
  
+  /** 
+   * Initialise the view for rendering
+   *
+   * @param boolean $i Whether the template is internal.
+   *
+   * @return void
+   */ 
   public function initDisplay($i)
   {		
-    if((1 || !$this->boot->getPersistentMode())
-       && !$this->view_disabled)
-      // disabling this optimization for now
-      {
-	$this->presenter->switchInternal($i);       
-	$this->presenter->display($this->templateFile);       
-      }
+    $this->presenter->switchInternal($i);       
+    $this->presenter->display($this->templateFile);       
   }
   
-  private function assignSessionVar()
-  {
-    foreach($_SESSION as $index => $value)
-    {
-      $this->assign($index, $value);
-    }
-  }
-   
+ 
+  /**
+   * Redirect the user to another location within the application.
+   * Redirection is disabled if in command line mode to prevent tests breaking.
+   * 
+   * @param string $endString the new URI to redirect to.
+   * 
+   * @return void
+   */  
   public function redirect($endString)
   {    
     if(!$this->boot->getPersistentMode())
@@ -157,6 +226,14 @@ class Controller
       }
   }
 
+
+  /**
+   * Redirect to a local cgi script.
+   * 
+   * @param string $endString path to the script.
+   * 
+   * @return void
+   */
   protected function redirect_cgi($endString)
   {
     session_write_close();    
@@ -171,99 +248,22 @@ class Controller
   }
   
 
+  /** 
+   * End current user session
+   *
+   * @return void
+   */
   protected function sessionDown()
   {
     Session::down();
   }
 
 
-  protected function toggleEditMode()
-  {
-    if($_SESSION['edit_mode'] != 1)
-    {
-      $_SESSION['edit_mode'] = 1;      
-    }
-    else
-    {
-      $_SESSION['edit_mode'] = 0;
-    }
-  }
-  
-  protected function setFailedURI($uri)
-  {
-    Session::set('failed_uri', $uri);
-  }
-
-
-  protected function http_error($type)
-  {
-    $response = '';
-    $message = '';
-    switch($type)
-      {
-      case 400:
-	$response = 'HTTP/1.1 400 bad request';
-	$message = 'Bad request';
-	break;
-      case 404:
-	$response = 'HTTP/1.0 404 Not Found';
-	$message = 'Sorry this page does not exist or is out of date.';
-	break;	
-      }
-    header($response);
-    $this->presenter->assign('message', $message);
-    $this->presenter->assign('code', $type);
-    $this->presenter->display('http_error.tpl');
-    exit();
-  }
-
-
-  protected function error($message)
-  {    
-    if(DEBUG_MODE == 0)
-      {
-	$this->http_error(404);
-      }
-    else
-      {
-	if(isset($_SERVER['HTTP_HOST']))
-	  {
-	    $this->setFailedURI($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
-	  }
-	Session::set('app_error', array($this->module, $this->class, $message, date('U')));
-	//$this->redirect('empathy/error/');       
-	throw new Exception('Couldn\'t dispatch: '.$message);
-      }
-  }
-
-
-  protected function loadUIVars($ui, $ui_array)
-  {
-    $new_app = Session::getNewApp();
-    foreach($ui_array as $setting)
-      {
-	if(isset($_GET[$setting]))
-	  {
-	    if(!$new_app)
-	      {
-		$_SESSION[$ui][$setting] = $_GET[$setting];	    
-	      }
-	    else
-	      {
-		Session::setUISetting($ui, $setting, $_GET[$setting]);
-	      }
-	  }
-	elseif(Session::getUISetting($ui, $setting) !== false)
-	  {
-	    $_GET[$setting] = Session::getUISetting($ui, $setting);
-	  }
-	elseif(isset($_SESSION[$ui][$setting]))
-	  {
-	    $_GET[$setting] = $_SESSION[$ui][$setting];
-	  }
-      }
-  }
-
+  /** 
+   * Determines whether current request is an ajax request from the browser.
+   *
+   * @return void
+   */
   protected function isXMLHttpRequest()
   {
     $request = 0;
@@ -275,75 +275,38 @@ class Controller
     return $request;
   }
 
-  protected function initID($id, $def, $assertSet=false) // when $def is 0, valid is true when id is 0
-  {
-    $valid = true;
-    $assign_def = false;
 
-    if(!isset($_GET[$id]))
-      {
-	$assign_def = true;
-	if($assertSet)
-	  {
-	    $valid = false;
-	  }
-      }
-    elseif(!((string) $_GET[$id] === (string)(int) $_GET[$id]) || ($_GET[$id] == 0 && $def != 0)
-	   || $_GET[$id] < 0)
-      {
-	$assign_def = true;
-	$valid = false;
-      }
-
-    if($assign_def)
-      {
-	$_GET[$id] = $def;
-      }
-
-    return $valid;
-  }
-
-
-  protected function execScript($script, $args, $passthru=false)
-  {    
-    $exec = 'cd '.DOC_ROOT.'/scripts; ';
-    $exec .= PERL.' '.DOC_ROOT.'/scripts/'.$script.' '.implode(' ', $args);
-    if(!$passthru)
-      {
-	exec($exec);
-      }
-    else
-      {
-	passthru($exec);
-      }
-  }
-
+  /** 
+   * Assign value to the current view.
+   *
+   * @param string $name 
+   *
+   * @param mixed $data 
+   *
+   *
+   * @return void
+   */
   public function assign($name, $data)
   {
     $this->presenter->assign($name, $data);
   }
 
 
-  public function __destruct()
-  {     
-    if(defined('ELIB_SQL_LOGGING') &&
-       ELIB_SQL_LOGGING == true)
-      {
-	\ELib\Util\SQLLog::log('----------END OF REQUEST---------');
-      }
-  }
-  
-
-
-
-
-
-
+  /**
+   * Retrieve name of current module
+   *
+   * @return string $module
+   */
   public function getModule()
   {
     return $this->module;
   }
 
+  /**
+   * Retrieve name of current controller class
+   *
+   * @return string $class
+   */
   public function getClass()
   {
     return $this->class;

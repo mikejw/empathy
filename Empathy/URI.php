@@ -1,31 +1,52 @@
 <?php
-  // Copyright 2008 Mike Whiting (mail@mikejw.co.uk).
-  // This file is part of the Empathy MVC framework.
-
-  // Empathy is free software: you can redistribute it and/or modify
-  // it under the terms of the GNU Lesser General Public License as published by
-  // the Free Software Foundation, either version 3 of the License, or
-  // (at your option) any later version.
-
-  // Empathy is distributed in the hope that it will be useful,
-  // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  // GNU Lesser General Public License for more details.
-
-  // You should have received a copy of the GNU Lesser General Public License
-  // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Empathy;
 
+/**
+ * Empathy URI
+ * @file			Empathy/URI.php
+ * @description		Analyize URI and determine route to appliction module, controller class and event/action.
+ * @author			Mike Whiting
+ * @license			LGPLv3
+ *
+ * (c) copyright Mike Whiting 
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class URI
 {
+
+  /**
+   * Missing class constant 
+   */
   const MISSING_CLASS = 1;
+
+  /**
+   * Missing class definition constant 
+   */
   const MISSING_CLASS_DEF = 2;
+
+  /**
+   * Missing event/action definition
+   */
   const MISSING_EVENT_DEF = 3;
+
+  /**
+   * 404 error contant
+   */
   const ERROR_404 = 4;
+
+  /**
+   * No template defined constant
+   */
   const NO_TEMPLATE = 5;
+
+  /**
+   * Max comparisons contant 
+   */
   const MAX_COMP = 4; // maxium relevant info stored in a URI
                       // ie module, class, event, id
+
 
   private $full;
   private $uriString;
