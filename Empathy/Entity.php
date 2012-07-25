@@ -94,7 +94,6 @@ class Entity
   {
     $this->val = new Validate();
     $this->properties = array();
-    $this->controller = $controller;
     $this->loadProperties();
     if($auto_connect)
       {
