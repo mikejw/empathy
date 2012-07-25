@@ -60,7 +60,7 @@ class Empathy
    * when necessary.
    * @var boolean
    */
-  private $use_elib;
+  private static $use_elib;
 
 
 
@@ -82,12 +82,12 @@ class Empathy
     if(isset($this->bootOptions['use_elib']) &&
        $this->bootOptions['use_elib'])
       {
-	$this->use_elib = true;
+	self::$use_elib = true;
 	\ELib\Config::load($configDir);
       }
     else
       {
-	$this->use_elib = false;
+	self::$use_elib = false;
       }
 
     if($this->getHandlingErrors())
@@ -363,7 +363,7 @@ class Empathy
 	array_push($location, DOC_ROOT.'/storage/');
       }         
     elseif(strpos($class, 'Empathy') === 0 ||
-	   (strpos($class, 'ELib') === 0 && $this->use_elib))
+	   (strpos($class, 'ELib') === 0 && self::$use_elib))
       {
 	$class = str_replace('\\', '/', $class);	
       }
