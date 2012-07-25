@@ -310,5 +310,43 @@ class Controller
   {
     return $this->class;
   }
+
+
+  /**
+   * Obtain user interface control values from request/session.
+   * @param string $ui name of interface control set
+   *
+   * @param array $ui_array set of control settings
+   *
+   * @return void
+   */
+  public function loadUIVars($ui, $ui_array)
+  {
+    $new_app = Session::getNewApp();
+    foreach($ui_array as $setting)
+      {
+	if(isset($_GET[$setting]))
+	  {
+	    if(!$new_app)
+	      {
+		$_SESSION[$ui][$setting] = $_GET[$setting];     
+	      }
+	    else
+	      {
+		Session::setUISetting($ui, $setting, $_GET[$setting]);
+	      }
+	  }
+	elseif(Session::getUISetting($ui, $setting) !== false)
+	  {
+	    $_GET[$setting] = Session::getUISetting($ui, $setting);
+	  }
+	elseif(isset($_SESSION[$ui][$setting]))
+	  {
+	    $_GET[$setting] = $_SESSION[$ui][$setting];
+	  }
+      }
+  }
+  
+  
 }
 ?>
