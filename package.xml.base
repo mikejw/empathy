@@ -72,9 +72,9 @@
       </dir>
       <file name="config.yml" role="cfg" />
       <file name="eaa.zip" role="data" />
-      <file name="COPYING" role="doc" />
+      <file name="licence.txt" role="doc" />
       <file name="README" role="doc" />
-      <file  name="empathyf" role="script">
+      <file name="empathyf" role="script">
 	<tasks:replace from="@php_dir@" to="php_dir" type="pear-config" />
       </file>
     </dir>
