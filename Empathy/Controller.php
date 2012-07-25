@@ -133,7 +133,6 @@ class Controller
 
     if($this->presenter !== null)
       {
-	$this->assignSessionVar();
 	$this->assignControllerInfo();
 	$this->assignConstants();
       }
