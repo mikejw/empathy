@@ -73,8 +73,6 @@ class DBC
    * @return */
   public function getHandle()
   {    
-    print_r($this->handle);
-
     return $this->handle;
   }
 
