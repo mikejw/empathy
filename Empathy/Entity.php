@@ -352,11 +352,11 @@ class Entity
   public function save($table, $format, $sanitize)
   {
     $this->toXHTMLChris($format);
-    if($sanitize == SANITIZE)
+    if($sanitize == self::SANITIZE)
       {
 	$this->sanitize();
       }
-    elseif($sanitize == SANITIZE_NO_POST)
+    elseif($sanitize == self::SANITIZE_NO_POST)
       {
 	$this->sanitizeNoPost();
       }
