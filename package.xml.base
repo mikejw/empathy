@@ -47,10 +47,12 @@
 	<dir name="Util">
 	  <file name="CLI.php" role="php" />
 	  <file name="ELib.php" role="php" />
+	  <file name="Pear.php" role="php" />
 	  <file name="Test.php" role="php" />
 	  <file name="TestUnit.php" role="php" />
 	</dir>	
 	<file name="Bootstrap.php" role="php" />
+	<file name="Config.php" role="php" />
 	<file name="Controller.php" role="php" />
 	<file name="DBC.php" role="php" />
 	<file name="DBPool.php" role="php" />
