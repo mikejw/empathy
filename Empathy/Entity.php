@@ -177,10 +177,12 @@ class Entity
       {
 	throw new SafeException('DB Error: No database username');
       }
+    /* commenting this out because it's too annoying
     if(!defined('DB_PASS') || DB_PASS == '')
       {
 	throw new SafeException('DB Error: No database password');
       }
+    */
     $this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
 			   DB_USER, DB_PASS);    
   }
