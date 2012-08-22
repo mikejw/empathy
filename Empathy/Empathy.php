@@ -1,5 +1,6 @@
 <?php
 
+
 define('MVC_VERSION', '0.9.4');
 require_once('spyc/spyc.php');
 
@@ -76,8 +77,8 @@ class Empathy
   {
     $this->persistent_mode = $persistent_mode;
     spl_autoload_register(array($this, 'loadClass'));
-    $this->loadConfig($configDir);    
-    $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../cfg/Empathy'));
+    $this->loadConfig($configDir);
+    $this->loadConfig(Empathy\Util\Pear::getConfigDir().'/Empathy');
 
     if(isset($this->bootOptions['use_elib']) &&
        $this->bootOptions['use_elib'])
