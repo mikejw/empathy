@@ -76,7 +76,7 @@ class Empathy
   public function __construct($configDir, $persistent_mode = null)
   {
     $this->persistent_mode = $persistent_mode;
-    spl_autoload_register(array($this, 'loadClass'));
+    //spl_autoload_register(array($this, 'loadClass'));
     $this->loadConfig($configDir);
     $this->loadConfig(Empathy\Util\Pear::getConfigDir().'/Empathy');
 
