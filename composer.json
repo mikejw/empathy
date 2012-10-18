@@ -1,0 +1,21 @@
+{
+    "name": "mikejw/empathy",
+    "type": "framework",
+    "description": "Empathy PHP Framework",
+    "keywords": ["framework"],
+    "homepage": "http://empathyphp.co.uk",
+    "license": "GPL3",
+    "authors": [
+        {"name": "Mike Whiting", "email": "mail@mikejw.co.uk"}
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": { "Empathy\\MVC": "empathy/" }
+    },
+    "extra": {
+        }
+    }
+}
