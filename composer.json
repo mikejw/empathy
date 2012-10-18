@@ -13,7 +13,7 @@
     },
     "minimum-stability": "dev",
     "autoload": {
-        "psr-0": { "Empathy\\MVC": "empathy/" }
+        "psr-0": { "Empathy\\MVC": "Empathy/" }
     },
     "extra": {
         }
