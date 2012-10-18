@@ -1,5 +1,6 @@
 <?php
 
+namespace Empathy\MVC;
 
 define('MVC_VERSION', '0.9.4');
 require_once('spyc/spyc.php');
