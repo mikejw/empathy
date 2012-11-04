@@ -1,14 +1,10 @@
 <?php
 
-namespace Empathy;
+namespace Empathy\MVC;
 
 class Exception extends \Exception
 {
-
-
-
-
-
+    //
 }
 
 

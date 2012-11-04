@@ -1,17 +1,17 @@
 <?php
 
 
-namespace Empathy;
+namespace Empathy\MVC;
 
 class Plugin
 {
-  protected $bootstrap;
+    protected $bootstrap;
 
 
-  public function __construct($b)
-  {
-    $this->bootstrap = $b;
-  }
+    public function __construct($b)
+    {
+        $this->bootstrap = $b;
+    }
 
   
 

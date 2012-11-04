@@ -1,6 +1,6 @@
 <?php
 
-namespace Empathy\Util;
+namespace Empathy\MVC\Util;
 
 class Pear
 {

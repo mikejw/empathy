@@ -1,7 +1,7 @@
 <?php
 
-namespace Empathy\Plugin;
-use Empathy\Plugin as Plugin;
+namespace Empathy\MVC\Plugin;
+use Empathy\MVC\Plugin as Plugin;
 
 class Redbean extends Plugin implements PreDispatch
 {
@@ -36,6 +36,7 @@ class Redbean extends Plugin implements PreDispatch
       }	            
             
     \R::setup('mysql:host='.DB_SERVER.';dbname='.DB_NAME, DB_USER, DB_PASS);
+    //\R::setup();
   }
 }
 ?>

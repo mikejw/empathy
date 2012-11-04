@@ -1,11 +1,9 @@
 <?php
 
-namespace Empathy;
+namespace Empathy\MVC;
 
 class Config
 {
-
-
-
+    //
 }
 ?>

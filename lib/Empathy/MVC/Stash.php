@@ -1,25 +1,25 @@
 <?php
 
-namespace Empathy;
+namespace Empathy\MVC;
 
 class Stash
 {
-  private $items;
+    private $items;
   
-  public function __construct()
-  {
-    $this->items = array();
-  }  
+    public function __construct()
+    {
+        $this->items = array();
+    }  
 
-  public function get($key)
-  {
-    return $this->items[$key];
-  }
+    public function get($key)
+    {
+        return $this->items[$key];
+    }
 
-  public function store($key, $data)
-  {
-    $this->items[$key] = $data;
-  }
+    public function store($key, $data)
+    {
+        $this->items[$key] = $data;
+    }
 
 
 }

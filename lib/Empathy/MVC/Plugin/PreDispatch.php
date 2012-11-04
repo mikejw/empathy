@@ -1,9 +1,9 @@
 <?php
 
-namespace Empathy\Plugin;
+namespace Empathy\MVC\Plugin;
 
 interface PreDispatch
 {
-  public function onPreDispatch();
+    public function onPreDispatch();
 }
 ?>

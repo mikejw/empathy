@@ -1,11 +1,11 @@
 <?php
 
-namespace Empathy\Plugin;
+namespace Empathy\MVC\Plugin;
 
 interface Presentation
 {
-  //  public function __construct();
-  public function assign($name, $data);
-  public function display($template);
+    //  public function __construct();
+    public function assign($name, $data);
+    public function display($template);
 }
 ?>
