@@ -113,9 +113,9 @@ class Entity
     {
         $r = new \ReflectionClass(get_class($this));
 
-        if ($r->getParentClass()->getName() != 'Empathy\Entity') {
+        if ($r->getParentClass()->getName() != 'Empathy\MVC\Entity') {
             $props = array();
-            while (($class = $r->getName()) != 'Empathy\Entity') {
+            while (($class = $r->getName()) != 'Empathy\MVC\Entity') {
                 $props[] = $r->getProperties();
                 $r = $r->getParentClass();
             }
