@@ -1,7 +1,7 @@
 <?php
 
 
-define('MVC_VERSION', '0.9.4');
+define('MVC_VERSION', '0.9.4.1');
 require_once('spyc/spyc.php');
 
 /**
