@@ -21,13 +21,17 @@ fi
 # return to source dir
 cd ${CWD}
 
+cd ./tmp/
+
 # bundle up base app architype
-zip -r ./eaa.zip ./eaa/
+zip -r ./eaa.zip ../eaa/
+
+cp -r ../src/Empathy .
 
 # repackage and add back to channel
-cat ./package.xml.base | sed s/CURRENT_DATE/${DATE}/ | sed s/CURRENT_TIME/${TIME}/ > package.xml
+cat ../package.xml.base | sed s/CURRENT_DATE/${DATE}/ | sed s/CURRENT_TIME/${TIME}/ > package.xml
 pear package
-pirum add ${CHANNEL_ROOT} ${PACKAGE_NAME}-${VERSION}.tgz
+#pirum add ${CHANNEL_ROOT} ${PACKAGE_NAME}-${VERSION}.tgz
 
 
 
