@@ -4,7 +4,7 @@ namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Plugin as Plugin;
 
-class JSONView-1.0 extends Plugin implements PreDispatch, Presentation
+class JSONView extends Plugin implements PreDispatch, Presentation
 {
     private $output;
 

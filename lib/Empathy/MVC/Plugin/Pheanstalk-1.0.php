@@ -4,7 +4,7 @@ namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Plugin as Plugin;
 
-class Pheanstalk-1.0
+class Pheanstalk
 {
 
     public function __construct()

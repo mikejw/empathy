@@ -4,7 +4,7 @@ namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Plugin as Plugin;
 
-class EDefault-1.0 extends Plugin implements PreDispatch
+class EDefault extends Plugin implements PreDispatch
 {
     public function __construct()
     {

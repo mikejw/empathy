@@ -4,7 +4,7 @@ namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Plugin as Plugin;
 
-class Doctrine-1.0 extends Plugin implements PreDispatch
+class Doctrine extends Plugin implements PreDispatch
 {
     private $d_conn;
     private $d_man;

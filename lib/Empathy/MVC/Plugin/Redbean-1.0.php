@@ -3,7 +3,7 @@
 namespace Empathy\MVC\Plugin;
 use Empathy\MVC\Plugin as Plugin;
 
-class Redbean-1.0 extends Plugin implements PreDispatch
+class Redbean extends Plugin implements PreDispatch
 {
 
     public function __construct()

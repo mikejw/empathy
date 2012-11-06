@@ -6,7 +6,7 @@
 namespace Empathy\MVC\Plugin;
 use Empathy\MVC\Plugin as Plugin;
 
-class TwitterOAuth-1.0
+class TwitterOAuth
 {
 
   public function __construct()

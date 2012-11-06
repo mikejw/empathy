@@ -3,7 +3,7 @@
 namespace Empathy\MVC\Plugin;
 use Empathy\MVC\Plugin as Plugin;
 
-class Smarty-1.0 extends Plugin implements PreDispatch, Presentation
+class Smarty extends Plugin implements PreDispatch, Presentation
 {
     private $smarty;
 
