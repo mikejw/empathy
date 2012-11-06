@@ -26,8 +26,8 @@
     <notes>-</notes>
     <contents>
         <dir name="/">
-            <dir name="src">
-                <dir name="Empathy" baseinstalldir="/">
+            <dir name="src" baseinstalldir="/">
+                <dir name="Empathy">
                     <dir name="MVC">
                         <dir name="bin">
                             <file name="echo_include_path.php" role="php" />
