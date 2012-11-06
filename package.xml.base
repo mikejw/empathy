@@ -28,7 +28,7 @@
         <dir name="/">
             <dir name="src">
                 <dir name="Empathy">
-                    <div name="MVC">
+                    <dir name="MVC">
                         <dir name="bin">
                             <file name="echo_include_path.php" role="php" />
                         </dir>
