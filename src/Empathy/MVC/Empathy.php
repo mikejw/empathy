@@ -321,9 +321,7 @@ class Empathy
                 array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
             }
             array_push($location, DOC_ROOT.'/storage/');
-        } elseif(strpos($class, 'Empathy') === 0 ||
-               (strpos($class, 'ELib') === 0 && self::$use_elib))
-        {
+        } elseif(strpos($class, 'Empathy') === 0) {
             $class = str_replace('\\', '/', $class);
         }
         array_push($location, DOC_ROOT.'/application/');
