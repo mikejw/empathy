@@ -3,7 +3,7 @@
 namespace Empathy\MVC\Plugin;
 use Empathy\MVC\Plugin as Plugin;
 
-class Smarty extends Plugin implements PreDispatch, Presentation
+class Smarty-1.0 extends Plugin implements PreDispatch, Presentation
 {
     private $smarty;
 
@@ -12,18 +12,16 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty = new \Smarty();
     }
 
-
     public function onPreDispatch()
     {
-        $this->smarty->debugging = SMARTY_DEBUGGING;    
+        $this->smarty->debugging = SMARTY_DEBUGGING;
         $this->smarty->template_dir = DOC_ROOT."/presentation";
         $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
         $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
-        $this->smarty->config_dir = DOC_ROOT."/tpl/configs";   
+        $this->smarty->config_dir = DOC_ROOT."/tpl/configs";
 
-        if(defined('SMARTY_CACHING') && SMARTY_CACHING == true)
-        {
-            $this->smarty->caching = 1; 
+        if (defined('SMARTY_CACHING') && SMARTY_CACHING == true) {
+            $this->smarty->caching = 1;
         }
 
         // assign constants
@@ -33,7 +31,6 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
-
 
     public function assign($name, $data)
     {
@@ -57,10 +54,8 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     public function switchInternal($i)
     {
-        if($i)
-        {        
+        if ($i) {
             $this->smarty->template_dir = realpath(dirname(__FILE__));
         }
     }
 }
-?>

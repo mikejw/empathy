@@ -15,12 +15,10 @@ class Store
   {
     $this->object[$index] = $value;
   }
-  
+
   public function get($index)
   {
     return $this->object[$index];
   }
 
-
 }
-?>

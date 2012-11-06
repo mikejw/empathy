@@ -9,7 +9,7 @@ namespace Empathy;
  * @author			Mike Whiting
  * @license			LGPLv3
  *
- * (c) copyright Mike Whiting 
+ * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
  */
@@ -27,7 +27,6 @@ class DBC
    */
   private $name;
 
-  
   /**
    * Username to use for connection.
    */
@@ -43,8 +42,7 @@ class DBC
    */
   private $handle;
 
-
-  /** 
+  /**
    * Contrustor takes connection passed from parameters from
    * DBPool object and creates connection.
    * @param string $s server name.
@@ -64,17 +62,15 @@ class DBC
     $this->user = $u;
     $this->pass = $p;
     $this->handle = new \PDO('mysql:host='.$this->server.';dbname='.$this->name,
-    			     $this->user, $this->pass);
+                     $this->user, $this->pass);
   }
-
 
   /**
    * Returns database connection handle produced by PDO
    * @return */
   public function getHandle()
-  {    
+  {
     return $this->handle;
   }
 
 }
-?>

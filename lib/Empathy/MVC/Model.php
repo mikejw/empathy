@@ -1,50 +1,47 @@
 <?php
 
-namespace Empathy;
+namespace Empathy\MVC;
 
 class Model
 {
-  protected static $db_handle = null;
+    protected static $db_handle = null;
 
-  protected static function connectModel($model, $host)
-  {
-    // cached handle is not null
-    // and new host is null
-    // use cached
-    if(self::$db_handle !== null && $host === null)
-      {
-	$model->setDBH(self::$db_handle);
-      }
-    // use a new host
-    elseif($host !== null)
-      {
-	$model->setDBH(DBPool::getConnection($host));
-      }
-    // db_handle is null and host is null
-    // (initiate default)
-    elseif(self::$db_handle == null && $host == null)
-      {
-	$handle = DBPool::getDefCX();
-	$model->setDBH($handle);
-	self::$db_handle = $handle;
-      }
+    protected static function connectModel($model, $host)
+    {
+        // cached handle is not null
+        // and new host is null
+        // use cached
+        if (self::$db_handle !== null && $host === null) {
+            $model->setDBH(self::$db_handle);
+        } elseif ($host !== null) {
+            // use a new host
+            $model->setDBH(DBPool::getConnection($host));
+        } elseif (self::$db_handle == null && $host == null) {
+            // db_handle is null and host is null
+            // (initiate default)
+            $handle = DBPool::getDefCX();
+            $model->setDBH($handle);
+            self::$db_handle = $handle;
+        }
 
-  }
+    }
 
-  public static function load($model, $host = null)
-  {           
-    $class = '\Empathy\\Model\\'.$model;
-    $storage_object = new $class(false); // prevent auto-connecting
+    public static function load($model, $host = null)
+    {
+        $class = '\Empathy\\Model\\'.$model;
 
-    self::connectModel($storage_object, $host);
+        // prevent auto-connecting
+        $storage_object = new $class(false);
 
-    return $storage_object;
-  }
+        self::connectModel($storage_object, $host);
 
-  public static function getTable($model)
-  {
-    $class = '\\Empathy\\Model\\'.$model;
-    return $class::TABLE;
-  }
+        return $storage_object;
+    }
+
+    public static function getTable($model)
+    {
+        $class = '\\Empathy\\Model\\'.$model;
+
+        return $class::TABLE;
+    }
 }
-?>

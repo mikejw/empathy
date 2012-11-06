@@ -5,11 +5,11 @@ namespace Empathy\MVC;
 class Stash
 {
     private $items;
-  
+
     public function __construct()
     {
         $this->items = array();
-    }  
+    }
 
     public function get($key)
     {
@@ -21,6 +21,4 @@ class Stash
         $this->items[$key] = $data;
     }
 
-
 }
-?>

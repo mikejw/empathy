@@ -1,19 +1,15 @@
 <?php
 
+namespace Empathy\MVC\Plugin;
 
-namespace Empathy\Plugin;
-use Empathy\Plugin as Plugin;
+use Empathy\MVC\Plugin as Plugin;
 
-class JSBeautifier
+class JSBeautifier-1.0
 {
 
-  public function __construct()
-  {
-    //
-  }
-
-  
-
+    public function __construct()
+    {
+        //
+    }
 
 }
-?>

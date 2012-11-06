@@ -3,7 +3,7 @@
 namespace Empathy\MVC;
 
 define('MVC_VERSION', '0.9.4');
-require_once('spyc/spyc.php');
+require_once 'spyc/spyc.php';
 
 /**
  * Empathy
@@ -12,7 +12,7 @@ require_once('spyc/spyc.php');
  * @author			Mike Whiting
  * @license			LGPLv3
  *
- * (c) copyright Mike Whiting 
+ * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
  */
@@ -25,13 +25,11 @@ class Empathy
      */
     private $boot;
 
-
     /**
      * Boot options read from application config file.
      * @var array
      */
     private $bootOptions;
-
 
     /**
      * Plugin definition read from application config file.
@@ -39,14 +37,12 @@ class Empathy
      */
     private $plugins;
 
-  
     /**
      * When application is set to handle errors
      * this array is used to collect the error messages.
      * @var array
      */
     private $errors;
-
 
     /**
      * Application persistent mode. Implies there could be multiple requests to handle
@@ -55,7 +51,6 @@ class Empathy
      */
     private $persistent_mode;
 
-  
     /**
      * This flag is read from the boot_options section of the application config.
      * If it is true then the main autoload function will attempt to load ELib components
@@ -64,8 +59,6 @@ class Empathy
      */
     private static $use_elib;
 
-
-
     /**
      * Create application object.
      * @param string $configDir the location of the application config file
@@ -73,7 +66,7 @@ class Empathy
      * @param boolean $persistent_mode Whether the application is running in persistent mode.
      * If true this means there could be many requests following initialization.
      * @return void
-     */  
+     */
     public function __construct($configDir, $persistent_mode = null)
     {
         $this->persistent_mode = $persistent_mode;
@@ -86,29 +79,24 @@ class Empathy
         {
             self::$use_elib = true;
             \Empathy\ELib\Config::load($configDir);
-        }
-        else
-        {
+        } else {
             self::$use_elib = false;
         }
 
-        if($this->getHandlingErrors())
-        {
-            set_error_handler(array($this, 'errorHandler'));    
+        if ($this->getHandlingErrors()) {
+            set_error_handler(array($this, 'errorHandler'));
         }
 
-        $this->boot = new Bootstrap($this->bootOptions, $this->plugins, $this);	
-    
+        $this->boot = new Bootstrap($this->bootOptions, $this->plugins, $this);
+
         $this->initPlugins();
-    
-        if($this->persistent_mode !== true)
-        {
+
+        if ($this->persistent_mode !== true) {
             $this->beginDispatch();
         }
     }
 
-
-    /** 
+    /**
      * Returns value of handle_errors setting from application config boot options.
      * @return void
      */
@@ -117,8 +105,7 @@ class Empathy
         return (isset($this->bootOptions['handle_errors']) &&
                 $this->bootOptions['handle_errors']);
     }
-  
-  
+
     /**
      * Makes call to plugin initialization of boot object.
      * If application has been configured to handle errors
@@ -128,23 +115,16 @@ class Empathy
      */
     public function initPlugins()
     {
-        if(!$this->getHandlingErrors())
-        {
+        if (!$this->getHandlingErrors()) {
             $this->boot->initPlugins();
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 $this->boot->initPlugins();
-            }
-            catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $this->exceptionHandler($e);
             }
         }
     }
-
 
     /**
      * Dispatch to controller via boot object.
@@ -154,26 +134,19 @@ class Empathy
      *
      */
     public function beginDispatch()
-    {    
-        if(!$this->getHandlingErrors())
-        {
+    {
+        if (!$this->getHandlingErrors()) {
             $this->boot->dispatch();
-        }
-        else
-        {
-            try
-            {       
+        } else {
+            try {
                 $this->boot->dispatch();
-            }        
-            catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $this->exceptionHandler($e);
             }
         }
     }
 
-
-    /** 
+    /**
      * Returns the $persistent_mode setting.
      * @return boolean $persistent_mode
      */
@@ -181,8 +154,6 @@ class Empathy
     {
         return $this->persistent_mode;
     }
-
-
 
     /**
      * Returns errors caught by error handler.
@@ -195,14 +166,13 @@ class Empathy
 
     /**
      * Returns whether error handler has caught anything or not.
-     * @return boolean 
+     * @return boolean
      */
     public function hasErrors()
     {
         return (sizeof($this->errors) > 0);
     }
 
-  
     /**
      * Return a concatenated string of all caught error messages.
      * @return string $errors
@@ -211,7 +181,6 @@ class Empathy
     {
         return implode('</h2><h2>&nbsp;</h2><h2>', $this->getErrors());
     }
-
 
     /**
      * The error handling function.
@@ -228,31 +197,29 @@ class Empathy
      *
      */
     public function errorHandler($errno, $errstr, $errfile, $errline)
-    {  
-        if(error_reporting())
-        {
+    {
+        if (error_reporting()) {
             $msg = '';
-            switch ($errno)
-            {
-            case E_ERROR:	
+            switch ($errno) {
+            case E_ERROR:
             case E_USER_ERROR:
                 $msg = "Error: [$errno] $errstr";
                 $msg .= "  Fatal error on line $errline in file $errfile";
                 $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
                 $msg .= " Aborting...";
                 die($msg);
-                break;	
+                break;
             case E_WARNING:
             case E_USER_WARNING:
                 $msg = "Warning: [$errno] $errstr";
-                break;	    
+                break;
             case E_NOTICE:
             case E_USER_NOTICE:
                 $msg = "Notice: [$errno] $errstr";
-                break;	           
+                break;
             case E_DEPRECATED:
             case E_STRICT:
-                $msg = "Strict/Deprecated notice: [$errno] $errstr";	
+                $msg = "Strict/Deprecated notice: [$errno] $errstr";
                 break;
             default:
                 $msg = "Unknown error type: [$errno] $errstr";
@@ -262,9 +229,9 @@ class Empathy
             //$msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
             $this->errors[] = $msg;
         }
+
         return true;
     }
-
 
     /**
      * The exception handler.  Deals with any exception.
@@ -277,23 +244,21 @@ class Empathy
     private function exceptionHandler($e)
     {
         // prioritise any caught errors over exceptions thrown
-        if($this->hasErrors())
-        {
+        if ($this->hasErrors()) {
             $e = new ErrorException($this->errorsToString());
         }
-   
+
         // force safe exception
         //$e = new Empathy\SafeException($e->getMessage());
 
-        switch(get_class($e))
-        {
+        switch (get_class($e)) {
         case 'Empathy\SafeException':
             echo 'Safe exception: '.$e->getMessage();
             exit();
             break;
 
         default:
-            // redispatch to error page 
+            // redispatch to error page
             /*
               $_GET['module'] = 'notfound';
               $_GET['class'] = 'notfound';
@@ -309,42 +274,36 @@ class Empathy
         }
     }
 
-
     /**
      * read config file from specified location
-     * @param string $configDir
+     * @param  string $configDir
      * @return void
      */
     private function loadConfig($configDir)
     {
         $configFile = $configDir.'/config.yml';
-        if(!file_exists($configFile))
-        {
+        if (!file_exists($configFile)) {
             die('Config error: '.$configFile.' does not exist');
         }
         $s = new \Spyc();
-        $config = $s->YAMLLoad($configFile);      
-        foreach($config as $index => $item)
-        {
-            if(!is_array($item))
-            {
+        $config = $s->YAMLLoad($configFile);
+        foreach ($config as $index => $item) {
+            if (!is_array($item)) {
                 define(strtoupper($index), $item);
             }
-        }   
-        if(isset($config['boot_options']))
-        {
+        }
+        if (isset($config['boot_options'])) {
             $this->bootOptions = $config['boot_options'];
         }
 
-        if(isset($config['plugins']))
-        {
+        if (isset($config['plugins'])) {
             $this->plugins = $config['plugins'];
         }
     }
 
     /**
      * the autoload function.
-     * @param string $class the name of class that PHP is attempting to load
+     * @param  string $class the name of class that PHP is attempting to load
      * @return void
      */
     public static function loadClass($class)
@@ -358,37 +317,29 @@ class Empathy
             $class_arr = explode('\\', $class);
             $class = $class_arr[sizeof($class_arr)-1];
 
-            if(isset($_GET['module']))
-            {
+            if (isset($_GET['module'])) {
                 array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
             }
             array_push($location, DOC_ROOT.'/storage/');
-        }         
-        elseif(strpos($class, 'Empathy') === 0 ||
+        } elseif(strpos($class, 'Empathy') === 0 ||
                (strpos($class, 'ELib') === 0 && self::$use_elib))
         {
-            $class = str_replace('\\', '/', $class);	
+            $class = str_replace('\\', '/', $class);
         }
         array_push($location, DOC_ROOT.'/application/');
 
-    
-        while($i < sizeof($location) && $load_error == 1)
-        {
-            $class_file = $location[$i].$class.'.php';           
+        while ($i < sizeof($location) && $load_error == 1) {
+            $class_file = $location[$i].$class.'.php';
 
             //echo $class_file.'<br />';
 
-            if(@include($class_file))
-            {		
-                $class_file.": 1<br />\n";	
+            if (@include($class_file)) {
+                $class_file.": 1<br />\n";
                 $load_error = 0;
-            }
-            else
-            {
+            } else {
                 $class_file.": 0<br />\n";
-            }	
+            }
             $i++;
-        }        
+        }
     }
 }
-?>

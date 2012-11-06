@@ -8,4 +8,3 @@ interface Presentation
     public function assign($name, $data);
     public function display($template);
 }
-?>

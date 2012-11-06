@@ -1,16 +1,15 @@
 <?php
 
-namespace Empathy\Plugin;
-use Empathy\Plugin as Plugin;
+namespace Empathy\MVC\Plugin;
 
-class Phirehose
+use Empathy\MVC\Plugin as Plugin;
+
+class Phirehose-1.0
 {
 
-  public function __construct()
-  {     	  
-	require('phirehose/Phirehose.php');
-  }
-
+    public function __construct()
+    {
+    require 'phirehose/Phirehose.php';
+    }
 
 }
-?>
