@@ -1,6 +1,3 @@
-package.xml
-*.tgz
-eaa.zip
 docs/generated
 apidocs
 tmp

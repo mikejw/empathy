@@ -26,54 +26,52 @@
     <notes>-</notes>
     <contents>
         <dir name="/">
-            <dir name="src" baseinstalldir="/">
-                <dir name="Empathy">
-                    <dir name="MVC">
-                        <dir name="bin">
-                            <file name="echo_include_path.php" role="php" />
-                        </dir>
-                        <dir name="Plugin">
-                            <file name="Doctrine-1.0.php" role="php" />
-                            <file name="EDefault-1.0.php" role="php" />
-                            <file name="FacebookSDK-1.0.php" role="php" />
-                            <file name="JSBeautifier-1.0.php" role="php" />
-                            <file name="JSONView-1.0.php" role="php" />
-                            <file name="Pheanstalk-1.0.php" role="php" />
-                            <file name="Phirehose-1.0.php" role="php" />
-                            <file name="PreDispatch.php" role="php" /> 
-                            <file name="Presentation.php" role="php" />
-                            <file name="Redbean-1.0.php" role="php" />
-                            <file name="Smarty-1.0.php" role="php" />
-                            <file name="TwitterOAuth-1.0.php" role="php" />
-                        </dir>
-                        <dir name="Util">
-                            <file name="CLI.php" role="php" />
-                            <file name="ELib.php" role="php" />
-                            <file name="Pear.php" role="php" />
-                            <file name="Test.php" role="php" />
-                            <file name="TestUnit.php" role="php" />
-                        </dir>	
-                        <file name="Bootstrap.php" role="php" />
-                        <file name="Config.php" role="php" />
-                        <file name="Controller.php" role="php" />
-                        <file name="DBC.php" role="php" />
-                        <file name="DBPool.php" role="php" />
-                        <file name="Empathy.php" role="php" />
-                        <file name="Entity.php" role="php" />
-                        <file name="ErrorException.php" role="php" />
-                        <file name="Exception.php" role="php" />
-                        <file name="Model.php" role="php" />
-                        <file name="Plugin.php" role="php" />
-                        <file name="PluginManager.php" role="php" />
-                        <file name="SafeException.php" role="php" />
-                        <file name="SectionItemStandAlone.php" role="php" />
-                        <file name="Session.php" role="php" />
-                        <file name="Stash.php" role="php" />
-                        <file name="Store.php" role="php" />
-                        <file name="URI.php" role="php" />
-                        <file name="Validate.php" role="php" />
-                        <file name="empathy.tpl" role="php" />
+            <dir name="Empathy">
+                <dir name="MVC">
+                    <dir name="bin">
+                        <file name="echo_include_path.php" role="php" />
                     </dir>
+                    <dir name="Plugin">
+                        <file name="Doctrine-1.0.php" role="php" />
+                        <file name="EDefault-1.0.php" role="php" />
+                        <file name="FacebookSDK-1.0.php" role="php" />
+                        <file name="JSBeautifier-1.0.php" role="php" />
+                        <file name="JSONView-1.0.php" role="php" />
+                        <file name="Pheanstalk-1.0.php" role="php" />
+                        <file name="Phirehose-1.0.php" role="php" />
+                        <file name="PreDispatch.php" role="php" /> 
+                        <file name="Presentation.php" role="php" />
+                        <file name="Redbean-1.0.php" role="php" />
+                        <file name="Smarty-1.0.php" role="php" />
+                        <file name="TwitterOAuth-1.0.php" role="php" />
+                    </dir>
+                    <dir name="Util">
+                        <file name="CLI.php" role="php" />
+                        <file name="ELib.php" role="php" />
+                        <file name="Pear.php" role="php" />
+                        <file name="Test.php" role="php" />
+                        <file name="TestUnit.php" role="php" />
+                    </dir>	
+                    <file name="Bootstrap.php" role="php" />
+                    <file name="Config.php" role="php" />
+                    <file name="Controller.php" role="php" />
+                    <file name="DBC.php" role="php" />
+                    <file name="DBPool.php" role="php" />
+                    <file name="Empathy.php" role="php" />
+                    <file name="Entity.php" role="php" />
+                    <file name="ErrorException.php" role="php" />
+                    <file name="Exception.php" role="php" />
+                    <file name="Model.php" role="php" />
+                    <file name="Plugin.php" role="php" />
+                    <file name="PluginManager.php" role="php" />
+                    <file name="SafeException.php" role="php" />
+                    <file name="SectionItemStandAlone.php" role="php" />
+                    <file name="Session.php" role="php" />
+                    <file name="Stash.php" role="php" />
+                    <file name="Store.php" role="php" />
+                    <file name="URI.php" role="php" />
+                    <file name="Validate.php" role="php" />
+                    <file name="empathy.tpl" role="php" />
                 </dir>
             </dir>
             <file name="config.yml" role="cfg" />
