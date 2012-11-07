@@ -111,11 +111,13 @@ class Entity
      */
     private function loadProperties()
     {
+        $super_class = 'Empathy\MVC\Entity';
+
         $r = new \ReflectionClass(get_class($this));
 
-        if ($r->getParentClass()->getName() != 'Empathy\MVC\Entity') {
+        if ($r->getParentClass()->getName() != $super_class) {
             $props = array();
-            while (($class = $r->getName()) != 'Empathy\MVC\Entity') {
+            while (($class = $r->getName()) != $super_class) {
                 $props[] = $r->getProperties();
                 $r = $r->getParentClass();
             }
