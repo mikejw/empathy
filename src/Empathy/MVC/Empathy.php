@@ -54,7 +54,9 @@ class Empathy
     /**
      * This flag is read from the boot_options section of the application config.
      * If it is true then the main autoload function will attempt to load ELib components
-     * when necessary.
+     * when necessary. (There is now no difference in in loading elib components as the common namespace 'vendor'
+     * is always the same.)
+     *
      * @var boolean
      */
     private static $use_elib;
@@ -67,10 +69,12 @@ class Empathy
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode = null)
+    public function __construct($configDir, $persistent_mode=null, $system_mode=false)
     {
         $this->persistent_mode = $persistent_mode;
-        //spl_autoload_register(array($this, 'loadClass'));
+        if($system_mode) {
+            spl_autoload_register(array($this, 'loadClass'));
+        }
         $this->loadConfig($configDir);
         $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
 
@@ -321,9 +325,7 @@ class Empathy
                 array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
             }
             array_push($location, DOC_ROOT.'/storage/');
-        } elseif(strpos($class, 'Empathy') === 0 ||
-               (strpos($class, 'ELib') === 0 && self::$use_elib))
-        {
+        } elseif(strpos($class, 'Empathy') === 0) {
             $class = str_replace('\\', '/', $class);
         }
         array_push($location, DOC_ROOT.'/application/');

@@ -1,6 +1,6 @@
 <?php
 
-namespace Empathy;
+namespace Empathy\MVC;
 
 /**
  * Empathy Database Pool

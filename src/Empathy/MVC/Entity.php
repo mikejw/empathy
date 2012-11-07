@@ -1,6 +1,6 @@
 <?php
 
-namespace Empathy;
+namespace Empathy\MVC;
 
 /**
  * Empathy Entity
@@ -111,11 +111,13 @@ class Entity
      */
     private function loadProperties()
     {
+        $super_class = 'Empathy\MVC\Entity';
+
         $r = new \ReflectionClass(get_class($this));
 
-        if ($r->getParentClass()->getName() != 'Empathy\Entity') {
+        if ($r->getParentClass()->getName() != $super_class) {
             $props = array();
-            while (($class = $r->getName()) != 'Empathy\Entity') {
+            while (($class = $r->getName()) != $super_class) {
                 $props[] = $r->getProperties();
                 $r = $r->getParentClass();
             }
