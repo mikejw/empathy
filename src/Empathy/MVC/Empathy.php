@@ -54,7 +54,9 @@ class Empathy
     /**
      * This flag is read from the boot_options section of the application config.
      * If it is true then the main autoload function will attempt to load ELib components
-     * when necessary.
+     * when necessary. (There is now no difference in in loading elib components as the common namespace 'vendor'
+     * is always the same.)
+     *
      * @var boolean
      */
     private static $use_elib;
