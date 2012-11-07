@@ -1,8 +1,8 @@
 ---
 name: eaa
 title: 
-doc_root: /opt/local/apache2/htdocs/eaa
-web_root: bastian/eaa
+doc_root: /var/www/eaa
+web_root: localhost/eaa
 public_dir: /public_html
 db_server: 127.0.0.1
 db_user: root
@@ -13,6 +13,9 @@ tpl_by_class: true
 boot_options:
   default_module: front
   dynamic_module:
+  use_elib: false
+  handle_errors: true
+  environment: dev
 smarty_debugging: false
 
 plugins:
@@ -23,17 +26,17 @@ plugins:
     class_path: Smarty/Smarty.class.php
     class_name: \Smarty
     loader:
-  - name: Doctrine
-    version: 1.0
-    class_path: Doctrine.php
-    class_name: \Doctrine
-    loader: autoload
-  - name: Zend
-    version: 1.0
-    class_path: Zend/Loader.php
-    class_name: \Zend_Loader
-    loader: loadClass
-  - name: Pheanstalk
-    version: 1.0
+#  - name: Doctrine
+#    version: 1.0
+#    class_path: Doctrine.php
+#    class_name: \Doctrine
+#    loader: autoload
+#  - name: Zend
+#    version: 1.0
+#    class_path: Zend/Loader.php
+ #   class_name: \Zend_Loader
+ #   loader: loadClass
+ # - name: Pheanstalk
+ #   version: 1.0
 
 
