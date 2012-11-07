@@ -69,10 +69,12 @@ class Empathy
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode = null)
+    public function __construct($configDir, $persistent_mode=null, $system_mode=false)
     {
         $this->persistent_mode = $persistent_mode;
-        //spl_autoload_register(array($this, 'loadClass'));
+        if($system_mode) {
+            spl_autoload_register(array($this, 'loadClass'));
+        }
         $this->loadConfig($configDir);
         $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
 
