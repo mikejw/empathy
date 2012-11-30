@@ -76,7 +76,12 @@ class Empathy
             spl_autoload_register(array($this, 'loadClass'));
         }
         $this->loadConfig($configDir);
-        $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
+        
+        if($system_mode) {
+            $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
+        } else {
+            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../')); 
+        }
 
         if(isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib'])
