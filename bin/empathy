@@ -7,7 +7,7 @@ use YAML::Tiny;
 use Getopt::Long;
 
 
-my $lib_path = "@php_dir@";
+my $lib_path = "./vendor/mikejw/empathy";
 
 # get empathy config
 my %config = &read_global_config();
@@ -144,7 +144,7 @@ sub exec_app()
 sub read_global_config
 {
     my %config;
-    my $yaml = YAML::Tiny->read($lib_path.'/cfg/Empathy/config.yml');
+    my $yaml = YAML::Tiny->read($lib_path.'/config.yml');
     %config = (
 	mysql => $yaml->[0]->{'mysql'},
         mysql_dump => $yaml->[0]->{'mysql_dump'},
