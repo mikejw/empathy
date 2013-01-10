@@ -140,13 +140,12 @@ class Bootstrap
     /**
      * Create URI object which determines dispatch method and
      * perform dispatch
-     * @param string $defaultModule default module taken from application config
      *
-     * @param string $dynamicModule dynamic module taken from application config (if using CMS)
+     * @param bool $fake
      *
      * @return void
      */
-    public function dispatch()
+    public function dispatch($fake=false)
     {
         $this->uri = new URI($this->defaultModule, $this->dynamicModule);
         $error = $this->uri->getError();
@@ -162,11 +161,14 @@ class Bootstrap
         }
         $controller_name = $this->uri->getControllerName();
         $this->controller = new $controller_name($this);
-        $this->controller->$_GET['event']();
-        if ($this->mvc->hasErrors()) {
-            throw new ErrorException($this->mvc->errorsToString());
-        } else {
-            $this->display(false);
+
+        if($fake == false) {
+            $this->controller->$_GET['event']();
+            if ($this->mvc->hasErrors()) {
+                throw new ErrorException($this->mvc->errorsToString());
+            } else {
+                $this->display(false);
+            }
         }
     }
 
@@ -316,6 +318,15 @@ class Bootstrap
     public function getDebugMode()
     {
         return $this->debug_mode;
+    }
+
+    /**
+     * Returns controller.
+     * @return Controller
+     */
+    public function getController()
+    {
+        return $this->controller;
     }
 
 }

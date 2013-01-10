@@ -139,19 +139,27 @@ class Empathy
      * Dispatch to controller via boot object.
      * If application has been configured to handle errors
      * then calls are wrapped in try/catch blocks.
-     * @return void
+     *
+     * @param bool $fake value is passed to the dispatch method of boot
+     * which will (if true) not call the controller action. the
+     * controller object is then returned.
+     *
+     * @return void/Controller
      *
      */
-    public function beginDispatch()
+    public function beginDispatch($fake=false)
     {
         if (!$this->getHandlingErrors()) {
-            $this->boot->dispatch();
+            $this->boot->dispatch($fake);
         } else {
             try {
-                $this->boot->dispatch();
+                $this->boot->dispatch($fake);
             } catch (\Exception $e) {
                 $this->exceptionHandler($e);
             }
+        }
+        if($fake) {
+            return $this->boot->getController();
         }
     }
 
