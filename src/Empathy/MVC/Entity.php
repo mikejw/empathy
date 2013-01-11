@@ -371,7 +371,7 @@ class Entity
      *
      * @return void
      */
-    public function insert($table, $id, $format, $sanitize)
+    public function insert($table, $id, $format, $sanitize, $force_id=false)
     {
         $this->toXHTMLChris($format);
         if ($sanitize == 1) {
@@ -389,7 +389,7 @@ class Entity
         $id = 0;
 
         foreach ($this->properties as $property) {
-            if (!in_array($property, $this->globally_ignored_property)) {
+            if (($force_id && $property == 'id') || (!in_array($property, $this->globally_ignored_property))) {
                 if (is_numeric($this->$property) && !is_string($this->$property)) {
                     $sql .= $this->$property;
                 } elseif ($this->$property == '') {
@@ -623,16 +623,18 @@ class Entity
         return $all;
     }
 
-    public function assignFromPost($ignore)
+    public function assignFromPost($ignore, $force_id=false)
     {
         foreach ($this->properties as $property) {
-            if(!in_array($property, $this->globally_ignored_property)
-               && !in_array($property, $ignore))
+            if(($force_id && $property == 'id') ||
+               (!in_array($property, $this->globally_ignored_property)
+                && !in_array($property, $ignore)))
             {
                 $this->$property = $_POST[$property];
             }
         }
     }
+
 
     public function prepareOptions($first, $label, $table)
     {
