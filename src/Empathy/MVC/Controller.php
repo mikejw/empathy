@@ -179,8 +179,9 @@ class Controller
     }
 
     /**
-     * Redirect the user to another location within the application.
-     * Redirection is disabled if in command line mode to prevent tests breaking.
+     * Redirect the user to another location within the application
+     * Redirection is disabled if the MVC_TEST_MODE global flag is detected to prevent tests breaking
+     * but execution always begins to end here
      *
      * @param string $endString the new URI to redirect to.
      *
@@ -188,7 +189,7 @@ class Controller
      */
     public function redirect($endString)
     {
-        if (!$this->boot->getPersistentMode()) {
+        if (!defined('MVC_TEST_MODE')) {
             session_write_close();
             $location = 'Location: ';
             $location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
@@ -197,7 +198,10 @@ class Controller
             }
             header($location);
             exit();
+        } else {
+            throw new TestModeException('Cannot redirect due to test mode.');
         }
+        
     }
 
     /**

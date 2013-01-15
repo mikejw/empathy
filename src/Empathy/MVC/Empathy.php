@@ -269,9 +269,12 @@ class Empathy
         //$e = new Empathy\SafeException($e->getMessage());
 
         switch (get_class($e)) {
-        case 'Empathy\SafeException':
+        case 'Empathy\MVC\SafeException':
             echo 'Safe exception: '.$e->getMessage();
             exit();
+            break;
+        case 'Empathy\MVC\TestModeException':
+            // allow execution to end naturally
             break;
 
         default:
