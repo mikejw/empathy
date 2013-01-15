@@ -82,6 +82,7 @@ class CLI
      */
     public static function request($e, $uri)
     {
+
         switch (self::$_reqMode) {
         case CLIMode::TIMED:
 
@@ -113,8 +114,10 @@ class CLI
             break;
 
         case CLIMode::FAKED:
-            $_SERVER['REQUEST_URI'] = $uri;
+            ob_start();
+            $_SERVER['REQUEST_URI'] = $uri;            
             $controller = $e->beginDispatch(true);
+            ob_end_clean();
             self::_requestEnd();
 
             return $controller;

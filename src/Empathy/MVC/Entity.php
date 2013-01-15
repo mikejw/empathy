@@ -272,32 +272,37 @@ class Entity
     }
 
     /**
-     * Escape non-numeric fields after checking the field exists within the POST data.
+     * Escape non-numeric and non-empty fields
+     * Check the field exists within the POST data by default
      *
      * @return void
      */
-    public function sanitize()
+    public function sanitize($checkPostValues=true)
     {
         foreach ($this->properties as $property) {
-            if (isset($_POST[$property]) && !(is_numeric($property))) {
-                $this->$property = mysql_escape_string($this->$property);
+
+            if ((!$checkPostValues || ($checkPostValues && isset($_POST[$property]))) &&
+                !in_array($property, $this->globally_ignored_property) &&
+                $this->$property !== null &&
+                !is_numeric($this->$property)) {
+    
+                $this->$property = substr($this->dbh->quote($this->$property), 1, -1);
             }
         }
+      
     }
 
+
     /**
-     * Escape non-numeric fields.
+     * Escape non-numeric and non-empty fields.
      *
      * @return void
      */
     public function sanitizeNoPost()
     {
-        foreach ($this->properties as $property) {
-            if (!in_array($property, $this->globally_ignored_property) && !is_numeric($property)) {
-                $this->$property = mysql_escape_string($this->$property);
-            }
-        }
+        $this->sanitize(false);
     }
+
 
     /**
      * Save object back to database (update query).
