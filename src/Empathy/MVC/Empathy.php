@@ -276,19 +276,29 @@ class Empathy
         case 'Empathy\MVC\TestModeException':
             // allow execution to end naturally
             break;
+        case 'Empathy\MVC\RequestException':
 
-        default:
-            // redispatch to error page
-            /*
-              $_GET['module'] = 'notfound';
-              $_GET['class'] = 'notfound';
-              $_GET['event'] = 'default_event';
-              $this->beginDispatch();
+            $response = '';
+            switch($e->getCode()) {
+
+            /*   
+            case 400:
+                $response = 'HTTP/1.1 400 bad request';
+                $message = 'Bad request';
+                break;
             */
+            case RequestException::NOT_FOUND:
+                $response = 'HTTP/1.0 404 Not Found';
+        
+                break;
+            default:
+                break;
+            }
+            header($response);
 
-            // TODO:: handling of errors/exceptions when in non debug modes / non-dev environments
-            // i.e. 404s when necessary otherwise server error pages?
-
+            //break; do not break! => we want to continue exection to allow exception to be 'dispatched'
+        default:
+   
             $this->boot->dispatchException($e);
             break;
         }

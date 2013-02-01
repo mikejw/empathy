@@ -2,7 +2,7 @@
 
 namespace Empathy\MVC;
 
-class ErrorException extends \Exception
+class ErrorException extends Exception
 {
     //
 }
