@@ -280,13 +280,11 @@ class Empathy
 
             $response = '';
             switch($e->getCode()) {
-
-            /*   
-            case 400:
+            
+            case RequestException::BAD_REQUEST:
                 $response = 'HTTP/1.1 400 bad request';
                 $message = 'Bad request';
                 break;
-            */
             case RequestException::NOT_FOUND:
                 $response = 'HTTP/1.0 404 Not Found';
         
@@ -296,9 +294,8 @@ class Empathy
             }
             header($response);
 
-            //break; do not break! => we want to continue exection to allow exception to be 'dispatched'
+            //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
         default:
-   
             $this->boot->dispatchException($e);
             break;
         }

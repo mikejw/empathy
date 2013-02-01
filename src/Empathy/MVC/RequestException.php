@@ -5,7 +5,7 @@ namespace Empathy\MVC;
 class RequestException extends Exception
 {
     const NOT_FOUND = 0;
-    const SERVER_ERROR = 1;
+    const BAD_REQUEST = 1;
 
     public function __construct($message, $code=0, \Exception $previous=null)
     {
