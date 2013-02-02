@@ -117,6 +117,7 @@ class Controller
         if ($this->presenter !== null) {
             $this->assignControllerInfo();
             $this->assignConstants();
+            $this->assignEnvironment();
         }
 
         // if within CMS assign the current section name to the template
@@ -152,6 +153,19 @@ class Controller
         $this->assign('class', $this->class);
         $this->assign('event', $this->event);
     }
+
+
+  /**
+     * Assign environment value to the view
+     *
+     * @return void
+     *
+     */
+    private function assignEnvironment()
+    {
+        $this->assign('environment', $this->environment);
+    }
+
 
     /**
      * Set the name of the current view template
