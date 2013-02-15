@@ -173,10 +173,24 @@ class Entity
      *
      * @return void
      */
-    public function setDBH($dbh)
+    public function setDBH(&$dbh)
     {
         $this->dbh = $dbh;
     }
+
+
+   /**
+     * Clear associated PDO objects
+     *
+     * @return void
+     */
+    public function dbDisconnect()
+    {
+        unset($this->result);
+        $this->dbh = null;
+    }
+
+
 
     /**
      * Perform MySQL query
