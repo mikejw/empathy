@@ -7,6 +7,8 @@ use YAML::Tiny;
 use Getopt::Long;
 
 
+
+
 my $lib_path = "./vendor/mikejw/empathy";
 
 # get empathy config
@@ -71,11 +73,14 @@ elsif($new_app)
     print "Web root: ";
     chomp ($web_root = <>);
     
-    $doc_root = `pwd`.$name;
-    `cp $lib_path/data/Empathy/eaa.zip .`;
-    `unzip eaa.zip`;
-    `mv eaa $name`;
+    # old 'system mode'
+    #$doc_root = `pwd`.$name;
+    #`cp $lib_path/data/Empathy/eaa.zip .`;
+    #`unzip eaa.zip`;
+    #`mv eaa $name`;
 
+    `cp -r $lib_path/eaa/* .`;
+    print "Done.\n";
 }
 
 
