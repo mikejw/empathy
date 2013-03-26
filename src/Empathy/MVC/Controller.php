@@ -308,10 +308,10 @@ class Controller
      * @return void
      */
     public function loadUIVars($ui, $ui_array)
-    {
+    {        
         $new_app = Session::getNewApp();
         foreach ($ui_array as $setting) {
-            if (isset($_GET[$setting])) {
+            if (isset($_GET[$setting])) {                
                 if (!$new_app) {
                     $_SESSION[$ui][$setting] = $_GET[$setting];
                 } else {
@@ -322,7 +322,7 @@ class Controller
             } elseif (isset($_SESSION[$ui][$setting])) {
                 $_GET[$setting] = $_SESSION[$ui][$setting];
             }
-        }
+        }    
     }
 
     // when $def is 0, valid is true when id is 0
