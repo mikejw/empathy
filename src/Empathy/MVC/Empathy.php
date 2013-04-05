@@ -2,7 +2,7 @@
 
 namespace Empathy\MVC;
 
-define('MVC_VERSION', '0.9.4.1');
+define('MVC_VERSION', '0.9.5');
 require_once 'spyc/spyc.php';
 
 /**
