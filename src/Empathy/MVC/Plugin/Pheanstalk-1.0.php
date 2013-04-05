@@ -8,8 +8,9 @@ class Pheanstalk
 {
 
     public function __construct()
-    {
-        require 'pheanstalk/pheanstalk_init.php';
+    {        
+        //require 'pheanstalk/pheanstalk_init.php';
+        // code is now loaded through composer
     }
 
 }

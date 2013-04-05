@@ -140,13 +140,12 @@ class Bootstrap
     /**
      * Create URI object which determines dispatch method and
      * perform dispatch
-     * @param string $defaultModule default module taken from application config
      *
-     * @param string $dynamicModule dynamic module taken from application config (if using CMS)
+     * @param bool $fake
      *
      * @return void
      */
-    public function dispatch()
+    public function dispatch($fake=false)
     {
         $this->uri = new URI($this->defaultModule, $this->dynamicModule);
         $error = $this->uri->getError();
@@ -157,16 +156,29 @@ class Bootstrap
         {
             $error = $this->uri->dynamicSection();
         }
+
         if ($error > 0) {
-            throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
+
+            if($this->environment == 'prod' || $this->debug_mode == false) {     
+
+                if($error == URI::MISSING_CLASS ||
+                    $error == URI::MISSING_EVENT_DEF) { 
+                    throw new RequestException('Not found', RequestException::NOT_FOUND);
+                }
+            } else {
+                throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
+            }
         }
         $controller_name = $this->uri->getControllerName();
         $this->controller = new $controller_name($this);
-        $this->controller->$_GET['event']();
-        if ($this->mvc->hasErrors()) {
-            throw new ErrorException($this->mvc->errorsToString());
-        } else {
-            $this->display(false);
+
+        if($fake == false) {
+            $event_val = $this->controller->$_GET['event']();
+            if ($this->mvc->hasErrors()) {
+                throw new ErrorException($this->mvc->errorsToString());
+            } elseif ($event_val !== false) {
+                $this->display(false);
+            }
         }
     }
 
@@ -177,16 +189,28 @@ class Bootstrap
      *
      * @return void
      */
-
     public function dispatchException($e)
     {
+        $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
+
+
         $this->controller = new Controller($this);
 
         if ($this->controller->getModule() != 'api') {
-            // old handling
-            $this->controller->setTemplate('../empathy.tpl');
+            
             $this->controller->assign('error', $e->getMessage());
-            $this->display(true);
+                        
+            if($req_error) {
+    
+                 $this->controller->assign('code', $e->getCode());
+                 $this->controller->setTemplate('elib:/req_error.tpl');
+                 $this->display();
+            } else {
+                $this->controller->setTemplate('../empathy.tpl');
+                $this->display(true);
+            }
+            
+
         } else {
             if (!$this->debug_mode) {
                 $r = new \EROb(\ReturnCodes::SERVER_ERROR, 'Server error.');
@@ -206,7 +230,7 @@ class Bootstrap
      *
      * @return void
      */
-    private function display($i)
+    private function display($i=false)
     {
         $this->controller->initDisplay($i);
     }
@@ -316,6 +340,15 @@ class Bootstrap
     public function getDebugMode()
     {
         return $this->debug_mode;
+    }
+
+    /**
+     * Returns controller.
+     * @return Controller
+     */
+    public function getController()
+    {
+        return $this->controller;
     }
 
 }

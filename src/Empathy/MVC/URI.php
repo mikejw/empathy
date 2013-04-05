@@ -134,14 +134,28 @@ class URI
             array_pop($uri);
             $size--;
         }
+
+        $args = '';
+
         // ignore any args
         if (preg_match('/\?/', $uri[$size])) {
             $start_args = strpos($uri[$size], '?');
+            $args = substr($uri[$size], $start_args);
             $uri[$size] = substr($uri[$size], 0, $start_args);
+
             if ($uri[$size] == '') {
                 array_pop($uri);
             }
         }
+
+        // check for uppercase letters in main uri
+        // and redirect if present
+        $temp_uri_string = implode('/', $uri);
+        if(preg_match('/[A-Z]/', $temp_uri_string)) {
+            header('Location: http://'.WEB_ROOT.PUBLIC_DIR.'/'.strtolower($temp_uri_string).$args, true, 301);
+            exit(); 
+        }
+        
         $this->uri = $uri;
     }
 

@@ -13,7 +13,11 @@ class Stash
 
     public function get($key)
     {
-        return $this->items[$key];
+        if(!isset($this->items[$key])) {
+            return null;
+        } else {        
+            return $this->items[$key];
+        }
     }
 
     public function store($key, $data)

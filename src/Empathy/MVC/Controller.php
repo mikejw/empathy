@@ -117,6 +117,7 @@ class Controller
         if ($this->presenter !== null) {
             $this->assignControllerInfo();
             $this->assignConstants();
+            $this->assignEnvironment();
         }
 
         // if within CMS assign the current section name to the template
@@ -153,6 +154,19 @@ class Controller
         $this->assign('event', $this->event);
     }
 
+
+  /**
+     * Assign environment value to the view
+     *
+     * @return void
+     *
+     */
+    private function assignEnvironment()
+    {
+        $this->assign('environment', $this->environment);
+    }
+
+
     /**
      * Set the name of the current view template
      *
@@ -179,8 +193,9 @@ class Controller
     }
 
     /**
-     * Redirect the user to another location within the application.
-     * Redirection is disabled if in command line mode to prevent tests breaking.
+     * Redirect the user to another location within the application
+     * Redirection is disabled if the MVC_TEST_MODE global flag is detected to prevent tests breaking
+     * but execution always begins to end here
      *
      * @param string $endString the new URI to redirect to.
      *
@@ -188,7 +203,7 @@ class Controller
      */
     public function redirect($endString)
     {
-        if (!$this->boot->getPersistentMode()) {
+        if (!defined('MVC_TEST_MODE')) {
             session_write_close();
             $location = 'Location: ';
             $location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
@@ -197,7 +212,10 @@ class Controller
             }
             header($location);
             exit();
+        } else {
+            throw new TestModeException('Cannot redirect due to test mode.');
         }
+        
     }
 
     /**
@@ -290,10 +308,10 @@ class Controller
      * @return void
      */
     public function loadUIVars($ui, $ui_array)
-    {
+    {        
         $new_app = Session::getNewApp();
         foreach ($ui_array as $setting) {
-            if (isset($_GET[$setting])) {
+            if (isset($_GET[$setting])) {                
                 if (!$new_app) {
                     $_SESSION[$ui][$setting] = $_GET[$setting];
                 } else {
@@ -304,7 +322,32 @@ class Controller
             } elseif (isset($_SESSION[$ui][$setting])) {
                 $_GET[$setting] = $_SESSION[$ui][$setting];
             }
+        }    
+    }
+
+    // when $def is 0, valid is true when id is 0
+    public function initID($id, $def, $assertSet=false)
+    {
+        $valid = true;
+        $assign_def = false;
+
+        if (!isset($_GET[$id])) {
+            $assign_def = true;
+            if ($assertSet) {
+                $valid = false;
+            }
+        } elseif(!((string) $_GET[$id] === (string) (int) $_GET[$id]) || ($_GET[$id] == 0 && $def != 0)
+               || $_GET[$id] < 0)
+        {
+            $assign_def = true;
+            $valid = false;
         }
+
+        if ($assign_def) {
+            $_GET[$id] = $def;
+        }
+
+        return $valid;
     }
 
 }

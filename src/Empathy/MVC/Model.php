@@ -15,7 +15,8 @@ class Model
             $model->setDBH(self::$db_handle);
         } elseif ($host !== null) {
             // use a new host
-            $model->setDBH(DBPool::getConnection($host));
+            $dbh = DBPool::getConnection($host);
+            $model->setDBH($dbh);
         } elseif (self::$db_handle == null && $host == null) {
             // db_handle is null and host is null
             // (initiate default)
@@ -28,7 +29,13 @@ class Model
 
     public static function load($model, $host = null)
     {
-        $class = '\Empathy\\Model\\'.$model;
+        $class = '\Empathy\\MVC\\Model\\'.$model;
+
+        // manually add entity class 
+        // (for cases when not in 'system-mode' and this code lies outside
+        // the reach of the composer autoload 
+        $file = $model.'.php';
+        require_once(DOC_ROOT.'/storage/'.$file);
 
         // prevent auto-connecting
         $storage_object = new $class(false);
@@ -38,9 +45,18 @@ class Model
         return $storage_object;
     }
 
+
+    public static function disconnect(array $models)
+    {
+        foreach($models as $m) {
+            $m->dbDisconnect();
+        }
+
+    }
+
     public static function getTable($model)
     {
-        $class = '\\Empathy\\Model\\'.$model;
+        $class = '\\Empathy\\MVC\\Model\\'.$model;
 
         return $class::TABLE;
     }

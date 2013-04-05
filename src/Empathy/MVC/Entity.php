@@ -1,6 +1,6 @@
 <?php
 
-namespace Empathy;
+namespace Empathy\MVC;
 
 /**
  * Empathy Entity
@@ -111,11 +111,13 @@ class Entity
      */
     private function loadProperties()
     {
+        $super_class = 'Empathy\MVC\Entity';
+
         $r = new \ReflectionClass(get_class($this));
 
-        if ($r->getParentClass()->getName() != 'Empathy\Entity') {
+        if ($r->getParentClass()->getName() != $super_class) {
             $props = array();
-            while (($class = $r->getName()) != 'Empathy\Entity') {
+            while (($class = $r->getName()) != $super_class) {
                 $props[] = $r->getProperties();
                 $r = $r->getParentClass();
             }
@@ -171,10 +173,24 @@ class Entity
      *
      * @return void
      */
-    public function setDBH($dbh)
+    public function setDBH(&$dbh)
     {
         $this->dbh = $dbh;
     }
+
+
+   /**
+     * Clear associated PDO objects
+     *
+     * @return void
+     */
+    public function dbDisconnect()
+    {
+        unset($this->result);
+        $this->dbh = null;
+    }
+
+
 
     /**
      * Perform MySQL query
@@ -270,32 +286,37 @@ class Entity
     }
 
     /**
-     * Escape non-numeric fields after checking the field exists within the POST data.
+     * Escape non-numeric and non-empty fields
+     * Check the field exists within the POST data by default
      *
      * @return void
      */
-    public function sanitize()
+    public function sanitize($checkPostValues=true)
     {
         foreach ($this->properties as $property) {
-            if (isset($_POST[$property]) && !(is_numeric($property))) {
-                $this->$property = mysql_escape_string($this->$property);
+
+            if ((!$checkPostValues || ($checkPostValues && isset($_POST[$property]))) &&
+                !in_array($property, $this->globally_ignored_property) &&
+                $this->$property !== null &&
+                !is_numeric($this->$property)) {
+    
+                $this->$property = substr($this->dbh->quote($this->$property), 1, -1);
             }
         }
+      
     }
 
+
     /**
-     * Escape non-numeric fields.
+     * Escape non-numeric and non-empty fields.
      *
      * @return void
      */
     public function sanitizeNoPost()
     {
-        foreach ($this->properties as $property) {
-            if (!in_array($property, $this->globally_ignored_property) && !is_numeric($property)) {
-                $this->$property = mysql_escape_string($this->$property);
-            }
-        }
+        $this->sanitize(false);
     }
+
 
     /**
      * Save object back to database (update query).
@@ -369,7 +390,7 @@ class Entity
      *
      * @return void
      */
-    public function insert($table, $id, $format, $sanitize)
+    public function insert($table, $id, $format, $sanitize, $force_id=false)
     {
         $this->toXHTMLChris($format);
         if ($sanitize == 1) {
@@ -387,7 +408,7 @@ class Entity
         $id = 0;
 
         foreach ($this->properties as $property) {
-            if (!in_array($property, $this->globally_ignored_property)) {
+            if (($force_id && $property == 'id') || (!in_array($property, $this->globally_ignored_property))) {
                 if (is_numeric($this->$property) && !is_string($this->$property)) {
                     $sql .= $this->$property;
                 } elseif ($this->$property == '') {
@@ -621,16 +642,18 @@ class Entity
         return $all;
     }
 
-    public function assignFromPost($ignore)
+    public function assignFromPost($ignore, $force_id=false)
     {
         foreach ($this->properties as $property) {
-            if(!in_array($property, $this->globally_ignored_property)
-               && !in_array($property, $ignore))
+            if(($force_id && $property == 'id') ||
+               (!in_array($property, $this->globally_ignored_property)
+                && !in_array($property, $ignore)))
             {
                 $this->$property = $_POST[$property];
             }
         }
     }
+
 
     public function prepareOptions($first, $label, $table)
     {

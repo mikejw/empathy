@@ -2,7 +2,7 @@
 
 namespace Empathy\MVC;
 
-define('MVC_VERSION', '0.9.4.1');
+define('MVC_VERSION', '0.9.5');
 require_once 'spyc/spyc.php';
 
 /**
@@ -54,7 +54,9 @@ class Empathy
     /**
      * This flag is read from the boot_options section of the application config.
      * If it is true then the main autoload function will attempt to load ELib components
-     * when necessary.
+     * when necessary. (There is now no difference in in loading elib components as the common namespace 'vendor'
+     * is always the same.)
+     *
      * @var boolean
      */
     private static $use_elib;
@@ -67,12 +69,19 @@ class Empathy
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode = null)
+    public function __construct($configDir, $persistent_mode=null, $system_mode=false)
     {
         $this->persistent_mode = $persistent_mode;
-        //spl_autoload_register(array($this, 'loadClass'));
+        if($system_mode) {
+            spl_autoload_register(array($this, 'loadClass'));
+        }
         $this->loadConfig($configDir);
-        $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
+        
+        if($system_mode) {
+            $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
+        } else {
+            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../')); 
+        }
 
         if(isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib'])
@@ -130,19 +139,27 @@ class Empathy
      * Dispatch to controller via boot object.
      * If application has been configured to handle errors
      * then calls are wrapped in try/catch blocks.
-     * @return void
+     *
+     * @param bool $fake value is passed to the dispatch method of boot
+     * which will (if true) not call the controller action. the
+     * controller object is then returned.
+     *
+     * @return void/Controller
      *
      */
-    public function beginDispatch()
+    public function beginDispatch($fake=false)
     {
         if (!$this->getHandlingErrors()) {
-            $this->boot->dispatch();
+            $this->boot->dispatch($fake);
         } else {
             try {
-                $this->boot->dispatch();
+                $this->boot->dispatch($fake);
             } catch (\Exception $e) {
                 $this->exceptionHandler($e);
             }
+        }
+        if($fake) {
+            return $this->boot->getController();
         }
     }
 
@@ -252,23 +269,33 @@ class Empathy
         //$e = new Empathy\SafeException($e->getMessage());
 
         switch (get_class($e)) {
-        case 'Empathy\SafeException':
+        case 'Empathy\MVC\SafeException':
             echo 'Safe exception: '.$e->getMessage();
             exit();
             break;
+        case 'Empathy\MVC\TestModeException':
+            // allow execution to end naturally
+            break;
+        case 'Empathy\MVC\RequestException':
 
+            $response = '';
+            switch($e->getCode()) {
+            
+            case RequestException::BAD_REQUEST:
+                $response = 'HTTP/1.1 400 bad request';
+                $message = 'Bad request';
+                break;
+            case RequestException::NOT_FOUND:
+                $response = 'HTTP/1.0 404 Not Found';
+        
+                break;
+            default:
+                break;
+            }
+            header($response);
+
+            //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
         default:
-            // redispatch to error page
-            /*
-              $_GET['module'] = 'notfound';
-              $_GET['class'] = 'notfound';
-              $_GET['event'] = 'default_event';
-              $this->beginDispatch();
-            */
-
-            // TODO:: handling of errors/exceptions when in non debug modes / non-dev environments
-            // i.e. 404s when necessary otherwise server error pages?
-
             $this->boot->dispatchException($e);
             break;
         }
@@ -321,9 +348,7 @@ class Empathy
                 array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
             }
             array_push($location, DOC_ROOT.'/storage/');
-        } elseif(strpos($class, 'Empathy') === 0 ||
-               (strpos($class, 'ELib') === 0 && self::$use_elib))
-        {
+        } elseif(strpos($class, 'Empathy') === 0) {
             $class = str_replace('\\', '/', $class);
         }
         array_push($location, DOC_ROOT.'/application/');
