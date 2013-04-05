@@ -19,22 +19,27 @@ class JSONView extends Plugin implements PreDispatch, Presentation
     }
 
     public function display($template)
-    {
+    {         
         $debug_mode = $this->bootstrap->getDebugMode();
+
+
 
         header('Content-type: application/json');
         if(is_object($this->output) &&
            (get_class($this->output) == 'ROb'||
             get_class($this->output) == 'EROb'))
-        {
+        {           
             if ($debug_mode) {
-                echo js_beautify((string) $this->output);
+                $jsb = new \JSBeautifier();
+                echo $jsb->beautify((string) $this->output);
             } else {
                 echo (string) $this->output;
             }
         } else {
+
             if ($debug_mode) {
-                echo js_beautify(json_encode($this->output));
+                $jsb = new \JSBeautifier();
+                echo $jsb->beautify(json_encode($this->output));
             } else {
                 echo json_encode($this->output);
             }
