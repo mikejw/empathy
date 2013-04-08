@@ -29,11 +29,18 @@ class JSONView extends Plugin implements PreDispatch, Presentation
            (get_class($this->output) == 'ROb'||
             get_class($this->output) == 'EROb'))
         {           
+
+            $output = (string) $this->output;
+
+            if(false !== ($callback = $this->output->getJSONPCallback())) {
+                $output = $callback.'('.$output.')';
+            }
+
             if ($debug_mode) {
                 $jsb = new \JSBeautifier();
-                echo $jsb->beautify((string) $this->output);
+                echo $jsb->beautify($output);
             } else {
-                echo (string) $this->output;
+                echo $output;
             }
         } else {
 
