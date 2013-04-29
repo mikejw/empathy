@@ -270,8 +270,8 @@ class Bootstrap
                 }
                 $plugin_manager->preDispatch();
             }
-        } catch (\Exception $e) {
-            throw new \Empathy\SafeException($e->getMessage());
+        } catch (\Exception $e) {            
+            throw new \Empathy\MVC\SafeException($e->getMessage());
         }
     }
 
