@@ -211,7 +211,6 @@ class Controller
                 $location .= $endString;
             }
             header($location);
-            exit();
         } else {
             throw new TestModeException('Cannot redirect due to test mode.');
         }
