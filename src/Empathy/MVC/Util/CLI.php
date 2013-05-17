@@ -33,7 +33,7 @@ namespace Empathy\MVC\Util;
 class CLI
 {
 
-    private static $_reqMode = CLIMode::TIMED;
+    private static $_reqMode = CLIMode::STREAMED;
 
 
     /**
@@ -123,6 +123,11 @@ class CLI
             return $controller;
             break;
 
+        case CLIMode::STREAMED:
+            $_SERVER['REQUEST_URI'] = $uri;
+            $e->beginDispatch();
+            break;
+            
         default:
             break;
 

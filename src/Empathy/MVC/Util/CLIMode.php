@@ -33,5 +33,6 @@ class CLIMode
     const TIMED = 0;
     const CAPTURED = 1;
     const FAKED = 2;
+    const STREAMED = 3;
 
 }
