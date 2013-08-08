@@ -20,11 +20,14 @@ class JSONView extends Plugin implements PreDispatch, Presentation
 
     public function display($template)
     {         
+        $force_formatted = (defined('ELIB_FORCE_FORMATTED') && ELIB_FORCE_FORMATTED);
+
         $debug_mode = $this->bootstrap->getDebugMode();
 
+        if(!(defined('MVC_TEST_MODE') && MVC_TEST_MODE)) {
+            header('Content-type: application/json');
+        }
 
-
-        header('Content-type: application/json');
         if(is_object($this->output) &&
            (get_class($this->output) == 'ROb'||
             get_class($this->output) == 'EROb'))
@@ -36,7 +39,7 @@ class JSONView extends Plugin implements PreDispatch, Presentation
                 $output = $callback.'('.$output.')';
             }
 
-            if ($debug_mode) {
+            if ($debug_mode || $force_formatted) {
                 $jsb = new \JSBeautifier();
                 echo $jsb->beautify($output);
             } else {
@@ -44,7 +47,7 @@ class JSONView extends Plugin implements PreDispatch, Presentation
             }
         } else {
 
-            if ($debug_mode) {
+            if ($debug_mode || $force_formatted) {
                 $jsb = new \JSBeautifier();
                 echo $jsb->beautify(json_encode($this->output));
             } else {

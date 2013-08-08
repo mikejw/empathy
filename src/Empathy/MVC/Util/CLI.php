@@ -103,7 +103,10 @@ class CLI
 
         case CLIMode::CAPTURED:
 
+
+            
             ob_start();
+
             $_SERVER['REQUEST_URI'] = $uri;
             $e->beginDispatch();
             $response = ob_get_contents();
