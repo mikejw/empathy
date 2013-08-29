@@ -7,8 +7,6 @@ use YAML::Tiny;
 use Getopt::Long;
 
 
-
-
 my $lib_path = "./vendor/mikejw/empathy";
 
 # get empathy config
@@ -22,45 +20,34 @@ my %actions = (
     mysql_extra => \&mysql_extra,
     doctrine_gen_models => \&doctrine_gen_models,
     doctrine_gen_yaml => \&doctrine_gen_yaml,
-    doctrine_generate => \&doctrine_generate
+    doctrine_generate => \&doctrine_generate,
+    node_compile_less => \&node_compile_less,
+    node_compile_js => \&node_compile_js
     );
 
 # initialize options
 my $mysql = '';
 my $doctrine = '';
 my $new_app = 0;
+my $node = '';
 GetOptions(
     'mysql=s' => \$mysql,
     'doctrine=s' => \$doctrine,
-    'new_app' => \$new_app
+    'new_app' => \$new_app,
+    'node=s' => \$node,
     );
 
-my $call;
 if($mysql)
 { 
-    $call = 'mysql_'.$mysql;
-    if(defined($actions{$call}))
-    {	
-	$actions{$call}->();
-    }
-    else
-    {
-	die "No can do. Exiting...\n";
-	exit();
-    }
+    &attempt_call('mysql_'.$mysql);
+}
+elsif($node)
+{
+    &attempt_call('node_'.$node);
 }
 elsif($doctrine)
 {
-    $call = 'doctrine_'.$doctrine;
-    if(defined($actions{$call}))
-    {
-	$actions{$call}->();
-    }
-    else
-    {
-	die "No can do. Exiting...\n";
-	exit();
-    }
+    &attempt_call('doctrine_'.$doctrine);
 }
 elsif($new_app)
 {
@@ -89,6 +76,16 @@ elsif($new_app)
 
 
 # functions...
+sub attempt_call()
+{
+    my ($call) = @_;
+    if(defined($actions{$call})) {	
+	$actions{$call}->();
+    } else {
+	die "No can do. Exiting...\n";
+	exit(0);
+    }
+}
 
 sub doctrine_generate()
 {
@@ -184,4 +181,40 @@ sub read_app_config
 	);   
 }
 
+sub node_compile_less
+{
+    my $css;
+    my $css_dir = "./public_html/css/less";
+    my $less_command = "./node_modules/.bin/lessc --yui-compress";    
+    my $less_files = $css_dir.'/*.less';
+    my @src_files = glob $less_files;
+    foreach my $file (@src_files) {	
+	$_ = $file;
+	s/\.less$/.css/;
+	$css = $_;
+	my $command = "$less_command $file $css";
+	`$command`;	
+    }
+    my $init_css = "./public_html/elib/init.min.css";
+    `cat $init_css $css > ./tmp.css; mv tmp.css $css`;
+}
 
+sub node_compile_js
+{
+   my $yui_command = "./node_modules/.bin/yuicompressor";
+   my $js_dir = "./public_html/js";
+
+   `cat $js_dir/common.js $js_dir/mikejw.js > ./tmp.js`;
+   
+   #$_ = $js;
+   #s/\.js$/_ob.js/;
+   #my $o_js = $_;
+
+   my $o_js = $js_dir.'/mikejw.min.js';
+
+   my $command = "$yui_command -o $o_js ./tmp.js";
+   `$command`;
+   unlink('./tmp.js');
+}
+
+1;
