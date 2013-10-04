@@ -16,6 +16,7 @@ boot_options:
   use_elib: false
   handle_errors: true
   environment: dev
+  debug_mode: true
 smarty_debugging: false
 
 plugins:
