@@ -5,6 +5,11 @@ use Cwd qw/abs_path getcwd/;
 use Data::Dumper;
 use YAML::Tiny;
 use Getopt::Long;
+use File::Path 'make_path';
+
+use constant TPL_CACHE => './tpl/templates_c';
+use constant ELIB_PUBLIC => '../vendor/mikejw/elib-base/public'; # relative to directory where symlink is created
+
 
 
 my $lib_path = "./vendor/mikejw/empathy";
@@ -22,7 +27,8 @@ my %actions = (
     doctrine_gen_yaml => \&doctrine_gen_yaml,
     doctrine_generate => \&doctrine_generate,
     node_compile_less => \&node_compile_less,
-    node_compile_js => \&node_compile_js
+    node_compile_js => \&node_compile_js,
+    misc_tpl_cache => \&misc_tpl_cache
     );
 
 # initialize options
@@ -30,11 +36,13 @@ my $mysql = '';
 my $doctrine = '';
 my $new_app = 0;
 my $node = '';
+my $misc = '';
 GetOptions(
     'mysql=s' => \$mysql,
     'doctrine=s' => \$doctrine,
     'new_app' => \$new_app,
     'node=s' => \$node,
+    'misc=s' => \$misc
     );
 
 if($mysql)
@@ -48,6 +56,10 @@ elsif($node)
 elsif($doctrine)
 {
     &attempt_call('doctrine_'.$doctrine);
+}
+elsif($misc)
+{
+    &attempt_call('misc_'.$misc);
 }
 elsif($new_app)
 {
@@ -216,5 +228,18 @@ sub node_compile_js
    `$command`;
    unlink('./tmp.js');
 }
+
+sub misc_tpl_cache
+{
+
+    if(! -d TPL_CACHE) {
+        make_path(TPL_CACHE);
+        chmod 0777, TPL_CACHE;
+    }
+    #if [ ! -e ./public_html/elib ]; then
+    #   ln -s ${ELIB_PUBLIC} ./public_html/elib
+    #fi
+}
+
 
 1;

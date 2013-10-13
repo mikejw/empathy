@@ -162,17 +162,30 @@ class Bootstrap
             if($this->environment == 'prod' || $this->debug_mode == false) {     
 
                 if($error == URI::MISSING_CLASS ||
-                    $error == URI::MISSING_EVENT_DEF) { 
-                    throw new RequestException('Not found', RequestException::NOT_FOUND);
+                    $error == URI::MISSING_EVENT_DEF) {
+
+                    if($this->defaultModule != '') {
+                        throw new RequestException('Not found', RequestException::NOT_FOUND);                        
+                    }
                 }
             } else {
                 throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
             }
         }
-        $controller_name = $this->uri->getControllerName();
-        $this->controller = new $controller_name($this);
 
-        if($fake == false) {
+        $controller_name = $this->uri->getControllerName();
+
+        if ($controller_name == 'Empathy\\MVC\\Controller\\') {
+          
+            $_GET['event'] = '';
+            $_GET['class'] = 'Controller';
+
+            $this->controller = new Controller($this);
+        } else {
+            $this->controller = new $controller_name($this);            
+        }
+
+        if($fake == false && $_GET['event'] != '') {
             $event_val = $this->controller->$_GET['event']();
             if ($this->mvc->hasErrors()) {
                 throw new ErrorException($this->mvc->errorsToString());

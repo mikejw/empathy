@@ -79,7 +79,7 @@ class URI
         $this->error = 0;
         $this->processRequest();
         $this->setController();
-        //$this->printRouting();
+        $this->printRouting();
     }
 
     public function getData()
@@ -232,6 +232,7 @@ class URI
         $this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
     }
 
+    // cause of error
     private function setController()
     {
         if (!(isset($_GET['class'])) && isset($_GET['module'])) {
@@ -396,7 +397,7 @@ class URI
     public function sanity($default_module)
     {
         if (!isset($default_module)) {
-            throw new SafeException('Dispatch error: No default module specified');
+            //throw new SafeException('Dispatch error: No default module specified');
         }
         if (!defined('WEB_ROOT')) {
             throw new SafeException('Dispatch error: Web root is not defined');
@@ -406,18 +407,6 @@ class URI
         }
         if (!defined('DOC_ROOT')) {
             throw new SafeException('Dispatch error: Doc root is not defined');
-        }
-        if (!defined('SMARTY_DEBUGGING')) {
-            throw new SafeException('Dispatch error: Smarty debugging is not defined');
-        }
-        if (!defined('TITLE')) {
-            throw new SafeException('Dispatch error: No fallback title is defined');
-        }
-        if (!defined('NAME')) {
-            throw new SafeException('Dispatch error: Web application needs a name');
-        }
-        if (!defined('TPL_BY_CLASS')) {
-            throw new SafeException('Dispatch error: TPL_BY_CLASS is not defined');
         }
     }
 }

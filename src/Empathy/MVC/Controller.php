@@ -101,12 +101,15 @@ class Controller
         $this->module = $_GET['module'];
         $this->class = $_GET['class'];
         $this->event = $_GET['event'];
-        $this->title = TITLE;
 
-        if (TPL_BY_CLASS == 0) {
-            $this->templateFile = $this->module.'.tpl';
-        } else {
+        if(defined('TITLE')) {
+           $this->title = TITLE;           
+        }
+ 
+        if(!defined('TPL_BY_CLASS') || TPL_BY_CLASS) {
             $this->templateFile = $this->class.'.tpl';
+        } else {
+            $this->templateFile = $this->module.'.tpl';
         }
 
         Session::up();
@@ -133,12 +136,17 @@ class Controller
      */
     private function assignConstants()
     {
-        $this->assign('NAME', NAME);
+        if (defined('NAME')) {
+            $this->assign('NAME', NAME);    
+        }
+        if (defined('TITLE')) {
+            $this->assign('TITLE', TITLE);
+        }
+
+        $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('WEB_ROOT', WEB_ROOT);
         $this->assign('PUBLIC_DIR', PUBLIC_DIR);
-        $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('MVC_VERSION', MVC_VERSION);
-        $this->assign('TITLE', TITLE);
     }
 
     /**

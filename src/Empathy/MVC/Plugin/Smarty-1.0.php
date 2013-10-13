@@ -14,7 +14,10 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     public function onPreDispatch()
     {
-        $this->smarty->debugging = SMARTY_DEBUGGING;
+        if(defined('SMARTY_DEBUGGING') && SMARTY_DEBUGGING) {
+            $this->smarty->debugging = true;
+        }
+
         $this->smarty->template_dir = DOC_ROOT."/presentation";
         $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
         $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
@@ -25,10 +28,12 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         }
 
         // assign constants
-        $this->assign('NAME', NAME);
+        if(defined('NAME')) {
+            $this->assign('NAME', NAME);    
+        }
+        $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('WEB_ROOT', WEB_ROOT);
         $this->assign('PUBLIC_DIR', PUBLIC_DIR);
-        $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
 
