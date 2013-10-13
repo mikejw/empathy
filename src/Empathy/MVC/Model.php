@@ -27,7 +27,7 @@ class Model
 
     }
 
-    public static function load($model, $host = null)
+    public static function load($model, $id=null, $params=array(), $host=null)
     {
         $class = '\Empathy\\MVC\\Model\\'.$model;
 
@@ -37,10 +37,15 @@ class Model
         $file = $model.'.php';
         require_once(DOC_ROOT.'/storage/'.$file);
 
-        // prevent auto-connecting
-        $storage_object = new $class(false);
+        $reflect  = new \ReflectionClass($class);
+        $storage_object = $reflect->newInstanceArgs($params);
 
-        self::connectModel($storage_object, $host);
+        // todo: if id is numeric load record!
+
+        if(get_parent_class($storage_object) == 'Empathy\MVC\Entity') {
+            self::connectModel($storage_object, $host);
+            $storage_object->init();
+        }
 
         return $storage_object;
     }

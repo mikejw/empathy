@@ -76,9 +76,13 @@ the default_event function we're going to create an instance of the Hello model 
 
 	public function default_event()
 	{
-		$h = new \Empathy\MVC\Model\Hello('Mike');
+		$h = \Empathy\MVC\Model::load('Hello', null, array('Mike'));
 		$this->assign('hello', $h);
 	}
+
+The key line in this code is the call to 'Model::load'.  The first parameter here is the name of our model class, which resides within the storage directory.  The second argument, which has been set to null, is where an ID may be specified for fetching a specific record from the database with the corresponding ID.  The last argument is an array of parameters that we want to send 
+to model class as it is instantiatetd.  (In the section after this one we will be looking at more advanced uses of the model
+and the native MySQL abstraction functionality that relies on Entity model classes. ->
 
 [to do add a description about the nameing conventions of modules, classes and actions].
 
@@ -96,7 +100,7 @@ If this is set to true then the default behaviour is that it will load a templat
 
 To choose to load a custom named template it is done explicitly.  This is done by using the setTempalte function (which belongs to controller classes). e.g inside our 'default_event' action we could have this code::
 
-	$h = new \Empathy\MVC\Model\Hello('Mike');
+	$h = \Empathy\MVC\Model::load('Hello', null, array('Mike'));
 	$this->assign('hello', $h);
 	$this->setTempalte('my_other_template.tpl');
 

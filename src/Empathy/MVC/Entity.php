@@ -72,24 +72,18 @@ class Entity
         return '\''.date('Y:m:d H:i:s', time()).'\'';
     }
 
+
     /**
      * Instantiates validation object
      * and loads model properties/fields.
-     * Connects to database by default.
-     *
-     * @param boolean $auto_connect Default overall behaviour is that
-     * entity object is created through Model, which handles the connection.
      *
      * @return void
      */
-    public function __construct($auto_connect = true)
+    public function init()
     {
         $this->val = new Validate();
         $this->properties = array();
         $this->loadProperties();
-        if ($auto_connect) {
-            $this->dbConnect();
-        }
     }
 
     /**
