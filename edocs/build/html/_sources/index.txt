@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Empathy's documentation!
-===================================
+Empathy MVC Framework For PHP
+=============================
+
+.. image:: postit.jpg
 
 Contents:
 
@@ -13,6 +15,7 @@ Contents:
 
    intro
    gettingstarted
+   themvc
 
 
 

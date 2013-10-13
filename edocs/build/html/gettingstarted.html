@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,7 +9,7 @@
     
     <title>Getting Started &mdash; Empathy 0.9.5.2 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -50,12 +49,44 @@
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <p>These instructions should help you get familiarised with Empathy by creating
-your first Empathy web application. Talking through its basic configuration
-and setup and explaining the basic inbuilt functionality.</p>
+your first Empathy web application, talking through its basic configuration
+and setup and explaining some basic inbuilt functionality.</p>
 <div class="section" id="creating-your-first-empathy-application">
 <h2>Creating Your First Empathy Application<a class="headerlink" href="#creating-your-first-empathy-application" title="Permalink to this headline">¶</a></h2>
-<p>To create your first app simply create a new empty directory and then paste
-in the following a new file called &#8216;composer.json&#8217;.:</p>
+<p>The first thing to decide is if you are going to use an associated virtual host for your
+new app.  This decision will determine what to set the three most important configuration
+options and it is recomended that you don&#8217;t use a new virtual host if you are going to
+be developing on your local machine or workstation.  The main advantage is that
+if you are working on multiple web apps you don&#8217;t need to remember lots of URLs or
+separate virtual host configuration files (where there might be other config) for simply
+working on websites that you are developing locally.</p>
+<p>Typically Apache will be pre-configured with a default virtual host that is set up to
+serve files under &#8216;/var/www/&#8217; and can be accessed using the URL &#8216;<a class="reference external" href="http://localhost/">http://localhost/</a>&#8216;.
+Using this default it means this is where you should place your apps and then test/debug
+them using the URL:</p>
+<div class="highlight-python"><pre>http://localhost/myapp/</pre>
+</div>
+<p>Althought the real URL will be:</p>
+<div class="highlight-python"><pre>http://localhost/myapp/public_html/</pre>
+</div>
+<p>because the default Empathy directory structure reserves a public direcory where files are
+served from for the sake of security and better organisation.  When it comes to deploying
+the app you can easily setup your webserver to serve from the public directory. i.e.:</p>
+<div class="highlight-python"><pre>http://www.mikejw.com/</pre>
+</div>
+<p>is actually serving files from &#8216;/var/www/mikejw/public_html/&#8217;&#8217; on the server.  So when working
+on this site locally the configuration is the following:</p>
+<div class="highlight-python"><pre>doc_root: /var/www/mikejw
+web_root: localhost/mikejw
+public_dir: /public_html</pre>
+</div>
+<p>and when live the configuration is:</p>
+<div class="highlight-python"><pre>doc_root: /var/www/mikejw
+web_root: mikejw.com
+public_dir:                                     # empty</pre>
+</div>
+<p>To create your first app simply create a new empty directory inside &#8216;/var/www&#8217; (or wherever
+you have decided to serve the app from) and then paste in the following a new file called &#8216;composer.json&#8217;.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
     <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;My first Empathy app.&quot;</span><span class="p">,</span>
     <span class="s">&quot;description&quot;</span><span class="p">:</span> <span class="s">&quot;An empathy web app with all the modern PHP-FIG goodness (hopefully).&quot;</span><span class="p">,</span>
@@ -67,16 +98,89 @@ in the following a new file called &#8216;composer.json&#8217;.:</p>
 </pre></div>
 </div>
 <p>Next install Empathy into the directory by running:</p>
-<div class="highlight-python"><pre>composer install</pre>
+<div class="highlight-python"><pre>$ composer install</pre>
 </div>
+<p>You should now have a directory under &#8216;/var/www/&#8217; e.g. &#8216;/var/www/firstapp&#8217; and inside &#8216;firstapp&#8217; the file
+&#8216;composer.json&#8217; with the above contents. Once the composer install command has been run you will also have a &#8216;composer.lock&#8217;
+file and a new directory called &#8216;vendor&#8217;. (For more information on Composer see <a class="reference external" href="http://getcomposer.org/">http://getcomposer.org/</a>.)</p>
 </div>
 <div class="section" id="configuring">
 <h2>Configuring<a class="headerlink" href="#configuring" title="Permalink to this headline">¶</a></h2>
-<p>Next up is crating the folder structure and configuring the app.</p>
+<p>Next up is creating the folder structure and configuring the app.</p>
 <p>To begin type:</p>
-<div class="highlight-python"><pre>./vendor/bin/empathy --new_app</pre>
+<div class="highlight-python"><pre>$ ./vendor/bin/empathy --new_app</pre>
 </div>
-<p>and answer the questions.</p>
+<p>and answer the questions. This will create the minimal file/folder structure
+for working with Empathy.</p>
+<p>Next put the following into the file called &#8216;config.yml&#8217; file:</p>
+<div class="highlight-python"><pre>---
+doc_root: /opt/local/apache2/htdocs/firstapp    # path to the app
+web_root: localhost/firstapp                    # url for accessing the app locally
+public_dir: /public_html                        # directory where files are actually served from
+
+plugins:
+  - name: Smarty
+    version: 1.0
+    class_path: Smarty/Smarty.class.php
+    class_name: \Smarty
+    loader:</pre>
+</div>
+<p>The Smarty plugin is essential at this stage because it is responsibe for rendering the view - think HTML templates. (As
+of writing there is only one other plugin available for serving the view of an application but it doesn&#8217;t deal
+with HTML.)</p>
+<p>You are now ready to try out the app and see if it works so navigate to:</p>
+<div class="highlight-python"><pre>http://localhost/firstapp/public_html/</pre>
+</div>
+<p>If the app is set up correctly you will see the following error:</p>
+<div class="highlight-python"><pre>Fatal error: Smarty error: the $compile_dir '...' does not exist, or is not a directory...</pre>
+</div>
+<p>To fix this we need to create the template cache directory for Smarty and we do this with this shortcut command:</p>
+<div class="highlight-python"><pre>./vendor/bin/empathy --misc tpl_cache</pre>
+</div>
+<p>(This creates the directory path and chmods the cache directory to fully writable.)</p>
+<p>If you run this command and try navigating to the above URL you should now see a &#8216;Success!&#8217; message.</p>
+<p>Finally Empathy relies on Apache &#8216;mod_rewrite&#8217; for routing URLs so the recommened aproach is to first of all
+ensure that the AllowOverride directive has been set to &#8216;All&#8217; for your current virtual host.  See
+<a class="reference external" href="http://httpd.apache.org/docs/2.2/mod/core.html#allowoverride">http://httpd.apache.org/docs/2.2/mod/core.html#allowoverride</a> for more info. Once this is done we can create our &#8216;.htaccess&#8217; file
+that will enable &#8216;mod_rewite&#8217; and set up the simple rules.  The .htaccess file needs to live in the &#8216;public_dir&#8217; folder, typically called &#8216;public_html&#8217;, alongside the &#8216;index.php&#8217; file.</p>
+<p>The contents of this file will be:</p>
+<div class="highlight-python"><pre>RewriteEngine on
+RewriteBase /firstapp/public_html/
+
+RewriteRule ^([_a-z0-9-]/*)*$ index.php</pre>
+</div>
+<p>To test this is working we need to add the following configuration block to the &#8216;config.yml&#8217; file:</p>
+<div class="highlight-python"><pre>boot_options:
+  environment: dev
+  handle_errors: true
+  debug_mode: true</pre>
+</div>
+<p>The file now should look like this:</p>
+<div class="highlight-python"><pre>---
+doc_root: /opt/local/apache2/htdocs/first       # path to the app
+web_root: moonchild/first                       # url for accessing the app locally
+public_dir: /public_html                        # directory where files are actually served from
+
+plugins:
+  - name: Smarty
+    version: 1.0
+    class_path: Smarty/Smarty.class.php
+    class_name: \Smarty
+    loader:
+
+boot_options:
+  handle_errors: true
+  environment: dev
+  debug_mode: true</pre>
+</div>
+<p>Now navigate to the following URL:</p>
+<div class="highlight-python"><pre>http://localhost/firstapp/public_html/foo</pre>
+</div>
+<p>and you should see the following error:</p>
+<div class="highlight-python"><pre>Dispatch error 1 : Missing class file</pre>
+</div>
+<p>This means Empathy was unable to map the URL to anything inside the application.  What we expect!
+Before learning about routing it is recommended that you read the next section which is about the MVC itself.</p>
 </div>
 </div>
 
