@@ -29,12 +29,30 @@ Next install Empathy into the directory by running::
 
 Configuring
 -----------
-Next up is crating the folder structure and configuring the app.
+Next up is creating the folder structure and configuring the app.
 
 To begin type::
 
     ./vendor/bin/empathy --new_app
 
-and answer the questions.
+and answer the questions. This will create the minimal file/folder structure
+for working with Empathy.
+
+Next put the following into your config.yml file:: 
+
+	---
+	doc_root: /opt/local/apache2/htdocs/first
+	web_root: moonchild/first
+	public_dir: /public_html
+
+	plugins:
+  	  - name: Smarty
+        version: 1.0
+        class_path: Smarty/Smarty.class.php
+        class_name: \Smarty
+        loader:
+
+
+
 
 

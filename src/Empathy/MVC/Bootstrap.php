@@ -163,10 +163,7 @@ class Bootstrap
 
                 if($error == URI::MISSING_CLASS ||
                     $error == URI::MISSING_EVENT_DEF) {
-
-                    if($this->defaultModule != '') {
-                        throw new RequestException('Not found', RequestException::NOT_FOUND);                        
-                    }
+                        throw new RequestException('Not found', RequestException::NOT_FOUND);
                 }
             } else {
                 throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
@@ -174,23 +171,20 @@ class Bootstrap
         }
 
         $controller_name = $this->uri->getControllerName();
-
-        if ($controller_name == 'Empathy\\MVC\\Controller\\') {
-          
-            $_GET['event'] = '';
-            $_GET['class'] = 'Controller';
-
-            $this->controller = new Controller($this);
-        } else {
-            $this->controller = new $controller_name($this);            
-        }
-
-        if($fake == false && $_GET['event'] != '') {
+        $this->controller = new $controller_name($this);            
+        
+        if($fake == false) {
             $event_val = $this->controller->$_GET['event']();
             if ($this->mvc->hasErrors()) {
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($event_val !== false) {
-                $this->display(false);
+
+                if($this->uri->getInternal()) {
+                    $this->controller->setTemplate('../empathy.tpl');
+                    $this->display(true);
+                } else {
+                    $this->display(false);                    
+                }
             }
         }
     }

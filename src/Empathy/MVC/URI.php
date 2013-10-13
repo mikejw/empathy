@@ -57,6 +57,7 @@ class URI
     private $controllerPath = '';
     private $controllerName = '';
     private $cli_mode_detected;
+    private $internal_controller = 'empathy';
 
     public function __construct($default_module, $dynamic_module)
     {
@@ -79,7 +80,7 @@ class URI
         $this->error = 0;
         $this->processRequest();
         $this->setController();
-        $this->printRouting();
+        //$this->printRouting();
     }
 
     public function getData()
@@ -118,7 +119,13 @@ class URI
         if (isset($_GET['module'])) {
             $this->setModule($_GET['module']);
         } elseif ($this->uriString == '') { // || strpos($this->uriString, '.')) {
-            $this->setModule($this->defaultModule);
+
+            if($this->defaultModule === null) {
+
+                $this->setModule($this->internal_controller);
+            } else {
+                $this->setModule($this->defaultModule);    
+            }
         } else {
             $this->formURI();
             $this->analyzeURI();
@@ -244,7 +251,8 @@ class URI
             $this->setControllerPath();
         }
 
-        if (!is_file($this->controllerPath)) {
+        if (!$this->internal && !is_file($this->controllerPath)) {
+
             if (isset($_GET['class'])) {
                 $_GET['event'] = $_GET['class'];
             }
@@ -255,6 +263,7 @@ class URI
                 $this->controllerName = $_GET['module'];
                 $this->setControllerPath();
             }
+
             if (!is_file($this->controllerPath)) {
                 $this->error = URI::MISSING_CLASS;
             }
@@ -263,10 +272,11 @@ class URI
         $this->controllerName = 'Empathy\\MVC\\Controller\\'.$this->controllerName;
 
         if (!$this->error) {
+            require_once(DOC_ROOT.'/application/CustomController.php');
+            
             if (!class_exists($this->controllerName)) {
                 // try manual include
-                // make sure custom controller has been loaded
-                require_once(DOC_ROOT.'/application/CustomController.php');
+                // make sure custom controller has been loaded   
                 @include($this->controllerPath);
                 if (!class_exists($this->controllerName)) {
                     $this->error = URI::MISSING_CLASS_DEF;
@@ -396,9 +406,6 @@ class URI
 
     public function sanity($default_module)
     {
-        if (!isset($default_module)) {
-            //throw new SafeException('Dispatch error: No default module specified');
-        }
         if (!defined('WEB_ROOT')) {
             throw new SafeException('Dispatch error: Web root is not defined');
         }
@@ -409,4 +416,10 @@ class URI
             throw new SafeException('Dispatch error: Doc root is not defined');
         }
     }
+
+    public function getInternal()
+    {
+        return $this->internal;
+    }
+
 }
