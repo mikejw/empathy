@@ -102,7 +102,7 @@ You are now ready to try out the app and see if it works so navigate to::
 
     http://localhost/firstapp/public_html/
 
-If the app is set up correctly you will see the following error::
+If the app is set up correctly at this point you will see the following error::
 
     Fatal error: Smarty error: the $compile_dir '...' does not exist, or is not a directory...
 
@@ -114,7 +114,7 @@ To fix this we need to create the template cache directory for Smarty and we do 
 
 If you run this command and try navigating to the above URL you should now see a 'Success!' message.
 
-Finally Empathy relies on Apache 'mod_rewrite' for routing URLs so the recommened aproach is to first of all
+Finally, Empathy relies on Apache 'mod_rewrite' for routing URLs so the recommened aproach is to first of all
 ensure that the AllowOverride directive has been set to 'All' for your current virtual host.  See 
 http://httpd.apache.org/docs/2.2/mod/core.html#allowoverride for more info. Once this is done we can create our '.htaccess' file
 that will enable 'mod_rewite' and set up the simple rules.  The .htaccess file needs to live in the 'public_dir' folder, typically called 'public_html', alongside the 'index.php' file.
@@ -133,7 +133,7 @@ To test this is working we need to add the following configuration block to the 
       handle_errors: true 
       debug_mode: true
 
-The file now should look like this::
+The complete config file should now look like this::
 
     ---
     doc_root: /opt/local/apache2/htdocs/first       # path to the app
@@ -160,7 +160,7 @@ and you should see the following error::
 
     Dispatch error 1 : Missing class file
 
-This means Empathy was unable to map the URL to anything inside the application.  What we expect!
+This means Empathy was unable to map the URL to anything inside the application.  This is what we expect.
 Before learning about routing it is recommended that you read the next section which is about the MVC itself.
 
 
