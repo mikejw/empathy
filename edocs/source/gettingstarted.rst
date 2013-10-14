@@ -129,7 +129,6 @@ The contents of this file will be::
 To test this is working we need to add the following configuration block to the 'config.yml' file::
 
     boot_options:
-      environment: dev
       handle_errors: true 
       debug_mode: true
 
@@ -149,7 +148,6 @@ The complete config file should now look like this::
     
     boot_options:
       handle_errors: true
-      environment: dev
       debug_mode: true
 
 Now navigate to the following URL::

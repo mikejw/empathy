@@ -16,7 +16,12 @@ Contents:
    intro
    gettingstarted
    themvc
-
+   routing
+   advancedmodels
+   extensions-elib-base
+   extensions-elib-blog
+   extensions-elib-cms
+   
 
 
     
