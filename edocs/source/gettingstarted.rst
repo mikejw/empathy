@@ -2,54 +2,53 @@
 Getting Started
 ===============
 
-These instructions should help you get familiarised with Empathy by creating
-your first Empathy web application, talking through its basic configuration
-and setup and explaining some basic inbuilt functionality.
-
 
 Creating Your First Empathy Application
 ---------------------------------------
 
 The first thing to decide is if you are going to use an associated virtual host for your
-new app.  This decision will determine what to set the three most important configuration
-options and it is recomended that you don't use a new virtual host if you are going to
+new application.  This decision will determine what to set the three most important configuration
+options outlined below. It is recomended that you don't use a new virtual host if you are going to
 be developing on your local machine or workstation.  The main advantage is that 
-if you are working on multiple web apps you don't need to remember lots of URLs or
-separate virtual host configuration files (where there might be other config) for simply
-working on websites that you are developing locally.
+if you are working on multiple projects at once you will not need to remember lots of URLs and
+locations of websever configuration files.
 
-Typically Apache will be pre-configured with a default virtual host that is set up to
-serve files under '/var/www/' and can be accessed using the URL 'http://localhost/'.
-Using this default it means this is where you should place your apps and then test/debug
-them using the URL::
+Typically with Apache your machine will be pre-configured with a default virtual host
+that is set up to serve files under :file:`/var/www/` and can be accessed using the URL
+'http://localhost/'. Using this default means that this is where you should place your application
+and then test it using the URL::
 
     http://localhost/myapp/
 
-Althought the real URL will be::
+However the real URL will be::
 
     http://localhost/myapp/public_html/
 
-because the default Empathy directory structure reserves a public direcory where files are
-served from for the sake of security and better organisation.  When it comes to deploying 
-the app you can easily setup your webserver to serve from the public directory. i.e.::
+This is due to the default Empathy directory structure reserving a :term:`public direcory` where files are
+served from, for the sake of security and better organisation.  When it comes to deploying 
+the application you can easily configure your webserver to serve from the public directory itself.
+As an example consider the URL for my blog::
 
     http://www.mikejw.com/
-is actually serving files from '/var/www/mikejw/public_html/'' on the server.  So when working 
-on this site locally the configuration is the following::
+This is an Empathy application that has been set up with Apache to have files served
+from :file:`/var/www/mikejw/public_html/` on the server.  So in its live environment the configuration is::
+
+    doc_root: /var/www/mikejw
+    web_root: www.mikejw.com
+    public_dir:                                     # empty
+
+
+When working on this site locally the configuration is the following::
 
     doc_root: /var/www/mikejw
     web_root: localhost/mikejw
     public_dir: /public_html
 
-and when live the configuration is::
-
-    doc_root: /var/www/mikejw
-    web_root: mikejw.com
-    public_dir:                                     # empty
 
 
-To create your first app simply create a new empty directory inside '/var/www' (or wherever
-you have decided to serve the app from) and then paste in the following a new file called :file:`composer.json`.::
+So assuming the recommended configuration with Apache, create your first application create a new empty directory inside '/var/www' (or wherever
+you have decided to have it served from) and then paste the following into a new file called
+:file:`composer.json`.::
 
     {
         "name": "My first Empathy app.",
@@ -72,7 +71,7 @@ on Composer see http://getcomposer.org/.)
 
 Configuring
 -----------
-Next up is creating the folder structure and configuring the app.
+Next up is creating the folder structure and configuring.
 
 To begin type::
 
