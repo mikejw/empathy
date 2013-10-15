@@ -49,7 +49,7 @@ and when live the configuration is::
 
 
 To create your first app simply create a new empty directory inside '/var/www' (or wherever
-you have decided to serve the app from) and then paste in the following a new file called 'composer.json'.::
+you have decided to serve the app from) and then paste in the following a new file called :file:`composer.json`.::
 
     {
         "name": "My first Empathy app.",
@@ -64,9 +64,11 @@ Next install Empathy into the directory by running::
 
     $ composer install
 
-You should now have a directory under '/var/www/' e.g. '/var/www/firstapp' and inside 'firstapp' the file 
-'composer.json' with the above contents. Once the composer install command has been run you will also have a 'composer.lock' 
-file and a new directory called 'vendor'. (For more information on Composer see http://getcomposer.org/.)
+You should now have a directory under '/var/www/' e.g. '/var/www/firstapp' and inside 'firstapp' the file
+:file:`composer.json` with the above contents. Once the composer install command has been run you will also
+have a :file:`composer.lock` file and a new directory called :file:`vendor`. (For more information
+on Composer see http://getcomposer.org/.)
+
 
 Configuring
 -----------
@@ -79,7 +81,7 @@ To begin type::
 and answer the questions. This will create the minimal file/folder structure
 for working with Empathy.
 
-Next put the following into the file called 'config.yml' file:: 
+Next put the following into the file called :file:`config.yml`:: 
 
     ---
     doc_root: /opt/local/apache2/htdocs/firstapp    # path to the app
@@ -114,10 +116,12 @@ To fix this we need to create the template cache directory for Smarty and we do 
 
 If you run this command and try navigating to the above URL you should now see a 'Success!' message.
 
-Finally, Empathy relies on Apache 'mod_rewrite' for routing URLs so the recommened aproach is to first of all
-ensure that the AllowOverride directive has been set to 'All' for your current virtual host.  See 
-http://httpd.apache.org/docs/2.2/mod/core.html#allowoverride for more info. Once this is done we can create our '.htaccess' file
-that will enable 'mod_rewite' and set up the simple rules.  The .htaccess file needs to live in the 'public_dir' folder, typically called 'public_html', alongside the 'index.php' file.
+Finally, Empathy relies on Apache :term:`mod_rewrite` for routing URLs so the recommened aproach is to first of all
+ensure that the :term:`AllowOverride` directive has been set to 'All' for your current virtual host.  See 
+http://httpd.apache.org/docs/2.2/mod/core.html#allowoverride for more info. Once this is done we can create our
+:file:`.htaccess` file that will enable :term:`mod_rewite` and set up the simple rules.  The :file:`.htaccess`
+file needs to live in the :term:`public_dir` directory, typically called :file:`public_html`, alongside the
+:file:`index.php` file.
 
 The contents of this file will be::
 
@@ -126,7 +130,7 @@ The contents of this file will be::
 
     RewriteRule ^([_a-z0-9-]/*)*$ index.php
 
-To test this is working we need to add the following configuration block to the 'config.yml' file::
+To test this is working we need to add the following configuration block to the :file:`config.yml` file::
 
     boot_options:
       handle_errors: true 
