@@ -47,8 +47,8 @@ When working on this site locally the configuration is the following::
     web_root: localhost/mikejw
     public_dir: /public_html
 
-
-So assuming the recommended configuration with Apache, create your first
+The reason this is important is so that [routing] works correctly. So
+assuming the recommended configuration with Apache, create your first
 application create a new empty directory inside :file:`/var/www` (or wherever
 you have decided to have it served from) and then paste the following into a
 new file called :file:`composer.json`.::
