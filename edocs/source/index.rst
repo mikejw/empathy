@@ -18,6 +18,7 @@ Contents:
    themvc
    routing
    advancedmodels
+   plugins
    extensions-elib-base
    extensions-elib-blog
    extensions-elib-cms
