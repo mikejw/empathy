@@ -1,20 +1,24 @@
 #!/usr/bin/perl
+
 use strict;
 use warnings;
 use Cwd qw/abs_path getcwd/;
 use Data::Dumper;
 use YAML::Tiny;
 use Getopt::Long;
+use File::Path 'make_path';
 
-
+use constant TPL_CACHE => './tpl/templates_c';
+use constant ELIB_PUBLIC => '../vendor/mikejw/elib-base/public'; # relative to directory where symlink is created
 
 
 my $lib_path = "./vendor/mikejw/empathy";
 
 # get empathy config
+our $app_config_yaml;
 my %config = &read_global_config();
 my %app_config = &read_app_config();
-my $app_config_yaml;
+
 
 my %actions = (
     mysql_setup => \&mysql_setup,
@@ -23,64 +27,83 @@ my %actions = (
     mysql_extra => \&mysql_extra,
     doctrine_gen_models => \&doctrine_gen_models,
     doctrine_gen_yaml => \&doctrine_gen_yaml,
-    doctrine_generate => \&doctrine_generate
+    doctrine_generate => \&doctrine_generate,
+    node_compile_less => \&node_compile_less,
+    node_compile_js => \&node_compile_js,
+    misc_tpl_cache => \&misc_tpl_cache
 );
 
 # initialize options
 my $mysql = '';
 my $doctrine = '';
 my $new_app = 0;
-
+my $node = '';
+my $misc = '';
 GetOptions(
     'mysql=s' => \$mysql,
     'doctrine=s' => \$doctrine,
-    'new_app' => \$new_app
+    'new_app' => \$new_app,
+    'node=s' => \$node,
+    'misc=s' => \$misc
 );
 
-my $call;
-
 if($mysql) { 
-    $call = 'mysql_'.$mysql;
-    if(defined($actions{$call})) {   
-        $actions{$call}->();
-    } else {
-        die "No can do. Exiting...\n";
-    }
+    &attempt_call('mysql_'.$mysql);
+
+} elsif($node) {
+    &attempt_call('node_'.$node);
+
 } elsif($doctrine) {
-    $call = 'doctrine_'.$doctrine;
-    if(defined($actions{$call})) {
-        $actions{$call}->();
-    } else {
-        die "No can do. Exiting...\n";
-    }
+    &attempt_call('doctrine_'.$doctrine);
+
+} elsif($misc) {
+    &attempt_call('misc_'.$misc);
+
 } elsif($new_app) {
     my $name = '';
     my $web_root = '';
-    my $doc_root = '';
+    my $tmp_web_root;
+    my $tmp_doc_root = '';
+    my $doc_root = getcwd;
+    my @doc_root_arr;
+    my $tmp_name;
 
-    print "New app name: ";
-    chomp ($name = <>);
-    print "Web root: ";
-    chomp ($web_root = <>);
-    
-    # old 'system mode'
-    #$doc_root = `pwd`.$name;
-    #`cp $lib_path/data/Empathy/eaa.zip .`;
-    #`unzip eaa.zip`;
-    #`mv eaa $name`;
+    print "New app doc root [$doc_root]: ";
+    chomp ($tmp_doc_root = <>);
+
+    if(!$tmp_doc_root eq '') {
+        $doc_root = $tmp_doc_root;
+    }
+
+    @doc_root_arr = split(/\//, $doc_root);
+    $name = $doc_root_arr[@doc_root_arr-1]; 
+    $web_root = 'localhost/'.$doc_root_arr[@doc_root_arr-1];
+
+    print "New app name: [$name]: ";
+    chomp ($tmp_name = <>);
+
+    if(!$tmp_name eq '') {
+        $name = $tmp_name;
+    }
+
+    print "Web root: [$web_root]: ";
+    chomp ($tmp_web_root = <>);
+  
+    if(!$tmp_web_root eq '') {
+        $web_root = $tmp_web_root;
+    }
 
     `cp -r $lib_path/eaa/* .`;
-    print "Done.\n";
-    
-    &read_app_config(); # call read config again
 
-    # config
+    # new stuff...
+    &read_app_config(); # call read config again
     $app_config_yaml->[0]->{'name'} = $name;
     $app_config_yaml->[0]->{'web_root'} = $web_root;
-    $app_config_yaml->[0]->{'doc_root'} = getcwd;
+    $app_config_yaml->[0]->{'doc_root'} = $doc_root;
 
-    #print Dumper($app_config_yaml);
     $app_config_yaml->write('config.yml');
+
+    print "Done.\n";
 }
 
 
@@ -89,6 +112,17 @@ if($mysql) {
 
 
 # functions...
+sub attempt_call()
+{
+    my ($call) = @_;
+    if(defined($actions{$call})) {
+
+	   $actions{$call}->();
+    } else {
+
+	   die "No can do. Exiting...\n";
+    }
+}
 
 sub doctrine_generate()
 {
@@ -104,9 +138,10 @@ sub doctrine_gen_models()
 sub doctrine_gen_yaml()
 {
     if(!-d './models') {
-        die("Doctrine models directory does not exist. Exiting...\n");
+	   die("Doctrine models directory does not exist. Exiting...\n");
+
     } else {    
-        &exec_app('doctrine_yaml');
+	   &exec_app('doctrine_yaml');
     }
 }
 
@@ -118,7 +153,7 @@ sub mysql_setup()
 sub mysql_populate()
 {
     &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' '.$app_config{'db_name'}.' < dump.sql');  
+    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' '.$app_config{'db_name'}.' < dump.sql');	
 }
 sub mysql_extra()
 {
@@ -147,12 +182,13 @@ sub read_global_config
 {
     my %config;
     my $yaml = YAML::Tiny->read($lib_path.'/config.yml');
+
     %config = (
         mysql => $yaml->[0]->{'mysql'},
         mysql_dump => $yaml->[0]->{'mysql_dump'},
         ffmpeg => $yaml->[0]->{'ffmpeg'},
-        perl => $yaml->[0]->{'perl'}
-    );
+	   perl => $yaml->[0]->{'perl'}
+	);
 }
 sub read_app_config
 {
@@ -162,25 +198,73 @@ sub read_app_config
     $app_config_yaml = $yaml;
 
     if(!defined($yaml->[0]->{'db_pass'})) {
-        $yaml->[0]->{'db_pass'} = '';
+	   $yaml->[0]->{'db_pass'} = '';
     }
-
     %app_config = (
-        name => $yaml->[0]->{'name'},
-        title => $yaml->[0]->{'title'},
-        doc_root => $yaml->[0]->{'doc_root'},
-        web_Root => $yaml->[0]->{'web_root'},
-        public_dir => $yaml->[0]->{'public_dir'},
-        db_server => $yaml->[0]->{'db_server'},
-        db_user => $yaml->[0]->{'db_user'},
-        db_pass => $yaml->[0]->{'db_pass'},
-        db_name => $yaml->[0]->{'db_name'},
-        tbl_prefix => $yaml->[0]->{'tbl_prefix'},
-        tpl_by_class => $yaml->[0]->{'tpl_by_class'},
-        boot_options => $yaml->[0]->{'boot_options'},
-        smarty_debugging => $yaml->[0]->{'smarty_debugging'},
-        plugins => $yaml->[0]->{'plugins'}
-    );   
+    	name =>	$yaml->[0]->{'name'},
+    	title => $yaml->[0]->{'title'},
+    	doc_root => $yaml->[0]->{'doc_root'},
+    	web_Root => $yaml->[0]->{'web_root'},
+    	public_dir => $yaml->[0]->{'public_dir'},
+    	db_server => $yaml->[0]->{'db_server'},
+    	db_user => $yaml->[0]->{'db_user'},
+    	db_pass => $yaml->[0]->{'db_pass'},
+    	db_name => $yaml->[0]->{'db_name'},
+    	tbl_prefix => $yaml->[0]->{'tbl_prefix'},
+    	tpl_by_class => $yaml->[0]->{'tpl_by_class'},
+    	boot_options => $yaml->[0]->{'boot_options'},
+    	smarty_debugging => $yaml->[0]->{'smarty_debugging'},
+    	plugins => $yaml->[0]->{'plugins'}
+	);   
+}
+
+sub node_compile_less
+{
+    my $css;
+    my $css_dir = "./public_html/css/less";
+    my $less_command = "./node_modules/.bin/lessc --yui-compress";    
+    my $less_files = $css_dir.'/*.less';
+    my @src_files = glob $less_files;
+    foreach my $file (@src_files) {	
+        $_ = $file;
+    	s/\.less$/.css/;
+        $css = $_;
+        my $command = "$less_command $file $css";
+        `$command`;	
+    }
+    my $init_css = "./public_html/elib/init.min.css";
+    `cat $init_css $css > ./tmp.css; mv tmp.css $css`;
+}
+
+sub node_compile_js
+{
+   my $yui_command = "./node_modules/.bin/yuicompressor";
+   my $js_dir = "./public_html/js";
+
+   `cat $js_dir/common.js $js_dir/mikejw.js > ./tmp.js`;
+   
+   #$_ = $js;
+   #s/\.js$/_ob.js/;
+   #my $o_js = $_;
+
+   my $o_js = $js_dir.'/mikejw.min.js';
+
+   my $command = "$yui_command -o $o_js ./tmp.js";
+   `$command`;
+   unlink('./tmp.js');
+}
+
+sub misc_tpl_cache
+{
+
+    if(! -d TPL_CACHE) {
+        make_path(TPL_CACHE);
+        chmod 0777, TPL_CACHE;
+    }
+    #if [ ! -e ./public_html/elib ]; then
+    #   ln -s ${ELIB_PUBLIC} ./public_html/elib
+    #fi
 }
 
 
+1;

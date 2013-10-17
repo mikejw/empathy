@@ -3,11 +3,9 @@ name: eaa
 doc_root: /var/www/eaa
 web_root: localhost/eaa
 public_dir: /public_html
-
 boot_options:
   handle_errors: true
   debug_mode: true
-
 plugins:
   - name: Smarty
     version: 1.0
