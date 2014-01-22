@@ -30,6 +30,11 @@ class Redbean extends Plugin implements PreDispatch
         if (!$this->isIP(DB_SERVER)) {
             throw new \Empathy\Exception('Database server must be an IP address.');
         }
-        \R::setup('mysql:host='.DB_SERVER.';dbname='.DB_NAME, DB_USER, DB_PASS);
+
+        $dsn = 'mysql:host='.DB_SERVER.';dbname='.DB_NAME;
+        if(defined(DB_PORT) && is_numeric(DB_PORT)) {
+            $dsn .= 'port='.DB_PORT.';';
+        }
+        \R::setup($dsn, DB_USER, DB_PASS);
     }
 }

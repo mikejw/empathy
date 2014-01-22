@@ -36,9 +36,9 @@ class DBPool
    * @return void
    */
 
-  public static function addHost($s, $n, $u, $p, $host)
+  public static function addHost($s, $n, $u, $p, $host, $port=null)
   {
-    self::$pool[$host] = new DBC($s, $n, $u, $p);
+    self::$pool[$host] = new DBC($s, $n, $u, $p, $port);
   }
 
   /**
@@ -75,7 +75,14 @@ class DBPool
   public static function getDefCX()
   {
     if (sizeof(self::$pool) < 1) {
-    self::addHost(DB_SERVER, DB_NAME, DB_USER, DB_PASS, 'default');
+        if(defined(DB_PORT) && is_numeric(DB_PORT)) {
+
+          self::addHost(DB_SERVER, DB_NAME, DB_USER, DB_PASS, 'default');
+
+        } else {
+          
+          self::addHost(DB_SERVER, DB_NAME, DB_USER, DB_PASS, 'default', DB_PORT);
+        }
       }
 
     return self::getConnection('default');

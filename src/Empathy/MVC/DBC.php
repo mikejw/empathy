@@ -4,10 +4,10 @@ namespace Empathy\MVC;
 
 /**
  * Empathy Database Connection
- * @file			Empathy/DBC.php
- * @description		Instance of an Empathy database connection. (Supports MySQL only.)
- * @author			Mike Whiting
- * @license			LGPLv3
+ * @file      Empathy/DBC.php
+ * @description   Instance of an Empathy database connection. (Supports MySQL only.)
+ * @author      Mike Whiting
+ * @license     LGPLv3
  *
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
@@ -20,7 +20,7 @@ class DBC
    * IP address of database server to connect to.
    *
    */
-  private $server;
+   private $server;
 
   /**
    * Name of database.
@@ -38,6 +38,12 @@ class DBC
   private $pass;
 
   /**
+   * Database port
+   */
+  private $port;
+
+
+  /**
    * Handle for connection produced by PDO.
    */
   private $handle;
@@ -53,16 +59,25 @@ class DBC
    *
    * @param string $p database password.
    *
+   * @param int $port database port.
+   *
    * @return void.
    */
-  public function __construct($s, $n, $u, $p)
+  public function __construct($s, $n, $u, $p, $port)
   {
     $this->server = $s;
     $this->name = $n;
     $this->user = $u;
     $this->pass = $p;
-    $this->handle = new \PDO('mysql:host='.$this->server.';dbname='.$this->name,
-                     $this->user, $this->pass);
+    $this->port = $port;
+
+    $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';';
+    if($this->port !== null) {
+        $dsn .= 'port='.$this->port.';';
+    }
+
+    $this->handle = new \PDO(
+      $dsn, $this->user, $this->pass);
   }
 
   /**
