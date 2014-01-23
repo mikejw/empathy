@@ -75,13 +75,10 @@ class DBPool
   public static function getDefCX()
   {
     if (sizeof(self::$pool) < 1) {
-        if(defined(DB_PORT) && is_numeric(DB_PORT)) {
-
-          self::addHost(DB_SERVER, DB_NAME, DB_USER, DB_PASS, 'default');
-
-        } else {
-          
+        if(defined('DB_PORT') && is_numeric(DB_PORT)) {
           self::addHost(DB_SERVER, DB_NAME, DB_USER, DB_PASS, 'default', DB_PORT);
+        } else {
+          self::addHost(DB_SERVER, DB_NAME, DB_USER, DB_PASS, 'default');
         }
       }
 
