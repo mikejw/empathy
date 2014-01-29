@@ -91,7 +91,7 @@ class Entity
      *
      * @return integer $id
      */
-    protected function insertId()
+    public function insertId()
     {
         return $this->dbh->lastInsertId();
     }
@@ -156,8 +156,11 @@ class Entity
            throw new SafeException('DB Error: No database password');
            }
         */
-        $this->dbh = new \PDO('mysql:host='.DB_SERVER.';dbname='.DB_NAME,
-                              DB_USER, DB_PASS);
+        $dsn = 'mysql:host='.DB_SERVER.';dbname='.DB_NAME.';';
+        if(defined('DB_PORT') && is_numeric(DB_PORT)) {
+            $dsn .= 'port='.DB_PORT.';';
+        }
+        $this->dbh = new \PDO($dsn, DB_USER, DB_PASS);
     }
 
     /**
