@@ -22,5 +22,5 @@
             "Empathy": "src/"
         }
     },
-    "bin": [ "bin/empathy" ]   
+    "bin": [ "bin/empathy", "bin/empathyp" ]   
 }

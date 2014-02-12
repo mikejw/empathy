@@ -1,0 +1,38 @@
+<?php
+
+if(false == @include('./vendor/autoload.php')) {
+
+    die('Please install composer deps.');
+} else {
+
+    $arguments = new \cli\Arguments(array('strict' => false));
+
+    $arguments->addFlag(array('help', 'h'), 'Show this help screen');
+    $arguments->addFlag(array('new_app', 'n'), 'Create new app.');
+    $arguments->addFlag('version', 'Display the MVC version.');
+
+    $arguments->addOption(array('mysql', 'm'), array(
+                              'default'     => 'dump',
+                              'description' => 'Perform MySQL operation. Default is database dump.'));
+
+    $arguments->addOption('node', array(
+                              'default'     => null,
+                              'description' => 'Perform node.js operation.'));
+
+    $arguments->addOption('misc', array(
+                              'default'     => null,
+                              'description' => 'Perform misc operation.'));
+
+    $arguments->parse();
+    if($arguments['help']) {
+        \cli\out_padded($arguments->getHelpScreen());
+        //echo $arguments->getHelpScreen();
+        \cli\out_padded("\n");
+        //echo "\n\n";
+    }
+
+    //echo $arguments->asJSON() . "\n";
+    
+    
+
+}
