@@ -15,7 +15,8 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "wp-cli/php-cli-tools": "v0.9.3"
+        "wp-cli/php-cli-tools": "v0.9.3",
+        "mustangostang/spyc": "0.5.1"
     },
     "autoload": {
         "psr-0": {

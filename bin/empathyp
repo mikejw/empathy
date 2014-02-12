@@ -1,6 +1,10 @@
 <?php
 
 
+define('TPL_CACHE', './tpl/templates_c');
+define('LIB_PATH', './vendor/mikejw/empathy');
+define('ELIB_PUBLIC', '../vendor/mikejw/elib-base/public'); # relative to directory where symlink is created
+
 
 if(false == @include('./vendor/autoload.php')) {
 
@@ -28,13 +32,7 @@ if(false == @include('./vendor/autoload.php')) {
     $arguments->parse();
     if($arguments['help']) {
         \cli\out_padded($arguments->getHelpScreen());
-        //echo $arguments->getHelpScreen();
         \cli\out_padded("\n");
-        //echo "\n\n";
     }
-
-    //echo $arguments->asJSON() . "\n";
-    
-    
 
 }
