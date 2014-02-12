@@ -1,7 +1,7 @@
 ---
-mysql: /opt/local/bin/mysql5
-mysql_dump: /opt/local/bin/mysqldump5
-perl: /opt/local/bin/perl
+mysql: /usr/bin/mysql
+mysql_dump: /usr/bin/mysqldump
+perl: /usr/bin/perl
 ffmpeg: /usr/bin/ffmpeg
 makepasswd: /usr/bin/makepasswd
 
