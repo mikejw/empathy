@@ -97,6 +97,11 @@ function new_app()
 
     recursive_copy(LIB_PATH.'/eaa', './', $name);
 
+    $access_file = './public_html/htaccess';
+    $access = str_replace('WEB_ROOT', $name.'/public_html/', file_get_contents($access_file));
+    file_put_contents(str_replace('htaccess', '.htaccess', $access_file), $access);
+    unlink($access_file);
+
     # new stuff...
     $cfg = read_app_config(); # call read config again
     $cfg['name'] = $name;

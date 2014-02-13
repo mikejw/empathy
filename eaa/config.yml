@@ -5,10 +5,17 @@ web_root: localhost/eaa
 public_dir: /public_html
 boot_options:
   handle_errors: true
+  default_module: front
+  use_elib: false
+  environment: dev
   debug_mode: true
 plugins:
-  - name: Smarty
+  -
+    name: Smarty
     version: 1.0
     class_path: Smarty/Smarty.class.php
     class_name: \Smarty
     loader:
+  -
+    name: EDefault
+    version: 1.0
