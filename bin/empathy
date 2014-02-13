@@ -6,6 +6,11 @@ if(false == @include('./vendor/autoload.php')) {
     die('Please install composer deps.');
 }
 
+if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    define('SEPARATOR', '\\');
+} else {
+    define('SEPARATOR', '/');
+}
 define('TPL_CACHE', './tpl/templates_c');
 define('LIB_PATH', './vendor/mikejw/empathy');
 define('ELIB_PUBLIC', '../vendor/mikejw/elib-base/public'); # relative to directory where symlink is created
@@ -58,7 +63,7 @@ function new_app()
         $doc_root = $tmp_doc_root;
     }
 
-    $doc_root_arr = explode('/', $doc_root);
+    $doc_root_arr = explode(SEPARATOR, $doc_root);
     $name = $doc_root_arr[sizeof($doc_root_arr) - 1]; 
     $web_root = 'localhost/'.$name;
     $tmp_name = \cli\prompt("Please enter name: [$name]", $name);    
