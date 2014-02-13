@@ -15,7 +15,7 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "wp-cli/php-cli-tools": "v0.9.3",
+        "wp-cli/php-cli-tools": "dev-master",
         "mustangostang/spyc": "0.5.1"
     },
     "autoload": {
@@ -23,5 +23,6 @@
             "Empathy": "src/"
         }
     },
-    "bin": [ "bin/empathy", "bin/empathyp" ]   
+    "minimum-stability": "dev",
+    "bin": [ "bin/empathy" ]
 }
