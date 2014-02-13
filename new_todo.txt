@@ -1,2 +1,7 @@
 
 - plugins can be loaded from local project dir
+
+
+13/02/2014
+- new app landing page skin (and add default module 'front')
+- create .htaccess dynamically

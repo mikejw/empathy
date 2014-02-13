@@ -16,6 +16,25 @@ define('LIB_PATH', './vendor/mikejw/empathy');
 define('ELIB_PUBLIC', '../vendor/mikejw/elib-base/public'); # relative to directory where symlink is created
 
 
+function recursive_copy($src, $fdest, $app_name)
+{
+    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($src), RecursiveIteratorIterator::SELF_FIRST);
+    foreach($objects as $name => $object) {        
+        if(!preg_match('/\.$/', $name) && !is_dir($name)) {
+            $dest = str_replace($src, '.', $name);
+            $dest_dir = (dirname($dest));
+            if(!is_dir($dest_dir)) {
+                mkdir($dest_dir, 0777, true);
+            }
+            if(strpos($name, 'eaa.css')) {
+                $dest = str_replace('eaa.css', $app_name.'.css', $dest);
+            }
+            copy($name, $dest);
+        }
+    }
+}
+
+
 function read_yaml($file)
 {
     $rtnd = false;
@@ -75,7 +94,8 @@ function new_app()
     if($tmp_web_root != '') {
         $web_root = $tmp_web_root;
     }
-    execute('cp -r '.LIB_PATH.'/eaa/* .');
+
+    recursive_copy(LIB_PATH.'/eaa', './', $name);
 
     # new stuff...
     $cfg = read_app_config(); # call read config again
@@ -178,7 +198,7 @@ function option_misc($action)
 
 function boot()
 {
-    \Empathy\MVC\Util\Lib::addToIncludePath('../../libs');
+    \Empathy\MVC\Util\Lib::addToIncludePath(getcwd().'/../libs');
     //class R extends RedBean_Facade{}
     return new Empathy\MVC\Empathy(getcwd().'/', true);
 }
@@ -242,7 +262,6 @@ if($app_config !== false) {
     $boot = boot();
 }
 main();
-
 
 //\Empathy\MVC\Util\CLI::setReqMode(\Empathy\MVC\Util\CLIMode::CAPTURED);
 //echo \Empathy\MVC\Util\CLI::request($boot, '');
