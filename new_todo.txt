@@ -8,6 +8,13 @@
 - empathy cli tool catches invalid argument errors/exceptions
 - create generic function out of the custom .htaccess code for
   'site_down.html'.. any others? Test on Windows!
+- less working out of the box! (and yui-compressor) - tested on Win!
+- update eaa to HTML5 (and tidy up css etc)
+- fix simple routes (single slug => default module)
+
+
+
+
   
 
 
