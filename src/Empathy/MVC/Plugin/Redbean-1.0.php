@@ -1,7 +1,9 @@
 <?php
 
 namespace Empathy\MVC\Plugin;
-use Empathy\MVC\Plugin as Plugin;
+
+use Empathy\MVC\Plugin as Plugin,
+    RedBean_Facade as R;
 
 class Redbean extends Plugin implements PreDispatch
 {
@@ -35,6 +37,7 @@ class Redbean extends Plugin implements PreDispatch
         if(defined('DB_PORT') && is_numeric(DB_PORT)) {
             $dsn .= 'port='.DB_PORT.';';
         }
-        \R::setup($dsn, DB_USER, DB_PASS);
+        R::setup($dsn, DB_USER, DB_PASS);
     }
 }
+
