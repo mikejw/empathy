@@ -1,0 +1,101 @@
+
+
+body {
+
+    font-family: sans-serif;
+    color: #333;
+    background-color: #999;    
+    font-size: 62.5%;
+    background-image: url('../../img/grain.png');
+
+    #top_bar {
+        background-color: #000;
+        color: #ccc;
+        text-align: right;
+        height: 30px;
+        span {
+            position: absolute;
+            top: 15px;
+            right: 3%;
+            text-transform: uppercase;
+        }
+    }
+
+    #page {
+        width: 60%;
+        max-width: 700px;
+        margin: 0 auto;
+
+        header {
+            margin: 75px 0 0 0;
+            text-align: center;
+            h1 {
+                font-size: 3em;
+                color: #fff;
+                line-height: 1.2em;
+            }
+        }
+
+
+        #error, #about {
+            margin: 40px 0 0 0;
+            background-color: #fff;
+            color: #333;
+            padding: 12px 3% 24px 3%;
+            font-size: 1.3em;
+            line-height: 1.4em;
+        }
+
+        footer {
+            width: 80%;
+            margin: 80px auto 0 auto;
+            h4 {
+                font-size: 2em;
+                color: #fff;
+                text-transform: uppercase;
+            }
+            ul {
+                list-style: square;
+                color: #00e987;
+                margin: 0 0 0 5%;
+                li {
+                    line-height: 2em;
+                    font-size: 1.5em;
+                    a {
+                        text-decoration: none;
+                        color: #ccc;
+                        &:hover {
+                            text-decoration: underline;
+                            color: #eee;
+                        }
+                    } 
+                }
+            }
+            address {
+                margin: 25px 0 0 0;
+                text-align: center;
+                color: #999;
+                font-size: 1.1em;
+                a { 
+                    color: inherit;
+                }
+            }
+        }
+    }
+
+
+    &.alt {
+        background-image: url('../../img/grain2.png');
+
+        #top_bar {
+              background-color: #fff;
+              color: #ccc;
+        }
+
+    }
+}
+
+
+
+
+
