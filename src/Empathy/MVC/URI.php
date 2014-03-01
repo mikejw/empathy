@@ -234,7 +234,7 @@ class URI
     private function setModule($module)
     {
         $_GET['module'] = $module;
-        if ($_GET['module'] == 'empathy') {
+        if ($_GET['module'] == $this->internal_controller) {
             $this->internal = true;
         }
     }

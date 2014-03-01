@@ -15,16 +15,29 @@
  You should have received a copy of the GNU Lesser General Public License
  along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 *}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>{$TITLE}</title>
-<link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/init.css" type="text/css" media="all" />
-<link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/{$NAME}.css" type="text/css" media="all" />
-<link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/{$module}.css" type="text/css" media="all" />
-</head>
 
-<body>
-<div id="page">
+
+
+<footer>
+
+{if $error eq ''}
+<nav id="links">
+<h4>Links</h4>
+<ul>
+<li><a id="site" href="http://empathyphp.co.uk"><span>empathyphp.co.uk</span></a></li>
+<li><a id="github" href="http://github.com/mikejw/empathy"><span>GitHub</span></a></li>
+<li><a id="twitter" href="http://twitter.com/empathyphp"><span>twitter</span></a></li>
+</ul>
+</nav>
+{/if}
+
+<address>
+&copy; 2013 <a href="http://mikewhiting.co">Mike Whiting</a>.
+
+</address>
+</footer>
+
+
+</div>
+</body>
+</html>

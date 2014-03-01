@@ -60,7 +60,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     public function switchInternal($i)
     {
         if ($i) {
-            $this->smarty->template_dir = realpath(dirname(__FILE__));
+            $this->smarty->template_dir = realpath(dirname(__FILE__)).'/../../../../tpl/';
         }
     }
 }

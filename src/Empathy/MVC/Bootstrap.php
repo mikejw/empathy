@@ -180,7 +180,7 @@ class Bootstrap
             } elseif ($event_val !== false) {
 
                 if($this->uri->getInternal()) {
-                    $this->controller->setTemplate('../empathy.tpl');
+                    $this->controller->setTemplate('empathy.tpl');
                     $this->display(true);
                 } else {
                     $this->display(false);                    
@@ -213,7 +213,7 @@ class Bootstrap
                  $this->controller->setTemplate('elib:/req_error.tpl');
                  $this->display();
             } else {
-                $this->controller->setTemplate('../empathy.tpl');
+                $this->controller->setTemplate('empathy.tpl');
                 $this->display(true);
             }
             

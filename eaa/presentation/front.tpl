@@ -1,25 +1,15 @@
-{*
-Copyright 2008 Mike Whiting (mail@mikejw.co.uk).
-This file is part of the Empathy MVC framework.
+{include file="$DOC_ROOT/vendor/mikejw/empathy/tpl/header.tpl" alt=true}
 
-Empathy is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
 
-Empathy is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
+<header>
 
-You should have received a copy of the GNU Lesser General Public License
-along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
-*}
-{include file="header.tpl"}
+<p><img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/img/empathy.png" alt="" width="105" /></p>
 
-<h1>This is an Empathy application.</h1>
+<h1>Empathy</h1>
+
+
+</header>
 
 
 
-
-{include file="footer.tpl"}
+{include file="$DOC_ROOT/vendor/mikejw/empathy/tpl/footer.tpl"}
