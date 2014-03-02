@@ -49,4 +49,3 @@
 </div>
 
 <div id="page">
-<p>Alt: {$alt}</p>
