@@ -2,6 +2,11 @@
 
 body {
 
+
+    .clear {
+        overflow-y: hidden;
+    }
+
     font-family: sans-serif;
     color: #333;
     background-color: #999;    
@@ -22,8 +27,8 @@ body {
     }
 
     #page {
-        width: 60%;
-        max-width: 700px;
+        width: 90%;
+        max-width: 600px;
         margin: 0 auto;
 
         header {
@@ -84,7 +89,7 @@ body {
     }
 
 
-    &.alt {
+    &.default {
         background-image: url('../../img/grain2.png');
 
         #top_bar {
@@ -120,9 +125,88 @@ body {
                 }
             }
         }
-
     }
 
+    &.site {
+        background-image: none;
+        background-color: #fff;
+
+        #top_bar {
+              background-color: #fff;
+              font-family: 'News Cycle', sans-serif;
+              color: #999;
+        }
+
+        #page {
+
+            p, nav, address {
+                //font-family: 'News Cycle', sans-serif;
+                color: #333;
+            }
+
+            header {
+                h1 {
+                    margin-top: 4px;
+                    color: #222;
+                    font-family: 'Quattrocento Sans', cursive;
+                    text-transform: uppercase;
+                }
+            }
+
+            section {
+                nav {
+                    
+                    margin: 0 0 22px 0;
+                }
+                nav ul li a {
+                    font-size: 1.3em;
+                    float: left;
+                    width: 30%;
+                    padding: 0.5em;
+                    background-color: #eee;
+                    text-decoration: none;
+                    color: #333;
+                    margin: 5px 0 0 1.13%;
+                    -webkit-border-radius: 5px;
+                    -moz-border-radius: 5px;
+                    border-radius: 5px;
+                }
+
+                nav ul li a:hover {
+                    background-color: #ddd;
+                }
+
+                p {
+                    line-height: 1.5em;
+                    font-size: 1.3em;
+                    margin: 0 0 1em 0;
+                }
+            }
+
+            footer {
+
+                margin-top: 130px;
+
+                h4 {
+                    color: #666;
+                }
+                ul {
+                    li {
+                        a {
+                            color: #666;
+                        }
+                    }
+                }
+            }
+
+            address {
+                color: #666;
+                a {
+                    color: inhreit;
+                }
+            }
+        }
+    }
 
 }
 

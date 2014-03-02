@@ -1,4 +1,4 @@
-{include file="$DOC_ROOT/vendor/mikejw/empathy/tpl/header.tpl" alt=true}
+{include file="$DOC_ROOT/vendor/mikejw/empathy/tpl/header.tpl" mode="default"}
 
 
 <header>
