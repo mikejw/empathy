@@ -1,4 +1,7 @@
 
+  - Remove JSBeautifer.. work out what version
+    of PHP included JSON_PRETTY_PRINT => that is new minimum version
+
 Y - URI.php L179 => if method exists remove class error
    => different behaviour depending on dynamic module
 Y - Make dependencies configurable in new local config
