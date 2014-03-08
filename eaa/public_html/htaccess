@@ -2,7 +2,7 @@
 RewriteEngine on
 RewriteBase /WEB_ROOT
 
-RewriteRule ^([_a-z0-9-]/*)*$ index.php
+RewriteRule ^([_a-zA-Z0-9-]/*)*$ index.php
 
 
 

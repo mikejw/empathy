@@ -1,6 +1,8 @@
 
-  - Remove JSBeautifer.. work out what version
-    of PHP included JSON_PRETTY_PRINT => that is new minimum version
+
+Remove dependency on JSBeautifier (from libs).
+    Formatted json will be achieved through using JSON_PRETTY_PRINT
+    and therefore changes the minimum PHP version to 5.4.0
 
 Y - URI.php L179 => if method exists remove class error
    => different behaviour depending on dynamic module

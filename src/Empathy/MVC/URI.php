@@ -162,13 +162,13 @@ class URI
 
         // check for uppercase letters in main uri
         // and redirect if present
-        /*
+        
         $temp_uri_string = implode('/', $uri);
         if(preg_match('/[A-Z]/', $temp_uri_string)) {
             header('Location: http://'.WEB_ROOT.PUBLIC_DIR.'/'.strtolower($temp_uri_string).$args, true, 301);
             exit(); 
         }
-        */
+        
         
         $this->uri = $uri;
     }

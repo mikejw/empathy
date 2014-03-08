@@ -20,9 +20,12 @@ class JSONView extends Plugin implements PreDispatch, Presentation
 
     public function display($template)
     {         
+        // check for existence of 'force formatted' config option
+        // before displaying json responses in prettified format.
+        // the debug_mode boot option has stopped being used for this 
+        // purpose because of cases where debug information is sought but (slower) formatting
+        // is not required.
         $force_formatted = (defined('ELIB_FORCE_FORMATTED') && ELIB_FORCE_FORMATTED);
-
-        //$debug_mode = $this->bootstrap->getDebugMode();
 
         if(!(defined('MVC_TEST_MODE') && MVC_TEST_MODE)) {
             header('Content-type: application/json');
@@ -32,7 +35,6 @@ class JSONView extends Plugin implements PreDispatch, Presentation
            (get_class($this->output) == 'ROb'||
             get_class($this->output) == 'EROb'))
         {           
-
             $output = (string) $this->output;
 
             if(false !== ($callback = $this->output->getJSONPCallback())) {
@@ -56,13 +58,6 @@ class JSONView extends Plugin implements PreDispatch, Presentation
         }
     }
 
-    /*
-      public function __construct($b)
-      {
-      parent::__construct($b);
-      //
-      }
-    */
 
     public function onPreDispatch()
     {
