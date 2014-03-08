@@ -271,7 +271,10 @@ class Bootstrap
                     if (file_exists($plugin_path)) {
                         require($plugin_path);
                         $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
-                        $n = new $plugin($this);
+                        $n = new $plugin();
+                        if (isset($p['config'])) {
+                            $n->assignConfig($p['config']);
+                        }
                         $plugin_manager->register($n);
                     }
                 }
@@ -306,7 +309,7 @@ class Bootstrap
      */
     public function getURIError()
     {
-        return $this->uri->getError();
+        return (isset($this->uri))? $this->uri->getError(): null;
     }
 
     /**
@@ -319,7 +322,7 @@ class Bootstrap
      */
     public function getURICliMode()
     {
-        return $this->uri->getCliMode();
+        return (isset($this->uri))? $this->uri->getCliMode(): null;
     }
 
     /**
@@ -328,7 +331,7 @@ class Bootstrap
      */
     public function getURIData()
     {
-        return $this->uri->getData();
+        return (isset($this->uri))? $this->uri->getData(): null;
     }
 
     /**
