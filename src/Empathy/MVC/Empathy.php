@@ -278,15 +278,13 @@ class Empathy
         case 'Empathy\MVC\RequestException':
 
             $response = '';
-            switch($e->getCode()) {
-            
+            switch($e->getCode()) {            
             case RequestException::BAD_REQUEST:
-                $response = 'HTTP/1.1 400 bad request';
+                $response = 'HTTP/1.1 400 Bad Request';
                 $message = 'Bad request';
                 break;
             case RequestException::NOT_FOUND:
-                $response = 'HTTP/1.0 404 Not Found';
-        
+                $response = 'HTTP/1.0 404 Not Found';        
                 break;
             default:
                 break;

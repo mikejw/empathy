@@ -179,7 +179,7 @@ class Bootstrap
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($event_val !== false) {
 
-                if($this->uri->getInternal()) {
+                if($this->uri->getInternal()) {        
                     $this->controller->setTemplate('empathy.tpl');
                     $this->display(true);
                 } else {
@@ -199,25 +199,20 @@ class Bootstrap
     public function dispatchException($e)
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
-
-
         $this->controller = new Controller($this);
 
         if ($this->controller->getModule() != 'api') {
-            
             $this->controller->assign('error', $e->getMessage());
                         
             if($req_error) {
-    
                  $this->controller->assign('code', $e->getCode());
                  $this->controller->setTemplate('elib:/req_error.tpl');
                  $this->display();
             } else {
+                header('HTTP/1.0 500 Internal Server Error');
                 $this->controller->setTemplate('empathy.tpl');
                 $this->display(true);
-            }
-            
-
+            }           
         } else {
             if (!$this->debug_mode) {
                 $r = new \EROb(\ReturnCodes::SERVER_ERROR, 'Server error.');
