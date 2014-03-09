@@ -156,7 +156,7 @@ function option_node($action)
         case 'compile_less':
 
             $css_dir = './public_html/css/less';
-            $less_command = './node_modules/.bin/lessc --yui-compress';
+            $less_command = './node_modules/.bin/lessc --compress';
             $less_files = $css_dir.'/*.less';
             $src_files = glob($less_files);
 
@@ -166,7 +166,7 @@ function option_node($action)
                 $command = "$less_command $file $css";
                 execute($command); 
             }
-            $init_css = './public_html/elib/init.min.css';
+            $init_css = './public_html/css/less/init.min.css';
             execute("cat $init_css $css > ./tmp.css; mv tmp.css $css");
             break;
         case 'compile_js':
