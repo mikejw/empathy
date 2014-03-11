@@ -38,7 +38,13 @@ class Model
         require_once(DOC_ROOT.'/storage/'.$file);
 
         $reflect  = new \ReflectionClass($class);
-        $storage_object = $reflect->newInstanceArgs($params);
+
+        if(sizeof($params)) {
+            $storage_object = $reflect->newInstanceArgs($params);
+        } else {
+            $storage_object = $reflect->newInstanceArgs();
+        }
+
 
         // todo: if id is numeric load record!
 
