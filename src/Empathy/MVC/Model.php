@@ -42,7 +42,7 @@ class Model
 
         // todo: if id is numeric load record!
 
-        if(get_parent_class($storage_object) == 'Empathy\MVC\Entity') {
+        if(in_array('Empathy\MVC\Entity', class_parents($storage_object))) {
             self::connectModel($storage_object, $host);
             $storage_object->init();
         }
