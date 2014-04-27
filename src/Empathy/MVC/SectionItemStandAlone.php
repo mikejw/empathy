@@ -20,6 +20,8 @@ class SectionItemStandAlone extends Entity
 
     public function getURIData()
     {
+        $uri_data = array();
+
         $sql = "SELECT id, label, friendly_url FROM ".SectionItemStandAlone::$table;
         $error = "Could not get URI data.";
         $result = $this->query($sql, $error);
@@ -28,7 +30,6 @@ class SectionItemStandAlone extends Entity
             $uri_data[$i] = $row;
             $i++;
         }
-
         return $uri_data;
     }
 
@@ -48,5 +49,4 @@ class SectionItemStandAlone extends Entity
             //echo "Whoops!";
         }
     }
-
 }

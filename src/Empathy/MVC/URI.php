@@ -275,15 +275,13 @@ class URI
                 $this->error = URI::MISSING_CLASS;
             }
         }
-
         $this->controllerName = 'Empathy\\MVC\\Controller\\'.$this->controllerName;
-
         if (!$this->error) {
             require_once(DOC_ROOT.'/application/CustomController.php');
             
             if (!class_exists($this->controllerName)) {
                 // try manual include
-                // make sure custom controller has been loaded   
+                // make sure custom controller has been loaded
                 @include($this->controllerPath);
                 if (!class_exists($this->controllerName)) {
                     $this->error = URI::MISSING_CLASS_DEF;
@@ -311,9 +309,9 @@ class URI
     {
         // code still needed to assert correct section path - else throw 404
         $this->error = 0;
-        // temporary hack to provide object so that entity will assume it has a controller
-        // and connect to database
-        $section = new SectionItemStandAlone(new \stdClass());
+
+        $section = Model::load('Empathy\\MVC\\SectionItemStandAlone');
+
         if (!isset($this->dynamicModule) || $this->dynamicModule == '') {
             throw new Exception("Failed to find name of dynamic module.");
         } else {

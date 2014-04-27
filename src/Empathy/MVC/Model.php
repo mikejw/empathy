@@ -29,22 +29,22 @@ class Model
 
     public static function load($model, $id=null, $params=array(), $host=null)
     {
-        $class = '\Empathy\\MVC\\Model\\'.$model;
+        if (class_exists($model)) {
 
-        // manually add entity class 
-        // (for cases when not in 'system-mode' and this code lies outside
-        // the reach of the composer autoload 
-        $file = $model.'.php';
-        require_once(DOC_ROOT.'/storage/'.$file);
+            $storage_object = new $model($params);
 
-        $reflect  = new \ReflectionClass($class);
-
-        if(sizeof($params)) {
-            $storage_object = $reflect->newInstanceArgs($params);
         } else {
-            $storage_object = $reflect->newInstanceArgs();
-        }
 
+            $class = '\Empathy\\MVC\\Model\\'.$model;
+            // manually add entity class 
+            // (for cases when not in 'system-mode' and this code lies outside
+            // the reach of the composer autoload 
+            $file = $model.'.php';
+            require_once(DOC_ROOT.'/storage/'.$file);
+
+            $reflect  = new \ReflectionClass($class);
+            $storage_object = $reflect->newInstanceArgs($params);
+        }
 
         // todo: if id is numeric load record!
 
