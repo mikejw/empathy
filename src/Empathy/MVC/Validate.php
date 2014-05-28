@@ -47,51 +47,44 @@ class Validate
      *
      * @return boolean $valid
      */
-    public function valType($type, $field, $data, $optional)
+    public function valType($type, $field, $data, $optional, $message=null)
     {
         $valid = true;
-        if (!$optional || $data != '') {
+        if ($data != '') {
             switch ($type) {
             case self::TEXT:
                 if (!ctype_alnum(preg_replace($this->allowed_pattern_1, '', $data))) {
-                    $this->addError('Invalid '.$field, $field);
                     $valid = false;
                 }
                 break;
             case self::ALNUM:
                 if (!ctype_alnum($data)) {
-                    $this->addError('Invalid '.$field, $field);
                     $valid = false;
                 }
                 break;
             case self::NUM:
                 if (!is_numeric($data)) { // consider ctype_digit instead?
-                    $this->addError('Invalid '.$field, $field);
                     $valid = false;
                 }
                 break;
             case self::EMAIL:
                 if (!preg_match($this->email_pattern, $data)) {
-                    $this->addError('Invalid '.$field, $field);
                     $valid = false;
                 }
                 break;
             case self::TEL:
                 if (!ctype_digit(preg_replace('/\s/', '', $data))) {
-                    $this->addError('Invalid '.$field, $field);
                     $valid = false;
                 }
                 break;
             case self::USERNAME:
                 //if(!preg_match($this->unix_username_pattern, $data))
                 if (!preg_match($this->twitter_style_username, $data)) {
-                    $this->addError('Invalid '.$field, $field);
                     $valid = false;
                 }
                 break;
             case self::URL:
                 if (!preg_match($this->url_pattern, $data)) {
-                    $this->addError('Invalid '.$field, $field);
                     $valid = false;
                 }
                 break;
@@ -99,6 +92,24 @@ class Validate
                 die('No valid validation type specified.');
                 break;
             }
+
+            if (!$valid) {
+                if (is_string($message)) {
+                    $this->addError($message, $field);
+                }
+                elseif (isset($message[0])) {
+                   $this->addError($message[0], $field);
+                } else { 
+                    $this->addError('Invalid '.$field, $field);
+                }
+            }
+        } elseif (!$optional && $data == '') {
+            if (is_array($message) && isset($message[1])) {
+                $this->addError($message[1], $field);
+            } else {
+                $this->addError('This is a required field', $field);
+            }
+            
         }
 
         return $valid;
