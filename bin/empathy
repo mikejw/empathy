@@ -73,10 +73,10 @@ function new_app()
 {
     $name = '';
     $web_root = '';
-    $tmp_web_root;
+    $tmp_web_root = '';
     $tmp_doc_root = '';
     $doc_root = getcwd();
-    $tmp_name;
+    $tmp_name = '';
     $tmp_doc_root = \cli\prompt("Please enter document root [$doc_root]", $doc_root);
     if($tmp_doc_root != '') {
         $doc_root = $tmp_doc_root;
