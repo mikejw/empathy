@@ -119,6 +119,7 @@ class Entity
             $properties = array();
             foreach ($props as $p) {
                 foreach ($p as $rp) {
+                    
                     $name = $rp->name;
                     if (!in_array($name, $properties) && $name != 'table') {
                         $properties[] = $name;
@@ -128,8 +129,11 @@ class Entity
             $properties[] = 'table';
             $this->properties = $properties;
         } else { // it's a straightforward single subclass
+            
             foreach ($r->getProperties() as $item) {
-                array_push($this->properties, $item->name);
+                if (!$item->isPrivate()) {
+                    array_push($this->properties, $item->name);
+                }
             }
         }
     }
