@@ -246,7 +246,9 @@ class Entity
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             foreach ($row as $index => $value) {
-                $this->$index = $value;
+                if (!is_integer($index)) {
+                    $this->$index = $value;
+                }
             }
         } else {
             $loaded = false;
@@ -819,4 +821,18 @@ class Entity
     {
         return $this->val->valType($type, $field, $data, $optional);
     }
+
+
+
+    /**
+     * get entity properties
+     *
+     *
+     *
+     */
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
 }
