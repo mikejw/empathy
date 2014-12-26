@@ -347,10 +347,8 @@ class Entity
         $properties = array();
 
         foreach ($this->properties as $property) {
-            //	if(!in_array($property, $this->globally_ignored_property) && $this->$property != '')
-            if (!in_array($property, $this->globally_ignored_property)) {
-                array_push($properties, $property);
-            }
+
+            array_push($properties, $property);
         }
 
         $i = 0;
@@ -412,7 +410,8 @@ class Entity
         $id = 0;
 
         foreach ($this->properties as $property) {
-            if (($force_id && $property == 'id') || (!in_array($property, $this->globally_ignored_property))) {
+            if (($force_id && $property == 'id') || !$force_id) {
+
                 if (is_numeric($this->$property) && !is_string($this->$property)) {
                     $sql .= $this->$property;
                 } elseif ($this->$property == '') {
@@ -425,16 +424,14 @@ class Entity
                     $sql .= "'".$this->$property."'";
                 }
 
-                if (($i + sizeof($this->globally_ignored_property)) != sizeof($this->properties)) {
+                if (($i + 1) < sizeof($this->properties)) {
                     $sql .= ", ";
                 }
             }
             $i++;
         }
         $sql .= ")";
-
         $error = "Could not insert to table '$table'";
-
         $this->query($sql, $error);
 
         return $this->insertId();
