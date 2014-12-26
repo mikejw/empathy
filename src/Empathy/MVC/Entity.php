@@ -136,6 +136,7 @@ class Entity
                 }
             }
         }
+        $this->properties = array_diff($this->properties, $this->globally_ignored_property);
     }
 
     /**
