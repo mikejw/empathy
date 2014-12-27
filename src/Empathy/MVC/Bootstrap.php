@@ -161,8 +161,11 @@ class Bootstrap
 
             if($this->environment == 'prod' || $this->debug_mode == false) {     
 
-                if($error == URI::MISSING_CLASS ||
-                    $error == URI::MISSING_EVENT_DEF) {
+                if(
+                    $error == URI::MISSING_CLASS ||
+                    $error == URI::MISSING_EVENT_DEF ||
+                    $error == URI::ERROR_404
+                ) {
                         throw new RequestException('Not found', RequestException::NOT_FOUND);
                 }
             } else {
