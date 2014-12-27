@@ -264,37 +264,53 @@ class Empathy
             $e = new ErrorException($this->errorsToString());
         }
 
+        // checks exception not already of type req 
+        // then checks env before forcing a req error class
+        // (for diplaying standard error pages in prod)
+        // this in-turn depends on elib (elib smarty resource)
+        // for locating req_error template
+        if (
+            'Empathy\MVC\RequestException' != get_class($e) &&
+            $this->boot->getEnvironment() == 'prod'
+        ){
+            $message = '';
+            if ($this->boot->getDebugMode()) {
+                $message = $e->getMessage();
+            }
+            $e = new RequestException($message, RequestException::BAD_REQUEST);
+        }
+
         // force safe exception
         //$e = new Empathy\SafeException($e->getMessage());
 
         switch (get_class($e)) {
-        case 'Empathy\MVC\SafeException':
-            echo 'Safe exception: '.$e->getMessage();
-            exit();
-            break;
-        case 'Empathy\MVC\TestModeException':
-            // allow execution to end naturally
-            break;
-        case 'Empathy\MVC\RequestException':
+            case 'Empathy\MVC\SafeException':
+                echo 'Safe exception: '.$e->getMessage();
+                exit();
+                break;
+            case 'Empathy\MVC\TestModeException':
+                // allow execution to end naturally
+                break;
+            case 'Empathy\MVC\RequestException':
 
-            $response = '';
-            switch($e->getCode()) {            
-            case RequestException::BAD_REQUEST:
-                $response = 'HTTP/1.1 400 Bad Request';
-                $message = 'Bad request';
-                break;
-            case RequestException::NOT_FOUND:
-                $response = 'HTTP/1.0 404 Not Found';        
-                break;
+                $response = '';
+                switch($e->getCode()) {            
+                case RequestException::BAD_REQUEST:
+                    $response = 'HTTP/1.1 400 Bad Request';
+                    $message = 'Bad request';
+                    break;
+                case RequestException::NOT_FOUND:
+                    $response = 'HTTP/1.0 404 Not Found';        
+                    break;
+                default:
+                    break;
+                }
+                header($response);
+                //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
+
             default:
+                $this->boot->dispatchException($e);
                 break;
-            }
-            header($response);
-
-            //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
-        default:
-            $this->boot->dispatchException($e);
-            break;
         }
     }
 
