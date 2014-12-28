@@ -1,5 +1,5 @@
 ---
-mysql: /usr/bin/mysql
+mysql: mysql
 mysql_dump: /usr/bin/mysqldump
 perl: /usr/bin/perl
 ffmpeg: /usr/bin/ffmpeg

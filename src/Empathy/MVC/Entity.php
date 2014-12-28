@@ -208,7 +208,7 @@ class Entity
         if(defined('ELIB_SQL_LOGGING') &&
            ELIB_SQL_LOGGING == true)
         {
-            \ELib\Util\SQLLog::log($sql);
+            \Empathy\ELib\Util\SQLLog::log($sql);
         }
 
         $result = NULL;
