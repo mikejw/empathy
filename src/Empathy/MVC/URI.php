@@ -374,8 +374,7 @@ class URI
         }
 
         $_GET['event'] = 'default_event';
-        $_GET['id'] = $section->id;
-
+        
         if ($this->error < 1) {
             $this->setController();
         }
