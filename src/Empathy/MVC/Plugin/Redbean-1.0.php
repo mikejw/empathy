@@ -2,7 +2,9 @@
 
 
 namespace {
-    class R extends RedBeanPHP\Facade{} 
+    // for newer versions of redbean
+    // use RedBeanPHP\Facade
+    class R extends RedBean_Facade{} 
 }
 
 namespace Empathy\MVC\Plugin {
