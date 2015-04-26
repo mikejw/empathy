@@ -4,11 +4,11 @@ namespace Empathy\MVC;
 
 /**
  * Empathy Entity
- * @package                     Empathy
- * @file			Empathy/Entity.php
- * @description		Simple "ORM style" model objects for Empathy.
- * @author			Mike Whiting
- * @license			LGPLv3
+ * @package         Empathy
+ * @file            Empathy/Entity.php
+ * @description     Simple "ORM style" model objects for Empathy.
+ * @author          Mike Whiting
+ * @license         LGPLv3
  *
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
@@ -119,6 +119,7 @@ class Entity
             $properties = array();
             foreach ($props as $p) {
                 foreach ($p as $rp) {
+                    
                     $name = $rp->name;
                     if (!in_array($name, $properties) && $name != 'table') {
                         $properties[] = $name;
@@ -128,10 +129,14 @@ class Entity
             $properties[] = 'table';
             $this->properties = $properties;
         } else { // it's a straightforward single subclass
+            
             foreach ($r->getProperties() as $item) {
-                array_push($this->properties, $item->name);
+                if (!$item->isPrivate()) {
+                    array_push($this->properties, $item->name);
+                }
             }
         }
+        $this->properties = array_diff($this->properties, $this->globally_ignored_property);
     }
 
     /**
@@ -203,7 +208,7 @@ class Entity
         if(defined('ELIB_SQL_LOGGING') &&
            ELIB_SQL_LOGGING == true)
         {
-            \ELib\Util\SQLLog::log($sql);
+            \Empathy\ELib\Util\SQLLog::log($sql);
         }
 
         $result = NULL;
@@ -242,7 +247,9 @@ class Entity
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             foreach ($row as $index => $value) {
-                $this->$index = $value;
+                if (!is_integer($index)) {
+                    $this->$index = $value;
+                }
             }
         } else {
             $loaded = false;
@@ -340,10 +347,8 @@ class Entity
         $properties = array();
 
         foreach ($this->properties as $property) {
-            //	if(!in_array($property, $this->globally_ignored_property) && $this->$property != '')
-            if (!in_array($property, $this->globally_ignored_property)) {
-                array_push($properties, $property);
-            }
+
+            array_push($properties, $property);
         }
 
         $i = 0;
@@ -405,7 +410,8 @@ class Entity
         $id = 0;
 
         foreach ($this->properties as $property) {
-            if (($force_id && $property == 'id') || (!in_array($property, $this->globally_ignored_property))) {
+            if (($force_id && $property == 'id') || !$force_id) {
+
                 if (is_numeric($this->$property) && !is_string($this->$property)) {
                     $sql .= $this->$property;
                 } elseif ($this->$property == '') {
@@ -418,16 +424,14 @@ class Entity
                     $sql .= "'".$this->$property."'";
                 }
 
-                if (($i + sizeof($this->globally_ignored_property)) != sizeof($this->properties)) {
+                if (($i + 1) < sizeof($this->properties)) {
                     $sql .= ", ";
                 }
             }
             $i++;
         }
         $sql .= ")";
-
         $error = "Could not insert to table '$table'";
-
         $this->query($sql, $error);
 
         return $this->insertId();
@@ -815,4 +819,18 @@ class Entity
     {
         return $this->val->valType($type, $field, $data, $optional);
     }
+
+
+
+    /**
+     * get entity properties
+     *
+     *
+     *
+     */
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
 }

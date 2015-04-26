@@ -1,4 +1,5 @@
-docs/generated
-apidocs
-tmp
-/edocs/build
+/docs/build
+/composer.phar
+/build
+/vendor
+cache.properties

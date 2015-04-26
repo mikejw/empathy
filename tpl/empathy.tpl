@@ -1,4 +1,4 @@
-{include file="header.tpl"}
+{include file="eheader.tpl"}
 
 <header>
 <p><img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/img/empathy.png" alt="" width="105" /></p>
@@ -35,4 +35,4 @@
 
 
 
-{include file="footer.tpl"}
+{include file="efooter.tpl"}

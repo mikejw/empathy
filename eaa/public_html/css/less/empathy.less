@@ -265,6 +265,86 @@ body {
         }
     }
 
+
+    .md {
+
+        ul {
+            list-style: square;
+        }   
+
+        & > ul > li {
+            line-height: 1.5em;
+            font-size: 1.5em;   
+        }
+
+        & > ul, & > ul > li > ul { 
+            margin-bottom: 1em;
+            margin-left: 2em;
+        }
+
+        p {
+            line-height: 1.5em;
+            margin: 0 0 1em 0;
+            font-size: 1.5em;
+            strong {
+                font-weight: bold;
+            }
+            em {
+                font-style: italic;
+            }
+        }
+
+        h1 {
+            font-size: 2.7em;
+            margin: 0 0 1.1em 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin: 2.2em 0 0.9em 0;
+        }
+
+        h3 {
+            font-size: 1.7em;
+            margin: 2.2em 0 0.9em 0;
+        }
+
+        pre {
+            padding: 1em;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            font-size: 1.5em;
+            margin: 1.5em 0 1.5em 0;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            line-height: 1.3em;
+        }
+
+        #top {
+            position: relative;
+            top: 66px;
+            text-align: right;
+            font-size: 1.2em;
+        }
+
+        a {
+            color: #67102f;
+        }
+
+        a:hover {
+            color: #f92672;
+        }
+
+        hr {
+            border: none;
+            background-color: #ccc;
+            height: 1px;
+            margin: 2em 0 2em 0;
+        }
+    }
+
 }
 
 

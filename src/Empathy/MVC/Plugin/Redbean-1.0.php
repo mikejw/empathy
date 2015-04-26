@@ -2,6 +2,8 @@
 
 
 namespace {
+    // for newer versions of redbean
+    // use RedBeanPHP\Facade
     class R extends RedBean_Facade{} 
 }
 

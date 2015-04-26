@@ -1,4 +1,4 @@
-{include file="$DOC_ROOT/vendor/mikejw/empathy/tpl/header.tpl" mode="default"}
+{include file="$DOC_ROOT/vendor/mikejw/empathy/tpl/eheader.tpl" mode="default"}
 
 
 <header>
@@ -12,4 +12,4 @@
 
 
 
-{include file="$DOC_ROOT/vendor/mikejw/empathy/tpl/footer.tpl"}
+{include file="$DOC_ROOT/vendor/mikejw/empathy/tpl/efooter.tpl"}

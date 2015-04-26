@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/less/init.min.css" type="text/css" />
 <link rel="stylesheet/less" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/less/empathy.less" type="text/css" />
 {else}
-<link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/less/{$MODULE}.css" type="text/css" media="all" />
+<link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/less/empathy.css" type="text/css" media="all" />
 {/if}
 
 <script type="text/javascript" src="http://{$WEB_ROOT}{$PUBLIC_DIR}/js/jquery.min.js"></script>

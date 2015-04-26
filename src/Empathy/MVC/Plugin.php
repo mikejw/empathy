@@ -14,8 +14,6 @@ class Plugin
 
     public function assignConfig($config)
     {
-    	$this->config = json_decode($config, true);
+        $this->config = json_decode($config, true);
     }
-
-
 }

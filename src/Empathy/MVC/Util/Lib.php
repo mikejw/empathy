@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Empathy/MVC/Util/Lib.php 
- * 
+ * Empathy/MVC/Util/Lib.php
+ *
  * PHP Version 5
  *
  * LICENSE: This source file is subject to the LGPLv3 License that is bundled
@@ -14,11 +14,9 @@
  * @copyright 2008-2013 Mike Whiting
  * @license   http://www.gnu.org/licenses/gpl-3.0-standalone.html GPL v3.0
  * @link      http://empathyphp.co.uk
- *      
+ *
  */
-
 namespace Empathy\MVC\Util;
-
 
 /**
  * Empathy Lib Utility class.
@@ -42,13 +40,12 @@ class Lib
      */
     public static function addToIncludePath($path)
     {
-        $existing_include_path = get_include_path(); 
-        ini_set('include_path',
-                $existing_include_path
-                .PATH_SEPARATOR
-                .$path);
+        $existing_include_path = get_include_path();
+        ini_set(
+            'include_path',
+            $existing_include_path
+            .PATH_SEPARATOR
+            .$path
+        );
     }
-    
-
-
 }

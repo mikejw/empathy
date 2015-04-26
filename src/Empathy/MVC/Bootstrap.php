@@ -4,10 +4,10 @@ namespace Empathy\MVC;
 
 /**
  * Empathy Bootstrap
- * @file			Empathy/Bootstrap.php
- * @description		Bootstrap object for an application using Empathy.
- * @author			Mike Whiting
- * @license			LGPLv3
+ * @file            Empathy/Bootstrap.php
+ * @description     Bootstrap object for an application using Empathy.
+ * @author          Mike Whiting
+ * @license         LGPLv3
  *
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
@@ -145,24 +145,23 @@ class Bootstrap
      *
      * @return void
      */
-    public function dispatch($fake=false)
+    public function dispatch($fake = false)
     {
         $this->uri = new URI($this->defaultModule, $this->dynamicModule);
         $error = $this->uri->getError();
 
-        if($error == URI::MISSING_CLASS
+        if ($error == URI::MISSING_CLASS
            && isset($this->dynamicModule)
-           && $this->dynamicModule != '')
-        {
+           && $this->dynamicModule != '') {
             $error = $this->uri->dynamicSection();
         }
 
         if ($error > 0) {
-
-            if($this->environment == 'prod' || $this->debug_mode == false) {     
-
-                if($error == URI::MISSING_CLASS ||
-                    $error == URI::MISSING_EVENT_DEF) {
+            if ($this->environment == 'prod' || $this->debug_mode == false) {
+                if ($error == URI::MISSING_CLASS ||
+                    $error == URI::MISSING_EVENT_DEF ||
+                    $error == URI::ERROR_404
+                ) {
                         throw new RequestException('Not found', RequestException::NOT_FOUND);
                 }
             } else {
@@ -171,19 +170,18 @@ class Bootstrap
         }
 
         $controller_name = $this->uri->getControllerName();
-        $this->controller = new $controller_name($this);            
+        $this->controller = new $controller_name($this);
         
-        if($fake == false) {
+        if ($fake == false) {
             $event_val = $this->controller->$_GET['event']();
             if ($this->mvc->hasErrors()) {
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($event_val !== false) {
-
-                if($this->uri->getInternal()) {        
+                if ($this->uri->getInternal()) {
                     $this->controller->setTemplate('empathy.tpl');
                     $this->display(true);
                 } else {
-                    $this->display(false);                    
+                    $this->display(false);
                 }
             }
         }
@@ -199,20 +197,20 @@ class Bootstrap
     public function dispatchException($e)
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
+
         $this->controller = new Controller($this);
 
         if ($this->controller->getModule() != 'api') {
             $this->controller->assign('error', $e->getMessage());
                         
-            if($req_error) {
+            if ($req_error) {
                  $this->controller->assign('code', $e->getCode());
                  $this->controller->setTemplate('elib:/req_error.tpl');
                  $this->display();
             } else {
-                header('HTTP/1.0 500 Internal Server Error');
                 $this->controller->setTemplate('empathy.tpl');
                 $this->display(true);
-            }           
+            }
         } else {
             if (!$this->debug_mode) {
                 $r = new \EROb(\ReturnCodes::SERVER_ERROR, 'Server error.');
@@ -232,7 +230,7 @@ class Bootstrap
      *
      * @return void
      */
-    private function display($i=false)
+    private function display($i = false)
     {
         $this->controller->initDisplay($i);
     }
@@ -275,7 +273,7 @@ class Bootstrap
                 }
                 $plugin_manager->preDispatch();
             }
-        } catch (\Exception $e) {            
+        } catch (\Exception $e) {
             throw new \Empathy\MVC\SafeException($e->getMessage());
         }
     }
@@ -355,5 +353,4 @@ class Bootstrap
     {
         return $this->controller;
     }
-
 }

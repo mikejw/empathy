@@ -16,76 +16,74 @@ namespace Empathy\MVC;
 class DBC
 {
 
-  /**
-   * IP address of database server to connect to.
-   *
-   */
-   private $server;
+    /**
+    * IP address of database server to connect to.
+    *
+    */
+    private $server;
 
-  /**
-   * Name of database.
-   */
-  private $name;
+    /**
+    * Name of database.
+    */
+    private $name;
 
-  /**
-   * Username to use for connection.
-   */
-  private $user;
+    /**
+    * Username to use for connection.
+    */
+    private $user;
 
-  /**
-   * Password for connection.
-   */
-  private $pass;
+    /**
+    * Password for connection.
+    */
+    private $pass;
 
-  /**
-   * Database port
-   */
-  private $port;
+    /**
+    * Database port
+    */
+    private $port;
 
 
-  /**
-   * Handle for connection produced by PDO.
-   */
-  private $handle;
+    /**
+    * Handle for connection produced by PDO.
+    */
+    private $handle;
 
-  /**
-   * Contrustor takes connection passed from parameters from
-   * DBPool object and creates connection.
-   * @param string $s server name.
-   *
-   * @param string $n database name.
-   *
-   * @param string $u database username.
-   *
-   * @param string $p database password.
-   *
-   * @param int $port database port.
-   *
-   * @return void.
-   */
-  public function __construct($s, $n, $u, $p, $port)
-  {
-    $this->server = $s;
-    $this->name = $n;
-    $this->user = $u;
-    $this->pass = $p;
-    $this->port = $port;
+    /**
+    * Contrustor takes connection passed from parameters from
+    * DBPool object and creates connection.
+    * @param string $s server name.
+    *
+    * @param string $n database name.
+    *
+    * @param string $u database username.
+    *
+    * @param string $p database password.
+    *
+    * @param int $port database port.
+    *
+    * @return void.
+    */
+    public function __construct($s, $n, $u, $p, $port)
+    {
+        $this->server = $s;
+        $this->name = $n;
+        $this->user = $u;
+        $this->pass = $p;
+        $this->port = $port;
 
-    $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';';
-    if($this->port !== null) {
-        $dsn .= 'port='.$this->port.';';
+        $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';';
+        if ($this->port !== null) {
+            $dsn .= 'port='.$this->port.';';
+        }
+        $this->handle = new \PDO($dsn, $this->user, $this->pass);
     }
 
-    $this->handle = new \PDO(
-      $dsn, $this->user, $this->pass);
-  }
-
-  /**
-   * Returns database connection handle produced by PDO
-   * @return */
-  public function getHandle()
-  {
-    return $this->handle;
-  }
-
+    /**
+    * Returns database connection handle produced by PDO
+    * @return PDO handle
+    */
+    public function getHandle()
+    {
+        return $this->handle;
+    }
 }

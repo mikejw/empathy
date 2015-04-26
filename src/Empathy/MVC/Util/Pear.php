@@ -15,5 +15,4 @@ class Pear
 
         return $global_config_dir;
     }
-
 }

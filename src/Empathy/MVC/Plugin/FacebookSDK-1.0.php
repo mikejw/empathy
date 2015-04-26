@@ -9,7 +9,6 @@ class FacebookSDK
 
     public function __construct()
     {
-
+        //
     }
-
 }
