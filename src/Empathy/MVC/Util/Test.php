@@ -1,5 +1,7 @@
 <?php
 
+namespace Empathy\MVC\Util;
+
 /*
   usage:
   <?php

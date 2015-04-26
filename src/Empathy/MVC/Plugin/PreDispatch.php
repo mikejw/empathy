@@ -6,4 +6,3 @@ interface PreDispatch
 {
     public function onPreDispatch();
 }
-?>

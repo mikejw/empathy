@@ -67,5 +67,4 @@ class PluginManager
             return $view;
         }
     }
-
 }

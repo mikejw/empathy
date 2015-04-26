@@ -68,5 +68,4 @@ class JSONView extends Plugin implements PreDispatch, Presentation
     {
         //
     }
-
 }

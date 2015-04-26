@@ -10,5 +10,4 @@ class ELib
     {
         return Util::getLocation();
     }
-
 }

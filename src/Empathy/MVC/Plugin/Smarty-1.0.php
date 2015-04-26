@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC\Plugin;
+
 use Empathy\MVC\Plugin as Plugin;
 
 class Smarty extends Plugin implements PreDispatch, Presentation
@@ -14,7 +15,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     public function onPreDispatch()
     {
-        if(defined('SMARTY_DEBUGGING') && SMARTY_DEBUGGING) {
+        if (defined('SMARTY_DEBUGGING') && SMARTY_DEBUGGING) {
             $this->smarty->debugging = true;
         }
 
@@ -28,8 +29,8 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         }
 
         // assign constants
-        if(defined('NAME')) {
-            $this->assign('NAME', NAME);    
+        if (defined('NAME')) {
+            $this->assign('NAME', NAME);
         }
         $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('WEB_ROOT', WEB_ROOT);

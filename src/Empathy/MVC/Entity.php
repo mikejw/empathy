@@ -4,11 +4,11 @@ namespace Empathy\MVC;
 
 /**
  * Empathy Entity
- * @package                     Empathy
- * @file			Empathy/Entity.php
- * @description		Simple "ORM style" model objects for Empathy.
- * @author			Mike Whiting
- * @license			LGPLv3
+ * @package         Empathy
+ * @file            Empathy/Entity.php
+ * @description     Simple "ORM style" model objects for Empathy.
+ * @author          Mike Whiting
+ * @license         LGPLv3
  *
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled

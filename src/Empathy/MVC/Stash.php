@@ -13,9 +13,9 @@ class Stash
 
     public function get($key)
     {
-        if(!isset($this->items[$key])) {
+        if (!isset($this->items[$key])) {
             return null;
-        } else {        
+        } else {
             return $this->items[$key];
         }
     }
@@ -24,5 +24,4 @@ class Stash
     {
         $this->items[$key] = $data;
     }
-
 }

@@ -18,7 +18,7 @@ class Session
 
     public static function up()
     {
-        if(!defined('NAME')) {
+        if (!defined('NAME')) {
             self::$app = 'unnamed';
         } else {
             self::$app = NAME;
@@ -26,9 +26,8 @@ class Session
 
         if (self::$up === false) {
             @session_start();
-            if(!isset($_SESSION['app']) ||
-               !isset($_SESSION['app'][self::$app]))
-            {
+            if (!isset($_SESSION['app']) ||
+               !isset($_SESSION['app'][self::$app])) {
                 $_SESSION['app'][self::$app] = array();
             }
             //self::dump();
@@ -122,5 +121,4 @@ class Session
             }
         }
     }
-
 }

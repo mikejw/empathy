@@ -9,7 +9,6 @@ class Phirehose
 
     public function __construct()
     {
-    require 'phirehose/Phirehose.php';
+        require 'phirehose/Phirehose.php';
     }
-
 }
