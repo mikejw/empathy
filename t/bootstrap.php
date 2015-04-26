@@ -19,7 +19,9 @@ if (!function_exists('loadClass')) {
     spl_autoload_register('loadClass');
 }
 
+
+
 //\Empathy\MVC\Util\Lib::addToIncludePath('../../libs');
 //class R extends RedBean_Facade{}
 //$boot = new Empathy\MVC\Empathy(realpath(dirname(realpath(__FILE__)).'/../'), true);
-//$suite = new ESuite\Boot();
+$suite = new ESuite\Boot();

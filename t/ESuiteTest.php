@@ -9,7 +9,6 @@ use Empathy\MVC\Util\CLI,
 abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
 {
    
-
     protected function setUp()
     {
                 

@@ -25,7 +25,8 @@
         "phpmd/phpmd": "dev-master",
         "sebastian/phpcpd": "2.0.*@dev",
         "phploc/phploc": "2.1.*@dev",
-        "covex-nn/phpcb": "1.0.*@dev"
+        "covex-nn/phpcb": "1.0.*@dev",
+        "mockery/mockery": "dev-master"
     },
     "autoload": {
         "psr-0": {

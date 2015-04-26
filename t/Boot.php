@@ -8,6 +8,17 @@ class Boot
     private $db_criteria;
 
 
+    private static function dummyConfig()
+    {
+        // what's the dumbest configuaration that can be used?
+        // (using architype dir as dummy project base dir)
+        define('WEB_ROOT', 'foo');
+        define('PUBLIC_DIR', 'bar');
+        define('DOC_ROOT', realpath(dirname(realpath(__FILE__)).'/../eaa/'));
+    }
+
+
+
     public function __construct()
     {
         Config::init();
@@ -21,6 +32,9 @@ class Boot
         if(Config::get('set_test_mode')) {
             define('MVC_TEST_MODE', true);
         }
+
+
+        self::dummyConfig();
     }
 
     private function getCriteria()
