@@ -2,15 +2,14 @@
 
 namespace Empathy\MVC;
 
-define('MVC_VERSION', '0.9.5.2');
-require_once 'spyc/spyc.php';
+define('MVC_VERSION', '0.9.6');
 
 /**
  * Empathy
- * @file			Empathy/Empathy.php
- * @description		Creates global object that initializes an Empathy application
- * @author			Mike Whiting
- * @license			LGPLv3
+ * @file            Empathy/Empathy.php
+ * @description     Creates global object that initializes an Empathy application
+ * @author          Mike Whiting
+ * @license         LGPLv3
  *
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
@@ -54,7 +53,8 @@ class Empathy
     /**
      * This flag is read from the boot_options section of the application config.
      * If it is true then the main autoload function will attempt to load ELib components
-     * when necessary. (There is now no difference in in loading elib components as the common namespace 'vendor'
+     * when necessary. (There is now no difference in in loading elib components as the
+     * common namespace 'vendor'
      * is always the same.)
      *
      * @var boolean
@@ -69,23 +69,22 @@ class Empathy
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode=null, $system_mode=false)
+    public function __construct($configDir, $persistent_mode = null, $system_mode = false)
     {
         $this->persistent_mode = $persistent_mode;
-        if($system_mode) {
+        if ($system_mode) {
             spl_autoload_register(array($this, 'loadClass'));
         }
         $this->loadConfig($configDir);
         
-        if($system_mode) {
+        if ($system_mode) {
             $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
         } else {
-            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../')); 
+            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'));
         }
 
-        if(isset($this->bootOptions['use_elib']) &&
-           $this->bootOptions['use_elib'])
-        {
+        if (isset($this->bootOptions['use_elib']) &&
+           $this->bootOptions['use_elib']) {
             self::$use_elib = true;
             \Empathy\ELib\Config::load($configDir);
         } else {
@@ -147,7 +146,7 @@ class Empathy
      * @return void/Controller
      *
      */
-    public function beginDispatch($fake=false)
+    public function beginDispatch($fake = false)
     {
         if (!$this->getHandlingErrors()) {
             $this->boot->dispatch($fake);
@@ -158,7 +157,7 @@ class Empathy
                 $this->exceptionHandler($e);
             }
         }
-        if($fake) {
+        if ($fake) {
             return $this->boot->getController();
         }
     }
@@ -218,29 +217,29 @@ class Empathy
         if (error_reporting()) {
             $msg = '';
             switch ($errno) {
-            case E_ERROR:
-            case E_USER_ERROR:
-                $msg = "Error: [$errno] $errstr";
-                $msg .= "  Fatal error on line $errline in file $errfile";
-                $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
-                $msg .= " Aborting...";
-                die($msg);
-                break;
-            case E_WARNING:
-            case E_USER_WARNING:
-                $msg = "Warning: [$errno] $errstr";
-                break;
-            case E_NOTICE:
-            case E_USER_NOTICE:
-                $msg = "Notice: [$errno] $errstr";
-                break;
-            case E_DEPRECATED:
-            case E_STRICT:
-                $msg = "Strict/Deprecated notice: [$errno] $errstr";
-                break;
-            default:
-                $msg = "Unknown error type: [$errno] $errstr";
-                break;
+                case E_ERROR:
+                case E_USER_ERROR:
+                    $msg = "Error: [$errno] $errstr";
+                    $msg .= "  Fatal error on line $errline in file $errfile";
+                    $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
+                    $msg .= " Aborting...";
+                    die($msg);
+                    break;
+                case E_WARNING:
+                case E_USER_WARNING:
+                    $msg = "Warning: [$errno] $errstr";
+                    break;
+                case E_NOTICE:
+                case E_USER_NOTICE:
+                    $msg = "Notice: [$errno] $errstr";
+                    break;
+                case E_DEPRECATED:
+                case E_STRICT:
+                    $msg = "Strict/Deprecated notice: [$errno] $errstr";
+                    break;
+                default:
+                    $msg = "Unknown error type: [$errno] $errstr";
+                    break;
             }
             $msg .= " on line $errline in file $errfile";
             //$msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
@@ -265,39 +264,51 @@ class Empathy
             $e = new ErrorException($this->errorsToString());
         }
 
+        // checks exception not already of type req
+        // then checks env before forcing a req error class
+        // (for diplaying standard error pages in prod)
+        // this in-turn depends on elib (elib smarty resource)
+        // for locating req_error template
+        if ('Empathy\MVC\RequestException' != get_class($e) &&
+            $this->boot->getEnvironment() == 'prod') {
+            $message = '';
+            if ($this->boot->getDebugMode()) {
+                $message = $e->getMessage();
+            }
+            $e = new RequestException($message, RequestException::BAD_REQUEST);
+        }
+
         // force safe exception
         //$e = new Empathy\SafeException($e->getMessage());
 
         switch (get_class($e)) {
-        case 'Empathy\MVC\SafeException':
-            echo 'Safe exception: '.$e->getMessage();
-            exit();
-            break;
-        case 'Empathy\MVC\TestModeException':
-            // allow execution to end naturally
-            break;
-        case 'Empathy\MVC\RequestException':
+            case 'Empathy\MVC\SafeException':
+                echo 'Safe exception: '.$e->getMessage();
+                exit();
+                break;
+            case 'Empathy\MVC\TestModeException':
+                // allow execution to end naturally
+                break;
+            case 'Empathy\MVC\RequestException':
 
-            $response = '';
-            switch($e->getCode()) {
-            
-            case RequestException::BAD_REQUEST:
-                $response = 'HTTP/1.1 400 bad request';
-                $message = 'Bad request';
-                break;
-            case RequestException::NOT_FOUND:
-                $response = 'HTTP/1.0 404 Not Found';
-        
-                break;
+                $response = '';
+                switch($e->getCode()) {
+                    case RequestException::BAD_REQUEST:
+                        $response = 'HTTP/1.1 400 Bad Request';
+                        $message = 'Bad request';
+                        break;
+                    case RequestException::NOT_FOUND:
+                        $response = 'HTTP/1.0 404 Not Found';
+                        break;
+                    default:
+                        break;
+                }
+                header($response);
+                //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
+
             default:
+                $this->boot->dispatchException($e);
                 break;
-            }
-            header($response);
-
-            //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
-        default:
-            $this->boot->dispatchException($e);
-            break;
         }
     }
 
@@ -338,9 +349,8 @@ class Empathy
         $i = 0;
         $load_error = 1;
         $location = array('');
-        if(strpos($class, 'Controller\\')
-           || strpos($class, 'Model\\'))
-        {
+        if (strpos($class, 'Controller\\')
+           || strpos($class, 'Model\\')) {
             $class_arr = explode('\\', $class);
             $class = $class_arr[sizeof($class_arr)-1];
 
@@ -348,7 +358,7 @@ class Empathy
                 array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
             }
             array_push($location, DOC_ROOT.'/storage/');
-        } elseif(strpos($class, 'Empathy') === 0) {
+        } elseif (strpos($class, 'Empathy') === 0) {
             $class = str_replace('\\', '/', $class);
         }
         array_push($location, DOC_ROOT.'/application/');

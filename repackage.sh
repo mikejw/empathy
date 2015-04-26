@@ -10,7 +10,7 @@ export TEMP_DIR=./tmp
 export DATE=`date --rfc-3339=date`
 export TIME=`date +%T`
 
-extra=("src/Empathy" "config.yml" "licence.txt" "README" "empathyf")
+extra=("src/Empathy" "config.yml" "licence.txt" "README")
 
 # removing package from channel
 cd ${CHANNEL_ROOT}

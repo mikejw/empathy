@@ -1,5 +1,8 @@
 <?php
 
+namespace Empathy\MVC\Util;
+
+
 require 'PHPUnit/Extensions/OutputTestCase.php';
 require 'Empathy/Util/Test.php';
 
@@ -31,5 +34,4 @@ class TestUnit extends \PHPUnit_Framework_TestCase
     {
         return $this->test->getStatus();
     }
-
 }

@@ -4,7 +4,7 @@ namespace Empathy\MVC;
 
 class Session
 {
-    public static $app = NAME;
+    public static $app;
     private static $up = false;
 
     public static function dump()
@@ -18,11 +18,16 @@ class Session
 
     public static function up()
     {
+        if (!defined('NAME')) {
+            self::$app = 'unnamed';
+        } else {
+            self::$app = NAME;
+        }
+
         if (self::$up === false) {
             @session_start();
-            if(!isset($_SESSION['app']) ||
-               !isset($_SESSION['app'][self::$app]))
-            {
+            if (!isset($_SESSION['app']) ||
+               !isset($_SESSION['app'][self::$app])) {
                 $_SESSION['app'][self::$app] = array();
             }
             //self::dump();
@@ -116,5 +121,4 @@ class Session
             }
         }
     }
-
 }

@@ -27,20 +27,29 @@ class Model
 
     }
 
-    public static function load($model, $host = null)
+    public static function load($model, $id = null, $params = array(), $host = null)
     {
-        $class = '\Empathy\\MVC\\Model\\'.$model;
+        if (class_exists($model)) {
+            $storage_object = new $model($params);
 
-        // manually add entity class 
-        // (for cases when not in 'system-mode' and this code lies outside
-        // the reach of the composer autoload 
-        $file = $model.'.php';
-        require_once(DOC_ROOT.'/storage/'.$file);
+        } else {
+            $class = '\Empathy\\MVC\\Model\\'.$model;
+            // manually add entity class
+            // (for cases when not in 'system-mode' and this code lies outside
+            // the reach of the composer autoload
+            $file = $model.'.php';
+            require_once(DOC_ROOT.'/storage/'.$file);
 
-        // prevent auto-connecting
-        $storage_object = new $class(false);
+            $reflect  = new \ReflectionClass($class);
+            $storage_object = $reflect->newInstanceArgs($params);
+        }
 
-        self::connectModel($storage_object, $host);
+        // todo: if id is numeric load record!
+
+        if (in_array('Empathy\MVC\Entity', class_parents($storage_object))) {
+            self::connectModel($storage_object, $host);
+            $storage_object->init();
+        }
 
         return $storage_object;
     }
@@ -48,16 +57,14 @@ class Model
 
     public static function disconnect(array $models)
     {
-        foreach($models as $m) {
+        foreach ($models as $m) {
             $m->dbDisconnect();
         }
-
     }
 
     public static function getTable($model)
     {
         $class = '\\Empathy\\MVC\\Model\\'.$model;
-
         return $class::TABLE;
     }
 }

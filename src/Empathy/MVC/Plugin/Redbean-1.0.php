@@ -1,37 +1,62 @@
 <?php
 
-namespace Empathy\MVC\Plugin;
-use Empathy\MVC\Plugin as Plugin;
 
-class Redbean extends Plugin implements PreDispatch
-{
+namespace {
+    // for newer versions of redbean
+    // use RedBeanPHP\Facade
+    class R extends RedBean_Facade{} 
+}
 
-    public function __construct()
-    {
-        //
-    }
+namespace Empathy\MVC\Plugin {
 
-    private function isIP($server)
-    {
-        $ip = false;
-        $count = 0;
-        $stripped = str_replace('.', '', DB_SERVER, $count);
-        if ($count) {
-            if (is_numeric($stripped)) {
-                $ip = true;
+    class Redbean extends \Empathy\MVC\Plugin implements PreDispatch
+    {    
+        public function __construct()
+        {
+            //
+        }
+        
+        private function isIP($server)
+        {
+            $ip = false;
+            $count = 0;
+            $stripped = str_replace('.', '', DB_SERVER, $count);
+            if ($count) {
+                if (is_numeric($stripped)) {
+                    $ip = true;
+                }
+            }
+            
+            return $ip;
+        }
+        
+        public function onPreDispatch()
+        {
+            $dbms = (isset($this->config['dbms']))? $this->config['dbms']: 'mysql';
+
+            if ($dbms == 'sqlite') {
+                if (!isset($this->config['database'])) {
+                    throw new \Empathy\MVC\Exception('sqlite database file not supplied.');
+                }
+                $db = DOC_ROOT.'/'.$this->config['database'];
+                if (!file_exists($db)) {
+                    throw new \Empathy\MVC\Exception('sqlite database file not found.');
+                }
+                \R::setup('sqlite:'.$db);
+            } else {
+
+                if (!defined('DB_SERVER')) {
+                    throw new \Empathy\MVC\Exception('Database server is not defined in config.');
+                }
+                if (!$this->isIP(DB_SERVER)) {
+                    throw new \Empathy\MVC\Exception('Database server must be an IP address.');
+                }
+                $dsn = $dbms.':host='.DB_SERVER.';dbname='.DB_NAME.';';
+                if(defined('DB_PORT') && is_numeric(DB_PORT)) {
+                    $dsn .= 'port='.DB_PORT.';';
+                }                    
+                \R::setup($dsn, DB_USER, DB_PASS);                
             }
         }
-
-        return $ip;
-    }
-
-    public function onPreDispatch()
-    {
-        if (!$this->isIP(DB_SERVER)) {
-            throw new \Empathy\Exception('Database server must be an IP address.');
-        }
-
-        \R::setup('mysql:host='.DB_SERVER.';dbname='.DB_NAME, DB_USER, DB_PASS);
-        //\R::setup();
     }
 }

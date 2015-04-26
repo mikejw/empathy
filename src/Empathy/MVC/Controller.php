@@ -4,11 +4,13 @@ namespace Empathy\MVC;
 
 /**
  * Empathy Controller
- * @package                     Empathy
- * @file			Empathy/Controller.php
- * @description		        Controller superclass. Application controllers (found within modules) inherit from this class. Usually through CustomController.php which resides in the top-level applicaition directory.
- * @author			Mike Whiting
- * @license			LGPLv3
+ * @package         Empathy
+ * @file            Empathy/Controller.php
+ * @description     Controller superclass. Application controllers (found within modules) inherit from this class.
+ *                  Usually through CustomController.php which resides in the top-level applicaition directory.
+ *
+ * @author          Mike Whiting
+ * @license         LGPLv3
  *
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
@@ -23,7 +25,9 @@ class Controller
     protected $module;
 
     /**
-     * The name of the class that the current controller instance belongs to as determined by the URI object.  The class will belong to an application module and may well be the same name as the current application module. (A default controller class.)
+     * The name of the class that the current controller instance belongs to as determined by the URI object.
+     * The class will belong to an application module and may well be the same name as the current application module.
+     * (A default controller class.)
      */
     protected $class;
 
@@ -101,12 +105,15 @@ class Controller
         $this->module = $_GET['module'];
         $this->class = $_GET['class'];
         $this->event = $_GET['event'];
-        $this->title = TITLE;
 
-        if (TPL_BY_CLASS == 0) {
-            $this->templateFile = $this->module.'.tpl';
-        } else {
+        if (defined('TITLE')) {
+            $this->title = TITLE;
+        }
+ 
+        if (!defined('TPL_BY_CLASS') || TPL_BY_CLASS) {
             $this->templateFile = $this->class.'.tpl';
+        } else {
+            $this->templateFile = $this->module.'.tpl';
         }
 
         Session::up();
@@ -133,12 +140,17 @@ class Controller
      */
     private function assignConstants()
     {
-        $this->assign('NAME', NAME);
+        if (defined('NAME')) {
+            $this->assign('NAME', NAME);
+        }
+        if (defined('TITLE')) {
+            $this->assign('TITLE', TITLE);
+        }
+
+        $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('WEB_ROOT', WEB_ROOT);
         $this->assign('PUBLIC_DIR', PUBLIC_DIR);
-        $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('MVC_VERSION', MVC_VERSION);
-        $this->assign('TITLE', TITLE);
     }
 
     /**
@@ -254,9 +266,8 @@ class Controller
     protected function isXMLHttpRequest()
     {
         $request = 0;
-        if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-           ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'))
-        {
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+           ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
             $request = 1;
         }
 
@@ -307,10 +318,10 @@ class Controller
      * @return void
      */
     public function loadUIVars($ui, $ui_array)
-    {        
+    {
         $new_app = Session::getNewApp();
         foreach ($ui_array as $setting) {
-            if (isset($_GET[$setting])) {                
+            if (isset($_GET[$setting])) {
                 if (!$new_app) {
                     $_SESSION[$ui][$setting] = $_GET[$setting];
                 } else {
@@ -321,11 +332,11 @@ class Controller
             } elseif (isset($_SESSION[$ui][$setting])) {
                 $_GET[$setting] = $_SESSION[$ui][$setting];
             }
-        }    
+        }
     }
 
     // when $def is 0, valid is true when id is 0
-    public function initID($id, $def, $assertSet=false)
+    public function initID($id, $def, $assertSet = false)
     {
         $valid = true;
         $assign_def = false;
@@ -335,9 +346,8 @@ class Controller
             if ($assertSet) {
                 $valid = false;
             }
-        } elseif(!((string) $_GET[$id] === (string) (int) $_GET[$id]) || ($_GET[$id] == 0 && $def != 0)
-               || $_GET[$id] < 0)
-        {
+        } elseif (!((string) $_GET[$id] === (string) (int) $_GET[$id]) || ($_GET[$id] == 0 && $def != 0)
+               || $_GET[$id] < 0) {
             $assign_def = true;
             $valid = false;
         }
@@ -348,5 +358,4 @@ class Controller
 
         return $valid;
     }
-
 }
