@@ -39,6 +39,5 @@
             "Empathy": "src/"
         }
     },
-    "bin": [ "bin/empathy" ],
-    "minimum-stability": "dev"
+    "bin": [ "bin/empathy" ]
 }
