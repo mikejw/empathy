@@ -13,17 +13,11 @@
             "email": "mail@mikejw.co.uk"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:mikejw/elibs.git"
-        }
-    ],
     "require": {
         "php": ">=5.3.2",
         "wp-cli/php-cli-tools": "dev-master",
         "mustangostang/spyc": "0.5.1",
-        "mikejw/elibs": "dev-develop"
+        "mikejw/elibs": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "4.7.*@dev",        
@@ -39,6 +33,5 @@
             "Empathy": "src/"
         }
     },
-    "bin": [ "bin/empathy" ],
-    "minimum-stability": "dev"
+    "bin": [ "bin/empathy" ]
 }
