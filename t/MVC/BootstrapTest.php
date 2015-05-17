@@ -41,6 +41,11 @@ class BootstrapTest extends ESuiteTest
 
     public function testDispatch()
     {
+        define('WEB_ROOT', 'localhost');
+        define('PUBLIC_DIR', '');
+        $_SERVER['HTTP_HOST'] = 'localhost';
+        $_SERVER['REQUEST_URI'] = '/empathy';
+
         $this->bootstrap->dispatch();
         $this->assertTrue(true);
     }

@@ -121,7 +121,7 @@ class Controller
         // get presenter
         $this->presenter = $this->plugin_manager->getView();
 
-        if ($this->presenter !== null) {
+        if ($this->presenter !== NULL) {
             $this->assignControllerInfo();
             $this->assignConstants();
             $this->assignEnvironment();
@@ -140,16 +140,15 @@ class Controller
      */
     private function assignConstants()
     {
-        if (defined('NAME')) {
-            $this->assign('NAME', NAME);
+        if (Config::get('NAME') !== false) {
+            $this->assign('NAME', Config::get('NAME'));
         }
-        if (defined('TITLE')) {
-            $this->assign('TITLE', TITLE);
+        if (Config::get('TITLE') !== false) {
+            $this->assign('TITLE', Config::get('TITLE'));
         }
-
-        $this->assign('DOC_ROOT', DOC_ROOT);
-        $this->assign('WEB_ROOT', WEB_ROOT);
-        $this->assign('PUBLIC_DIR', PUBLIC_DIR);
+        $this->assign('DOC_ROOT', Config::get('DOC_ROOT'));
+        $this->assign('WEB_ROOT', Config::get('WEB_ROOT'));
+        $this->assign('PUBLIC_DIR', Config::get('PUBLIC_DIR'));
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
 

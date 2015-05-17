@@ -2,6 +2,7 @@
 
 namespace Empathy\MVC;
 
+
 define('MVC_VERSION', '0.9.6');
 
 /**
@@ -327,7 +328,7 @@ class Empathy
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
             if (!is_array($item)) {
-                define(strtoupper($index), $item);
+                Config::store(strtoupper($index), $item);
             }
         }
         if (isset($config['boot_options'])) {
@@ -345,7 +346,7 @@ class Empathy
      * @return void
      */
     public static function loadClass($class)
-    {
+    {       
         $i = 0;
         $load_error = 1;
         $location = array('');

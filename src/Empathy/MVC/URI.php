@@ -61,13 +61,13 @@ class URI
 
     public function __construct($default_module, $dynamic_module)
     {
-        if (isset($_SERVER['HTTP_HOST']) && strpos(WEB_ROOT, $_SERVER['HTTP_HOST']) === false) {
+        if (isset($_SERVER['HTTP_HOST']) && strpos(Config::get('WEB_ROOT'), $_SERVER['HTTP_HOST']) === false) {
             throw new SafeException('Host name mismatch.');
         }
 
         $this->cli_mode_detected = false;
         $this->sanity($default_module);
-        $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
+        $removeLength = strlen(Config::get('WEB_ROOT').Config::get('PUBLIC_DIR'));
         $this->defaultModule = $default_module;
         $this->dynamicModule = $dynamic_module;
         if (isset($_SERVER['HTTP_HOST'])) {
@@ -123,7 +123,7 @@ class URI
         if (isset($_GET['module'])) {
             $this->setModule($_GET['module']);
         } elseif ($this->uriString == '') { // || strpos($this->uriString, '.')) {
-            if ($this->defaultModule === null) {
+            if ($this->defaultModule === NULL) {
                 $this->setModule($this->internal_controller);
             } else {
                 $this->setModule($this->defaultModule);
@@ -162,7 +162,7 @@ class URI
         
         $temp_uri_string = implode('/', $uri);
         if (preg_match('/[A-Z]/', $temp_uri_string)) {
-            header('Location: http://'.WEB_ROOT.PUBLIC_DIR.'/'.strtolower($temp_uri_string).$args, true, 301);
+            header('Location: http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/'.strtolower($temp_uri_string).$args, true, 301);
             exit();
         }
         
@@ -238,7 +238,7 @@ class URI
 
     public function setControllerPath()
     {
-        $this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
+        $this->controllerPath = Config::get('DOC_ROOT').'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
     }
 
     // cause of error
@@ -271,7 +271,7 @@ class URI
         }
         $this->controllerName = 'Empathy\\MVC\\Controller\\'.$this->controllerName;
         if (!$this->error) {
-            require_once(DOC_ROOT.'/application/CustomController.php');
+            require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
             
             if (!class_exists($this->controllerName)) {
                 // try manual include
@@ -327,7 +327,7 @@ class URI
         $rows = $section->getURIData();
         if (isset($section_uri)) {
             for ($i = 0; $i < sizeof($rows); $i++) {
-                if ($rows[$i]['friendly_url'] != null) {
+                if ($rows[$i]['friendly_url'] != NULL) {
                     $comp = str_replace(" ", "", strtolower($rows[$i]['friendly_url']));
                 } else {
                     $comp = str_replace(" ", "", strtolower($rows[$i]['label']));
@@ -403,13 +403,13 @@ class URI
 
     public function sanity($default_module)
     {
-        if (!defined('WEB_ROOT')) {
+        if (Config::get('WEB_ROOT') == false) {
             throw new SafeException('Dispatch error: Web root is not defined');
         }
-        if (!defined('PUBLIC_DIR')) {
+        if (Config::get('PUBLIC_DIR') == false) {
             throw new SafeException('Dispatch error: Public dir is not defined');
         }
-        if (!defined('DOC_ROOT')) {
+        if (Config::get('DOC_ROOT') == false) {
             throw new SafeException('Dispatch error: Doc root is not defined');
         }
     }

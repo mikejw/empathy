@@ -2,6 +2,8 @@
 
 namespace Empathy\MVC;
 
+use Empathy\MVC\Config;
+
 /**
  * Empathy Database Pool
  * @file            Empathy/DBPool.php
@@ -38,7 +40,7 @@ class DBPool
     * @return void
     */
 
-    public static function addHost($s, $n, $u, $p, $host, $port = null)
+    public static function addHost($s, $n, $u, $p, $host, $port = NULL)
     {
         self::$pool[$host] = new DBC($s, $n, $u, $p, $port);
     }
@@ -77,10 +79,13 @@ class DBPool
     public static function getDefCX()
     {
         if (sizeof(self::$pool) < 1) {
-            if (defined('DB_PORT') && is_numeric(DB_PORT)) {
-                self::addHost(DB_SERVER, DB_NAME, DB_USER, DB_PASS, 'default', DB_PORT);
+
+            $db_port = Config::get('DB_PORT');
+
+            if (is_numeric($db_port)) {
+                self::addHost(Config::get('DB_SERVER'), Config::get('DB_NAME'), Config::get('DB_USER'), Config::get('DB_PASS'), 'default', $db_port);
             } else {
-                self::addHost(DB_SERVER, DB_NAME, DB_USER, DB_PASS, 'default');
+                self::addHost(Config::get('DB_SERVER'), Config::get('DB_NAME'), Config::get('DB_USER'), Config::get('DB_PASS'), 'default');
             }
         }
         return self::getConnection('default');

@@ -2,6 +2,7 @@
 
 namespace Empathy\MVC\Plugin;
 
+use Empathy\MVC\Config;
 use Empathy\MVC\Plugin as Plugin;
 
 class Smarty extends Plugin implements PreDispatch, Presentation
@@ -15,27 +16,16 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     public function onPreDispatch()
     {
-        if (defined('SMARTY_DEBUGGING') && SMARTY_DEBUGGING) {
+        if (Config::get('SMARTY_DEBUGGING')) {
             $this->smarty->debugging = true;
         }
-
-        $this->smarty->template_dir = DOC_ROOT."/presentation";
-        $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
-        $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
-        $this->smarty->config_dir = DOC_ROOT."/tpl/configs";
-
-        if (defined('SMARTY_CACHING') && SMARTY_CACHING == true) {
+        if (Config::get('SMARTY_CACHING')) {
             $this->smarty->caching = 1;
         }
-
-        // assign constants
-        if (defined('NAME')) {
-            $this->assign('NAME', NAME);
-        }
-        $this->assign('DOC_ROOT', DOC_ROOT);
-        $this->assign('WEB_ROOT', WEB_ROOT);
-        $this->assign('PUBLIC_DIR', PUBLIC_DIR);
-        $this->assign('MVC_VERSION', MVC_VERSION);
+        $this->smarty->template_dir = Config::get('DOC_ROOT')."/presentation";
+        $this->smarty->compile_dir = Config::get('DOC_ROOT')."/tpl/templates_c";
+        $this->smarty->cache_dir = Config::get('DOC_ROOT')."/tpl/cache";
+        $this->smarty->config_dir = Config::get('DOC_ROOT')."/tpl/configs";
     }
 
     public function assign($name, $data)
