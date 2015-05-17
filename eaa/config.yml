@@ -11,6 +11,9 @@ boot_options:
   debug_mode: true
 plugins:
   -
+    name: ELibs
+    version: 1.0
+  -
     name: Smarty
     version: 1.0
     class_path: Smarty/Smarty.class.php
