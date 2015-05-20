@@ -1,6 +1,8 @@
 <?php
 
 namespace ESuite\MVC;
+
+use Empathy\MVC\Config as EmpConfig;
 use ESuite\ESuiteTest;
 use \Mockery as m;
 
@@ -19,7 +21,8 @@ class BootstrapTest extends ESuiteTest
             'default_module' => 'foo',
             'dynamic_module' => null,
             'debug_mode' => false,
-            'environment' => 'dev'
+            //'environment' => 'dev'
+            'handle_errors' => false
         );
 
         $this->mvc = m::mock('Empathy\MVC\Empathy');
@@ -41,14 +44,16 @@ class BootstrapTest extends ESuiteTest
 
     public function testDispatch()
     {
-        define('WEB_ROOT', 'localhost');
-        define('PUBLIC_DIR', '');
-        $_SERVER['HTTP_HOST'] = 'localhost';
-        $_SERVER['REQUEST_URI'] = '/empathy';
+        // $_SERVER['HTTP_HOST'] = 'localhost';
+        // $_SERVER['REQUEST_URI'] = '/empathy';
+
+        $this->setConfig('WEB_ROOT', 'localhost');
+        $this->setConfig('PUBLIC_DIR', '');
+        $this->setConfig('DOC_ROOT', '');
+
+
 
         $this->bootstrap->dispatch();
         $this->assertTrue(true);
     }
-
-
 }

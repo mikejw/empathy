@@ -34,7 +34,7 @@ class Boot
         }
 
 
-        self::dummyConfig();
+        //self::dummyConfig();
     }
 
     private function getCriteria()

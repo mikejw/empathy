@@ -2,19 +2,23 @@
 
 namespace ESuite;
 
-use Empathy\MVC\Util\CLI,
-    Empathy\MVC\Util\CLIMode;
+use Empathy\MVC\Util\CLI;
+use Empathy\MVC\Util\CLIMode;
+use Empathy\MVC\Config as EmpConfig;
 
 
 abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
 {
    
     protected function setUp()
-    {
-                
+    {      
         //
     }    
     
+    protected function setConfig($key, $value)
+    {
+        EmpConfig::store($key, $value);
+    }
 
 
     protected function tearDown()

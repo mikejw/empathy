@@ -403,13 +403,13 @@ class URI
 
     public function sanity($default_module)
     {
-        if (Config::get('WEB_ROOT') == false) {
+        if (Config::get('WEB_ROOT') === false) {
             throw new SafeException('Dispatch error: Web root is not defined');
         }
-        if (Config::get('PUBLIC_DIR') == false) {
+        if (Config::get('PUBLIC_DIR') === false) {
             throw new SafeException('Dispatch error: Public dir is not defined');
         }
-        if (Config::get('DOC_ROOT') == false) {
+        if (Config::get('DOC_ROOT') === false) {
             throw new SafeException('Dispatch error: Doc root is not defined');
         }
     }
