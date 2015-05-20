@@ -25,7 +25,7 @@ class Session
         }
 
         if (self::$up === false) {
-            @session_start();
+            Testable::session_start();
             if (!isset($_SESSION['app']) ||
                !isset($_SESSION['app'][self::$app])) {
                 $_SESSION['app'][self::$app] = array();
@@ -52,9 +52,6 @@ class Session
 
     public static function getUISetting($ui, $setting)
     {
-
-        //    echo $_SESSION['app'][self::$app][$ui][$setting];
-
         if (isset($_SESSION['app'][self::$app][$ui][$setting])) {
             return $_SESSION['app'][self::$app][$ui][$setting];
         } else {
@@ -70,8 +67,8 @@ class Session
         // main logic
         unset($_SESSION['app'][self::$app]);
         if (sizeof($_SESSION['app']) == 0) {
-            session_unset();
-            session_destroy();
+            Testable::session_unset();
+            Testable::session_destroy();
         }
 
         // backwards compatibility
@@ -103,7 +100,8 @@ class Session
         unset($_SESSION['app'][self::$app][$key]);
     }
 
-    // taken from controller
+    
+    
     public static function loadUIVars($ui, $ui_array)
     {
         $new_app = self::getNewApp();
@@ -121,4 +119,11 @@ class Session
             }
         }
     }
+
+
+    public static function write()
+    {
+        Testable::session_write_close();
+    }
+
 }

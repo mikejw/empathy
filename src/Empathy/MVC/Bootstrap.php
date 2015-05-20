@@ -254,14 +254,14 @@ class Bootstrap
                 $plugin_manager->init();
                 foreach ($plugins as $p) {
                     if (isset($p['class_path'])) {
-                        require($p['class_path']);
+                        require_once($p['class_path']);
                         if (isset($p['loader']) && $p['loader'] != '') {
                             spl_autoload_register(array($p['class_name'], $p['loader']));
                         }
                     }
                     $plugin_path = realpath(dirname(realpath(__FILE__))).'/Plugin/'.$p['name'].'-'.$p['version'].'.php';
                     if (file_exists($plugin_path)) {
-                        require($plugin_path);
+                        require_once($plugin_path);
                         $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
                         $n = new $plugin();
                         if (isset($p['config'])) {

@@ -41,10 +41,6 @@ class Controller
      */
     private $templateFile;
 
-    /**
-     * The default title of the page taken from the application config file.
-     */
-    protected $title;
 
     /**
      * The view/presentation object that will be used to render the page.
@@ -90,44 +86,29 @@ class Controller
     public function __construct($boot)
     {
         $this->boot = $boot;
-
         $this->cli_mode = $boot->getURICliMode();
         $this->initError = $boot->getURIError();
         $this->uri_data = $boot->getURIData();
         $this->plugin_manager = $boot->getPluginManager();
         $this->plugin_manager->setController($this);
-
         $this->environment = $boot->getEnvironment();
-
         $this->stash = new Stash();
-
         $this->connected = false;
         $this->module = $_GET['module'];
         $this->class = $_GET['class'];
         $this->event = $_GET['event'];
-
-        if (defined('TITLE')) {
-            $this->title = TITLE;
-        }
- 
-        if (!defined('TPL_BY_CLASS') || TPL_BY_CLASS) {
+        if (Config::get('TPL_BY_CLASS')) {
             $this->templateFile = $this->class.'.tpl';
         } else {
             $this->templateFile = $this->module.'.tpl';
         }
-
         Session::up();
-
-        // get presenter
         $this->presenter = $this->plugin_manager->getView();
-
         if ($this->presenter !== NULL) {
             $this->assignControllerInfo();
             $this->assignConstants();
             $this->assignEnvironment();
         }
-
-        // if within CMS assign the current section name to the template
         if (isset($_GET['section_uri'])) {
             $this->assign('section', $_GET['section_uri']);
         }
@@ -205,27 +186,20 @@ class Controller
 
     /**
      * Redirect the user to another location within the application
-     * Redirection is disabled if the MVC_TEST_MODE global flag is detected to prevent tests breaking
-     * but execution always begins to end here
      *
      * @param string $endString the new URI to redirect to.
      *
      * @return void
      */
-    public function redirect($endString)
+    public function redirect($endString='')
     {
-        if (!defined('MVC_TEST_MODE')) {
-            session_write_close();
-            $location = 'Location: ';
-            $location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
-            if ($endString != '') {
-                $location .= $endString;
-            }
-            header($location);
-        } else {
-            throw new TestModeException('Cannot redirect due to test mode.');
+        Session::write();
+        $location = 'Location: ';
+        $location .= 'http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
+        if ($endString != '') {
+            $location .= $endString;
         }
-        
+        Testable::header($location);        
     }
 
     /**
@@ -235,16 +209,15 @@ class Controller
      *
      * @return void
      */
-    protected function redirect_cgi($endString)
+    public function redirect_cgi($endString='')
     {
-        session_write_close();
+        Session::write();
         $location = 'Location: ';
-        $location .= 'http://'.CGI.'/';
+        $location .= 'http://'.Config::get('CGI').'/';
         if ($endString != '') {
             $location .= $endString;
         }
-        header($location);
-        exit();
+        Testable::header($location);
     }
 
     /**
@@ -252,7 +225,7 @@ class Controller
      *
      * @return void
      */
-    protected function sessionDown()
+    public function sessionDown()
     {
         Session::down();
     }
@@ -262,14 +235,13 @@ class Controller
      *
      * @return void
      */
-    protected function isXMLHttpRequest()
+    public function isXMLHttpRequest()
     {
-        $request = 0;
+        $request = false;
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
            ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
-            $request = 1;
+            $request = true;
         }
-
         return $request;
     }
 
@@ -308,31 +280,6 @@ class Controller
         return $this->class;
     }
 
-    /**
-     * Obtain user interface control values from request/session.
-     * @param string $ui name of interface control set
-     *
-     * @param array $ui_array set of control settings
-     *
-     * @return void
-     */
-    public function loadUIVars($ui, $ui_array)
-    {
-        $new_app = Session::getNewApp();
-        foreach ($ui_array as $setting) {
-            if (isset($_GET[$setting])) {
-                if (!$new_app) {
-                    $_SESSION[$ui][$setting] = $_GET[$setting];
-                } else {
-                    Session::setUISetting($ui, $setting, $_GET[$setting]);
-                }
-            } elseif (Session::getUISetting($ui, $setting) !== false) {
-                $_GET[$setting] = Session::getUISetting($ui, $setting);
-            } elseif (isset($_SESSION[$ui][$setting])) {
-                $_GET[$setting] = $_SESSION[$ui][$setting];
-            }
-        }
-    }
 
     // when $def is 0, valid is true when id is 0
     public function initID($id, $def, $assertSet = false)
