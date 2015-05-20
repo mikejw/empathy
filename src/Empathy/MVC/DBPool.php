@@ -39,7 +39,6 @@ class DBPool
     *
     * @return void
     */
-
     public static function addHost($s, $n, $u, $p, $host, $port = NULL)
     {
         self::$pool[$host] = new DBC($s, $n, $u, $p, $port);
@@ -90,4 +89,11 @@ class DBPool
         }
         return self::getConnection('default');
     }
+
+    public static function reset()
+    {
+        self::$pool = array();
+    }
+
+
 }
