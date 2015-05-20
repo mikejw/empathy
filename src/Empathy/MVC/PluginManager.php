@@ -11,7 +11,7 @@ class PluginManager
 
     public function __construct()
     {
-        $this->initialized = 0;
+        $this->initialized = false;
         $this->plugins = array();
         $this->view_plugins = array();
     }
@@ -23,7 +23,7 @@ class PluginManager
 
     public function init()
     {
-        $this->initialized = 1;
+        $this->initialized = true;
     }
 
     public function register($p)
@@ -50,7 +50,7 @@ class PluginManager
     }
 
     public function getView()
-    {
+    {    
         if (sizeof($this->view_plugins) == 0) {
             throw new \Exception('No plugin loaded for view.');
         } else {

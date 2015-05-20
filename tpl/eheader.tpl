@@ -2,9 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-{include file="comp_title.tpl"}
-{include file="comp_keywords.tpl"}
-{include file="comp_description.tpl"}
+<title>Empathy {$MVC_VERSION}</title>
 
 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
 {if $environment eq 'dev'}

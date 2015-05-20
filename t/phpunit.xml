@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 
-<phpunit
+<phpunit    
     bootstrap="bootstrap.php"
     backupGlobals="false"
     stopOnFailure="true"

@@ -112,7 +112,6 @@ class Bootstrap
     public function __construct($bootOptions, $plugins, $mvc)
     {
         $this->persistent_mode = $mvc->getPersistentMode();
-
         $this->mvc = $mvc;
         $this->plugins = $plugins;
         $this->plugin_manager = new PluginManager();
