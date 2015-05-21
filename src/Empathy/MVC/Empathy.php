@@ -181,6 +181,7 @@ class Empathy
         return $this->errors;
     }
 
+
     /**
      * Returns whether error handler has caught anything or not.
      * @return boolean
@@ -259,7 +260,7 @@ class Empathy
      * @return void
      *
      */
-    private function exceptionHandler($e)
+    public function exceptionHandler($e)
     {
         // prioritise any caught errors over exceptions thrown
         if ($this->hasErrors()) {
@@ -285,14 +286,12 @@ class Empathy
 
         switch (get_class($e)) {
             case 'Empathy\MVC\SafeException':
-                echo 'Safe exception: '.$e->getMessage();
-                exit();
+                Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
             case 'Empathy\MVC\TestModeException':
                 // allow execution to end naturally
                 break;
             case 'Empathy\MVC\RequestException':
-
                 $response = '';
                 switch($e->getCode()) {
                     case RequestException::BAD_REQUEST:
@@ -305,7 +304,7 @@ class Empathy
                     default:
                         break;
                 }
-                header($response);
+                Testable::header($response);
                 //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
 
             default:
