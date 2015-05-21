@@ -29,27 +29,27 @@ class Empathy
      * Boot options read from application config file.
      * @var array
      */
-    private $bootOptions;
+    private $bootOptions = array();
 
     /**
      * Plugin definition read from application config file.
      * @var array
      */
-    private $plugins;
+    private $plugins = array();
 
     /**
      * When application is set to handle errors
      * this array is used to collect the error messages.
      * @var array
      */
-    private $errors;
+    private $errors = array();
 
     /**
      * Application persistent mode. Implies there could be multiple requests to handle
      * following initialization. This flag is passed directly to the application.
      * @var boolean
      */
-    private $persistent_mode;
+    private $persistent_mode = false;
 
     /**
      * This flag is read from the boot_options section of the application config.
@@ -60,7 +60,7 @@ class Empathy
      *
      * @var boolean
      */
-    private static $use_elib;
+    private static $use_elib = false;
 
     /**
      * Create application object.
@@ -190,6 +190,7 @@ class Empathy
         return (sizeof($this->errors) > 0);
     }
 
+
     /**
      * Return a concatenated string of all caught error messages.
      * @return string $errors
@@ -224,7 +225,7 @@ class Empathy
                     $msg .= "  Fatal error on line $errline in file $errfile";
                     $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
                     $msg .= " Aborting...";
-                    die($msg);
+                    Testable::doDie($msg);
                     break;
                 case E_WARNING:
                 case E_USER_WARNING:

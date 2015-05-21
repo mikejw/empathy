@@ -29,8 +29,11 @@ class Boot
         if (Config::get('reset_db')) {
             $this->dbReset();
         }
-        if(Config::get('set_test_mode')) {
-            define('MVC_TEST_MODE', true);
+        if (Config::get('set_test_mode')) {
+            define('MVC_TEST_MODE', Config::get('set_test_mode'));
+        }
+        if (Config::get('set_test_mode_output')) {
+            define('MVC_TEST_OUTPUT_ON', Config::get('set_test_mode_output'));
         }
 
 

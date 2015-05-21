@@ -8,10 +8,24 @@ namespace Empathy\MVC;
 class Testable extends Exception
 {
 
+    public static function doDie($msg='')
+    {
+        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
+            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
+                echo 'die: ' . $msg;
+            }        
+        } else {
+            die($header);
+        }
+    }
+
     public static function header($header)
     {
-        if (defined('MVC_TEST_MODE')) {
-            echo 'Setting header:' . $header;
+        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
+            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
+                echo 'Setting header:' . $header;    
+            }
+            
         } else {
             header($header);
         }
@@ -19,8 +33,10 @@ class Testable extends Exception
 
     public static function session_start()
     {
-        if (defined('MVC_TEST_MODE')) {
-            echo 'session start';
+        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
+            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
+                echo 'session start';
+            }
         } else {
             session_start();
         }
@@ -29,8 +45,10 @@ class Testable extends Exception
 
     public static function session_unset()
     {
-        if (defined('MVC_TEST_MODE')) {
-            echo 'session unset';
+        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
+            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
+                echo 'session unset';
+            }
         } else {
             session_unset();
         }
@@ -39,8 +57,10 @@ class Testable extends Exception
 
     public static function session_destroy()
     {
-        if (defined('MVC_TEST_MODE')) {
-            echo 'session destroy';
+        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
+            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
+                echo 'session destroy';
+            }
         } else {
             session_destroy();
         }
@@ -49,8 +69,10 @@ class Testable extends Exception
 
     public static function session_write_close()
     {
-        if (defined('MVC_TEST_MODE')) {
-            echo 'session_write_close';
+        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
+            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
+                echo 'session_write_close';
+            }
         } else {
             session_write_close();
         }
