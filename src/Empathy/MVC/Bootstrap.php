@@ -204,7 +204,7 @@ class Bootstrap
                         
             if ($req_error) {
                  $this->controller->assign('code', $e->getCode());
-                 $this->controller->setTemplate('elib:/req_error.tpl');
+                 $this->controller->setTemplate('req_error.tpl');
                  $this->display();
             } else {
                 $this->controller->setTemplate('empathy.tpl');

@@ -17,7 +17,7 @@ class EmpathyTest extends ESuiteTest
 
     private function createMVC($persistent=false)
     {   
-        $this->expectOutputRegex('/(Setting header)/');     
+        //$this->expectOutputRegex('/(Setting header)/');     
         return new \Empathy\MVC\Empathy($this->config_dir, $persistent);
     }
     
