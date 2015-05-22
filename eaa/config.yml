@@ -4,7 +4,7 @@ doc_root: /Users/mike/code/mikejw/empathy/eaa
 web_root: localhost/eaa
 public_dir: /public_html
 boot_options:
-  handle_errors: false
+  handle_errors: true
   default_module: front
   use_elib: false
   environment: prod
