@@ -7,10 +7,6 @@ use Empathy\MVC\Plugin as Plugin;
 
 class EDefault extends Plugin implements PreDispatch
 {
-    public function __construct()
-    {
-        //
-    }
 
     public function onPreDispatch()
     {

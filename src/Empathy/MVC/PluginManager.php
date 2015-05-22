@@ -67,4 +67,20 @@ class PluginManager
             return $view;
         }
     }
+
+    public function eLibsTestMode()
+    {
+        $mode = false;
+        foreach ($this->plugins as $p) {
+            if (get_class($p) == 'Empathy\MVC\Plugin\ELibs') {
+                $c = $p->getConfig();
+                if (isset($c['testing']) && $c['testing']) {
+                    $mode = true;
+                }
+                break;
+            }
+        }
+        return $mode;
+    }
+
 }

@@ -76,14 +76,12 @@ class Empathy
         if ($system_mode) {
             spl_autoload_register(array($this, 'loadClass'));
         }
-        $this->loadConfig($configDir);
-        
+        $this->loadConfig($configDir);        
         if ($system_mode) {
             $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
         } else {
             $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'));
         }
-
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
             self::$use_elib = true;
@@ -91,15 +89,11 @@ class Empathy
         } else {
             self::$use_elib = false;
         }
-
         if ($this->getHandlingErrors()) {
             set_error_handler(array($this, 'errorHandler'));
         }
-
         $this->boot = new Bootstrap($this->bootOptions, $this->plugins, $this);
-
         $this->initPlugins();
-
         if ($this->persistent_mode !== true) {
             $this->beginDispatch();
         }
@@ -270,8 +264,6 @@ class Empathy
         // checks exception not already of type req
         // then checks env before forcing a req error class
         // (for diplaying standard error pages in prod)
-        // this in-turn depends on elib (elib smarty resource)
-        // for locating req_error template
         if ('Empathy\MVC\RequestException' != get_class($e) &&
             $this->boot->getEnvironment() == 'prod') {
             $message = '';

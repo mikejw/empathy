@@ -9,13 +9,11 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 {
     private $smarty;
 
-    public function __construct()
-    {
-        $this->smarty = new \Smarty();
-    }
 
     public function onPreDispatch()
     {
+        $this->smarty = new \Smarty();
+
         if (Config::get('SMARTY_DEBUGGING')) {
             $this->smarty->debugging = true;
         }

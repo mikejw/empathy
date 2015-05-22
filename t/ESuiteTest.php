@@ -30,8 +30,9 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
 
     protected function makeFakeBootstrap()
     {
-        $doc_root = realpath(dirname(realpath(__FILE__)).'/../');
-
+        // use eaa archive as root
+        $doc_root = realpath(dirname(realpath(__FILE__)).'/../eaa/');
+        
         $this->setConfig('NAME', 'empathytest');
         $this->setConfig('TITLE', 'empathy testing');
         $this->setConfig('DOC_ROOT', $doc_root);
@@ -48,7 +49,8 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
         $plugins = array(
             array(
                 'name' => 'ELibs',
-                'version' => '1.0'
+                'version' => '1.0',
+                'config' => '{ "testing": true }'
             ),
             array(
                 'name' => 'Smarty',
@@ -62,6 +64,7 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
         $mvc = m::mock('Empathy\MVC\Empathy');
         $mvc->shouldReceive('getPersistentMode')->times(1)->andReturn(true);
         $bootstrap = new \Empathy\MVC\Bootstrap($dummyBootOptions, $plugins, $mvc);
+
         $bootstrap->initPlugins();
         return $bootstrap;
     }

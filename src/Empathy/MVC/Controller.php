@@ -94,9 +94,9 @@ class Controller
         $this->environment = $boot->getEnvironment();
         $this->stash = new Stash();
         $this->connected = false;
-        $this->module = $_GET['module'];
-        $this->class = $_GET['class'];
-        $this->event = $_GET['event'];
+        $this->module = (isset($_GET['module']))? $_GET['module']: NULL;
+        $this->class = (isset($_GET['class']))? $_GET['class']: NULL;
+        $this->event = (isset($_GET['event']))? $_GET['event']: NULL;
         if (Config::get('TPL_BY_CLASS')) {
             $this->templateFile = $this->class.'.tpl';
         } else {
@@ -111,6 +111,12 @@ class Controller
         }
         if (isset($_GET['section_uri'])) {
             $this->assign('section', $_GET['section_uri']);
+        }
+
+        // create a plugin for this?
+        // taken from mikejw custom controller
+        if($boot->getEnvironment() == 'dev') {
+            $this->assign('dev_rand', uniqid());
         }
     }
 
@@ -181,6 +187,18 @@ class Controller
     public function initDisplay($i)
     {
         $this->presenter->switchInternal($i);
+
+        // @todo: optimise somehow?
+        // for default templates check test mode
+        // derived from elibs plugin
+        if ($this->plugin_manager->eLibsTestMode()) {
+            $empathy_dir = Config::get('DOC_ROOT').'/../';
+        } else {
+            $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
+        }
+        $empathy_dir = realpath($empathy_dir);
+        $this->assign('EMPATHY_DIR', $empathy_dir);
+            
         $this->presenter->display($this->templateFile);
     }
 

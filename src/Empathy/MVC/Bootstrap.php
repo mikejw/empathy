@@ -202,6 +202,8 @@ class Bootstrap
         if ($this->controller->getModule() != 'api') {
             $this->controller->assign('error', $e->getMessage());
                         
+
+
             if ($req_error) {
                  $this->controller->assign('code', $e->getCode());
                  $this->controller->setTemplate('req_error.tpl');
@@ -263,10 +265,7 @@ class Bootstrap
                     if (file_exists($plugin_path)) {
                         require_once($plugin_path);
                         $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
-                        $n = new $plugin();
-                        if (isset($p['config'])) {
-                            $n->assignConfig($p['config']);
-                        }
+                        $n = (isset($p['config']))? new $plugin($p['config']): new $plugin(NULL);
                         $plugin_manager->register($n);
                     }
                 }
