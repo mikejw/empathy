@@ -7,8 +7,8 @@ boot_options:
   handle_errors: false
   default_module: front
   use_elib: false
-  environment: dev
-  debug_mode: true
+  environment: prod
+  debug_mode: false
 plugins:
   -
     name: ELibs
