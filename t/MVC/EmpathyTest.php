@@ -7,6 +7,10 @@ use Empathy\MVC\DBC;
 use ESuite\ESuiteTest;
 
 
+// @totdo: figure out proper use of expectOutput
+// can we set it multiple times.. or match over set of output
+// is it supposed to default to one test case?
+
 class EmpathyTest extends ESuiteTest
 {
     private $config_dir;
