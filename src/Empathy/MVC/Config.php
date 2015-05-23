@@ -23,4 +23,9 @@ class Config
     {
         self::$items[$key] = $data;
     }
+
+    public static function dump()
+    {
+        print_r(self::$items);
+    }
 }

@@ -21,7 +21,7 @@ class Bootstrap
      * which is instatiated before an action can be dispatchted.
      * @var Controller
      */
-    private $controller = null;
+    private $controller = NULL;
 
     /**
      * Default module read from application config file.
@@ -115,7 +115,15 @@ class Bootstrap
         $this->mvc = $mvc;
         $this->plugins = $plugins;
         $this->plugin_manager = new PluginManager();
+        $this->initBootOptions($bootOptions);
+    }
 
+
+    public function initBootOptions($bootOptions = NULL)
+    {
+        if ($bootOptions === NULL) {
+            $bootOptions = Config::get('BOOT_OPTIONS');
+        }    
         if (isset($bootOptions['default_module'])) {
             $this->defaultModule = $bootOptions['default_module'];
         }
@@ -125,16 +133,15 @@ class Bootstrap
         if (isset($bootOptions['debug_mode'])) {
             $this->debug_mode = ($bootOptions['debug_mode'] === true);
         }
-
         $this->environment = 'dev';
         $valid_env = array('dev', 'stag', 'prod');
-
         if (isset($bootOptions['environment'])) {
             if (in_array($bootOptions['environment'], $valid_env)) {
                 $this->environment = $bootOptions['environment'];
             }
         }
     }
+
 
     /**
      * Create URI object which determines dispatch method and

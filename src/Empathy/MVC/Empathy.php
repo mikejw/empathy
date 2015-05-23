@@ -319,14 +319,11 @@ class Empathy
         $s = new \Spyc();
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
-            if (!is_array($item)) {
-                Config::store(strtoupper($index), $item);
-            }
+            Config::store(strtoupper($index), $item);
         }
         if (isset($config['boot_options'])) {
             $this->bootOptions = $config['boot_options'];
         }
-
         if (isset($config['plugins'])) {
             $this->plugins = $config['plugins'];
         }
@@ -369,5 +366,12 @@ class Empathy
             }
             $i++;
         }
+    }
+
+
+
+    public function reloadBootOptions()
+    {
+        $this->boot->initBootOptions();
     }
 }
