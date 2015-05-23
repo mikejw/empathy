@@ -5,7 +5,7 @@ namespace Empathy\MVC;
 // simple mocking for certain native calls
 // use magic method?
 
-class Testable extends Exception
+class Testable
 {
 
     public static function doDie($msg='')

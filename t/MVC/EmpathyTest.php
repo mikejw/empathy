@@ -17,7 +17,7 @@ class EmpathyTest extends ESuiteTest
 
     private function createMVC($persistent=false)
     {   
-        $this->expectOutputRegex('/(Setting header)/');     
+        $this->expectOutputRegex('/(Setting header)/');
         return new \Empathy\MVC\Empathy($this->config_dir, $persistent);
     }
     
@@ -25,10 +25,7 @@ class EmpathyTest extends ESuiteTest
 
     public function testNew()
     {
-        //$this->markTestSkipped();
-        $this->setExpectedException(
-            'Empathy\MVC\Exception', 'Dispatch error 1 : Missing class file'
-        );    
+        //$this->expectOutputRegex('/<h1>Empathy<\/h1>/');
         $mvc = $this->createMVC();
     }
 
@@ -60,18 +57,24 @@ class EmpathyTest extends ESuiteTest
 
     public function testExceptions()
     {
+        //$this->markTestSkipped();
         $mvc = $this->createMVC(true);
         $this->expectOutputRegex('/die: Safe exception: some error/');
         $mvc->exceptionHandler(new \Empathy\MVC\SafeException('some error'));
 
         $mvc = $this->createMVC(true);
-        $this->expectOutputRegex('/<h2>some error<\/h2>/');     
+        $this->expectOutputRegex('/<h2>some error<\/h2>/');
         $mvc->exceptionHandler(new \Exception('some error'));
 
         // code = 0 => 404
         $mvc = $this->createMVC(true);
         $this->expectOutputRegex('/Not found/');    
-        $mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error')); 
+        $mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error'));
+
+        // code = 1 => 500
+        $mvc = $this->createMVC(true);
+        $this->expectOutputRegex('/Bad request/');    
+        $mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error', 1)); 
 
     }
 
