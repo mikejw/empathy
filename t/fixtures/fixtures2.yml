@@ -1,0 +1,12 @@
+
+
+ESuite\FakeEntityAlt:
+  detail{1..10}:
+    name: <firstName()>
+    age: <randomDigit()>
+    stamp: 'MYSQLTIME'
+    empty: <randomDigit()>
+    foo: 'DEFAULT'
+    anotherfield: 'some val'
+
+

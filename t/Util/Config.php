@@ -1,6 +1,6 @@
 <?php
 
-namespace ESuite;
+namespace ESuite\Util;
 
 class Config
 {
@@ -9,16 +9,13 @@ class Config
     public static function init()
     {
         self::$items = array();
-
-        $base = realpath(dirname(realpath(__FILE__)));
+        $base = realpath(dirname(realpath(__FILE__)).'/../');
         $config = $base.'/config.yml';
-
-        $config_arr = Util\YAML::load($config);
+        $config_arr = YAML::load($config);
         foreach ($config_arr as $index => $value) {
             self::$items[$index] = $value;
         }
-
-        self::set('base', dirname(realpath(__FILE__)));
+        self::set('base', $base);
     }
 
     public static function get($key)
@@ -27,7 +24,6 @@ class Config
         if (isset(self::$items[$key])) {
             $val = self::$items[$key];
         }
-
         return $val;
     }
 

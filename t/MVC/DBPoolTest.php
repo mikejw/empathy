@@ -12,12 +12,7 @@ class DBPoolTest extends ESuiteTest
 
     protected function setUp()
     {
-        $creds = $this->getDefDBCreds();
-        Config::store('DB_SERVER', $creds['db_host']);
-        Config::store('DB_NAME', $creds['db_name']);
-        Config::store('DB_USER', $creds['db_user']);
-        Config::store('DB_PASS', $creds['db_pass']);
-        Config::store('DB_PORT', $creds['db_port']);
+        \ESuite\Util\DB::loadDefDBCreds();
     }
 
     

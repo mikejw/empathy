@@ -16,17 +16,6 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
         //
     }    
     
-    protected function getDefDBCreds()
-    {
-        return array(
-            'db_host' => '127.0.0.1',
-            'db_name' => 'etest',
-            'db_user' => 'root',
-            'db_pass' => '',
-            'db_port' => 3306
-        );
-    }
-
 
     protected function makeFakeBootstrap()
     {
@@ -82,9 +71,8 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
     {
         m::close();
 
-
         global $suite;
-        if (Config::get('reset_db')) {
+        if (Util\Config::get('reset_db')) {
             $suite->dbReset();
         }
     }

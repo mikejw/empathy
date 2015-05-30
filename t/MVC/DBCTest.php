@@ -12,7 +12,7 @@ class DBCTest extends ESuiteTest
 
     protected function setUp()
     {
-        $creds = $this->getDefDBCreds();
+        $creds = \ESuite\Util\DB::getDefDBCreds();
 
         $this->dbc = new DBC(
             $creds['db_host'],

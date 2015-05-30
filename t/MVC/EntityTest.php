@@ -2,32 +2,36 @@
 
 namespace ESuite\MVC;
 
-use Empathy\MVC\Entity;
+use Empathy\MVC\EntityManager;
+use Empathy\MVC\Config as EmpConfig;
 use ESuite\ESuiteTest;
+use Nelmio\Alice\Fixtures;
 
 
 class EntityTest extends ESuiteTest
 {
-    private $entity;
-
+    
     protected function setUp()
     {
-        $creds = $this->getDefDBCreds();
-
-        $this->dbc = new DBC(
-            $creds['db_host'],
-            $creds['db_name'],
-            $creds['db_user'],
-            $creds['db_pass'],
-            $creds['db_port']
-        );
+        \ESuite\Util\DB::loadDefDBCreds();
     }
 
     
-    public function testConnection()
+    public function testAlice()
     {
-        //
-        $this->assertTrue(true);
+        //$this->markTestSkipped();
+
+        \ESuite\Util\DB::reset('fixtures/dd.sql');
+        $objectManager = new EntityManager();
+        $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures1.yml', $objectManager);
+
+
+        \ESuite\Util\DB::reset('fixtures/dd2.sql');
+        $objectManager = new EntityManager();
+        $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures2.yml', $objectManager);
+
+
+
     }
 
 }

@@ -4,21 +4,21 @@ namespace Empathy\MVC;
 
 class Model
 {
-    protected static $db_handle = null;
+    protected static $db_handle = NULL;
 
-    protected static function connectModel($model, $host)
+    public static function connectModel($model, $host = NULL)
     {
-        // cached handle is not null
-        // and new host is null
+        // cached handle is not NULL
+        // and new host is NULL
         // use cached
-        if (self::$db_handle !== null && $host === null) {
+        if (self::$db_handle !== NULL && $host === NULL) {
             $model->setDBH(self::$db_handle);
-        } elseif ($host !== null) {
+        } elseif ($host !== NULL) {
             // use a new host
             $dbh = DBPool::getConnection($host);
             $model->setDBH($dbh);
-        } elseif (self::$db_handle == null && $host == null) {
-            // db_handle is null and host is null
+        } elseif (self::$db_handle == NULL && $host == NULL) {
+            // db_handle is NULL and host is NULL
             // (initiate default)
             $handle = DBPool::getDefCX();
             $model->setDBH($handle);
@@ -27,7 +27,7 @@ class Model
 
     }
 
-    public static function load($model, $id = null, $params = array(), $host = null)
+    public static function load($model, $id = NULL, $params = array(), $host = NULL)
     {
         if (class_exists($model)) {
             $storage_object = new $model($params);
