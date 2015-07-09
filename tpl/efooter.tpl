@@ -14,7 +14,7 @@
 {/if}
 
 <address>
-<a href="http://empahyphp.co.uk">Empathy MVC Framework</a> &copy; 2014 <a href="http://mikewhiting.co">Mike Whiting</a>.
+<a href="http://empathyphp.co.uk">Empathy MVC Framework</a> &copy; 2014 <a href="http://mikewhiting.co">Mike Whiting</a>.
 
 </address>
 </footer>
