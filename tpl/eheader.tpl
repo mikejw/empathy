@@ -2,11 +2,11 @@
 <html>
 <head>
 <meta charset="utf-8" />
-{include file="comp_title.tpl"}
-{include file="comp_keywords.tpl"}
-{include file="comp_description.tpl"}
-
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+
+{include file="comp_title.tpl"}
+
 {if $environment eq 'dev'}
 <link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/less/init.min.css" type="text/css" />
 <link rel="stylesheet/less" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/less/empathy.less" type="text/css" />
