@@ -233,6 +233,9 @@ function main()
     $arguments->addOption('misc', array(
                               'default'     => null,
                               'description' => 'Perform misc operation.'));
+    $arguments->addOption('inst_mod', array(
+                              'default'     => null,
+                              'description' => 'Install/generate application extension module.'));
     $arguments->parse();
 
     //echo $arguments->asJSON(); exit();
@@ -245,17 +248,20 @@ function main()
         new_app();
 
     } else {
-        $valid_options = array('mysql', 'node', 'misc');
-
+        $valid_options = array('mysql', 'node', 'misc', 'inst_mod');
         foreach($valid_options as $o) {
-
             if(isset($arguments[$o])) {
-
                 $func = 'option_'.$o;
                 $func($arguments[$o]);
             }
         }
     }
+}
+
+function option_inst_mod($module) {
+
+    // currently no checks for lib
+    \Empathy\MVC\Util\ModuleGen::generate($module);
 }
 
 
