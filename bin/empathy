@@ -261,7 +261,8 @@ function main()
 function option_inst_mod($module) {
 
     // currently no checks for lib
-    \Empathy\MVC\Util\ModuleGen::generate($module);
+    $count = \Empathy\MVC\Util\ModuleGen::generate($module);
+    \cli\out_padded($count.' controller(s) generated.');
 }
 
 

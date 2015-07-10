@@ -12,6 +12,7 @@ class ModuleGen
         Libs::detect();
         $installed = Libs::getInstalled();
         $class_list = array();
+        $generated = 0;
 
         foreach ($installed as $i) {
             $gen_root = DOC_ROOT.'/vendor/'.$i.'/src/Empathy/ELib/Gen';
@@ -29,9 +30,11 @@ class ModuleGen
         foreach ($class_list as $c) {
             $tmp = new $c();
             if ($tmp->getModule() == $module) {
-                $tmp->write();
+                if ($tmp->write()) {
+                    $generated++;
+                }
             }
         }
+        return $generated;
     }
-    
 }

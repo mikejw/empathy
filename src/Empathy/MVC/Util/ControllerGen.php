@@ -32,7 +32,8 @@ ENDBLOB;
     }
 
     public function write()
-    {        
+    {       
+        $sucess = false;
         $module = DOC_ROOT.'/application/'.$this->module;
         $controller = $module.'/'.$this->name.'.php'; 
         if (!file_exists($module)) {
@@ -40,7 +41,10 @@ ENDBLOB;
         }
         if (!file_exists($controller)) {        
             $file = sprintf(self::BLOB, $this->name, $this->parent);
-            file_put_contents($controller, $file);
+            if (file_put_contents($controller, $file)) {
+                $success = true;
+            }
         }
+        return $success;
     }
 }
