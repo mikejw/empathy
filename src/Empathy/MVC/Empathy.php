@@ -327,6 +327,9 @@ class Empathy
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
             if (!is_array($item)) {
+                if ($index == 'doc_root') {
+                    $item = $configDir;
+                }
                 define(strtoupper($index), $item);
             }
         }
