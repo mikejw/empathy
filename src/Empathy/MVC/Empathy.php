@@ -328,7 +328,9 @@ class Empathy
         foreach ($config as $index => $item) {
             if (!is_array($item)) {
                 if ($index == 'doc_root') {
-                    $item = $configDir;
+                    if (!file_exists($item)) {
+                        $item = $configDir;
+                    }
                 }
                 define(strtoupper($index), $item);
             }
