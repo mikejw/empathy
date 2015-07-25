@@ -3,9 +3,16 @@
 <phpunit    
     bootstrap="bootstrap.php"
     backupGlobals="false"
-    stopOnFailure="true"
+    stopOnFailure="false"
     verbose="true"
     colors="true">
+
+
+  <testsuites>
+    <testsuite name="exp">
+      <directory>Experimental</directory>
+    </testsuite>
+  </testsuites>
 
   <logging>    
     <log type="junit" target="../build/testsuite.xml" logIncompleteSkipped="false" /> 
