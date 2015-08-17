@@ -25,7 +25,8 @@ class Testable
         if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
             if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
                 //echo 'Setting header:' . $header;
-                self::$headers[] = $header;
+                $header_arr = explode(':', $header);                
+                self::$headers[$header_arr[0]] = trim($header_arr[1]);
             }
             
         } else {
