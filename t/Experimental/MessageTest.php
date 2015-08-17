@@ -31,5 +31,9 @@ class MessageTest extends ESuiteTest
         $this->message->withProtocolVersion($version);
     }
 
+    public function testGetAllHeaders()
+    {
+        print_r($this->message->getHeaders());
+    }
 }
 

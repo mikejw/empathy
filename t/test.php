@@ -4,7 +4,10 @@
 if(false == @include('../vendor/autoload.php')) {
 
 } else {
-
-    $m = new Psr\Http\Message\MessageInterface();
+    require('bootstrap.php');
+    $m = new ESuite\Fake\Message();
+    echo '<pre>';
+    print_r($m->getHeaders());
+    echo '</pre>';
 }
 

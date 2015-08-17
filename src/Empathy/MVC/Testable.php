@@ -7,6 +7,7 @@ namespace Empathy\MVC;
 
 class Testable
 {
+    private static $headers;
 
     public static function doDie($msg='')
     {
@@ -23,7 +24,8 @@ class Testable
     {
         if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
             if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
-                echo 'Setting header:' . $header;    
+                //echo 'Setting header:' . $header;
+                self::$headers[] = $header;
             }
             
         } else {
@@ -77,5 +79,31 @@ class Testable
             session_write_close();
         }
     }
+
+    public static function getHeaders()
+    {
+        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
+            return self::$headers;
+        } else {
+            if (function_exists('getallheaders')) {
+                return getallheaders(); 
+            } else {
+                $h = array();
+                foreach ($_SERVER as $key => $value) {
+                    if (strpos($key, 'HTTP_') === 0) {                        
+                        $new_key = str_replace(' ', '-', ucwords(str_replace('_', ' ', substr(strtolower($key), 5))));
+                        $h[$new_key] = $value;
+                    }
+                }
+                return $h;
+            }
+        }
+    }
+
+    public static function miscReset()
+    {
+        self::$headers = array();
+    }
+
 }
 

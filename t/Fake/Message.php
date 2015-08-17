@@ -2,9 +2,9 @@
 
 namespace ESuite\Fake;
 
-use \Psr\Http\Message\MessageInterface;
-use \Psr\Http\Message\StreamInterface;
-
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\StreamInterface;
+use Empathy\MVC\Testable;
 
 class Message implements MessageInterface
 {
@@ -13,7 +13,11 @@ class Message implements MessageInterface
 
     public function __construct()
     {
+        Testable::miscReset();
         $this->protocolVersion = '1.1';
+        // set random header
+        Testable::header('Cache-Control: no-cache, must-revalidate');
+
     }
 
     private function protocolVersionValid($version)
@@ -42,7 +46,7 @@ class Message implements MessageInterface
     
     public function getHeaders()
     {
-
+        return Testable::getHeaders();
     }
 
    
