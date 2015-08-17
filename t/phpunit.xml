@@ -30,7 +30,8 @@
     </blacklist>
     
     <whitelist processUncoveredFilesFromWhitelist="false">
-      <directory suffix=".php">../src/</directory>      
+      <directory suffix=".php">../src/</directory>
+      <directory suffix=".php">./Fake/</directory> <!-- for testing psr 7 stuff -->      
     </whitelist>
     
   </filter>
