@@ -14,10 +14,7 @@ class Message implements MessageInterface
     public function __construct()
     {
         Testable::miscReset();
-        $this->protocolVersion = '1.1';
-        // set random header
-        Testable::header('Cache-Control: no-cache, must-revalidate');
-
+        $this->protocolVersion = '1.1';        
     }
 
     private function protocolVersionValid($version)
@@ -26,6 +23,20 @@ class Message implements MessageInterface
             throw new \Exception('Not valid protocol version.');
         }
     }
+
+    // get header by case-insenstive matching
+    private function getHeaderMatch($name)
+    {
+        $header = '';        
+        $name = strtolower($name);
+        $h = array_change_key_case(Testable::getHeaders());
+        if(isset($h[$name])) {
+            $header = $h[$name];        
+        }
+        return $header;
+    }
+
+
 
 
     // interface methods
@@ -51,19 +62,27 @@ class Message implements MessageInterface
 
    
     public function hasHeader($name)
-    {
-
+    {   
+        return in_array(strtolower($name), array_map(
+            'strtolower',
+            array_keys(Testable::getHeaders()))
+        );
     }
 
     public function getHeader($name)
     {
-
+        $values = array();        
+        $h = $this->getHeaderMatch($name);
+        if ($h !== '') {
+            $values = array_map('trim', explode(',', $h));
+        }
+        return $values;
     }
 
 
     public function getHeaderLine($name)
     {
-
+        return $this->getHeaderMatch($name);        
     }
 
 

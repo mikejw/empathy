@@ -83,7 +83,7 @@ class Testable
 
     public static function getHeaders()
     {
-        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
+        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {            
             return self::$headers;
         } else {
             if (function_exists('getallheaders')) {
