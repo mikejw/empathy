@@ -63,6 +63,15 @@ class MessageTest extends ESuiteTest
         $this->assertEquals('', $this->message->getHeaderLine('ghost'));
     }
 
+    public function testWithHeader()
+    {
+        Testable::header('Cache-Control: no-cache, must-revalidate');
+        $this->message->withHeader('Cache-Control');
+        //$this->assertEquals('no-cache, must-revalidate', $this->message->getHeaderLine('cache-control'));
+        //$this->assertEquals('', $this->message->getHeaderLine('ghost'));
+    }
+
+
 
 
 }

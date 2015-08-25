@@ -27,9 +27,9 @@ class Testable
                 //echo 'Setting header:' . $header;
                 $header_arr = explode(':', $header);                
                 self::$headers[$header_arr[0]] = trim($header_arr[1]);
-            }
-            
+            }       
         } else {
+            echo 1;
             header($header);
         }
     }

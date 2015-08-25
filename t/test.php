@@ -1,14 +1,32 @@
 <?php
 
+// if(false == @include('../vendor/autoload.php')) {
+
+// } else {
+//     require('bootstrap.php');
+
+//     \Empathy\MVC\Testable::header('Cache-Control: no-cache, must-revalidate');
+    
+//     $m = new ESuite\Fake\Message();
+//     //$new = $m->withHeader('Cache-Control', 'no-cache, must-revalidate');
+
+
+
+//     echo '<pre>';
+//     print_r($m->getHeaders());
+//     //print_r($_SERVER);
+//     echo '</pre>';
+// }
+
+
 if(false == @include('../vendor/autoload.php')) {
 
 } else {
-    $argv = array(
-        '--testsuite', 'exp',
-        '--configuration', './phpunit.xml'
-    );
-    $_SERVER['argv'] = $argv;
-    PHPUnit_TextUI_Command::main(false);
-    
+    \Empathy\MVC\Testable::header('Cache-Control: no-cache, must-revalidate');
+    //header('foo: bar');
+    echo '<pre>';
+    //print_r($m->getHeaders());
+    print_r(headers_list());
+    echo '</pre>';
+
 }
-?>
