@@ -179,7 +179,8 @@ class Bootstrap
         $this->controller = new $controller_name($this);
         
         if ($fake == false) {
-            $event_val = $this->controller->$_GET['event']();
+            $event = $_GET['event'];
+            $event_val = $this->controller->$event();
             if ($this->mvc->hasErrors()) {
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($event_val !== false) {
