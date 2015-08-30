@@ -29,7 +29,6 @@ class Testable
                 self::$headers[$header_arr[0]] = trim($header_arr[1]);
             }       
         } else {
-            echo 1;
             header($header);
         }
     }
