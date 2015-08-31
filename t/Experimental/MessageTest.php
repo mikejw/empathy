@@ -66,13 +66,24 @@ class MessageTest extends ESuiteTest
     public function testWithHeader()
     {
         Testable::header('Cache-Control: no-cache, must-revalidate');
-        $this->message->withHeader('Cache-Control');
-        //$this->assertEquals('no-cache, must-revalidate', $this->message->getHeaderLine('cache-control'));
-        //$this->assertEquals('', $this->message->getHeaderLine('ghost'));
+        $n = $this->message->withHeader('Cache-Control', '0');
+        $m = $this->message->withHeader('Cache-Control', 'no-cache, must-revalidate');
+        $this->assertInstanceOf('ESuite\Fake\Message', $m);
+        $this->assertEquals('no-cache, must-revalidate', $m->getHeaderLine('cache-control'));
     }
 
+    public function testWithAddedHeader()
+    {
+        Testable::header('Cache-Control: no-cache');        
+        $m = $this->message->withAddedHeader('Cache-Control', 'must-revalidate');
+        $this->assertInstanceOf('ESuite\Fake\Message', $m);
+        $this->assertEquals('no-cache, must-revalidate', $m->getHeaderLine('cache-control'));
+    }
 
-
+    public function testWithoutHeader()
+    {
+        
+    }
 
 }
 

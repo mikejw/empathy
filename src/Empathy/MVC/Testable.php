@@ -29,6 +29,7 @@ class Testable
                 self::$headers[$header_arr[0]] = trim($header_arr[1]);
             }       
         } else {
+            echo 'calling header';
             header($header);
         }
     }
@@ -85,8 +86,8 @@ class Testable
         if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {            
             return self::$headers;
         } else {
-            if (function_exists('getallheaders')) {
-                return getallheaders(); 
+            if (function_exists('apache_response_headers')) {
+                return apache_response_headers(); 
             } else {
                 $h = array();
                 foreach ($_SERVER as $key => $value) {

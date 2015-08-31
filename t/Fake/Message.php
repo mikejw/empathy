@@ -36,6 +36,10 @@ class Message implements MessageInterface
         return $header;
     }
 
+    private function setHeader($header)
+    {
+        Testable::header($header);
+    }
 
 
 
@@ -88,13 +92,17 @@ class Message implements MessageInterface
 
     public function withHeader($name, $value)
     {
-
+        $this->setHeader($name.': '.$value);
+        return $this;
     }
 
    
     public function withAddedHeader($name, $value)
     {
-
+        $values = $this->getHeader($name);
+        $values[] = $value;
+        $this->setHeader($name.': '.implode(', ', $values));
+        return $this;        
     }
 
    
