@@ -3,7 +3,6 @@
 namespace ESuite\Experimental;
 
 use ESuite\ESuiteTest;
-use Empathy\MVC\Testable;
 
 
 class MessageTest extends ESuiteTest
@@ -34,14 +33,23 @@ class MessageTest extends ESuiteTest
 
     public function testGetAllHeaders()
     {
-        Testable::header('Cache-Control: no-cache, must-revalidate');
+        $this->message->setHeader('Cache-Control', 'no-cache, must-revalidate');
         $headers = $this->message->getHeaders();
         $this->assertEquals(1, sizeof($headers));
     }
 
+    public function testFindHeader()
+    {
+        $this->message->setHeader('Cache-Control', 'no-cache, must-revalidate');
+        $this->message->findHeader('cache-control');
+        $key = $this->message->getMatched();
+        $this->assertEquals('no-cache, must-revalidate', $this->message->getHeaderLine($key));
+    }
+
+
     public function testHasHeader()
     {
-        Testable::header('Cache-Control: no-cache, must-revalidate');
+        $this->message->setHeader('Cache-Control', 'no-cache, must-revalidate');
         $this->assertTrue($this->message->hasHeader('cache-control'));
         $this->assertTrue($this->message->hasHeader('CACHE-control'));
         $this->assertFalse($this->message->hasHeader('cache-controlz'));
@@ -49,23 +57,23 @@ class MessageTest extends ESuiteTest
 
     public function testGetHeader()
     {
-        Testable::header('Cache-Control: no-cache, must-revalidate');
-        Testable::header('Foo-Bar: baz');        
+        $this->message->setHeader('Cache-Control', 'no-cache, must-revalidate');
+        $this->message->setHeader('Foo-Bar', 'baz');
         $this->assertEquals('["no-cache","must-revalidate"]', json_encode($this->message->getHeader('cache-control')));
         $this->assertEquals('["baz"]', json_encode($this->message->getHeader('FOO-BAR')));
         $this->assertEquals('[]', json_encode($this->message->getHeader('ghost')));
     }
 
     public function testGetHeaderLine()
-    {
-        Testable::header('Cache-Control: no-cache, must-revalidate');        
+    {        
+        $this->message->setHeader('Cache-Control', 'no-cache, must-revalidate');
         $this->assertEquals('no-cache, must-revalidate', $this->message->getHeaderLine('cache-control'));
         $this->assertEquals('', $this->message->getHeaderLine('ghost'));
     }
 
     public function testWithHeader()
-    {
-        Testable::header('Cache-Control: no-cache, must-revalidate');
+    {        
+        $this->message->setHeader('Cache-Control', 'no-cache, must-revalidate');
         $n = $this->message->withHeader('Cache-Control', '0');
         $m = $this->message->withHeader('Cache-Control', 'no-cache, must-revalidate');
         $this->assertInstanceOf('ESuite\Fake\Message', $m);
@@ -74,16 +82,20 @@ class MessageTest extends ESuiteTest
 
     public function testWithAddedHeader()
     {
-        Testable::header('Cache-Control: no-cache');        
-        $m = $this->message->withAddedHeader('Cache-Control', 'must-revalidate');
+        $this->message->setHeader('Cache-Control', 'no-cache');
+        $m = $this->message->withAddedHeader('Cache-ControL', 'must-revalidate');        
         $this->assertInstanceOf('ESuite\Fake\Message', $m);
+        $h = $m->getHeaderLine('cache-control');
         $this->assertEquals('no-cache, must-revalidate', $m->getHeaderLine('cache-control'));
     }
 
     public function testWithoutHeader()
     {
-        
+        $this->message->setHeader('Control', 'no-cache');
+        $this->message->setHeader('CACHE-Control', 'no-cache');
+        $m = $this->message->withoutHeader('Cache-Control');
+        $this->assertInstanceOf('ESuite\Fake\Message', $m);
+        $this->assertEquals('', $m->getHeaderLine('cache-control'));
     }
-
 }
 

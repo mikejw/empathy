@@ -9,7 +9,9 @@ use Empathy\MVC\Testable;
 class Message implements MessageInterface
 {
     private $protocolVersion;
-
+    private $headers = array();
+    private $body = '';
+    private $matched;
 
     public function __construct()
     {
@@ -24,27 +26,54 @@ class Message implements MessageInterface
         }
     }
 
+    public function findHeader($name)
+    {
+        $this->matched = NULL;
+        $name = strtolower($name);
+        foreach ($this->headers as $key => $value) {
+            if ($name == strtolower($key)) {
+                $this->matched = $key;
+                break;
+            }
+        }       
+    }
+
+    public function getMatched()
+    {
+        return $this->matched;
+    }
+
     // get header by case-insenstive matching
-    private function getHeaderMatch($name)
+    public function getHeaderMatch($name)
     {
         $header = '';        
-        $name = strtolower($name);
-        $h = array_change_key_case(Testable::getHeaders());
-        if(isset($h[$name])) {
-            $header = $h[$name];        
+        $this->findHeader($name);
+        if ($this->matched !== NULL) {
+            $header = $this->headers[$this->matched];
         }
         return $header;
     }
 
-    private function setHeader($header)
+    public function setHeader($header, $value)
     {
-        Testable::header($header);
+        $this->headers[$header] = $value;
+    }
+
+    public function removeHeader($name)
+    {
+        $this->findHeader($name);        
+        unset($this->headers[$this->getMatched()]);
     }
 
 
 
-    // interface methods
 
+
+
+
+
+
+    // interface methods
     public function getProtocolVersion()
     {
         return $this->protocolVersion;
@@ -61,7 +90,7 @@ class Message implements MessageInterface
     
     public function getHeaders()
     {
-        return Testable::getHeaders();
+        return $this->headers;
     }
 
    
@@ -69,14 +98,14 @@ class Message implements MessageInterface
     {   
         return in_array(strtolower($name), array_map(
             'strtolower',
-            array_keys(Testable::getHeaders()))
+            array_keys($this->headers))
         );
     }
 
     public function getHeader($name)
     {
         $values = array();        
-        $h = $this->getHeaderMatch($name);
+        $h = $this->getHeaderMatch($name);        
         if ($h !== '') {
             $values = array_map('trim', explode(',', $h));
         }
@@ -92,7 +121,7 @@ class Message implements MessageInterface
 
     public function withHeader($name, $value)
     {
-        $this->setHeader($name.': '.$value);
+        $this->setHeader($name, $value);
         return $this;
     }
 
@@ -101,14 +130,18 @@ class Message implements MessageInterface
     {
         $values = $this->getHeader($name);
         $values[] = $value;
-        $this->setHeader($name.': '.implode(', ', $values));
+        $values = implode(', ', $values);
+        $this->setHeader($this->matched, $values);
         return $this;        
     }
 
    
     public function withoutHeader($name)
     {
-
+        $header = $this->getHeaderMatch($name);
+        $local_m = clone $this;
+        $local_m->removeHeader($name);
+        return $local_m;
     }
 
    
