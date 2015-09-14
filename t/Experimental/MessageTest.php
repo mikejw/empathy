@@ -12,7 +12,7 @@ class MessageTest extends ESuiteTest
 
     protected function setUp()
     {
-        $this->message = new \ESuite\Fake\Message();    
+        $this->message = new \ESuite\Fake\Message();
     }
 
     public function testGetProtocolVersion()
@@ -97,5 +97,16 @@ class MessageTest extends ESuiteTest
         $this->assertInstanceOf('ESuite\Fake\Message', $m);
         $this->assertEquals('', $m->getHeaderLine('cache-control'));
     }
+
+    public function testGetBody()
+    {
+         $this->assertInstanceOf('ESuite\Fake\Stream', $this->message->getBody());
+    }
+
+    public function testWithBody()
+    {
+         $this->assertInstanceOf('ESuite\Fake\Message', $this->message->withBody(new \ESuite\Fake\Stream()));
+    }
+
 }
 

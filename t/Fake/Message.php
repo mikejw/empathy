@@ -4,19 +4,19 @@ namespace ESuite\Fake;
 
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
-use Empathy\MVC\Testable;
+
 
 class Message implements MessageInterface
 {
     private $protocolVersion;
     private $headers = array();
-    private $body = '';
+    private $body;
     private $matched;
 
     public function __construct()
     {
-        Testable::miscReset();
-        $this->protocolVersion = '1.1';        
+        $this->protocolVersion = '1.1';
+        $this->body = new Stream();
     }
 
     private function protocolVersionValid($version)
@@ -65,7 +65,10 @@ class Message implements MessageInterface
         unset($this->headers[$this->getMatched()]);
     }
 
-
+    public function setBody(StreamInterface $body)
+    {
+        $this->body = $body;
+    }
 
 
 
@@ -137,8 +140,7 @@ class Message implements MessageInterface
 
    
     public function withoutHeader($name)
-    {
-        $header = $this->getHeaderMatch($name);
+    {        
         $local_m = clone $this;
         $local_m->removeHeader($name);
         return $local_m;
@@ -147,12 +149,14 @@ class Message implements MessageInterface
    
     public function getBody()
     {
-
+        return $this->body;
     }
 
     public function withBody(StreamInterface $body)
     {
-
+        $local_m = clone $this;
+        $local_m->setBody($body);
+        return $local_m;
     }
 
 }
