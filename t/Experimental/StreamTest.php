@@ -34,18 +34,17 @@ class StreamTest extends ESuiteTest
     {
         $d = $this->stream->detach();    
         $this->assertTrue($this->stream->isClosed());
-        $this->assertEquals('foo', stream_get_contents($d));        
+        $this->assertEquals('foo', stream_get_contents($d));
+        $this->assertNull($this->stream->detach());
     }
 
 
     public function testGetSize()
     {
         $this->assertEquals(3, $this->stream->getSize());
-
         $this->stream->reset();
-        $this->stream->write("¡\u0800");
-        echo $this->stream->getSize();
-
+        $this->stream->write("¡");
+        $this->assertEquals(1, $this->stream->getSize());
     }
 
 

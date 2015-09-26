@@ -5,7 +5,6 @@
         "This file is @generated automatically"
     ],
     "hash": "2e3f7f12170094eb46821da472ab7854",
-    "content-hash": "25e5baae8b0b035d9f1ce67e35a5618b",
     "packages": [
         {
             "name": "mikejw/elibs",
@@ -173,7 +172,6 @@
                 "BSD-2-Clause"
             ],
             "description": "A code browser that augments the code with information from various QA tools.",
-            "abandoned": "mayflower/php-codebrowser",
             "time": "2013-11-12 21:58:07"
         },
         {
@@ -542,20 +540,20 @@
         },
         {
             "name": "phploc/phploc",
-            "version": "dev-master",
+            "version": "2.1.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phploc.git",
-                "reference": "d6b05c9072ed7ec3e365722d129f220c24aa90f1"
+                "reference": "be5fe2c16048ef9c986ac97be942db8eaebc6809"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phploc/zipball/d6b05c9072ed7ec3e365722d129f220c24aa90f1",
-                "reference": "d6b05c9072ed7ec3e365722d129f220c24aa90f1",
+                "url": "https://api.github.com/repos/sebastianbergmann/phploc/zipball/be5fe2c16048ef9c986ac97be942db8eaebc6809",
+                "reference": "be5fe2c16048ef9c986ac97be942db8eaebc6809",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6",
+                "php": ">=5.3.3",
                 "sebastian/finder-facade": "~1.1",
                 "sebastian/git": "~2.0",
                 "sebastian/version": "~1.0.3",
@@ -591,7 +589,7 @@
             ],
             "description": "A tool for quickly measuring the size of a PHP project.",
             "homepage": "https://github.com/sebastianbergmann/phploc",
-            "time": "2015-05-26 14:03:47"
+            "time": "2015-08-09 16:35:11"
         },
         {
             "name": "phpmd/phpmd",
