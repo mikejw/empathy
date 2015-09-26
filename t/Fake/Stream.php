@@ -10,18 +10,32 @@ class Stream implements StreamInterface
 
     public function __construct()
     {
-        $this->data = 'foo';
+        $this->data = fopen('php://memory', 'r+');
+        fwrite($this->data, 'foo');
+        rewind($this->data);
     }
+
+
+    public function isClosed()
+    {
+        $meta = @stream_get_meta_data($this->data);
+        return $meta['mode'] == NULL;
+    }
+
+
+
+
+    // interface methods
 
 
     public function __toString()
     {
-        return $this->data;
+        return stream_get_contents($this->data);
     }
 
     public function close()
     {
-
+        fclose($this->data);
     }
 
     public function detach()

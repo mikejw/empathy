@@ -21,7 +21,15 @@ class StreamTest extends ESuiteTest
         echo $this->stream;
     }
 
-    
+    public function testClose()
+    {
+        $this->assertFalse($this->stream->isClosed());
+        $this->stream->close();
+        $this->assertTrue($this->stream->isClosed());
+    }    
+
+
+
 
 }
 
