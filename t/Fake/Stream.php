@@ -16,7 +16,9 @@ class Stream implements StreamInterface
 
     private function init()
     {
-        $this->data = fopen('php://memory', 'r+');
+        //$mode = 'r+';
+        $mode = 'r';
+        $this->data = fopen('php://memory', $mode);
     }
 
 
@@ -81,7 +83,7 @@ class Stream implements StreamInterface
 
     public function seek($offset, $whence = SEEK_SET)
     {
-
+        fseek($this->data, $offset, $whence);
     }
 
     public function rewind()
@@ -92,7 +94,8 @@ class Stream implements StreamInterface
 
     public function isWritable()
     {
-
+        $mode = $this->getMetadata('mode');
+        echo $mode;
     }
 
     public function write($string)

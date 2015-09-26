@@ -67,9 +67,24 @@ class StreamTest extends ESuiteTest
         $this->assertTrue($this->stream->isSeekable());
     }
 
+    public function testSeek()
+    {
+        $this->stream->reset();
+        $this->stream->write('0123456789');
+        $this->stream->rewind();
+        $this->assertEquals(0, $this->stream->tell());
+        $this->stream->seek(1, SEEK_SET);
+        $this->assertEquals(1, $this->stream->tell());
+        $this->stream->seek(1, SEEK_CUR);
+        $this->assertEquals(2, $this->stream->tell());
+        $this->stream->seek(-9, SEEK_END);
+        $this->assertEquals(1, $this->stream->tell());
+    }
 
-
-
+    public function testIsWritable()
+    {
+        $this->assertTrue($this->stream->isWritable());
+    }
 
 }
 
