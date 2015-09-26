@@ -47,6 +47,29 @@ class StreamTest extends ESuiteTest
         $this->assertEquals(1, $this->stream->getSize());
     }
 
+    public function testTell()
+    {
+        $this->stream->reset();
+        $this->stream->write('hello, world');
+        $this->assertEquals(12, $this->stream->tell());
+    }
+
+    public function testEof()
+    {
+        $this->stream->reset();
+        $this->stream->write('hello, world');
+        $chunk = $this->stream->read(1);
+        $this->assertTrue($this->stream->eof());
+    }
+
+    public function testIsSeekable()
+    {
+        $this->assertTrue($this->stream->isSeekable());
+    }
+
+
+
+
 
 }
 

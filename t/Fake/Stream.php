@@ -29,8 +29,7 @@ class Stream implements StreamInterface
 
     public function isClosed()
     {
-        $meta = @stream_get_meta_data($this->data);
-        return $meta['mode'] == NULL;
+        return $this->getMetadata('mode') == NULL;
     }
 
     // interface methods
@@ -66,17 +65,18 @@ class Stream implements StreamInterface
 
     public function tell()
     {
-
+        return ftell($this->data);
     }
 
     public function eof()
     {
+        return feof($this->data);
 
     }
 
     public function isSeekable()
     {
-
+        return $this->getMetadata('seekable') == true;
     }
 
     public function seek($offset, $whence = SEEK_SET)
@@ -108,7 +108,7 @@ class Stream implements StreamInterface
 
     public function read($length)
     {
-
+        return fread($this->data, $length);
     }
 
     public function getContents()
@@ -119,6 +119,11 @@ class Stream implements StreamInterface
 
     public function getMetadata($key = null)
     {
-
+        $meta = @stream_get_meta_data($this->data);
+        if ($key === null) {
+            return $meta;
+        } else {
+            return $meta[$key];
+        }
     }
 }
