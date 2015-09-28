@@ -1,5 +1,8 @@
 <?php
 
+// TinoDidriksen: w is writable, w+ is read-write.
+
+
 $modes = array(
     'r' => false,
     'r+' => true,

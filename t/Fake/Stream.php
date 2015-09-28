@@ -16,8 +16,7 @@ class Stream implements StreamInterface
 
     private function init()
     {
-        $mode = 'r';
-        //$mode = 'r';
+        $mode = 'r+';
         $this->data = fopen('php://memory', $mode);
     }
 
@@ -95,7 +94,7 @@ class Stream implements StreamInterface
     public function isWritable()
     {
         $mode = $this->getMetadata('mode');
-        return strpos($mode, 'w+') === 0;        
+        return strpos($mode, 'w+') === 0;
     }
 
     public function write($string)
@@ -106,7 +105,8 @@ class Stream implements StreamInterface
 
     public function isReadable()
     {
-
+        $mode = $this->getMetadata('mode');
+        return strpos($mode, 'w+') === 0 || strpos($mode, 'r') === 0;
     }
 
     public function read($length)
