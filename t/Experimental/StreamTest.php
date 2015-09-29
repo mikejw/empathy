@@ -88,7 +88,7 @@ class StreamTest extends ESuiteTest
 
     public function testIsReadable()
     {
-        $this->assertTrue($this->stream->isWritable());
+        $this->assertTrue($this->stream->isReadable());
     }
 
 }
