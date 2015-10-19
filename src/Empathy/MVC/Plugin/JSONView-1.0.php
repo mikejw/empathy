@@ -4,7 +4,8 @@ namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Plugin as Plugin;
 
-class JSONView extends Plugin implements PreDispatch, Presentation
+
+class JSONView extends Plugin implements PreEvent, Presentation
 {
     private $output;
     private $error_ob;
@@ -24,10 +25,7 @@ class JSONView extends Plugin implements PreDispatch, Presentation
 
     public function display($template = null)
     {  
-        $this->initDeps();
         $force_formatted = (defined('ELIB_FORCE_FORMATTED') && ELIB_FORCE_FORMATTED);
-
-        //$debug_mode = $this->bootstrap->getDebugMode();
 
         if(!(defined('MVC_TEST_MODE') && MVC_TEST_MODE)) {
             header('Content-type: application/json');
@@ -61,32 +59,19 @@ class JSONView extends Plugin implements PreDispatch, Presentation
         }
     }
 
-    private function initDeps()
-    {
+    public function onPreEvent()
+    {        
+        $config = json_decode('{"api": {"error_ob":"WRI\\\\GOS\\\\EROb","return_ob":"WRI\\\\GOS\\\\ROB","return_codes":"WRI\\\\GOS\\\\ReturnCodes"}}', true);
         $module = $this->bootstrap->getController()->getModule();
-
-        $app_mod = $this->bootstrap->getApiMods();
-        if ($app_mod['name'] != $module) {
-            throw new \Exception('module and api config mismatch');
+        
+        if (in_array($module, array_keys($config))) {
+            $mod_conf = $config[$module];
+            $this->error_ob = $mod_conf['error_ob'];
+            $this->return_ob = $mod_conf['return_ob'];
+            $this->return_codes = $mod_conf['return_codes'];
+            $controller = $this->bootstrap->getController();
+            $controller->setPresenter($this);
         }
-
-        $this->error_ob = $app_mod['error_ob'];
-        $this->return_ob = $app_mod['return_ob'];
-        $this->return_codes = $app_mod['return_codes'];
-    }
-
-
-    /*
-      public function __construct($b)
-      {
-      parent::__construct($b);
-      //
-      }
-    */
-
-    public function onPreDispatch()
-    {
-        //
     }
 
     public function switchInternal($i)
@@ -95,8 +80,7 @@ class JSONView extends Plugin implements PreDispatch, Presentation
     }
 
     public function exception($debug, $exception, $req_error)
-    {        
-        $this->initDeps();
+    {    
         $rc = $this->return_codes;
         $e_ob = $this->error_ob;
 
@@ -108,6 +92,7 @@ class JSONView extends Plugin implements PreDispatch, Presentation
         }
         $this->assign('default', $r);
         $this->display();
+
     }
 
 

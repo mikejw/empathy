@@ -97,9 +97,6 @@ class Bootstrap
     private $environment;
 
 
-    private $api_mods;
-
-
     /**
      * Creates the bootstrap object and passes boot options
      * and plugin definition taken from the application config
@@ -129,10 +126,6 @@ class Bootstrap
         }
         if (isset($bootOptions['debug_mode'])) {
             $this->debug_mode = ($bootOptions['debug_mode'] === true);
-        }
-
-        if (isset($bootOptions['api_mods'])) {
-            $this->api_mods = $bootOptions['api_mods'];    
         }
 
         $this->environment = 'dev';
@@ -178,7 +171,10 @@ class Bootstrap
             }
         }
         $controller_name = $this->uri->getControllerName();
+
         $this->controller = new $controller_name($this);
+
+        $this->plugin_manager->preEvent();
 
         if($fake == false) {
             $event_val = $this->controller->$_GET['event']();
@@ -201,6 +197,9 @@ class Bootstrap
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
         $this->controller = new Controller($this);
+
+        $this->plugin_manager->preEvent();
+
         $this->controller->viewException($this->debug_mode, $e, $req_error);
     }
 
@@ -332,15 +331,5 @@ class Bootstrap
         return $this->controller;
     }
 
-
-    public function getApiMods($module = null)
-    { 
-        if ($module !== null) {
-            return $this->api_mods[$module];
-        } else {
-            return $this->api_mods[0];
-        }
-        
-    }
 
 }
