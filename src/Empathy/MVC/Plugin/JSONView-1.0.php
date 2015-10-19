@@ -4,9 +4,14 @@ namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Plugin as Plugin;
 
-class JSONView extends Plugin implements PreDispatch, Presentation
+class JSONView extends Plugin implements PreEvent, Presentation
 {
     private $output;
+    private $error_ob;
+    private $return_ob;
+    private $return_codes;
+ 
+
 
     public function assign($name, $data)
     {
@@ -32,8 +37,8 @@ class JSONView extends Plugin implements PreDispatch, Presentation
         }
 
         if(is_object($this->output) &&
-           (get_class($this->output) == 'ROb'||
-            get_class($this->output) == 'EROb'))
+           (get_class($this->output) ==  $this->return_ob||
+            get_class($this->output) == $this->error_ob))
         {           
             $output = (string) $this->output;
 
@@ -59,10 +64,36 @@ class JSONView extends Plugin implements PreDispatch, Presentation
     }
 
 
-    public function onPreDispatch()
+    public function onPreEvent()
     {
-        //
+        $module = $this->bootstrap->getController()->getModule();
+
+        if (isset($this->config) && in_array($module, array_keys($this->config))) {
+            $mod_conf = $this->config[$module];
+            $this->error_ob = $mod_conf['error_ob'];
+            $this->return_ob = $mod_conf['return_ob'];
+            $this->return_codes = $mod_conf['return_codes'];
+            $controller = $this->bootstrap->getController();
+            $controller->setPresenter($this);
+         }
     }
+
+    public function exception($debug, $exception, $req_error)
+    {               
+        $rc = $this->return_codes;
+        $e_ob = $this->error_ob;
+
+        if (!$debug) {
+            $r = new $e_ob($rc::SERVER_ERROR, 'Server error.');
+        } else {
+           
+            $r = new $e_ob(999, 'Exception: ' .$exception->getMessage(), 'SERVER_ERROR_EXPLICIT');
+        }
+        $this->assign('default', $r);
+        $this->display();
+    }
+
+
 
     public function switchInternal($i)
     {

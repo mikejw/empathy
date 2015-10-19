@@ -172,6 +172,8 @@ class Bootstrap
         $controller_name = $this->uri->getControllerName();
         $this->controller = new $controller_name($this);
         
+        $this->plugin_manager->preEvent();
+        
         if ($fake == false) {
             $event_val = $this->controller->$_GET['event']();
             if ($this->mvc->hasErrors()) {
@@ -197,30 +199,11 @@ class Bootstrap
     public function dispatchException($e)
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
-
         $this->controller = new Controller($this);
 
-        if ($this->controller->getModule() != 'api') {
-            $this->controller->assign('error', $e->getMessage());
-                        
-            if ($req_error) {
-                 $this->controller->assign('code', $e->getCode());
-                 $this->controller->setTemplate('elib:/req_error.tpl');
-                 $this->display();
-            } else {
-                $this->controller->setTemplate('empathy.tpl');
-                $this->display(true);
-            }
-        } else {
-            if (!$this->debug_mode) {
-                $r = new \EROb(\ReturnCodes::SERVER_ERROR, 'Server error.');
-            } else {
-                $r = new \EROb(999, $e->getMessage(), 'SERVER_ERROR_EXPLICIT');
-            }
+        $this->plugin_manager->preEvent();
 
-            $this->controller->assign('default', $r);
-            $this->display(false);
-        }
+        $this->controller->viewException($this->debug_mode, $e, $req_error);
     }
 
     /**
@@ -264,7 +247,7 @@ class Bootstrap
                     if (file_exists($plugin_path)) {
                         require($plugin_path);
                         $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
-                        $n = new $plugin();
+                        $n = new $plugin($this);
                         if (isset($p['config'])) {
                             $n->assignConfig($p['config']);
                         }

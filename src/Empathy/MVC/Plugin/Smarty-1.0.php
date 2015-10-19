@@ -64,4 +64,17 @@ class Smarty extends Plugin implements PreDispatch, Presentation
             $this->smarty->template_dir = realpath(dirname(__FILE__)).'/../../../../tpl/';
         }
     }
+
+    public function exception($debug, $exception, $req_error)
+    {
+        $this->assign('error', $exception->getMessage());                    
+        if($req_error) {
+             $this->assign('code', $exception->getCode());
+             $this->display('elib:/req_error.tpl');
+        } else {
+            $this->switchInternal(true);
+            $this->display('../empathy.tpl');
+        }
+    }
+
 }
