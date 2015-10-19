@@ -349,4 +349,12 @@ class Controller
         return $valid;
     }
 
+
+    public function viewException($debug, $exception, $req_error)
+    {
+        $this->presenter->exception($debug, $exception, $req_error);
+
+    }
+
+
 }

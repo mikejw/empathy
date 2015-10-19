@@ -1,7 +1,7 @@
 ---
-mysql: /usr/bin/mysql
-mysql_dump: /usr/bin/mysqldump
-perl: /usr/bin/perl
-ffmpeg: /usr/bin/ffmpeg
-makepasswd: /usr/bin/makepasswd
+mysql: /opt/local/lib/mariadb/bin/mysql
+mysql_dump: /opt/local/lib/mariadb/bin/mysqldump
+perl: /opt/local/bin/perl
+ffmpeg: /opt/local/bin/ffmpeg
+makepasswd: /opt/local/bin/makepasswd
 

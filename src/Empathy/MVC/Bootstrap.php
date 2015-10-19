@@ -96,6 +96,10 @@ class Bootstrap
      */
     private $environment;
 
+
+    private $api_mods;
+
+
     /**
      * Creates the bootstrap object and passes boot options
      * and plugin definition taken from the application config
@@ -125,6 +129,10 @@ class Bootstrap
         }
         if (isset($bootOptions['debug_mode'])) {
             $this->debug_mode = ($bootOptions['debug_mode'] === true);
+        }
+
+        if (isset($bootOptions['api_mods'])) {
+            $this->api_mods = $bootOptions['api_mods'];    
         }
 
         $this->environment = 'dev';
@@ -192,35 +200,8 @@ class Bootstrap
     public function dispatchException($e)
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
-
-
         $this->controller = new Controller($this);
-
-        if ($this->controller->getModule() != 'api') {
-            
-            $this->controller->assign('error', $e->getMessage());
-                        
-            if($req_error) {
-    
-                 $this->controller->assign('code', $e->getCode());
-                 $this->controller->setTemplate('elib:/req_error.tpl');
-                 $this->display();
-            } else {
-                $this->controller->setTemplate('../empathy.tpl');
-                $this->display(true);
-            }
-            
-
-        } else {
-            if (!$this->debug_mode) {
-                $r = new \EROb(\ReturnCodes::SERVER_ERROR, 'Server error.');
-            } else {
-                $r = new \EROb(999, $e->getMessage(), 'SERVER_ERROR_EXPLICIT');
-            }
-
-            $this->controller->assign('default', $r);
-            $this->display(false);
-        }
+        $this->controller->viewException($this->debug_mode, $e, $req_error);
     }
 
     /**
@@ -349,6 +330,17 @@ class Bootstrap
     public function getController()
     {
         return $this->controller;
+    }
+
+
+    public function getApiMods($module = null)
+    { 
+        if ($module !== null) {
+            return $this->api_mods[$module];
+        } else {
+            return $this->api_mods[0];
+        }
+        
     }
 
 }

@@ -7,7 +7,11 @@ use Empathy\MVC\Plugin as Plugin;
 class JSONView extends Plugin implements PreDispatch, Presentation
 {
     private $output;
+    private $error_ob;
+    private $return_ob;
+    private $return_codes;
 
+   
     public function assign($name, $data)
     {
         $this->output = $data;
@@ -18,8 +22,9 @@ class JSONView extends Plugin implements PreDispatch, Presentation
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template)
-    {         
+    public function display($template = null)
+    {  
+        $this->initDeps();
         $force_formatted = (defined('ELIB_FORCE_FORMATTED') && ELIB_FORCE_FORMATTED);
 
         //$debug_mode = $this->bootstrap->getDebugMode();
@@ -29,8 +34,8 @@ class JSONView extends Plugin implements PreDispatch, Presentation
         }
 
         if(is_object($this->output) &&
-           (get_class($this->output) == 'ROb'||
-            get_class($this->output) == 'EROb'))
+           (get_class($this->output) == $this->return_ob ||
+            get_class($this->output) == $this->error_ob))
         {           
 
             $output = (string) $this->output;
@@ -56,6 +61,21 @@ class JSONView extends Plugin implements PreDispatch, Presentation
         }
     }
 
+    private function initDeps()
+    {
+        $module = $this->bootstrap->getController()->getModule();
+
+        $app_mod = $this->bootstrap->getApiMods();
+        if ($app_mod['name'] != $module) {
+            throw new \Exception('module and api config mismatch');
+        }
+
+        $this->error_ob = $app_mod['error_ob'];
+        $this->return_ob = $app_mod['return_ob'];
+        $this->return_codes = $app_mod['return_codes'];
+    }
+
+
     /*
       public function __construct($b)
       {
@@ -73,5 +93,22 @@ class JSONView extends Plugin implements PreDispatch, Presentation
     {
         //
     }
+
+    public function exception($debug, $exception, $req_error)
+    {        
+        $this->initDeps();
+        $rc = $this->return_codes;
+        $e_ob = $this->error_ob;
+
+        if (!$debug) {
+            $r = new $e_ob($rc::SERVER_ERROR, 'Server error.');
+        } else {
+           
+            $r = new $e_ob(999, 'Exception: ' .$exception->getMessage(), 'SERVER_ERROR_EXPLICIT');
+        }
+        $this->assign('default', $r);
+        $this->display();
+    }
+
 
 }
