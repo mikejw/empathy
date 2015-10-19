@@ -36,8 +36,10 @@ class JSONView extends Plugin implements PreEvent, Presentation
             header('Content-type: application/json');
         }
 
+
+
         if(is_object($this->output) &&
-           (get_class($this->output) ==  $this->return_ob||
+           (get_class($this->output) ==  $this->return_ob ||
             get_class($this->output) == $this->error_ob))
         {           
             $output = (string) $this->output;
@@ -56,11 +58,14 @@ class JSONView extends Plugin implements PreEvent, Presentation
 
             if ($force_formatted) {
                 $jsb = new \JSBeautifier();
-                echo $jsb->beautify(json_encode($this->output));
+                echo $jsb->beautify(json_encode((array)$this->output));
             } else {
-                echo json_encode($this->output);
+
+                echo json_encode((array)$this->output);
             }
+
         }
+
     }
 
 
