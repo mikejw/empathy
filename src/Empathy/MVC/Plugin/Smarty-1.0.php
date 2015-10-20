@@ -64,7 +64,6 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         if ($internal) {
             $this->switchInternal();
         }
-
         $this->smarty->display($template);
     }
 
@@ -75,7 +74,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     private function switchInternal()
     {        
-        $this->smarty->template_dir = realpath(dirname(__FILE__)).'/../../../../tpl/';
+        $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
     }
 
     public function exception($debug, $exception, $req_error)
@@ -84,9 +83,8 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         if($req_error) {
              $this->assign('code', $exception->getCode());
              $this->display('elib:/req_error.tpl');
-        } else {
-            $this->switchInternal(true);
-            $this->display('../empathy.tpl');
+        } else {            
+            $this->display('empathy.tpl', true);
         }
     }
 
