@@ -20,7 +20,7 @@ interface Presentation
 
 	public function exception($debug, $exception, $req_error);
 	
-    public function display($template);
+    public function display($template, $internal=false);
 
     public function getVars();
 

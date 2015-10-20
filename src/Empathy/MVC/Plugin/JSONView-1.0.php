@@ -39,7 +39,7 @@ class JSONView extends Plugin implements PreEvent, Presentation
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template)
+    public function display($template, $internal=false)
     {         
         // check for existence of 'force formatted' config option
         // before displaying json responses in prettified format.

@@ -59,8 +59,12 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template)
+    public function display($template, $i=false)
     {
+        if ($i) {
+            $this->switchInternal($i);            
+        }
+
         $this->smarty->display($template);
     }
 
@@ -69,11 +73,9 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->load_filter($type, $name);
     }
 
-    public function switchInternal($i)
-    {
-        if ($i) {
-            $this->smarty->template_dir = realpath(dirname(__FILE__)).'/../../../../tpl/';
-        }
+    private function switchInternal()
+    {        
+        $this->smarty->template_dir = realpath(dirname(__FILE__)).'/../../../../tpl/';
     }
 
     public function exception($debug, $exception, $req_error)

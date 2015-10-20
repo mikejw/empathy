@@ -198,10 +198,9 @@ class Controller
      *
      * @return void
      */
-    public function initDisplay($i)
-    {
-        $this->presenter->switchInternal($i);
-        $this->presenter->display($this->templateFile);
+    public function initDisplay($internal)
+    {        
+        $this->presenter->display($this->templateFile, $internal);
     }
 
     /**
