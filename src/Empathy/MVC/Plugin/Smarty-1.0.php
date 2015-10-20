@@ -59,10 +59,10 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template, $i=false)
+    public function display($template, $internal=false)
     {
-        if ($i) {
-            $this->switchInternal($i);            
+        if ($internal) {
+            $this->switchInternal();
         }
 
         $this->smarty->display($template);
