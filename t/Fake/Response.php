@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class Response extends Message implements ResponseInterface
 {
-    private $status;
+    private $status = 200;
     private $reason = '';
 
 
@@ -18,7 +18,7 @@ class Response extends Message implements ResponseInterface
 
     public function setReason($reason)
     {
-        $this->status = $status;
+        $this->reason = $reason;
     }
 
 
@@ -27,14 +27,13 @@ class Response extends Message implements ResponseInterface
 
     public function getStatusCode()
     {
-        $this->status = 200;
         return $this->status;
     }
 
     public function withStatus($code, $reasonPhrase = '')
     {
         $r = clone $this;
-        $r->status = $code;
+        $r->setStatus($code);
         if ($reasonPhrase != '' ) {
             $r->setReason($reasonPhrase);
         }
