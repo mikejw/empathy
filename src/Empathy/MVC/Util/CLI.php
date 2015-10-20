@@ -11,8 +11,8 @@
  * @category  Framework
  * @package   Empathy
  * @author    Mike Whiting <mail@mikejw.co.uk>
- * @copyright 2008-2013 Mike Whiting
- * @license   http://www.gnu.org/licenses/gpl-3.0-standalone.html GPL v3.0
+ * @copyright 2008-2015 Mike Whiting
+ * @license   http://www.gnu.org/licenses/gpl-3.0-standalone.html LGPL v3.0
  * @link      http://empathyphp.co.uk
  *
  */
@@ -27,7 +27,7 @@ namespace Empathy\MVC\Util;
  * @category Framework
  * @package  Empathy
  * @author   Mike Whiting <mail@mikejw.co.uk>
- * @license  http://www.gnu.org/licenses/gpl-3.0-standalone.html GPL v3.0
+ * @license  http://www.gnu.org/licenses/gpl-3.0-standalone.html LGPL v3.0
  * @link     http://empathyphp.co.uk
  */
 class CLI

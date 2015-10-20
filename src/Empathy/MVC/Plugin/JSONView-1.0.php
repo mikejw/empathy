@@ -4,6 +4,17 @@ namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Plugin as Plugin;
 
+/**
+ * Empathy JSONView Plugin
+ * @file            Empathy/MVC/Plugin/JSONView.php
+ * @description     
+ * @author          Mike Whiting
+ * @license         LGPLv3
+ *
+ * (c) copyright Mike Whiting
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class JSONView extends Plugin implements PreEvent, Presentation
 {
     private $output;
@@ -13,9 +24,14 @@ class JSONView extends Plugin implements PreEvent, Presentation
  
 
 
-    public function assign($name, $data)
+    public function assign($name, $data, $no_array=false)
     {
-        $this->output = $data;
+        if ($no_array) {
+            $this->output = $data;    
+        } else {
+            $this->output[$name] = $data;
+        }
+        
     }
 
     public function clear_assign($name)
@@ -98,10 +114,11 @@ class JSONView extends Plugin implements PreEvent, Presentation
         $this->display();
     }
 
-
-
-    public function switchInternal($i)
+   
+    public function getVars()
     {
-        //
+        return $this->output;
     }
+
+
 }
