@@ -5,7 +5,7 @@ namespace Empathy\MVC\Plugin;
 
 /**
  * Empathy Cassandra Plugin
- * @file            Empathy/MVC/Plugin/Bootstrap.php
+ * @file            Empathy/MVC/Plugin/Cassandra.php
  * @description     
  * @author          Mike Whiting
  * @license         LGPLv3
