@@ -65,16 +65,14 @@ class JSONView extends Plugin implements PreEvent, Presentation
             }
 
             if ($force_formatted) {
-                $jsb = new \JSBeautifier();
-                echo $jsb->beautify($output);
+                echo json_decode(json_encode($output, JSON_PRETTY_PRINT));
             } else {
                 echo $output;
             }
         } else {
 
-            if ($force_formatted) {
-                $jsb = new \JSBeautifier();
-                echo $jsb->beautify(json_encode((array)$this->output));
+            if ($force_formatted) {                
+                echo json_encode((array)$this->output, JSON_PRETTY_PRINT);
             } else {
 
                 echo json_encode((array)$this->output);
