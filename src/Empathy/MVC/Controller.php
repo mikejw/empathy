@@ -283,9 +283,9 @@ class Controller
      *
      * @return void
      */
-    public function assign($name, $data)
+    public function assign($name, $data, $no_array=false)
     {
-        $this->presenter->assign($name, $data);
+        $this->presenter->assign($name, $data, $no_array);
     }
 
     /**

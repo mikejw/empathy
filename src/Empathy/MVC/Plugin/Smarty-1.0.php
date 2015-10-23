@@ -49,7 +49,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
 
-    public function assign($name, $data)
+    public function assign($name, $data, $no_array=false)
     {
         $this->smarty->assign($name, $data);
     }

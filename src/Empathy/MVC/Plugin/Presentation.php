@@ -16,7 +16,7 @@ namespace Empathy\MVC\Plugin;
 interface Presentation
 {
     
-    public function assign($name, $data);
+    public function assign($name, $data, $no_array=false);
 
 	public function exception($debug, $exception, $req_error);
 	
