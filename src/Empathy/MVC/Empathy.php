@@ -332,7 +332,10 @@ class Empathy
                         $item = $configDir;
                     }
                 }
-                define(strtoupper($index), $item);
+                if (!defined(strtoupper($index))) {
+                    define(strtoupper($index), $item);    
+                }
+                
             }
         }
         if (isset($config['boot_options'])) {
