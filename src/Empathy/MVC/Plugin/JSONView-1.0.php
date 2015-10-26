@@ -26,12 +26,14 @@ class JSONView extends Plugin implements PreEvent, Presentation
 
     public function assign($name, $data, $no_array=false)
     {
-        if ($no_array) {
+        if ($no_array) {            
             $this->output = $data;    
         } else {
+            if (is_object($this->output)) {
+                unset($this->output);
+            }
             $this->output[$name] = $data;
         }
-        
     }
 
     public function clear_assign($name)
@@ -108,7 +110,7 @@ class JSONView extends Plugin implements PreEvent, Presentation
            
             $r = new $e_ob(999, 'Exception: ' .$exception->getMessage(), 'SERVER_ERROR_EXPLICIT');
         }
-        $this->assign('default', $r);
+        $this->assign('default', $r, true);
         $this->display();
     }
 
