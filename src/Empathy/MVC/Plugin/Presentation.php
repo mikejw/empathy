@@ -24,4 +24,6 @@ interface Presentation
 
     public function getVars();
 
+    public function clearVars();
+
 }

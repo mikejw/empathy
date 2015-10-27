@@ -29,8 +29,8 @@ class JSONView extends Plugin implements PreEvent, Presentation
         if ($no_array) {            
             $this->output = $data;    
         } else {
-            if (is_object($this->output)) {
-                unset($this->output);
+            if (isset($this->object) && is_object($this->output)) {
+                $this->clearVars();                
             }
             $this->output[$name] = $data;
         }
@@ -72,11 +72,9 @@ class JSONView extends Plugin implements PreEvent, Presentation
                 echo $output;
             }
         } else {
-
             if ($force_formatted) {                
                 echo json_encode((array)$this->output, JSON_PRETTY_PRINT);
-            } else {
-
+            } else {               
                 echo json_encode((array)$this->output);
             }
 
@@ -120,5 +118,9 @@ class JSONView extends Plugin implements PreEvent, Presentation
         return $this->output;
     }
 
+    public function clearVars()
+    {
+        unset($this->output);
+    }
 
 }

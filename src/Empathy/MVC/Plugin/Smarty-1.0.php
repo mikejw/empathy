@@ -93,4 +93,9 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         return $this->smarty->get_template_vars();
     }
 
+    public function clearVars()
+    {
+        $this->smarty->clear_all_assign();
+    }
+
 }
