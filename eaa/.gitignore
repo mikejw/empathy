@@ -4,3 +4,4 @@
 /public_html/.htaccess
 /tpl
 /config.yml
+/node_modules
