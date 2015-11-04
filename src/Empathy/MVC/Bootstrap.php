@@ -245,19 +245,13 @@ class Bootstrap
                             }
                         }
                     }
-                    $plugin_path = realpath(dirname(__FILE__)).'/Plugin/'.$p['name'].'-'.$p['version'].'.php';
-                    if (file_exists($plugin_path)) {
-                        $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
-                        
-                        if (!class_exists($plugin)) {                         
-                            require($plugin_path);
-                            $n = new $plugin($this);
-                            if (isset($p['config'])) {
-                                $n->assignConfig($p['config']);
-                            }
-                            $plugin_manager->register($n);
-                        }
+                    
+                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];                                        
+                    $n = new $plugin($this);
+                    if (isset($p['config'])) {
+                        $n->assignConfig($p['config']);
                     }
+                    $plugin_manager->register($n);                    
                 }
                 $plugin_manager->preDispatch();
             }
