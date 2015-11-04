@@ -244,8 +244,7 @@ class Bootstrap
                                 spl_autoload_register(array($p['class_name'], $p['loader']));
                             }
                         }
-                    }
-                    
+                    }                    
                     $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];                                        
                     $n = new $plugin($this);
                     if (isset($p['config'])) {

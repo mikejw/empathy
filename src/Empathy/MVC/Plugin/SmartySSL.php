@@ -1,10 +1,6 @@
 <?php
 
-
-
 namespace Empathy\MVC\Plugin;
-
-require('../vendor/mikejw/empathy/src/Empathy/MVC/Plugin/Smarty-1.0.php');
 
 use Empathy\MVC\Plugin as Plugin;
 
@@ -28,9 +24,14 @@ class SmartySSL extends Smarty
         if ($internal) {
             $this->switchInternal();
         }
-	echo str_replace('http://'.WEB_ROOT,
-	     'https://'.WEB_ROOT,
-	     $this->smarty->fetch($template));
+        if (\Empathy\MVC\Util\Misc::isSecure()) {
+            echo str_replace('http://'.WEB_ROOT,
+                'https://'.WEB_ROOT,
+                $this->smarty->fetch($template)
+            );
+        } else {
+            $this->smarty->display($template);
+        }
     }
 
 }

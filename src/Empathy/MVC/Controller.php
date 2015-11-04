@@ -214,12 +214,7 @@ class Controller
      */
     public function redirect($endString)
     {
-	$proto = 'http';
-        if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-	      || $_SERVER['SERVER_PORT'] == 443) {
-	      $proto = 'https';
- 	}
-
+        $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';
         if (!defined('MVC_TEST_MODE')) {
             session_write_close();
             $location = 'Location: ';
