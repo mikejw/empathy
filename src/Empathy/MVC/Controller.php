@@ -214,10 +214,16 @@ class Controller
      */
     public function redirect($endString)
     {
+	$proto = 'http';
+        if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+	      || $_SERVER['SERVER_PORT'] == 443) {
+	      $proto = 'https';
+ 	}
+
         if (!defined('MVC_TEST_MODE')) {
             session_write_close();
             $location = 'Location: ';
-            $location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
+            $location .= $proto.'://'.WEB_ROOT.PUBLIC_DIR.'/';
             if ($endString != '') {
                 $location .= $endString;
             }
