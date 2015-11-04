@@ -17,7 +17,7 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class Smarty extends Plugin implements PreDispatch, Presentation
 {
-    private $smarty;
+    protected $smarty;
 
     public function __construct()
     {
@@ -72,7 +72,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->load_filter($type, $name);
     }
 
-    private function switchInternal()
+    protected function switchInternal()
     {        
         $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
     }
