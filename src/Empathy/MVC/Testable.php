@@ -9,12 +9,22 @@ class Testable
 {
     private static $headers;
 
+
+    private static function testMode()
+    {        
+        return ((defined('MVC_TEST_MODE') && MVC_TEST_MODE) &&
+            (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON));        
+    }
+
+    private static function testModeOnly()
+    {
+        return (defined('MVC_TEST_MODE') && MVC_TEST_MODE);
+    }
+
     public static function doDie($msg='')
     {
-        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
-            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
-                echo 'die: ' . $msg;
-            }        
+        if (self::testMode()) {
+            echo 'die: ' . $msg;       
         } else {
             die($header);
         }
@@ -22,12 +32,10 @@ class Testable
 
     public static function header($header)
     {
-        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
-            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
-                //echo 'Setting header:' . $header;
-                $header_arr = explode(':', $header);                
-                self::$headers[$header_arr[0]] = trim($header_arr[1]);
-            }       
+        if (self::testMode()) {
+            echo 'Setting header:' . $header;
+            $header_arr = explode(':', $header);                
+            self::$headers[$header_arr[0]] = trim($header_arr[1]);
         } else {
             echo 'calling header';
             header($header);
@@ -36,10 +44,8 @@ class Testable
 
     public static function session_start()
     {
-        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
-            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
-                echo 'session start';
-            }
+        if (self::testMode()) {
+            echo 'session start';
         } else {
             session_start();
         }
@@ -48,10 +54,8 @@ class Testable
 
     public static function session_unset()
     {
-        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
-            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
-                echo 'session unset';
-            }
+        if (self::testMode()) {
+            echo 'session unset';
         } else {
             session_unset();
         }
@@ -60,10 +64,8 @@ class Testable
 
     public static function session_destroy()
     {
-        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
-            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
-                echo 'session destroy';
-            }
+        if (self::testMode()) {
+            echo 'session destroy';
         } else {
             session_destroy();
         }
@@ -72,10 +74,8 @@ class Testable
 
     public static function session_write_close()
     {
-        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {
-            if (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON) {
-                echo 'session_write_close';
-            }
+        if (self::testMode()) {
+            echo 'session_write_close';
         } else {
             session_write_close();
         }
@@ -83,7 +83,7 @@ class Testable
 
     public static function getHeaders()
     {
-        if (defined('MVC_TEST_MODE') && MVC_TEST_MODE) {            
+        if (self::testMode()) {            
             return self::$headers;
         } else {
             if (function_exists('apache_response_headers')) {
@@ -107,4 +107,3 @@ class Testable
     }
 
 }
-
