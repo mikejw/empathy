@@ -4,10 +4,10 @@ namespace Empathy\MVC;
 
 /**
  * Empathy URI
- * @file			Empathy/URI.php
- * @description		Analyize URI and determine route to appliction module, controller class and event/action.
- * @author			Mike Whiting
- * @license			LGPLv3
+ * @file            Empathy/URI.php
+ * @description     Analyize URI and determine route to appliction module, controller class and event/action.
+ * @author          Mike Whiting
+ * @license         LGPLv3
  *
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
@@ -57,9 +57,14 @@ class URI
     private $controllerPath = '';
     private $controllerName = '';
     private $cli_mode_detected;
+    private $internal_controller = 'empathy';
 
     public function __construct($default_module, $dynamic_module)
     {
+        if (isset($_SERVER['HTTP_HOST']) && strpos(WEB_ROOT, $_SERVER['HTTP_HOST']) === false) {
+            throw new SafeException('Host name mismatch.');
+        }
+
         $this->cli_mode_detected = false;
         $this->sanity($default_module);
         $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
@@ -118,7 +123,11 @@ class URI
         if (isset($_GET['module'])) {
             $this->setModule($_GET['module']);
         } elseif ($this->uriString == '') { // || strpos($this->uriString, '.')) {
-            $this->setModule($this->defaultModule);
+            if ($this->defaultModule === null) {
+                $this->setModule($this->internal_controller);
+            } else {
+                $this->setModule($this->defaultModule);
+            }
         } else {
             $this->formURI();
             $this->analyzeURI();
@@ -150,10 +159,11 @@ class URI
 
         // check for uppercase letters in main uri
         // and redirect if present
+        
         $temp_uri_string = implode('/', $uri);
-        if(preg_match('/[A-Z]/', $temp_uri_string)) {
+        if (preg_match('/[A-Z]/', $temp_uri_string)) {
             header('Location: http://'.WEB_ROOT.PUBLIC_DIR.'/'.strtolower($temp_uri_string).$args, true, 301);
-            exit(); 
+            exit();
         }
         
         $this->uri = $uri;
@@ -182,7 +192,6 @@ class URI
             }
 
             if (!isset($_GET['module'])) {
-
                 /*
                   while ($j < sizeof($this->module) && $current != $this->module[$j]) {
                   $j++;
@@ -222,7 +231,7 @@ class URI
     private function setModule($module)
     {
         $_GET['module'] = $module;
-        if ($_GET['module'] == 'empathy') {
+        if ($_GET['module'] == $this->internal_controller) {
             $this->internal = true;
         }
     }
@@ -232,6 +241,7 @@ class URI
         $this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
     }
 
+    // cause of error
     private function setController()
     {
         if (!(isset($_GET['class'])) && isset($_GET['module'])) {
@@ -243,7 +253,7 @@ class URI
             $this->setControllerPath();
         }
 
-        if (!is_file($this->controllerPath)) {
+        if (!$this->internal && !is_file($this->controllerPath)) {
             if (isset($_GET['class'])) {
                 $_GET['event'] = $_GET['class'];
             }
@@ -254,18 +264,18 @@ class URI
                 $this->controllerName = $_GET['module'];
                 $this->setControllerPath();
             }
+
             if (!is_file($this->controllerPath)) {
                 $this->error = URI::MISSING_CLASS;
             }
         }
-
         $this->controllerName = 'Empathy\\MVC\\Controller\\'.$this->controllerName;
-
         if (!$this->error) {
+            require_once(DOC_ROOT.'/application/CustomController.php');
+            
             if (!class_exists($this->controllerName)) {
                 // try manual include
                 // make sure custom controller has been loaded
-                require_once(DOC_ROOT.'/application/CustomController.php');
                 @include($this->controllerPath);
                 if (!class_exists($this->controllerName)) {
                     $this->error = URI::MISSING_CLASS_DEF;
@@ -293,9 +303,9 @@ class URI
     {
         // code still needed to assert correct section path - else throw 404
         $this->error = 0;
-        // temporary hack to provide object so that entity will assume it has a controller
-        // and connect to database
-        $section = new SectionItemStandAlone(new \stdClass());
+
+        $section = Model::load('Empathy\\MVC\\SectionItemStandAlone');
+
         if (!isset($this->dynamicModule) || $this->dynamicModule == '') {
             throw new Exception("Failed to find name of dynamic module.");
         } else {
@@ -317,7 +327,7 @@ class URI
         $rows = $section->getURIData();
         if (isset($section_uri)) {
             for ($i = 0; $i < sizeof($rows); $i++) {
-                if ($rows[$i]['friendly_url'] != NULL) {
+                if ($rows[$i]['friendly_url'] != null) {
                     $comp = str_replace(" ", "", strtolower($rows[$i]['friendly_url']));
                 } else {
                     $comp = str_replace(" ", "", strtolower($rows[$i]['label']));
@@ -358,8 +368,7 @@ class URI
         }
 
         $_GET['event'] = 'default_event';
-        $_GET['id'] = $section->id;
-
+        
         if ($this->error < 1) {
             $this->setController();
         }
@@ -371,33 +380,29 @@ class URI
     {
         $message = '';
         switch ($this->error) {
-        case URI::MISSING_CLASS:
-            $message = 'Missing class file';
-            break;
-        case URI::MISSING_CLASS_DEF:
-            $message = 'Missing or incorrect class definition';
-            break;
-        case URI::MISSING_EVENT_DEF:
-            $message = 'Controller event '.$_GET['event'].' has not been defined';
-            break;
-        case URI::ERROR_404:
-            $message = 'Error 404';
-            break;
-        case URI::NO_TEMPLATE:
-            $message = 'No DSection template specified';
-            break;
-        default:
-            break;
+            case URI::MISSING_CLASS:
+                $message = 'Missing class file';
+                break;
+            case URI::MISSING_CLASS_DEF:
+                $message = 'Missing or incorrect class definition';
+                break;
+            case URI::MISSING_EVENT_DEF:
+                $message = 'Controller event '.$_GET['event'].' has not been defined';
+                break;
+            case URI::ERROR_404:
+                $message = 'Error 404';
+                break;
+            case URI::NO_TEMPLATE:
+                $message = 'No DSection template specified';
+                break;
+            default:
+                break;
         }
-
         return $message;
     }
 
     public function sanity($default_module)
     {
-        if (!isset($default_module)) {
-            throw new SafeException('Dispatch error: No default module specified');
-        }
         if (!defined('WEB_ROOT')) {
             throw new SafeException('Dispatch error: Web root is not defined');
         }
@@ -407,17 +412,10 @@ class URI
         if (!defined('DOC_ROOT')) {
             throw new SafeException('Dispatch error: Doc root is not defined');
         }
-        if (!defined('SMARTY_DEBUGGING')) {
-            throw new SafeException('Dispatch error: Smarty debugging is not defined');
-        }
-        if (!defined('TITLE')) {
-            throw new SafeException('Dispatch error: No fallback title is defined');
-        }
-        if (!defined('NAME')) {
-            throw new SafeException('Dispatch error: Web application needs a name');
-        }
-        if (!defined('TPL_BY_CLASS')) {
-            throw new SafeException('Dispatch error: TPL_BY_CLASS is not defined');
-        }
+    }
+
+    public function getInternal()
+    {
+        return $this->internal;
     }
 }

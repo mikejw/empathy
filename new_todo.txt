@@ -1,2 +1,0 @@
-
-- plugins can be loaded from local project dir

@@ -2,6 +2,18 @@
 
 namespace Empathy\MVC;
 
+
+/**
+ * Empathy PluginManager
+ * @file            Empathy/MVC/PluginManager.php
+ * @description     
+ * @author          Mike Whiting
+ * @license         LGPLv3
+ *
+ * (c) copyright Mike Whiting
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class PluginManager
 {
     private $plugins;
@@ -44,6 +56,17 @@ class PluginManager
         }
     }
 
+    public function preEvent()
+    {
+        foreach ($this->plugins as $p) {
+            $r = new \ReflectionClass(get_class($p));
+            if (in_array('Empathy\MVC\Plugin\PreEvent', $r->getInterfaceNames())) {
+                $p->onPreEvent();
+            }
+        }
+    }
+
+
     public function getInitialized()
     {
         return $this->initialized;
@@ -54,18 +77,8 @@ class PluginManager
         if (sizeof($this->view_plugins) == 0) {
             throw new \Exception('No plugin loaded for view.');
         } else {
-            $module = $this->controller->getModule();
-            $class = $this->controller->getClass();
-
-            $plugin = 0;
-            if ($module == 'api') {
-                $plugin = 1;
-            }
-
-            $view = $this->view_plugins[$plugin];
-
-            return $view;
+            
+            return $this->view_plugins[0];
         }
     }
-
 }

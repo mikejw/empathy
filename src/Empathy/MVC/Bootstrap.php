@@ -4,10 +4,10 @@ namespace Empathy\MVC;
 
 /**
  * Empathy Bootstrap
- * @file			Empathy/Bootstrap.php
- * @description		Bootstrap object for an application using Empathy.
- * @author			Mike Whiting
- * @license			LGPLv3
+ * @file            Empathy/Bootstrap.php
+ * @description     Bootstrap object for an application using Empathy.
+ * @author          Mike Whiting
+ * @license         LGPLv3
  *
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
@@ -145,39 +145,46 @@ class Bootstrap
      *
      * @return void
      */
-    public function dispatch($fake=false)
+    public function dispatch($fake = false)
     {
         $this->uri = new URI($this->defaultModule, $this->dynamicModule);
         $error = $this->uri->getError();
 
-        if($error == URI::MISSING_CLASS
+        if ($error == URI::MISSING_CLASS
            && isset($this->dynamicModule)
-           && $this->dynamicModule != '')
-        {
+           && $this->dynamicModule != '') {
             $error = $this->uri->dynamicSection();
         }
 
         if ($error > 0) {
-
-            if($this->environment == 'prod' || $this->debug_mode == false) {     
-
-                if($error == URI::MISSING_CLASS ||
-                    $error == URI::MISSING_EVENT_DEF) { 
-                    throw new RequestException('Not found', RequestException::NOT_FOUND);
+            if ($this->environment == 'prod' || $this->debug_mode == false) {
+                if ($error == URI::MISSING_CLASS ||
+                    $error == URI::MISSING_EVENT_DEF ||
+                    $error == URI::ERROR_404
+                ) {
+                        throw new RequestException('Not found', RequestException::NOT_FOUND);
                 }
             } else {
                 throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
             }
         }
+
         $controller_name = $this->uri->getControllerName();
         $this->controller = new $controller_name($this);
-
-        if($fake == false) {
+        
+        $this->plugin_manager->preEvent();
+        
+        if ($fake == false) {
             $event_val = $this->controller->$_GET['event']();
             if ($this->mvc->hasErrors()) {
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($event_val !== false) {
-                $this->display(false);
+                if ($this->uri->getInternal()) {
+                    $this->controller->setTemplate('empathy.tpl');
+                    $this->display(true);
+                } else {
+                    $this->display(false);
+                }
             }
         }
     }
@@ -192,35 +199,11 @@ class Bootstrap
     public function dispatchException($e)
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
-
-
         $this->controller = new Controller($this);
 
-        if ($this->controller->getModule() != 'api') {
-            
-            $this->controller->assign('error', $e->getMessage());
-                        
-            if($req_error) {
-    
-                 $this->controller->assign('code', $e->getCode());
-                 $this->controller->setTemplate('elib:/req_error.tpl');
-                 $this->display();
-            } else {
-                $this->controller->setTemplate('../empathy.tpl');
-                $this->display(true);
-            }
-            
+        $this->plugin_manager->preEvent();
 
-        } else {
-            if (!$this->debug_mode) {
-                $r = new \EROb(\ReturnCodes::SERVER_ERROR, 'Server error.');
-            } else {
-                $r = new \EROb(999, $e->getMessage(), 'SERVER_ERROR_EXPLICIT');
-            }
-
-            $this->controller->assign('default', $r);
-            $this->display(false);
-        }
+        $this->controller->viewException($this->debug_mode, $e, $req_error);
     }
 
     /**
@@ -230,7 +213,7 @@ class Bootstrap
      *
      * @return void
      */
-    private function display($i=false)
+    private function display($i = false)
     {
         $this->controller->initDisplay($i);
     }
@@ -255,23 +238,31 @@ class Bootstrap
                 $plugin_manager->init();
                 foreach ($plugins as $p) {
                     if (isset($p['class_path'])) {
-                        require($p['class_path']);
-                        if (isset($p['loader']) && $p['loader'] != '') {
-                            spl_autoload_register(array($p['class_name'], $p['loader']));
+                        if (!class_exists($p['class_name'])) {
+                            require($p['class_path']);
+                            if (isset($p['loader']) && $p['loader'] != '') {
+                                spl_autoload_register(array($p['class_name'], $p['loader']));
+                            }
                         }
                     }
-                    $plugin_path = realpath(dirname(realpath(__FILE__))).'/Plugin/'.$p['name'].'-'.$p['version'].'.php';
+                    $plugin_path = realpath(dirname(__FILE__)).'/Plugin/'.$p['name'].'-'.$p['version'].'.php';
                     if (file_exists($plugin_path)) {
-                        require($plugin_path);
                         $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
-                        $n = new $plugin($this);
-                        $plugin_manager->register($n);
+                        
+                        if (!class_exists($plugin)) {                         
+                            require($plugin_path);
+                            $n = new $plugin($this);
+                            if (isset($p['config'])) {
+                                $n->assignConfig($p['config']);
+                            }
+                            $plugin_manager->register($n);
+                        }
                     }
                 }
                 $plugin_manager->preDispatch();
             }
         } catch (\Exception $e) {
-            throw new \Empathy\SafeException($e->getMessage());
+            throw new \Empathy\MVC\SafeException($e->getMessage());
         }
     }
 
@@ -299,7 +290,7 @@ class Bootstrap
      */
     public function getURIError()
     {
-        return $this->uri->getError();
+        return (isset($this->uri))? $this->uri->getError(): null;
     }
 
     /**
@@ -312,7 +303,7 @@ class Bootstrap
      */
     public function getURICliMode()
     {
-        return $this->uri->getCliMode();
+        return (isset($this->uri))? $this->uri->getCliMode(): null;
     }
 
     /**
@@ -321,7 +312,7 @@ class Bootstrap
      */
     public function getURIData()
     {
-        return $this->uri->getData();
+        return (isset($this->uri))? $this->uri->getData(): null;
     }
 
     /**
@@ -350,5 +341,4 @@ class Bootstrap
     {
         return $this->controller;
     }
-
 }

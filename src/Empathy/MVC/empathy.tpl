@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title>Empathy Application Has Encountered an Error</title>
+<title>{if $error neq ''}Empathy Application Has Encountered an Error{else}Empathy Application{/if}</title>
 <style type="text/css" media="all">
 {literal}
 /* eric's reset code */
@@ -88,7 +88,20 @@ font-size: 12px; font-weight: normal; line-height: 1.5em; }
 <div id="page">
 <h1>Empathy {$MVC_VERSION}</h1>
 <div id="messages">
+
+{if $error neq ''}
 <h2>{$error}</h2>
+
+{elseif $about}
+<h2>Congratulaions...</h2>
+<p>You have successfully set up an empathy app.</p>
+
+<p>http://empathyphp.co.uk</p>
+
+
+
+{/if}
+
 
 <p>&nbsp;</p>
 <p>&nbsp;</p>

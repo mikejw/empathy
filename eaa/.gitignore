@@ -1,0 +1,7 @@
+/vendor
+/node_modules
+/public_html/components
+/public_html/.htaccess
+/tpl
+/config.yml
+/node_modules

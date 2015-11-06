@@ -78,9 +78,6 @@
             <file name="eaa.zip" role="data" />
             <file name="licence.txt" role="doc" />
             <file name="README" role="doc" />
-            <file name="empathyf" role="script">
-                <tasks:replace from="@php_dir@" to="php_dir" type="pear-config" />
-            </file>
         </dir>
     </contents>
     <dependencies>

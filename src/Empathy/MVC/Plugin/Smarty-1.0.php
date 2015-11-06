@@ -1,8 +1,20 @@
 <?php
 
 namespace Empathy\MVC\Plugin;
+
 use Empathy\MVC\Plugin as Plugin;
 
+/**
+ * Empathy Smarty Plugin
+ * @file            Empathy/MVC/Plugin/Smarty.php
+ * @description     
+ * @author          Mike Whiting
+ * @license         LGPLv3
+ *
+ * (c) copyright Mike Whiting
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class Smarty extends Plugin implements PreDispatch, Presentation
 {
     private $smarty;
@@ -14,7 +26,10 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     public function onPreDispatch()
     {
-        $this->smarty->debugging = SMARTY_DEBUGGING;
+        if (defined('SMARTY_DEBUGGING') && SMARTY_DEBUGGING) {
+            $this->smarty->debugging = true;
+        }
+
         $this->smarty->template_dir = DOC_ROOT."/presentation";
         $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
         $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
@@ -25,14 +40,16 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         }
 
         // assign constants
-        $this->assign('NAME', NAME);
+        if (defined('NAME')) {
+            $this->assign('NAME', NAME);
+        }
+        $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('WEB_ROOT', WEB_ROOT);
         $this->assign('PUBLIC_DIR', PUBLIC_DIR);
-        $this->assign('DOC_ROOT', DOC_ROOT);
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
 
-    public function assign($name, $data)
+    public function assign($name, $data, $no_array=false)
     {
         $this->smarty->assign($name, $data);
     }
@@ -42,8 +59,11 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template)
+    public function display($template, $internal=false)
     {
+        if ($internal) {
+            $this->switchInternal();
+        }
         $this->smarty->display($template);
     }
 
@@ -52,10 +72,30 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->load_filter($type, $name);
     }
 
-    public function switchInternal($i)
+    private function switchInternal()
+    {        
+        $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
+    }
+
+    public function exception($debug, $exception, $req_error)
     {
-        if ($i) {
-            $this->smarty->template_dir = realpath(dirname(__FILE__));
+        $this->assign('error', $exception->getMessage());                    
+        if($req_error) {
+             $this->assign('code', $exception->getCode());
+             $this->display('elib:/req_error.tpl');
+        } else {            
+            $this->display('empathy.tpl', true);
         }
     }
+
+    public function getVars()
+    {
+        return $this->smarty->get_template_vars();
+    }
+
+    public function clearVars()
+    {
+        $this->smarty->clear_all_assign();
+    }
+
 }

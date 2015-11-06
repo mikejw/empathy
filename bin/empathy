@@ -1,187 +1,295 @@
-#!/usr/bin/perl
-use strict;
-use warnings;
-use Cwd qw/abs_path getcwd/;
-use Data::Dumper;
-use YAML::Tiny;
-use Getopt::Long;
+<?php
+// Copyright 2008-2015 Mike Whiting (mail@mikejw.co.uk).
+// This file is part of the Empathy MVC framework.
+
+// Empathy is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Empathy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public License
+// along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
+
+if(false == @include('./vendor/autoload.php')) {
+
+    die('Please install composer deps.');
+}
+
+if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    define('SEPARATOR', '\\');
+} else {
+    define('SEPARATOR', '/');
+}
+define('TPL_CACHE', './tpl/templates_c');
+define('LIB_PATH', './vendor/mikejw/empathy');
+define('ELIB_PUBLIC', '../vendor/mikejw/elib-base/public'); # relative to directory where symlink is created
 
 
-
-
-my $lib_path = "./vendor/mikejw/empathy";
-
-# get empathy config
-my %config = &read_global_config();
-my %app_config = &read_app_config();
-
-my %actions = (
-    mysql_setup => \&mysql_setup,
-    mysql_dump => \&mysql_dump,
-    mysql_populate => \&mysql_populate,
-    mysql_extra => \&mysql_extra,
-    doctrine_gen_models => \&doctrine_gen_models,
-    doctrine_gen_yaml => \&doctrine_gen_yaml,
-    doctrine_generate => \&doctrine_generate
-    );
-
-# initialize options
-my $mysql = '';
-my $doctrine = '';
-my $new_app = 0;
-GetOptions(
-    'mysql=s' => \$mysql,
-    'doctrine=s' => \$doctrine,
-    'new_app' => \$new_app
-    );
-
-my $call;
-if($mysql)
-{ 
-    $call = 'mysql_'.$mysql;
-    if(defined($actions{$call}))
-    {	
-	$actions{$call}->();
-    }
-    else
-    {
-	die "No can do. Exiting...\n";
-	exit();
+function recursive_copy($src, $fdest, $app_name)
+{
+    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($src), RecursiveIteratorIterator::SELF_FIRST);
+    foreach($objects as $name => $object) {        
+        if(!preg_match('/\.$/', $name) && !is_dir($name)) {
+            $dest = str_replace($src, '.', $name);
+            $dest_dir = (dirname($dest));
+            if(!is_dir($dest_dir)) {
+                mkdir($dest_dir, 0777, true);
+            }
+            if(strpos($name, 'eaa.css')) {
+                $dest = str_replace('eaa.css', $app_name.'.css', $dest);
+            }
+            copy($name, $dest);
+        }
     }
 }
-elsif($doctrine)
+
+
+function read_yaml($file)
 {
-    $call = 'doctrine_'.$doctrine;
-    if(defined($actions{$call}))
-    {
-	$actions{$call}->();
+    $rtnd = false;
+    if(file_exists($file)) {
+        $s = new \Spyc();
+        $rtnd = $s->YAMLLoad($file); 
     }
-    else
-    {
-	die "No can do. Exiting...\n";
-	exit();
-    }
+    return $rtnd;
 }
-elsif($new_app)
+
+function read_app_config()
 {
-    my $name = '';
-    my $web_root = '';
-    my $doc_root = '';
+    return read_yaml('./config.yml');
+}
 
-    print "New app name: ";
-    chomp ($name = <>);
-    print "Web root: ";
-    chomp ($web_root = <>);
-    
-    # old 'system mode'
-    #$doc_root = `pwd`.$name;
-    #`cp $lib_path/data/Empathy/eaa.zip .`;
-    #`unzip eaa.zip`;
-    #`mv eaa $name`;
+function read_global_config()
+{
+    return read_yaml(LIB_PATH.'/config.yml');
+}
 
-    `cp -r $lib_path/eaa/* .`;
+function execute($command)
+{
+    $output = array();
+    $var = null;
+    exec($command, $output, $var);
+    //echo $command."\n";
+}
+
+function invalid_action()
+{
+    \cli\out_padded("Not a valid action. Run with --help (-h) flag.");
+}
+
+
+function new_app()
+{
+    $name = '';
+    $web_root = '';
+    $tmp_web_root = '';
+    $tmp_doc_root = '';
+    $doc_root = getcwd();
+    $tmp_name = '';
+    $tmp_doc_root = \cli\prompt("Please enter document root [$doc_root]", $doc_root);
+    if($tmp_doc_root != '') {
+        $doc_root = $tmp_doc_root;
+    }
+
+    $doc_root_arr = explode(SEPARATOR, $doc_root);
+    $name = $doc_root_arr[sizeof($doc_root_arr) - 1]; 
+    $web_root = 'localhost/'.$name;
+    $tmp_name = \cli\prompt("Please enter name: [$name]", $name);    
+    if($tmp_name != '') {
+        $name = $tmp_name;
+    }
+
+    $tmp_web_root = \cli\prompt("Please enter web root: [$web_root]", $web_root);      
+    if($tmp_web_root != '') {
+        $web_root = $tmp_web_root;
+    }
+
+    recursive_copy(LIB_PATH.'/eaa', './', $name);
+
+    $access_file = './public_html/htaccess';
+    $access = str_replace('WEB_ROOT', $name.'/public_html/', file_get_contents($access_file));
+    file_put_contents(str_replace('htaccess', '.htaccess', $access_file), $access);
+    unlink($access_file);
+
+    # new stuff...
+    $cfg = read_app_config(); # call read config again
+    $cfg['name'] = $name;
+    $cfg['web_root'] = $web_root;
+    $cfg['doc_root'] = $doc_root;
+
+    $s = new \spyc();
+    file_put_contents('./config.yml', $s->YAMLDump($cfg, true, 60));
+
+    option_misc('tpl_cache');
+
     print "Done.\n";
 }
 
 
 
-
-
-
-# functions...
-
-sub doctrine_generate()
+function option_mysql($action)
 {
-    &exec_app('doctrine_generate');
-}
+    global $config, $app_config;
 
-
-sub doctrine_gen_models()
-{
-    &exec_app('doctrine_models');
-}
-
-sub doctrine_gen_yaml()
-{
-    if(!-d './models')
-    {
-	die("Doctrine models directory does not exist. Exiting...\n");
+    if($action === "") {
+        $action = 'dump';
     }
-    else
-    {    
-	&exec_app('doctrine_yaml');
+
+    switch($action){
+        case 'setup':
+            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' < setup.sql');
+            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' < inserts.sql');   
+            break;
+        case 'dump':
+            \cli\out_padded("Performing dump...");
+            execute($config['mysql_dump'].' -u root --password='.$app_config['db_pass']
+                .' --no-create-info --complete-insert '.$app_config['db_name'].' > dump.sql');
+            break;
+        case 'populate':
+            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' < setup.sql');
+            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' '.$app_config['db_name'].' < dump.sql');
+            break;
+        case 'extra':
+            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' < extra.sql');
+            break;
+        default:
+            invalid_action();
+            break;
     }
 }
 
-sub mysql_setup()
-{
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < inserts.sql');     
-}
-sub mysql_populate()
-{
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < setup.sql');
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' '.$app_config{'db_name'}.' < dump.sql');	
-}
-sub mysql_extra()
-{
-    &execute($config{'mysql'}.' -u root --password='.$app_config{'db_pass'}.' < extra.sql');
-}
-sub mysql_dump()
-{
-    &execute($config{'mysql_dump'}.' -u root --password='.$app_config{'db_pass'}.' --no-create-info --complete-insert '.$app_config{'db_name'}.' > dump.sql');
-}
 
-sub execute()
+function option_node($action)
 {
-    my ($command) = @_;
-    my @output = `$command`;
-}
+    switch($action){
+        case 'compile_less':
 
-sub exec_app()
-{
-    my ($args) = @_;
-    my @output = &execute('php .'.$app_config{'public_dir'}.'/index.php '.$args);
-}
+            $css_dir = './public_html/css/less';
+            $less_command = './node_modules/.bin/lessc --compress';
+            $less_files = $css_dir.'/*.less';
+            $src_files = glob($less_files);
 
-
-# stores cwd temporarily, assumbed to be root of empathy app
-sub read_global_config
-{
-    my %config;
-    my $yaml = YAML::Tiny->read($lib_path.'/config.yml');
-    %config = (
-	mysql => $yaml->[0]->{'mysql'},
-        mysql_dump => $yaml->[0]->{'mysql_dump'},
-        ffmpeg => $yaml->[0]->{'ffmpeg'},
-	perl => $yaml->[0]->{'perl'}
-	);
-}
-sub read_app_config
-{
-    my %app_config;
-    my $config = './config.yml';
-    my $yaml = YAML::Tiny->read($config);
-    if(!defined($yaml->[0]->{'db_pass'}))
-    {
-	$yaml->[0]->{'db_pass'} = '';
+            foreach($src_files as $file) { 
+                
+                $css = preg_replace('/\.less/', '.css', $file);
+                $command = "$less_command $file $css";
+                execute($command); 
+            }
+            $init_css = './public_html/css/less/init.min.css';
+            execute("cat $init_css $css > ./tmp.css; mv tmp.css $css");
+            break;
+        case 'compile_js':
+            $yui_command = './node_modules/.bin/yuicompressor';
+            $js_dir = './public_html/js';
+            execute("cat $js_dir/common.js $js_dir/mikejw.js > ./tmp.js");
+            $o_js = $js_dir.'/mikejw.min.js';
+            execute("$yui_command -o $o_js ./tmp.js");
+            unlink('./tmp.js');
+            break;
+        default:
+            invalid_action();
+            break;
     }
-    %app_config = (
-	name =>	$yaml->[0]->{'name'},
-	title => $yaml->[0]->{'title'},
-	doc_root => $yaml->[0]->{'doc_root'},
-	web_Root => $yaml->[0]->{'web_root'},
-	public_dir => $yaml->[0]->{'public_dir'},
-	db_server => $yaml->[0]->{'db_server'},
-	db_user => $yaml->[0]->{'db_user'},
-	db_pass => $yaml->[0]->{'db_pass'},
-	db_name => $yaml->[0]->{'db_name'},
-	tbl_prefix => $yaml->[0]->{'tbl_prefix'},
-	tpl_by_class => $yaml->[0]->{'tpl_by_class'},
-	boot_options => $yaml->[0]->{'boot_options'},
-	smarty_debugging => $yaml->[0]->{'smarty_debugging'},
-	plugins => $yaml->[0]->{'plugins'}
-	);   
+
 }
+
+
+function option_misc($action)
+{
+    switch($action){
+        case 'tpl_cache':
+            if(!is_dir(TPL_CACHE)) {
+                mkdir(TPL_CACHE, 0777, true);
+            }
+            chmod(TPL_CACHE, 0777);
+            break;
+        default:
+            invalid_action();
+            break;
+    }
+
+}
+
+function boot()
+{
+    \Empathy\MVC\Util\Lib::addToIncludePath(getcwd().'/../libs');
+    //class R extends RedBean_Facade{}
+    return new Empathy\MVC\Empathy(getcwd().'/', true);
+}
+
+
+function main()
+{
+    $version = defined('MVC_VERSION')? MVC_VERSION: '0.9.x';
+    echo "\n
+                                  __  __         
+      ___  ____ ___  ____  ____ _/ /_/ /_  __  __
+     / _ \/ __ `__ \/ __ \/ __ `/ __/ __ \/ / / /
+    /  __/ / / / / / /_/ / /_/ / /_/ / / / /_/ / 
+    \___/_/ /_/ /_/ .___/\__,_/\__/_/ /_/\__, /  
+                 /_/                    /____/ v{$version}    
+    \n\n";
+    $arguments = new \cli\Arguments(array('strict' => true));
+    $arguments->addFlag(array('help', 'h'), 'Show this help screen');
+    $arguments->addFlag(array('new_app'), 'Create new app.');
+    //$arguments->addFlag('version', 'Display the MVC version.');
+    $arguments->addOption(array('mysql', 'm'), array(
+                              'default'     => 'dump',
+                              'description' => 'Perform MySQL operation. Default is database dump.'));
+    $arguments->addOption(array('node', 'n'), array(
+                              'default'     => null,
+                              'description' => 'Perform node.js operation.'));
+    $arguments->addOption('misc', array(
+                              'default'     => null,
+                              'description' => 'Perform misc operation.'));
+    $arguments->addOption('inst_mod', array(
+                              'default'     => null,
+                              'description' => 'Install/generate application extension module.'));
+    $arguments->parse();
+
+    //echo $arguments->asJSON(); exit();
+
+    if($arguments['help']) {
+        \cli\out_padded($arguments->getHelpScreen());
+        \cli\out_padded("\n");
+
+    } elseif (isset($arguments['new_app'])) {
+        new_app();
+
+    } else {
+        $valid_options = array('mysql', 'node', 'misc', 'inst_mod');
+        foreach($valid_options as $o) {
+            if(isset($arguments[$o])) {
+                $func = 'option_'.$o;
+                $func($arguments[$o]);
+            }
+        }
+    }
+}
+
+function option_inst_mod($module) {
+
+    // currently no checks for lib
+    $count = \Empathy\MVC\Util\ModuleGen::generate($module);
+    \cli\out_padded($count.' controller(s) generated.');
+}
+
+
+$boot = null;
+$app_config = read_app_config();
+$config = read_global_config();
+
+if($app_config !== false) {
+    $boot = boot();
+}
+main();
+
+//\Empathy\MVC\Util\CLI::setReqMode(\Empathy\MVC\Util\CLIMode::CAPTURED);
+//echo \Empathy\MVC\Util\CLI::request($boot, '');
 
 

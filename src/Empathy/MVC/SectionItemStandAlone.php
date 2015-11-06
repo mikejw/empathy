@@ -2,6 +2,18 @@
 
 namespace Empathy\MVC;
 
+
+/**
+ * Empathy SectionItemStandAlone class
+ * @file            Empathy/MVC/SectionItemStandAlone.php
+ * @description     For elib-cms modules.
+ * @author          Mike Whiting
+ * @license         LGPLv3
+ *
+ * (c) copyright Mike Whiting
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class SectionItemStandAlone extends Entity
 {
     public $id;
@@ -20,6 +32,8 @@ class SectionItemStandAlone extends Entity
 
     public function getURIData()
     {
+        $uri_data = array();
+
         $sql = "SELECT id, label, friendly_url FROM ".SectionItemStandAlone::$table;
         $error = "Could not get URI data.";
         $result = $this->query($sql, $error);
@@ -28,7 +42,6 @@ class SectionItemStandAlone extends Entity
             $uri_data[$i] = $row;
             $i++;
         }
-
         return $uri_data;
     }
 
@@ -48,5 +61,4 @@ class SectionItemStandAlone extends Entity
             //echo "Whoops!";
         }
     }
-
 }
