@@ -214,10 +214,11 @@ class Controller
      */
     public function redirect($endString)
     {
+        $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';
         if (!defined('MVC_TEST_MODE')) {
             session_write_close();
             $location = 'Location: ';
-            $location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
+            $location .= $proto.'://'.WEB_ROOT.PUBLIC_DIR.'/';
             if ($endString != '') {
                 $location .= $endString;
             }
