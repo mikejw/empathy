@@ -1,4 +1,7 @@
-{include file="eheader.tpl" mode="default"}
+
+
+{include file="eheader.tpl"}
+
 
 <header>
 <p><img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/img/empathy.png" alt="" width="105" /></p>
