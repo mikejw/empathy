@@ -252,11 +252,8 @@ class Bootstrap
                             }
                         }
                     }                    
-                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];                                        
-                    $n = new $plugin($this);
-                    if (isset($p['config'])) {
-                        $n->assignConfig($p['config']);
-                    }
+                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name']; 
+                    $n = (isset($p['config']))? new $plugin($p['config']): new $plugin(NULL);
                     $plugin_manager->register($n);                    
                 }
                 $plugin_manager->preDispatch();
