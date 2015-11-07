@@ -41,10 +41,6 @@ class Controller
      */
     private $templateFile;
 
-    /**
-     * The default title of the page taken from the application config file.
-     */
-    protected $title;
 
     /**
      * The view/presentation object that will be used to render the page.
@@ -90,46 +86,37 @@ class Controller
     public function __construct($boot)
     {
         $this->boot = $boot;
-
         $this->cli_mode = $boot->getURICliMode();
         $this->initError = $boot->getURIError();
         $this->uri_data = $boot->getURIData();
         $this->plugin_manager = $boot->getPluginManager();
         $this->plugin_manager->setController($this);
-
         $this->environment = $boot->getEnvironment();
-
         $this->stash = new Stash();
-
         $this->connected = false;
-        $this->module = $_GET['module'];
-        $this->class = $_GET['class'];
-        $this->event = $_GET['event'];
-
-        if (defined('TITLE')) {
-            $this->title = TITLE;
-        }
- 
-        if (!defined('TPL_BY_CLASS') || TPL_BY_CLASS) {
+        $this->module = (isset($_GET['module']))? $_GET['module']: NULL;
+        $this->class = (isset($_GET['class']))? $_GET['class']: NULL;
+        $this->event = (isset($_GET['event']))? $_GET['event']: NULL;
+        if (Config::get('TPL_BY_CLASS')) {
             $this->templateFile = $this->class.'.tpl';
         } else {
             $this->templateFile = $this->module.'.tpl';
         }
-
         Session::up();
-
-        // get presenter
         $this->presenter = $this->plugin_manager->getView();
-
-        if ($this->presenter !== null) {
+        if ($this->presenter !== NULL) {
             $this->assignControllerInfo();
             $this->assignConstants();
             $this->assignEnvironment();
         }
-
-        // if within CMS assign the current section name to the template
         if (isset($_GET['section_uri'])) {
             $this->assign('section', $_GET['section_uri']);
+        }
+
+        // create a plugin for this?
+        // taken from mikejw custom controller
+        if($boot->getEnvironment() == 'dev') {
+            $this->assign('dev_rand', uniqid());
         }
     }
 
@@ -140,16 +127,15 @@ class Controller
      */
     private function assignConstants()
     {
-        if (defined('NAME')) {
-            $this->assign('NAME', NAME);
+        if (Config::get('NAME') !== false) {
+            $this->assign('NAME', Config::get('NAME'));
         }
-        if (defined('TITLE')) {
-            $this->assign('TITLE', TITLE);
+        if (Config::get('TITLE') !== false) {
+            $this->assign('TITLE', Config::get('TITLE'));
         }
-
-        $this->assign('DOC_ROOT', DOC_ROOT);
-        $this->assign('WEB_ROOT', WEB_ROOT);
-        $this->assign('PUBLIC_DIR', PUBLIC_DIR);
+        $this->assign('DOC_ROOT', Config::get('DOC_ROOT'));
+        $this->assign('WEB_ROOT', Config::get('WEB_ROOT'));
+        $this->assign('PUBLIC_DIR', Config::get('PUBLIC_DIR'));
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
 
@@ -201,32 +187,37 @@ class Controller
     public function initDisplay($i)
     {
         $this->presenter->switchInternal($i);
+
+        // @todo: optimise somehow?
+        // for default templates check test mode
+        // derived from elibs plugin
+        if ($this->plugin_manager->eLibsTestMode()) {
+            $empathy_dir = Config::get('DOC_ROOT').'/../';
+        } else {
+            $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
+        }
+        $empathy_dir = realpath($empathy_dir);
+        $this->assign('EMPATHY_DIR', $empathy_dir);
+            
         $this->presenter->display($this->templateFile);
     }
 
     /**
      * Redirect the user to another location within the application
-     * Redirection is disabled if the MVC_TEST_MODE global flag is detected to prevent tests breaking
-     * but execution always begins to end here
      *
      * @param string $endString the new URI to redirect to.
      *
      * @return void
      */
-    public function redirect($endString)
+    public function redirect($endString='')
     {
-        if (!defined('MVC_TEST_MODE')) {
-            session_write_close();
-            $location = 'Location: ';
-            $location .= 'http://'.WEB_ROOT.PUBLIC_DIR.'/';
-            if ($endString != '') {
-                $location .= $endString;
-            }
-            header($location);
-        } else {
-            throw new TestModeException('Cannot redirect due to test mode.');
+        Session::write();
+        $location = 'Location: ';
+        $location .= 'http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
+        if ($endString != '') {
+            $location .= $endString;
         }
-        
+        Testable::header($location);        
     }
 
     /**
@@ -236,16 +227,15 @@ class Controller
      *
      * @return void
      */
-    protected function redirect_cgi($endString)
+    public function redirect_cgi($endString='')
     {
-        session_write_close();
+        Session::write();
         $location = 'Location: ';
-        $location .= 'http://'.CGI.'/';
+        $location .= 'http://'.Config::get('CGI').'/';
         if ($endString != '') {
             $location .= $endString;
         }
-        header($location);
-        exit();
+        Testable::header($location);
     }
 
     /**
@@ -253,7 +243,7 @@ class Controller
      *
      * @return void
      */
-    protected function sessionDown()
+    public function sessionDown()
     {
         Session::down();
     }
@@ -263,14 +253,13 @@ class Controller
      *
      * @return void
      */
-    protected function isXMLHttpRequest()
+    public function isXMLHttpRequest()
     {
-        $request = 0;
+        $request = false;
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
            ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
-            $request = 1;
+            $request = true;
         }
-
         return $request;
     }
 
@@ -309,31 +298,6 @@ class Controller
         return $this->class;
     }
 
-    /**
-     * Obtain user interface control values from request/session.
-     * @param string $ui name of interface control set
-     *
-     * @param array $ui_array set of control settings
-     *
-     * @return void
-     */
-    public function loadUIVars($ui, $ui_array)
-    {
-        $new_app = Session::getNewApp();
-        foreach ($ui_array as $setting) {
-            if (isset($_GET[$setting])) {
-                if (!$new_app) {
-                    $_SESSION[$ui][$setting] = $_GET[$setting];
-                } else {
-                    Session::setUISetting($ui, $setting, $_GET[$setting]);
-                }
-            } elseif (Session::getUISetting($ui, $setting) !== false) {
-                $_GET[$setting] = Session::getUISetting($ui, $setting);
-            } elseif (isset($_SESSION[$ui][$setting])) {
-                $_GET[$setting] = $_SESSION[$ui][$setting];
-            }
-        }
-    }
 
     // when $def is 0, valid is true when id is 0
     public function initID($id, $def, $assertSet = false)

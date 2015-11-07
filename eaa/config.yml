@@ -1,18 +1,19 @@
 ---
 name: eaa
-doc_root: /var/www/eaa
+doc_root: /Users/mike/code/mikejw/empathy/eaa
 web_root: localhost/eaa
 public_dir: /public_html
 boot_options:
   handle_errors: true
   default_module: front
   use_elib: false
-  environment: dev
-  debug_mode: true
+  environment: prod
+  debug_mode: false
 plugins:
   -
     name: ELibs
     version: 1.0
+    config: '{ "testing": true }'
   -
     name: Smarty
     version: 1.0

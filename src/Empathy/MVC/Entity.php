@@ -395,9 +395,9 @@ class Entity
     public function insert($table, $id, $format, $sanitize, $force_id=false)
     {
         $this->toXHTMLChris($format);
-        if ($sanitize == 1) {
+        if ($sanitize == self::SANITIZE) {
             $this->sanitize();
-        } elseif ($sanitize == 2) {
+        } elseif ($sanitize == self::SANITIZE_NO_POST) {
             $this->sanitizeNoPost();
         }
 

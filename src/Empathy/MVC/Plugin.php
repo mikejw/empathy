@@ -4,16 +4,26 @@ namespace Empathy\MVC;
 
 class Plugin
 {
-    protected $bootstrap;
     protected $config;
+    
 
-    public function __construct($b)
+    public function __construct($config = NULL)
     {
-        $this->bootstrap = $b;
+        if ($config !== NULL) {
+            $this->assignConfig($config);
+        }
     }
+
 
     public function assignConfig($config)
     {
-        $this->config = json_decode($config, true);
+        $this->config = json_decode($config, true);        
     }
+
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
 }

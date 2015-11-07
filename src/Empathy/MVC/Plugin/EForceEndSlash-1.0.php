@@ -6,11 +6,7 @@ use Empathy\MVC\Plugin as Plugin;
 
 class EForceEndSlash extends Plugin implements PreDispatch
 {
-    public function __construct()
-    {
-        //
-    }
-
+   
     public function onPreDispatch()
     {   
         // check if target looks life a file first

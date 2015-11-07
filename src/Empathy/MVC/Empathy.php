@@ -2,6 +2,7 @@
 
 namespace Empathy\MVC;
 
+
 define('MVC_VERSION', '0.9.6');
 
 /**
@@ -28,27 +29,27 @@ class Empathy
      * Boot options read from application config file.
      * @var array
      */
-    private $bootOptions;
+    private $bootOptions = array();
 
     /**
      * Plugin definition read from application config file.
      * @var array
      */
-    private $plugins;
+    private $plugins = array();
 
     /**
      * When application is set to handle errors
      * this array is used to collect the error messages.
      * @var array
      */
-    private $errors;
+    private $errors = array();
 
     /**
      * Application persistent mode. Implies there could be multiple requests to handle
      * following initialization. This flag is passed directly to the application.
      * @var boolean
      */
-    private $persistent_mode;
+    private $persistent_mode = false;
 
     /**
      * This flag is read from the boot_options section of the application config.
@@ -59,7 +60,7 @@ class Empathy
      *
      * @var boolean
      */
-    private static $use_elib;
+    private static $use_elib = false;
 
     /**
      * Create application object.
@@ -75,14 +76,12 @@ class Empathy
         if ($system_mode) {
             spl_autoload_register(array($this, 'loadClass'));
         }
-        $this->loadConfig($configDir);
-        
+        $this->loadConfig($configDir);        
         if ($system_mode) {
             $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
         } else {
             $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'));
         }
-
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
             self::$use_elib = true;
@@ -90,15 +89,11 @@ class Empathy
         } else {
             self::$use_elib = false;
         }
-
         if ($this->getHandlingErrors()) {
             set_error_handler(array($this, 'errorHandler'));
         }
-
         $this->boot = new Bootstrap($this->bootOptions, $this->plugins, $this);
-
         $this->initPlugins();
-
         if ($this->persistent_mode !== true) {
             $this->beginDispatch();
         }
@@ -180,6 +175,7 @@ class Empathy
         return $this->errors;
     }
 
+
     /**
      * Returns whether error handler has caught anything or not.
      * @return boolean
@@ -188,6 +184,7 @@ class Empathy
     {
         return (sizeof($this->errors) > 0);
     }
+
 
     /**
      * Return a concatenated string of all caught error messages.
@@ -223,7 +220,7 @@ class Empathy
                     $msg .= "  Fatal error on line $errline in file $errfile";
                     $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
                     $msg .= " Aborting...";
-                    die($msg);
+                    Testable::doDie($msg);
                     break;
                 case E_WARNING:
                 case E_USER_WARNING:
@@ -257,7 +254,7 @@ class Empathy
      * @return void
      *
      */
-    private function exceptionHandler($e)
+    public function exceptionHandler($e)
     {
         // prioritise any caught errors over exceptions thrown
         if ($this->hasErrors()) {
@@ -267,8 +264,6 @@ class Empathy
         // checks exception not already of type req
         // then checks env before forcing a req error class
         // (for diplaying standard error pages in prod)
-        // this in-turn depends on elib (elib smarty resource)
-        // for locating req_error template
         if ('Empathy\MVC\RequestException' != get_class($e) &&
             $this->boot->getEnvironment() == 'prod') {
             $message = '';
@@ -283,14 +278,12 @@ class Empathy
 
         switch (get_class($e)) {
             case 'Empathy\MVC\SafeException':
-                echo 'Safe exception: '.$e->getMessage();
-                exit();
+                Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
             case 'Empathy\MVC\TestModeException':
                 // allow execution to end naturally
                 break;
             case 'Empathy\MVC\RequestException':
-
                 $response = '';
                 switch($e->getCode()) {
                     case RequestException::BAD_REQUEST:
@@ -303,7 +296,7 @@ class Empathy
                     default:
                         break;
                 }
-                header($response);
+                Testable::header($response);
                 //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
 
             default:
@@ -326,19 +319,20 @@ class Empathy
         $s = new \Spyc();
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
+
+            // auto fix of doc root
             if (!is_array($item)) {
                 if ($index == 'doc_root') {
                     if (!file_exists($item)) {
                         $item = $configDir;
                     }
                 }
-                define(strtoupper($index), $item);
             }
+            Config::store(strtoupper($index), $item);
         }
         if (isset($config['boot_options'])) {
             $this->bootOptions = $config['boot_options'];
         }
-
         if (isset($config['plugins'])) {
             $this->plugins = $config['plugins'];
         }
@@ -350,7 +344,7 @@ class Empathy
      * @return void
      */
     public static function loadClass($class)
-    {
+    {       
         $i = 0;
         $load_error = 1;
         $location = array('');
@@ -381,5 +375,12 @@ class Empathy
             }
             $i++;
         }
+    }
+
+
+
+    public function reloadBootOptions()
+    {
+        $this->boot->initBootOptions();
     }
 }

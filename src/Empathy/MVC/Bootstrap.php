@@ -21,7 +21,7 @@ class Bootstrap
      * which is instatiated before an action can be dispatchted.
      * @var Controller
      */
-    private $controller = null;
+    private $controller = NULL;
 
     /**
      * Default module read from application config file.
@@ -112,11 +112,18 @@ class Bootstrap
     public function __construct($bootOptions, $plugins, $mvc)
     {
         $this->persistent_mode = $mvc->getPersistentMode();
-
         $this->mvc = $mvc;
         $this->plugins = $plugins;
         $this->plugin_manager = new PluginManager();
+        $this->initBootOptions($bootOptions);
+    }
 
+
+    public function initBootOptions($bootOptions = NULL)
+    {
+        if ($bootOptions === NULL) {
+            $bootOptions = Config::get('BOOT_OPTIONS');
+        }    
         if (isset($bootOptions['default_module'])) {
             $this->defaultModule = $bootOptions['default_module'];
         }
@@ -126,16 +133,15 @@ class Bootstrap
         if (isset($bootOptions['debug_mode'])) {
             $this->debug_mode = ($bootOptions['debug_mode'] === true);
         }
-
         $this->environment = 'dev';
         $valid_env = array('dev', 'stag', 'prod');
-
         if (isset($bootOptions['environment'])) {
             if (in_array($bootOptions['environment'], $valid_env)) {
                 $this->environment = $bootOptions['environment'];
             }
         }
     }
+
 
     /**
      * Create URI object which determines dispatch method and
@@ -173,7 +179,8 @@ class Bootstrap
         $this->controller = new $controller_name($this);
         
         if ($fake == false) {
-            $event_val = $this->controller->$_GET['event']();
+            $event = $_GET['event'];
+            $event_val = $this->controller->$event();
             if ($this->mvc->hasErrors()) {
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($event_val !== false) {
@@ -203,9 +210,11 @@ class Bootstrap
         if ($this->controller->getModule() != 'api') {
             $this->controller->assign('error', $e->getMessage());
                         
+
+
             if ($req_error) {
                  $this->controller->assign('code', $e->getCode());
-                 $this->controller->setTemplate('elib:/req_error.tpl');
+                 $this->controller->setTemplate('req_error.tpl');
                  $this->display();
             } else {
                 $this->controller->setTemplate('empathy.tpl');
@@ -255,19 +264,16 @@ class Bootstrap
                 $plugin_manager->init();
                 foreach ($plugins as $p) {
                     if (isset($p['class_path'])) {
-                        require($p['class_path']);
+                        require_once($p['class_path']);
                         if (isset($p['loader']) && $p['loader'] != '') {
                             spl_autoload_register(array($p['class_name'], $p['loader']));
                         }
                     }
                     $plugin_path = realpath(dirname(realpath(__FILE__))).'/Plugin/'.$p['name'].'-'.$p['version'].'.php';
                     if (file_exists($plugin_path)) {
-                        require($plugin_path);
+                        require_once($plugin_path);
                         $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
-                        $n = new $plugin();
-                        if (isset($p['config'])) {
-                            $n->assignConfig($p['config']);
-                        }
+                        $n = (isset($p['config']))? new $plugin($p['config']): new $plugin(NULL);
                         $plugin_manager->register($n);
                     }
                 }
