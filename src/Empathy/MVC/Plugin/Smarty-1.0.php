@@ -26,7 +26,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->config_dir = Config::get('DOC_ROOT')."/tpl/configs";
 
         // for smarty 3 disable notices from view (like smarty 2)
-        $smarty->error_reporting = E_ALL & ~E_NOTICE;
+        $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
     }
 
     public function assign($name, $data)
