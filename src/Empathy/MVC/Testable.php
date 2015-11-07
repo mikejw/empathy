@@ -37,7 +37,6 @@ class Testable
             $header_arr = explode(':', $header);                
             self::$headers[$header_arr[0]] = trim($header_arr[1]);
         } else {
-            echo 'calling header';
             header($header);
         }
     }
