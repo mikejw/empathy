@@ -186,6 +186,18 @@ class Controller
      */
     public function initDisplay($internal)
     {        
+        // @todo: optimise somehow?
+        // for default templates check test mode
+        // derived from elibs plugin
+        if ($this->plugin_manager->eLibsTestMode()) {
+            $empathy_dir = Config::get('DOC_ROOT').'/../';
+        } else {
+            $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
+        }
+        $empathy_dir = realpath($empathy_dir);
+        $this->assign('EMPATHY_DIR', $empathy_dir);
+
+
         $this->presenter->display($this->templateFile, $internal);
     }
 
