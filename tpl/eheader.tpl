@@ -2,9 +2,12 @@
 <html>
 <head>
 <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="initial-scale=1.0, width=device-width" />
+
 <title>Empathy {$MVC_VERSION}</title>
 
-<meta name="viewport" content="initial-scale=1.0, width=device-width" />
+
 {if $environment eq 'dev'}
 <link rel="stylesheet" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/less/init.min.css" type="text/css" />
 <link rel="stylesheet/less" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/css/less/empathy.less" type="text/css" />

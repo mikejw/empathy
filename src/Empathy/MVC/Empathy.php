@@ -319,6 +319,15 @@ class Empathy
         $s = new \Spyc();
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
+
+            // auto fix of doc root
+            if (!is_array($item)) {
+                if ($index == 'doc_root') {
+                    if (!file_exists($item)) {
+                        $item = $configDir;
+                    }
+                }
+            }
             Config::store(strtoupper($index), $item);
         }
         if (isset($config['boot_options'])) {
