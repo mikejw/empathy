@@ -1,11 +1,12 @@
 <?php
 
-namespace Empathy\MVC;
+namespace Empathy\MVC\Plugin;
 
+use Empathy\MVC\Plugin as Plugin;
 
 /**
- * Empathy SafeException class
- * @file            Empathy/MVC/SafeException.php
+ * Empathy JSBeautifier Plugin
+ * @file            Empathy/MVC/Plugin/JSBeautifier.php
  * @description     
  * @author          Mike Whiting
  * @license         LGPLv3
@@ -14,7 +15,11 @@ namespace Empathy\MVC;
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
  */
-class SafeException extends Exception
+class JSBeautifier
 {
-	//
+
+    public function __construct()
+    {
+        //
+    }
 }

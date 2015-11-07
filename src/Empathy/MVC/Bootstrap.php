@@ -178,6 +178,8 @@ class Bootstrap
         $controller_name = $this->uri->getControllerName();
         $this->controller = new $controller_name($this);
         
+        $this->plugin_manager->preEvent();
+        
         if ($fake == false) {
             $event = $_GET['event'];
             $event_val = $this->controller->$event();
@@ -204,32 +206,11 @@ class Bootstrap
     public function dispatchException($e)
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
-
         $this->controller = new Controller($this);
 
-        if ($this->controller->getModule() != 'api') {
-            $this->controller->assign('error', $e->getMessage());
-                        
+        $this->plugin_manager->preEvent();
 
-
-            if ($req_error) {
-                 $this->controller->assign('code', $e->getCode());
-                 $this->controller->setTemplate('req_error.tpl');
-                 $this->display();
-            } else {
-                $this->controller->setTemplate('empathy.tpl');
-                $this->display(true);
-            }
-        } else {
-            if (!$this->debug_mode) {
-                $r = new \EROb(\ReturnCodes::SERVER_ERROR, 'Server error.');
-            } else {
-                $r = new \EROb(999, $e->getMessage(), 'SERVER_ERROR_EXPLICIT');
-            }
-
-            $this->controller->assign('default', $r);
-            $this->display(false);
-        }
+        $this->controller->viewException($this->debug_mode, $e, $req_error);
     }
 
     /**
@@ -264,18 +245,19 @@ class Bootstrap
                 $plugin_manager->init();
                 foreach ($plugins as $p) {
                     if (isset($p['class_path'])) {
-                        require_once($p['class_path']);
-                        if (isset($p['loader']) && $p['loader'] != '') {
-                            spl_autoload_register(array($p['class_name'], $p['loader']));
+                        if (!class_exists($p['class_name'])) {
+                            require($p['class_path']);
+                            if (isset($p['loader']) && $p['loader'] != '') {
+                                spl_autoload_register(array($p['class_name'], $p['loader']));
+                            }
                         }
+                    }                    
+                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];                                        
+                    $n = new $plugin($this);
+                    if (isset($p['config'])) {
+                        $n->assignConfig($p['config']);
                     }
-                    $plugin_path = realpath(dirname(realpath(__FILE__))).'/Plugin/'.$p['name'].'-'.$p['version'].'.php';
-                    if (file_exists($plugin_path)) {
-                        require_once($plugin_path);
-                        $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
-                        $n = (isset($p['config']))? new $plugin($p['config']): new $plugin(NULL);
-                        $plugin_manager->register($n);
-                    }
+                    $plugin_manager->register($n);                    
                 }
                 $plugin_manager->preDispatch();
             }

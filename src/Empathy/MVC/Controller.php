@@ -184,22 +184,9 @@ class Controller
      *
      * @return void
      */
-    public function initDisplay($i)
-    {
-        $this->presenter->switchInternal($i);
-
-        // @todo: optimise somehow?
-        // for default templates check test mode
-        // derived from elibs plugin
-        if ($this->plugin_manager->eLibsTestMode()) {
-            $empathy_dir = Config::get('DOC_ROOT').'/../';
-        } else {
-            $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
-        }
-        $empathy_dir = realpath($empathy_dir);
-        $this->assign('EMPATHY_DIR', $empathy_dir);
-            
-        $this->presenter->display($this->templateFile);
+    public function initDisplay($internal)
+    {        
+        $this->presenter->display($this->templateFile, $internal);
     }
 
     /**
@@ -211,13 +198,14 @@ class Controller
      */
     public function redirect($endString='')
     {
+        $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';        
         Session::write();
         $location = 'Location: ';
-        $location .= 'http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
+        $location .= $proto.'://'.WEB_ROOT.PUBLIC_DIR.'/';
         if ($endString != '') {
             $location .= $endString;
         }
-        Testable::header($location);        
+        Testable::header($location);         
     }
 
     /**
@@ -273,9 +261,9 @@ class Controller
      *
      * @return void
      */
-    public function assign($name, $data)
+    public function assign($name, $data, $no_array=false)
     {
-        $this->presenter->assign($name, $data);
+        $this->presenter->assign($name, $data, $no_array);
     }
 
     /**
@@ -322,4 +310,16 @@ class Controller
 
         return $valid;
     }
+
+    public function viewException($debug, $exception, $req_error)
+    {
+        $this->presenter->exception($debug, $exception, $req_error);
+
+    }
+
+    public function setPresenter($view)
+    {       
+        $this->presenter = $view;
+    }
 }
+

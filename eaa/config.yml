@@ -7,8 +7,12 @@ boot_options:
   handle_errors: true
   default_module: front
   use_elib: false
-  environment: prod
-  debug_mode: false
+  environment: dev
+  debug_mode: true
+db_server: 127.0.0.1
+db_user: root
+db_pass:
+db_name:
 plugins:
   -
     name: ELibs

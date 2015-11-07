@@ -4,6 +4,18 @@ namespace Empathy\MVC\Util;
 
 use Empathy\ELib\Util\Libs;
 
+
+/**
+ * Empathy module code generation
+ * @file            Empathy/MVC/Util/ModuleGen.php
+ * @description     
+ * @author          Mike Whiting
+ * @license         LGPLv3
+ *
+ * (c) copyright Mike Whiting
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class ModuleGen
 {
     

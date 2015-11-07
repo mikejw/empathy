@@ -2,12 +2,10 @@
 
 namespace Empathy\MVC\Util;
 
-use ELib\MVC\Util;
-
 
 /**
- * Empathy ELib Plugin
- * @file            Empathy/MVC/Util/ELib.php
+ * Empathy Misc util
+ * @file            Empathy/MVC/Util/Pear.php
  * @description     
  * @author          Mike Whiting
  * @license         LGPLv3
@@ -16,10 +14,12 @@ use ELib\MVC\Util;
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
  */
-class ELib
+class Misc
 {
-    public static function getLibLocation()
-    {
-        return Util::getLocation();
+
+    public static function isSecure()
+    {    
+        return ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || $_SERVER['SERVER_PORT'] == 443);
     }
 }

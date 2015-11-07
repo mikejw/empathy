@@ -1,11 +1,10 @@
 <?php
 
-namespace Empathy\MVC;
-
+namespace Empathy\MVC\Plugin;
 
 /**
- * Empathy SafeException class
- * @file            Empathy/MVC/SafeException.php
+ * Empathy PreEvent interface
+ * @file            Empathy/MVC/Plugin/PreEvent.php
  * @description     
  * @author          Mike Whiting
  * @license         LGPLv3
@@ -14,7 +13,8 @@ namespace Empathy\MVC;
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
  */
-class SafeException extends Exception
+interface PreEvent
 {
-	//
+    public function onPreEvent();
 }
+

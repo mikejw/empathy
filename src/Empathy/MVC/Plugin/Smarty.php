@@ -5,9 +5,20 @@ namespace Empathy\MVC\Plugin;
 use Empathy\MVC\Config;
 use Empathy\MVC\Plugin as Plugin;
 
+/**
+ * Empathy Smarty Plugin
+ * @file            Empathy/MVC/Plugin/Smarty.php
+ * @description     
+ * @author          Mike Whiting
+ * @license         LGPLv3
+ *
+ * (c) copyright Mike Whiting
+ * This source file is subject to the LGPLv3 License that is bundled
+ * with this source code in the file licence.txt
+ */
 class Smarty extends Plugin implements PreDispatch, Presentation
 {
-    private $smarty;
+    protected $smarty;
 
 
     public function onPreDispatch()
@@ -29,7 +40,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
     }
 
-    public function assign($name, $data)
+    public function assign($name, $data, $no_array=false)
     {
         $this->smarty->assign($name, $data);
     }
@@ -39,8 +50,11 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template)
+    public function display($template, $internal=false)
     {
+        if ($internal) {
+            $this->switchInternal();
+        }
         $this->smarty->display($template);
     }
 
@@ -49,10 +63,30 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->load_filter($type, $name);
     }
 
-    public function switchInternal($i)
+    protected function switchInternal()
+    {        
+        $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
+    }
+
+    public function exception($debug, $exception, $req_error)
     {
-        if ($i) {
-            $this->smarty->template_dir = realpath(dirname(__FILE__)).'/../../../../tpl/';
+        $this->assign('error', $exception->getMessage());                    
+        if($req_error) {
+             $this->assign('code', $exception->getCode());
+             $this->display('elib:/req_error.tpl');
+        } else {            
+            $this->display('empathy.tpl', true);
         }
     }
+
+    public function getVars()
+    {
+        return $this->smarty->get_template_vars();
+    }
+
+    public function clearVars()
+    {
+        $this->smarty->clear_all_assign();
+    }
+
 }
