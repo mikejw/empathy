@@ -2,7 +2,9 @@
 
 namespace Empathy\MVC\Plugin;
 
+use Empathy\MVC\Config;
 use Empathy\MVC\Plugin as Plugin;
+
 
 /**
  * Empathy ELibs Plugin
