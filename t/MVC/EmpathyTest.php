@@ -49,7 +49,11 @@ class EmpathyTest extends ESuiteTest
     {
         //$this->markTestSkipped();
 
-        $this->expectOutputRegex('/Not found/');
+        $this->setExpectedException(
+            'Empathy\MVC\RequestException', 'Not found'
+        );
+
+        //$this->expectOutputRegex('/Not found/');
         $this->mvc = $this->createMVC();
     }
 
