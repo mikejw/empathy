@@ -186,6 +186,13 @@ class Controller
      */
     public function initDisplay($internal)
     {        
+        $this->assignEmpathyDir();
+        $this->presenter->display($this->templateFile, $internal);
+    }
+
+
+    public function assignEmpathyDir()
+    {
         // @todo: optimise somehow?
         // for default templates check test mode
         // derived from elibs plugin
@@ -196,10 +203,8 @@ class Controller
         }
         $empathy_dir = realpath($empathy_dir);
         $this->assign('EMPATHY_DIR', $empathy_dir);
-
-
-        $this->presenter->display($this->templateFile, $internal);
     }
+
 
     /**
      * Redirect the user to another location within the application
