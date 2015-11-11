@@ -153,7 +153,7 @@ class Bootstrap
      */
     public function dispatch($fake = false)
     {
-        $this->uri = new URI($this->defaultModule, $this->dynamicModule);
+        $this->uri = new URI($this->defaultModule, $this->dynamicModule);        
         $error = $this->uri->getError();
 
         if ($error == URI::MISSING_CLASS
@@ -161,6 +161,7 @@ class Bootstrap
            && $this->dynamicModule != '') {
             $error = $this->uri->dynamicSection();
         }
+
 
         if ($error > 0) {
             if ($this->environment == 'prod' || $this->debug_mode == false) {
@@ -173,9 +174,7 @@ class Bootstrap
             } else {
                 throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
             }
-        }
-
-    
+        }    
 
         $controller_name = $this->uri->getControllerName();
         $this->controller = new $controller_name($this);

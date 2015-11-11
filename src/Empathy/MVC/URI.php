@@ -62,6 +62,8 @@ class URI
 
     public function __construct($default_module, $dynamic_module)
     {
+
+
         if (isset($_SERVER['HTTP_HOST']) && strpos(Config::get('WEB_ROOT'), $_SERVER['HTTP_HOST']) === false) {
             throw new SafeException('Host name mismatch.');
         }
@@ -83,8 +85,11 @@ class URI
         }
 
         $this->error = 0;
+
         $this->processRequest();
+
         $this->setController();
+
         //$this->printRouting();
     }
 
@@ -245,14 +250,21 @@ class URI
     // cause of error
     private function setController()
     {
+
+
+
         if (!(isset($_GET['class'])) && isset($_GET['module'])) {
             $_GET['class'] = $_GET['module'];
         }
+
+
 
         if (isset($_GET['class'])) {
             $this->controllerName = $_GET['class'];
             $this->setControllerPath();
         }
+
+
 
         if (!$this->internal && !is_file($this->controllerPath)) {
             if (isset($_GET['class'])) {
@@ -270,8 +282,10 @@ class URI
                 $this->error = URI::MISSING_CLASS;
             }
         }
+    
         $this->controllerName = 'Empathy\\MVC\\Controller\\'.$this->controllerName;
         if (!$this->error) {
+
             require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
             
             if (!class_exists($this->controllerName)) {
