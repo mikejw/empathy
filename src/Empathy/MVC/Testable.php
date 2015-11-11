@@ -26,7 +26,7 @@ class Testable
         if (self::testMode()) {
             echo 'die: ' . $msg;       
         } else {
-            die($header);
+            die($msg);
         }
     }
 

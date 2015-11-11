@@ -175,11 +175,14 @@ class Bootstrap
             }
         }
 
+    
+
         $controller_name = $this->uri->getControllerName();
         $this->controller = new $controller_name($this);
         
         $this->plugin_manager->preEvent();
-        
+
+
         if ($fake == false) {
             $event = $_GET['event'];
             $event_val = $this->controller->$event();

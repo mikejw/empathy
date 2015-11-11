@@ -2,6 +2,7 @@
 
 namespace Empathy\MVC;
 
+
 /**
  * Empathy URI
  * @file            Empathy/URI.php

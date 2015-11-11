@@ -276,8 +276,10 @@ class Empathy
         // force safe exception
         //$e = new Empathy\SafeException($e->getMessage());
 
+
         switch (get_class($e)) {
             case 'Empathy\MVC\SafeException':
+                
                 Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
             case 'Empathy\MVC\TestModeException':

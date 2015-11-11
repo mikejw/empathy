@@ -218,7 +218,7 @@ class Controller
         $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';        
         Session::write();
         $location = 'Location: ';
-        $location .= $proto.'://'.WEB_ROOT.PUBLIC_DIR.'/';
+        $location .= $proto.'://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
         if ($endString != '') {
             $location .= $endString;
         }
