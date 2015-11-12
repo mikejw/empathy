@@ -50,7 +50,9 @@ class Session
     public static function getNewApp()
     {
         $new_app = false;
-        if (sizeof($_SESSION['app'][self::$app]) > 0) {
+        if (isset($_SESSION['app'][self::$app]) &&
+            sizeof($_SESSION['app'][self::$app]) > 0
+        ) {
             $new_app = true;
         }
 
