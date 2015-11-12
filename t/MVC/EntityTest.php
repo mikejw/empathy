@@ -21,16 +21,18 @@ class EntityTest extends ESuiteTest
     {
         //$this->markTestSkipped();
 
-        \ESuite\Util\DB::reset('fixtures/dd.sql');
+        // \ESuite\Util\DB::reset('fixtures/dd.sql');
+        // $objectManager = new EntityManager();
+        // $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures1.yml', $objectManager);
+
+
+        // \ESuite\Util\DB::reset('fixtures/dd2.sql');
+        // $objectManager = new EntityManager();
+        // $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures2.yml', $objectManager);
+
+        \ESuite\Util\DB::reset('fixtures/dd3.sql');
         $objectManager = new EntityManager();
-        $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures1.yml', $objectManager);
-
-
-        \ESuite\Util\DB::reset('fixtures/dd2.sql');
-        $objectManager = new EntityManager();
-        $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures2.yml', $objectManager);
-
-
+        $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures3.yml', $objectManager);
 
     }
 
