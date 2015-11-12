@@ -20,6 +20,6 @@ class Misc
     public static function isSecure()
     {    
         return ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                || $_SERVER['SERVER_PORT'] == 443);
+                || (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443));
     }
 }
