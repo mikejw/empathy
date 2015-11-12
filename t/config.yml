@@ -2,7 +2,7 @@
 reset_db: false
 set_test_mode: true
 set_test_mode_output: true
-mysql: /opt/local/lib/mariadb/bin/mysql
+mysql: mysql
 
 
 
