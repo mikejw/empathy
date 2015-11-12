@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "32e8af249010b37f4a9e9c9b05867479",
-    "content-hash": "938810ab3e12ab286b6c0692f27f3587",
+    "hash": "1f42824759ff863370ebd295bae0f7e6",
+    "content-hash": "e5ade13bb861c13d9be9e894291283d0",
     "packages": [
         {
             "name": "mikejw/elibs",
-            "version": "dev-master",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikejw/elibs.git",
-                "reference": "1255d973fe5fef13b658ff9a75ceccc2ddd924e4"
+                "reference": "ae5bc4e5d24e45774faed653beca0c478982af3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikejw/elibs/zipball/1255d973fe5fef13b658ff9a75ceccc2ddd924e4",
-                "reference": "1255d973fe5fef13b658ff9a75ceccc2ddd924e4",
+                "url": "https://api.github.com/repos/mikejw/elibs/zipball/ae5bc4e5d24e45774faed653beca0c478982af3b",
+                "reference": "ae5bc4e5d24e45774faed653beca0c478982af3b",
                 "shasum": ""
             },
             "type": "library",
@@ -28,7 +28,7 @@
             "keywords": [
                 "lib"
             ],
-            "time": "2015-10-29 16:57:58"
+            "time": "2015-11-11 18:15:52"
         },
         {
             "name": "mustangostang/spyc",
@@ -173,6 +173,7 @@
                 "BSD-2-Clause"
             ],
             "description": "A code browser that augments the code with information from various QA tools.",
+            "abandoned": "mayflower/php-codebrowser",
             "time": "2013-11-12 21:58:07"
         },
         {
@@ -1597,12 +1598,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "7698bd312b8533e84b61614ac29b8e3b3f8c7534"
+                "reference": "63d98702c42aef8babf7e85eba40d464cfaa48d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/7698bd312b8533e84b61614ac29b8e3b3f8c7534",
-                "reference": "7698bd312b8533e84b61614ac29b8e3b3f8c7534",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/63d98702c42aef8babf7e85eba40d464cfaa48d7",
+                "reference": "63d98702c42aef8babf7e85eba40d464cfaa48d7",
                 "shasum": ""
             },
             "require": {
@@ -1663,7 +1664,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2015-11-06 00:04:28"
+            "time": "2015-11-11 23:46:19"
         },
         {
             "name": "symfony/config",
