@@ -16,11 +16,11 @@ foo                     VARCHAR(3)              NULL DEFAULT 'bar'
 ) ENGINE=InnoDB;
 
 
--- CREATE TABLE    related(
--- id                      INT(11)                 AUTO_INCREMENT PRIMARY KEY,
--- fake_id                 INT(11)                 NOT NULL,
--- name                    VARCHAR(64)             NOT NULL,
--- FOREIGN KEY (fake_id) REFERENCES fake(id)) ENGINE=InnoDB;
+CREATE TABLE    related(
+id                      INT(11)                 AUTO_INCREMENT PRIMARY KEY,
+fake_id                 INT(11)                 NOT NULL,
+name                    VARCHAR(64)             NOT NULL,
+FOREIGN KEY (fake_id) REFERENCES fake(id)) ENGINE=InnoDB;
 
 
 

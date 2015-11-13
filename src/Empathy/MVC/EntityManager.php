@@ -27,9 +27,16 @@ class EntityManager implements PersisterInterface
     public function persist(array $objects)
     {
         foreach ($objects as $object) {
+
             $object->init();
+            foreach ($object->getProperties() as $property) {
+                if (is_object($object->$property)) {
+                    $object->$property = $object->$property->id;
+                }
+            }
+
             Model::connectModel($object);
-            $object->insert($object::TABLE, true, array(''), Entity::SANITIZE_NO_POST);
+            $object->id = $object->insert($object::TABLE, true, array(''), Entity::SANITIZE_NO_POST);
         }
     }
 

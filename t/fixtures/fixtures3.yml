@@ -1,7 +1,7 @@
 
 
 ESuite\FakeEntity:
-  detail{1..10}:
+  fakeentity{1..10}:
     name: <firstName()>
     age: <randomDigit()>
     stamp: 'MYSQLTIME'
@@ -10,7 +10,7 @@ ESuite\FakeEntity:
 
 
 ESuite\FakeRelatedEntity:
-  detail{1..10}:
+  fakerelated{1..10}:
     fake_id: @fakeentity<current()>
     name: <firstName()>
 

@@ -37,16 +37,9 @@ class EntityTest extends ESuiteTest
     
     public function testAlice()
     {
-
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
-
         $this->loadFixtures('fixtures/dd2.sql', '/fixtures/fixtures2.yml');
-        
-        //$this->loadFixtures('fixtures/dd3.sql', '/fixtures/fixtures3.yml');
-        
-        
-       
-
+        $this->loadFixtures('fixtures/dd3.sql', '/fixtures/fixtures3.yml');
     }
 
 }
