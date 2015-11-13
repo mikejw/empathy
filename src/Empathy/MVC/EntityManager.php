@@ -2,6 +2,7 @@
 
 namespace Empathy\MVC;
 
+use Nelmio\Alice\PersisterInterface;
 
 
 /**
@@ -19,15 +20,17 @@ namespace Empathy\MVC;
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
  */
-class EntityManager
+class EntityManager implements PersisterInterface
 {
     
     
-    public function persist($object)
+    public function persist(array $objects)
     {
-        $object->init();
-        Model::connectModel($object);
-        $object->insert($object::TABLE, true, array(''), Entity::SANITIZE_NO_POST);
+        foreach ($objects as $object) {
+            $object->init();
+            Model::connectModel($object);
+            $object->insert($object::TABLE, true, array(''), Entity::SANITIZE_NO_POST);
+        }
     }
 
 

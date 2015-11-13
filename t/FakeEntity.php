@@ -16,5 +16,4 @@ class FakeEntity extends Entity
     const TABLE = 'fake';
 
 
-
 }

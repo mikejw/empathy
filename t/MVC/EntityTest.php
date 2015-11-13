@@ -3,9 +3,12 @@
 namespace ESuite\MVC;
 
 use Empathy\MVC\EntityManager;
+use Empathy\MVC\EntityPopulator;
 use Empathy\MVC\Config as EmpConfig;
 use ESuite\ESuiteTest;
+
 use Nelmio\Alice\Fixtures;
+use Nelmio\Alice\Fixtures\Loader;
 
 
 class EntityTest extends ESuiteTest
@@ -16,23 +19,33 @@ class EntityTest extends ESuiteTest
         \ESuite\Util\DB::loadDefDBCreds();
     }
 
+
+    private function loadFixtures($reset, $file)
+    {
+        $populator = new EntityPopulator();
+        \ESuite\Util\DB::reset($reset);
+        $objectManager = new EntityManager();
+
+        $file = \ESuite\Util\Config::get('base').$file;
+        $loader = new Loader();        
+        $loader->addPopulator($populator);
+
+        $objects = $loader->load($file);
+        $objectManager->persist($objects);
+    }
+
     
     public function testAlice()
     {
-        //$this->markTestSkipped();
 
-        // \ESuite\Util\DB::reset('fixtures/dd.sql');
-        // $objectManager = new EntityManager();
-        // $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures1.yml', $objectManager);
+        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
 
-
-        // \ESuite\Util\DB::reset('fixtures/dd2.sql');
-        // $objectManager = new EntityManager();
-        // $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures2.yml', $objectManager);
-
-        \ESuite\Util\DB::reset('fixtures/dd3.sql');
-        $objectManager = new EntityManager();
-        $objects = Fixtures::load(\ESuite\Util\Config::get('base').'/fixtures/fixtures3.yml', $objectManager);
+        $this->loadFixtures('fixtures/dd2.sql', '/fixtures/fixtures2.yml');
+        
+        //$this->loadFixtures('fixtures/dd3.sql', '/fixtures/fixtures3.yml');
+        
+        
+       
 
     }
 
