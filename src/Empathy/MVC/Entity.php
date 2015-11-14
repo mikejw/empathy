@@ -456,7 +456,7 @@ class Entity
         if ($table === null) {
             $table = $this::TABLE;
         }
-        
+
         $all = array();
         $sql = 'SELECT * FROM '.$table;
         $error = 'Could not get all rows from '.$table;
