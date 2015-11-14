@@ -43,7 +43,16 @@ class EntityManager implements PersisterInterface
 
     public function find($class, $id)
     {
-        throw new \Exception('not yet implemented.');
+        if (!class_exists($class)) {
+            throw new \Exception('Entity class does not exist.');
+        }
+        $object = new $class;
+        $object->init();
+        Model::connectModel($object);
+
+        $object->id = $id;
+        $object->load();
+        return $object;
     }
 
 

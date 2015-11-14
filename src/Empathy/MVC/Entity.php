@@ -333,8 +333,16 @@ class Entity
      *
      * @return void
      */
-    public function save($table, $format, $sanitize)
+    public function save($table=null, $format=null, $sanitize=self::SANITIZE_NO_POST)
     {
+        if ($table === null) {
+            $table = $this::TABLE;
+        }
+
+        if ($format === null) {
+            $format = array();
+        }
+
         $this->toXHTMLChris($format);
         if ($sanitize == self::SANITIZE) {
             $this->sanitize();
@@ -443,8 +451,12 @@ class Entity
      *
      * @return array $all all rows from the table.
      */
-    public function getAll($table)
+    public function getAll($table=null)
     {
+        if ($table === null) {
+            $table = $this::TABLE;
+        }
+        
         $all = array();
         $sql = 'SELECT * FROM '.$table;
         $error = 'Could not get all rows from '.$table;
