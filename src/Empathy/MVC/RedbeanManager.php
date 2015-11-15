@@ -26,7 +26,10 @@ class RedbeanManager implements PersisterInterface
     
     public function persist(array $objects)
     {
-        // foreach ($objects as $object) {
+        foreach ($objects as $object) {
+
+                
+
 
         //     $object->init();
         //     foreach ($object->getProperties() as $property) {
@@ -37,7 +40,7 @@ class RedbeanManager implements PersisterInterface
 
         //     Model::connectModel($object);
         //     $object->id = $object->insert($object::TABLE, true, array(''), Entity::SANITIZE_NO_POST);
-        // }
+        }
     }
 
 
