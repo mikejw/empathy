@@ -15,11 +15,13 @@ namespace Empathy\MVC;
  */
 class Plugin
 {
+    protected $bootstrap;
     protected $config;
     
 
-    public function __construct($config = NULL)
+    public function __construct($bootstrap, $config = NULL)
     {
+        $this->bootstrap = $bootstrap;
         if ($config !== NULL) {
             $this->assignConfig($config);
         }
