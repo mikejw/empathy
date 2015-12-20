@@ -209,9 +209,7 @@ class Bootstrap
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
         $this->controller = new Controller($this);
-
-        $this->controller->assignEmpathyDir();
-
+ 
         $this->plugin_manager->preEvent();
 
         $this->controller->viewException($this->debug_mode, $e, $req_error);
@@ -257,7 +255,9 @@ class Bootstrap
                         }
                     }                    
                     $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name']; 
-                    $n = (isset($p['config']))? new $plugin($this, $p['config']): new $plugin($this, NULL);
+                    $n = (isset($p['config']))?
+                        new $plugin($plugin_manager, $this, $p['config']):
+                        new $plugin($plugin_manager, $this, NULL);
                     $plugin_manager->register($n);                    
                 }
                 $plugin_manager->preDispatch();

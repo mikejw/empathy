@@ -17,11 +17,13 @@ class Plugin
 {
     protected $bootstrap;
     protected $config;
+    protected $manager;
     
 
-    public function __construct($bootstrap, $config = NULL)
+    public function __construct($manager, $bootstrap, $config = NULL)
     {
         $this->bootstrap = $bootstrap;
+        $this->manager = $manager;
         if ($config !== NULL) {
             $this->assignConfig($config);
         }

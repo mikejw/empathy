@@ -19,9 +19,9 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class ELibs extends Plugin
 {
-    public function __construct($config)
+    public function __construct($manager, $bootstrap, $config)
     {
-        parent::__construct($config);
+        parent::__construct($manager, $bootstrap, $config);
 	 	
 	 	if (isset($this->config['testing']) && $this->config['testing']) {
             $path = '/../vendor/mikejw/elibs';

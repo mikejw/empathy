@@ -19,7 +19,7 @@ class EntityTest extends ESuiteTest
     
     public function testAlice()
     {
-        //$this->markTestSkipped();
+        $this->markTestSkipped();
 
         \ESuite\Util\DB::reset('fixtures/dd.sql');
         $objectManager = new EntityManager();
