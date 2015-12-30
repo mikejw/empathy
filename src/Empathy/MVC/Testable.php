@@ -34,8 +34,18 @@ class Testable
     {
         if (self::testMode()) {
             echo 'Setting header:' . $header;
-            $header_arr = explode(':', $header);                
-            self::$headers[$header_arr[0]] = trim($header_arr[1]);
+            $header_arr = explode(':', $header);
+
+	    if (sizeof($header_arr)) {
+	        $index = $header_arr[0];
+		array_shift($header_arr);
+		if (sizeof($header_arr) == 1 ) {
+		   $content = $header_arr[0];
+		} else {
+		   $content = implode(':', $header_arr);
+		}
+	        self::$headers[$index] = trim($content);
+	    }
         } else {
             header($header);
         }

@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "32e8af249010b37f4a9e9c9b05867479",
-    "content-hash": "938810ab3e12ab286b6c0692f27f3587",
+    "hash": "9ec2a23490d3753d0102137206651da1",
+    "content-hash": "c0544a2deb7e26e060118829aa06c29e",
     "packages": [
         {
             "name": "mikejw/elibs",
-            "version": "dev-master",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikejw/elibs.git",
-                "reference": "1255d973fe5fef13b658ff9a75ceccc2ddd924e4"
+                "reference": "ae5bc4e5d24e45774faed653beca0c478982af3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikejw/elibs/zipball/1255d973fe5fef13b658ff9a75ceccc2ddd924e4",
-                "reference": "1255d973fe5fef13b658ff9a75ceccc2ddd924e4",
+                "url": "https://api.github.com/repos/mikejw/elibs/zipball/ae5bc4e5d24e45774faed653beca0c478982af3b",
+                "reference": "ae5bc4e5d24e45774faed653beca0c478982af3b",
                 "shasum": ""
             },
             "type": "library",
@@ -28,7 +28,7 @@
             "keywords": [
                 "lib"
             ],
-            "time": "2015-10-29 16:57:58"
+            "time": "2015-11-11 18:15:52"
         },
         {
             "name": "mustangostang/spyc",
@@ -393,27 +393,27 @@
         },
         {
             "name": "nelmio/alice",
-            "version": "dev-empathy",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mikejw/alice.git",
-                "reference": "2f0b5cacba6486d2b62ed50247faf65ce6a586eb"
+                "url": "https://github.com/nelmio/alice.git",
+                "reference": "045d59b93246f04238cbfc50c051a947161e7b3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikejw/alice/zipball/2f0b5cacba6486d2b62ed50247faf65ce6a586eb",
-                "reference": "2f0b5cacba6486d2b62ed50247faf65ce6a586eb",
+                "url": "https://api.github.com/repos/nelmio/alice/zipball/045d59b93246f04238cbfc50c051a947161e7b3f",
+                "reference": "045d59b93246f04238cbfc50c051a947161e7b3f",
                 "shasum": ""
             },
             "require": {
                 "fzaninotto/faker": "~1.0",
                 "php": ">=5.4",
-                "symfony/yaml": "~2.0"
+                "symfony/yaml": "~2.0|~3.0"
             },
             "require-dev": {
                 "doctrine/common": "~2.3",
-                "phpunit/phpunit": "3.7.*",
-                "symfony/property-access": "~2.2"
+                "phpunit/phpunit": "~4.0",
+                "symfony/property-access": "~2.2|~3.0"
             },
             "type": "library",
             "extra": {
@@ -426,6 +426,7 @@
                     "Nelmio\\Alice\\": "src/Nelmio/Alice"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -441,15 +442,12 @@
             ],
             "description": "Expressive fixtures generator",
             "keywords": [
+                "Fixture",
                 "data",
-                "fixture",
                 "orm",
                 "test"
             ],
-            "support": {
-                "source": "https://github.com/mikejw/alice/tree/empathy"
-            },
-            "time": "2015-05-30 09:08:26"
+            "time": "2015-11-09 00:07:45"
         },
         {
             "name": "pdepend/pdepend",
@@ -1597,12 +1595,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "7698bd312b8533e84b61614ac29b8e3b3f8c7534"
+                "reference": "63d98702c42aef8babf7e85eba40d464cfaa48d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/7698bd312b8533e84b61614ac29b8e3b3f8c7534",
-                "reference": "7698bd312b8533e84b61614ac29b8e3b3f8c7534",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/63d98702c42aef8babf7e85eba40d464cfaa48d7",
+                "reference": "63d98702c42aef8babf7e85eba40d464cfaa48d7",
                 "shasum": ""
             },
             "require": {
@@ -1663,7 +1661,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2015-11-06 00:04:28"
+            "time": "2015-11-11 23:46:19"
         },
         {
             "name": "symfony/config",

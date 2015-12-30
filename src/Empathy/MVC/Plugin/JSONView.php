@@ -36,10 +36,6 @@ class JSONView extends Plugin implements PreEvent, Presentation
         }
     }
 
-    public function clear_assign($name)
-    {
-        $this->smarty->clear_assign($name);
-    }
 
     public function display($template, $internal=false)
     {         
@@ -53,8 +49,6 @@ class JSONView extends Plugin implements PreEvent, Presentation
         if(!(defined('MVC_TEST_MODE') && MVC_TEST_MODE)) {
             header('Content-type: application/json');
         }
-
-
 
         if(is_object($this->output) &&
            (get_class($this->output) ==  $this->return_ob ||
