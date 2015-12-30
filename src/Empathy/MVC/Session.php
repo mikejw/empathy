@@ -30,10 +30,10 @@ class Session
 
     public static function up()
     {
-        if (!defined('NAME')) {
+        if (empty($name = Config::get('NAME'))) {
             self::$app = 'unnamed';
         } else {
-            self::$app = NAME;
+            self::$app = $name;
         }
 
         if (self::$up === false) {
