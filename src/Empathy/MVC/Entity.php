@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC;
+use Empathy\MVC\Config;
 
 /**
  * Empathy Entity
@@ -16,6 +17,15 @@ namespace Empathy\MVC;
  */
 class Entity
 {
+
+    public function __construct()
+    {
+        if (Config::get('LEGACY_MODEL')) {
+            ModelLegacy::load($this);
+        }
+    }
+
+
     /**
      * The name of the database table the entity maps to.
      */
