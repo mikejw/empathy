@@ -3,7 +3,7 @@
 namespace Empathy\MVC\Util;
 
 use Empathy\ELib\Util\Libs;
-
+use Empathy\MVC\Config;
 
 /**
  * Empathy module code generation
@@ -27,7 +27,7 @@ class ModuleGen
         $generated = 0;
 
         foreach ($installed as $i) {
-            $gen_root = DOC_ROOT.'/vendor/'.$i.'/src/Empathy/ELib/Gen';
+            $gen_root = Config::get('DOC_ROOT').'/vendor/'.$i.'/src/Empathy/ELib/Gen';
             if (file_exists($gen_root)) {
 
                 $files = glob($gen_root.'/*.php');

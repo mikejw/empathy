@@ -1,7 +1,7 @@
 <?php
 
 namespace Empathy\MVC\Util;
-
+use Empathy\MVC\Config;
 
 /**
  * Empathy ControllerGen Plugin
@@ -46,7 +46,7 @@ ENDBLOB;
     public function write()
     {       
         $sucess = false;
-        $module = DOC_ROOT.'/application/'.$this->module;
+        $module = Config::get('DOC_ROOT').'/application/'.$this->module;
         $controller = $module.'/'.$this->name.'.php'; 
         if (!file_exists($module)) {
             mkdir($module);
