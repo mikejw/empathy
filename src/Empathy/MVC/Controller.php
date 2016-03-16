@@ -350,5 +350,15 @@ class Controller
     {       
         $this->presenter = $view;
     }
+
+
+    protected function assignCSRFToken()
+    {
+        $token = md5(uniqid(rand(), true));
+        $this->assign('csrf_token', $token);
+        Session::set('csrf_token', $token);
+    }
+
+
 }
 
