@@ -1,7 +1,7 @@
 <?php
 
 namespace Empathy\MVC;
-
+use Empathy\MVC\Config;
 
 /**
  * Empathy model class
@@ -50,7 +50,7 @@ class Model
             // (for cases when not in 'system-mode' and this code lies outside
             // the reach of the composer autoload
             $file = $model.'.php';
-            require_once(DOC_ROOT.'/storage/'.$file);
+            require_once(Config::get('DOC_ROOT').'/storage/'.$file);
 
             $reflect  = new \ReflectionClass($class);
             $storage_object = $reflect->newInstanceArgs($params);
