@@ -34,9 +34,6 @@ class Subdomains extends Plugin implements PreDispatch
                Config::store('WEB_ROOT_DEFAULT', Config::get('WEB_ROOT'));
                Config::store('SUDBOMAIN', $matches[1]);
                Config::store('WEB_ROOT', $matches[0].Config::get('WEB_ROOT'));
-
-               echo Config::get('WEB_ROOT');
-               exit();
             }
         }
     }
