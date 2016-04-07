@@ -136,6 +136,9 @@ class Controller
         }
         $this->assign('DOC_ROOT', Config::get('DOC_ROOT'));
         $this->assign('WEB_ROOT', Config::get('WEB_ROOT'));
+        $this->assign('WEB_ROOT_DEFAULT', Config::get('WEB_ROOT_DEFAULT'));
+        $this->assign('SUBDOMAIN', Config::get('SUBDOMAIN'));
+
         $this->assign('PUBLIC_DIR', Config::get('PUBLIC_DIR'));
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
