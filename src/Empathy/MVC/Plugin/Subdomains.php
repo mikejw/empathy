@@ -23,18 +23,21 @@ class Subdomains extends Plugin implements PreDispatch
     // regex from http://stackoverflow.com/a/10526727/6108127
     public function onPreDispatch()
     {
-	if (isset($_SERVER['HTTP_HOST'])) {
+        if (isset($_SERVER['HTTP_HOST'])) {
 
-	    $matches = [];
-	    if (preg_match(
-	       '/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i',
-	       $_SERVER['HTTP_HOST'],
-	       $matches)) {
+            $matches = [];
+            if (preg_match(
+               '/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i',
+               $_SERVER['HTTP_HOST'],
+               $matches)) {
 
-	       Config::store('WEB_ROOT_DEFAULT', Config::get('WEB_ROOT'));
-	       Config::store('SUDBOMAIN', $matches[1]);
-	       Config::store('WEB_ROOT', $matches[0].Config::get('WEB_ROOT'));
-	    }
-	}
+               Config::store('WEB_ROOT_DEFAULT', Config::get('WEB_ROOT'));
+               Config::store('SUDBOMAIN', $matches[1]);
+               Config::store('WEB_ROOT', $matches[0].Config::get('WEB_ROOT'));
+
+               echo Config::get('WEB_ROOT');
+               exit();
+            }
+        }
     }
 }
