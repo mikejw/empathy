@@ -45,7 +45,7 @@ ENDBLOB;
 
     public function write()
     {       
-        $sucess = false;
+        $success = false;
         $module = Config::get('DOC_ROOT').'/application/'.$this->module;
         $controller = $module.'/'.$this->name.'.php'; 
         if (!file_exists($module)) {
