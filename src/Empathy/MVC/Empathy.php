@@ -78,9 +78,9 @@ class Empathy
         }
         $this->loadConfig($configDir);        
         if ($system_mode) {
-            $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
+            $this->loadConfig(Util\Pear::getConfigDir().'/Empathy', true);
         } else {
-            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'));
+            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'), true);
         }
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
@@ -312,7 +312,7 @@ class Empathy
      * @param  string $configDir
      * @return void
      */
-    private function loadConfig($configDir)
+    private function loadConfig($configDir, $hard=false)
     {
         $configFile = $configDir.'/config.yml';
         if (!file_exists($configFile)) {
@@ -330,7 +330,12 @@ class Empathy
                     }
                 }
             }
-            Config::store(strtoupper($index), $item);
+
+            if ($hard) {
+                define(strtoupper($index), $item);
+            } else {
+                Config::store(strtoupper($index), $item);                
+            }
         }
         if (isset($config['boot_options'])) {
             $this->bootOptions = $config['boot_options'];
