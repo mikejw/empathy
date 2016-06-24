@@ -49,7 +49,25 @@ module.exports = function(grunt) {
                         src: ['<%= node %>/bootstrap/fonts/glyphicons-halflings-regular.*'],
                         dest: '<%= destfaf %>/', 
                         filter: 'isFile'
-                    }
+                    },
+                    {
+                        expand: true,                
+                        cwd: '<%= node %>/tinymce/plugins/',
+                        src: [ "*.*", "**/*.*" ],
+                        dest: '<%= dest %>/plugins'
+                    },
+                    {
+                        expand: true,                
+                        cwd: '<%= node %>/tinymce/themes/',
+                        src: [ "*.*", "**/*.*" ],
+                        dest: '<%= dest %>/themes'
+                    },
+                    {
+                        expand: true,                
+                        cwd: '<%= node %>/tinymce/skins/',
+                        src: [ "*.*", "**/*.*" ],
+                        dest: '<%= dest %>/skins'
+                    },
                 ]
             }
         },
@@ -57,17 +75,22 @@ module.exports = function(grunt) {
             css: {
                 files: {
                     '<%= dest %>/css.css': [
-                        '<%= node %>/bootstrap/dist/css/bootstrap.min.css',
-                        '<%= node %>/font-awesome/css/font-awesome.min.css'
+                            '<%= node %>/bootstrap/dist/css/bootstrap.min.css',
+                            '<%= node %>/font-awesome/css/font-awesome.min.css'
                     ]
                 }
             },
             js: {
                 files: {
                     '<%= dest %>/js.js': [
-                        '<%= node %>/jquery/dist/jquery.min.js',
-                        '<%= node %>/bootstrap/dist/js/bootstrap.min.js',
-                        '<%= node %>/less/dist/less.min.js'
+                            '<%= node %>/jquery/dist/jquery.min.js',
+                            '<%= node %>/bootstrap/dist/js/bootstrap.min.js',
+                            '<%= node %>/less/dist/less.min.js',                            
+                            '<%= node %>/jquery-ui/ui/core.js',
+                            '<%= node %>/jquery-ui/ui/widget.js',
+                            '<%= node %>/jquery-ui/ui/mouse.js',
+                            '<%= node %>/jquery-ui/ui/sortable.js',
+                            '<%= node %>/tinymce/tinymce.jquery.js'
                     ]
                 }
             }
