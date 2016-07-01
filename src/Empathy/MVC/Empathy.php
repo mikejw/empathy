@@ -5,6 +5,7 @@ namespace Empathy\MVC;
 
 define('MVC_VERSION', '0.9.7');
 
+
 /**
  * Empathy
  * @file            Empathy/Empathy.php
@@ -92,12 +93,8 @@ class Empathy
         if ($this->getHandlingErrors()) {
             set_error_handler(array($this, 'errorHandler'));
         }
-        $this->boot = new Bootstrap($this->bootOptions, $this->plugins, $this);
-        $this->initPlugins();
-        if ($this->persistent_mode !== true) {
-            $this->beginDispatch();
-        }
     }
+
 
     /**
      * Returns value of handle_errors setting from application config boot options.
@@ -314,11 +311,15 @@ class Empathy
      */
     private function loadConfig($configDir, $hard=false)
     {
+        global $container;
+
         $configFile = $configDir.'/config.yml';
         if (!file_exists($configFile)) {
             die('Config error: '.$configFile.' does not exist');
         }
-        $s = new \Spyc();
+        
+        $s = $container->get('Spyc');
+
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
 
@@ -332,7 +333,9 @@ class Empathy
             }
 
             if ($hard) {
-                define(strtoupper($index), $item);
+                if (!defined(strtoupper($index))) {
+                    define(strtoupper($index), $item);
+                }
             } else {
                 Config::store(strtoupper($index), $item);                
             }
@@ -390,4 +393,25 @@ class Empathy
     {
         $this->boot->initBootOptions();
     }
+
+
+
+    // DI
+    public function init() {
+
+        global $container;
+        $this->boot = $container->get('Bootstrap'); 
+        $this->initPlugins();
+        if ($this->persistent_mode !== true) {
+            $this->beginDispatch();
+        }
+    }
+
+    public function getBootOptions() {
+        return $this->bootOptions;
+    }
+    public function getPlugins() {
+        return $this->plugins;
+    }
+
 }

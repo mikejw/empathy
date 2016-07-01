@@ -17,7 +17,8 @@
         "php": ">=5.3.0",
         "wp-cli/php-cli-tools": "dev-master",
         "mustangostang/spyc": "0.5.1",
-        "mikejw/elibs": "dev-develop"
+        "mikejw/elibs": "dev-develop",
+        "php-di/php-di": "^5.3"
     },
     "require-dev": {
         "phpunit/phpunit": "4.7.*@dev",        
