@@ -4,7 +4,7 @@ namespace Empathy\MVC\Util\Testing;
 
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
-
+use Empathy\MVC\Config as EmpConfig;
 
 
 
@@ -83,6 +83,11 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
 
         $bootstrap = $container->get('Bootstrap');
         return $bootstrap;
+    }
+
+
+    protected function setConfig($key, $value) {
+        EmpConfig::store($key, $value);
     }
 
 }
