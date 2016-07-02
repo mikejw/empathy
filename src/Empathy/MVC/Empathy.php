@@ -311,14 +311,12 @@ class Empathy
      */
     private function loadConfig($configDir, $hard=false)
     {
-        global $container;
-
         $configFile = $configDir.'/config.yml';
         if (!file_exists($configFile)) {
             die('Config error: '.$configFile.' does not exist');
         }
         
-        $s = $container->get('Spyc');
+        $s = DI::getContainer()->get('Spyc');
 
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
@@ -399,8 +397,7 @@ class Empathy
     // DI
     public function init() {
 
-        global $container;
-        $this->boot = $container->get('Bootstrap'); 
+        $this->boot = DI::getContainer()->get('Bootstrap'); 
         $this->initPlugins();
         if ($this->persistent_mode !== true) {
             $this->beginDispatch();
@@ -413,5 +410,13 @@ class Empathy
     public function getPlugins() {
         return $this->plugins;
     }
+
+    public function setBootOptions($options) {
+        $this->bootOptions = $options;
+    }
+    public function setPlugins($plugins) {
+        $this->plugins = $plugins;
+    }
+
 
 }

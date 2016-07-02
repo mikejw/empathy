@@ -5,20 +5,20 @@ namespace Empathy\MVC;
 
 class DI {
 
+	private static $container;
 
-
-	public static function init() {
-
-
-		global $configDir, $persistentMode, $systemMode, $container;
-
+	public static function init(
+		$configDir,
+		$persistentMode = false,
+		$systemMode = false
+		) {
 
 		$builder = new \DI\ContainerBuilder();
 		$builder->addDefinitions([
 		    
 		    'configDir' => $configDir,
-		    'persistentMode' => isset($persistentMode)? $persistentMode: null,
-		    'systemMode' => isset($systemMode)? $systemMode: null,
+		    'persistentMode' => $persistentMode,
+		    'systemMode' => $systemMode,
 		    'Spyc' => new \Spyc(),
 		    'Empathy' => function (\DI\Container $c) {
 		        return new Empathy(
@@ -36,6 +36,12 @@ class DI {
 		    	);
 		    }
 		]);
-		return $builder->build();
+		self::$container = $builder->build();
+		return self::$container;
 	}
+
+	public static function getContainer() {
+		return self::$container;
+	}
+
 }
