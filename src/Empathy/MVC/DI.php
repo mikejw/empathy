@@ -35,6 +35,13 @@ class DI {
 		    		$empathy
 		    	);
 		    },
+		    'URI' => function (\DI\Container $c) {
+		    	$bootstrap = $c->get('Bootstrap');
+		    	return new URI(
+		    		$bootstrap->getDefaultModule(),
+		    		$bootstrap->getDynamicModule()
+		    	);
+		    },
 		    'PluginManager' => new PluginManager()
 		]);
 		self::$container = $builder->build();

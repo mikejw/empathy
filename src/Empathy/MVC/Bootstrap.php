@@ -153,7 +153,8 @@ class Bootstrap
      */
     public function dispatch($fake = false)
     {
-        $this->uri = new URI($this->defaultModule, $this->dynamicModule);        
+        $this->uri = DI::getContainer()->get('URI');
+
         $error = $this->uri->getError();
 
         if ($error == URI::MISSING_CLASS
@@ -342,4 +343,20 @@ class Bootstrap
     {
         return $this->controller;
     }
+
+    /**
+     *  @return string
+     */
+    public function getDefaultModule() {
+        return $this->defaultModule;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDynamicModule() {
+        return $this->dynamicModule;
+    }
+
+
 }
