@@ -114,7 +114,7 @@ class Bootstrap
         $this->persistent_mode = $mvc->getPersistentMode();
         $this->mvc = $mvc;
         $this->plugins = $plugins;
-        $this->plugin_manager = new PluginManager();
+        $this->plugin_manager = DI::getContainer()->get('PluginManager');
         $this->initBootOptions($bootOptions);
     }
 

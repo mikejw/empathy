@@ -70,8 +70,6 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        m::close();
-
         global $suite;
         if (Util\Config::get('reset_db')) {
             $suite->dbReset();

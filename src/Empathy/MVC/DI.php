@@ -34,7 +34,8 @@ class DI {
 		    		$empathy->getPlugins(),
 		    		$empathy
 		    	);
-		    }
+		    },
+		    'PluginManager' => new PluginManager()
 		]);
 		self::$container = $builder->build();
 		return self::$container;
