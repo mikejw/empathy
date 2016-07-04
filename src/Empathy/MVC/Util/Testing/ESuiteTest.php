@@ -41,10 +41,10 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function makeFakeBootstrap() {
+    protected function makeFakeBootstrap($testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY) {
         // use eaa archive as root
         $doc_root = realpath(
-            dirname(realpath(__FILE__)).'/../../../../eaa/'
+            dirname(realpath(__FILE__)).'/../../../../../eaa/'
         );
         
         $this->setConfig('NAME', 'empathytest');
@@ -64,7 +64,7 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
             array(
                 'name' => 'ELibs',
                 'version' => '1.0',
-                'config' => '{ "testing": true }'
+                'config' => '{ "testing": '.$testingMode.' }'
             ),
             array(
                 'name' => 'Smarty',
