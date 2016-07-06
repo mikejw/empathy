@@ -284,10 +284,10 @@ class URI
         }
     
         $this->controllerName = 'Empathy\\MVC\\Controller\\'.$this->controllerName;
-        if (!$this->error) {
+        require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
 
-            require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
-            
+        if (!$this->error) {
+    
             if (!class_exists($this->controllerName)) {
                 // try manual include
                 // make sure custom controller has been loaded
