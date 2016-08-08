@@ -11,7 +11,7 @@ ESuite\FakeEntity:
 
 ESuite\FakeRelatedEntity:
   fakerelated{1..10}:
-    fake_id: @fakeentity<current()>
+    fake_id: "@fakeentity<current()>"
     name: <firstName()>
 
 

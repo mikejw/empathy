@@ -27,9 +27,9 @@
         "phpmd/phpmd": "dev-master",
         "sebastian/phpcpd": "2.0.*@dev",
         "phploc/phploc": "2.1.*@dev",
-        "covex-nn/phpcb": "1.0.*@dev",
+        "mayflower/php-codebrowser": "dev-master",
         "mockery/mockery": "dev-master",
-        "nelmio/alice": "dev-master"
+        "nelmio/alice": "2.2.2"
     },
     "autoload": {
         "psr-0": {
