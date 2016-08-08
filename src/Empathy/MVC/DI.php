@@ -42,7 +42,8 @@ class DI {
 		    		$bootstrap->getDynamicModule()
 		    	);
 		    },
-		    'PluginManager' => new PluginManager()
+		    'PluginManager' => new PluginManager(),
+		    'Stash' => new Stash()
 		]);
 		self::$container = $builder->build();
 		return self::$container;
