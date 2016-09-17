@@ -114,7 +114,7 @@ class Bootstrap
         $this->persistent_mode = $mvc->getPersistentMode();
         $this->mvc = $mvc;
         $this->plugins = $plugins;
-        $this->plugin_manager = new PluginManager();
+        $this->plugin_manager = DI::getContainer()->get('PluginManager');
         $this->initBootOptions($bootOptions);
     }
 
@@ -151,9 +151,10 @@ class Bootstrap
      *
      * @return void
      */
-    public function dispatch($fake = false)
+    public function dispatch($fake = false, $controller = null)
     {
-        $this->uri = new URI($this->defaultModule, $this->dynamicModule);        
+        $this->uri = DI::getContainer()->get('URI');
+
         $error = $this->uri->getError();
 
         if ($error == URI::MISSING_CLASS
@@ -162,8 +163,7 @@ class Bootstrap
             $error = $this->uri->dynamicSection();
         }
 
-
-        if ($error > 0) {
+        if ($error > 0 && $controller === null) {
             if ($this->environment == 'prod' || $this->debug_mode == false) {
                 if ($error == URI::MISSING_CLASS ||
                     $error == URI::MISSING_EVENT_DEF ||
@@ -176,11 +176,14 @@ class Bootstrap
             }
         }    
 
-        $controller_name = $this->uri->getControllerName();
-        $this->controller = new $controller_name($this);
+        if ($controller === null) {
+            $controller_name = $this->uri->getControllerName();
+            $this->controller = new $controller_name($this);
+        } else {
+            $this->controller = new $controller($this);
+        }
         
         $this->plugin_manager->preEvent();
-
 
         if ($fake == false) {
             $event = $_GET['event'];
@@ -342,4 +345,20 @@ class Bootstrap
     {
         return $this->controller;
     }
+
+    /**
+     *  @return string
+     */
+    public function getDefaultModule() {
+        return $this->defaultModule;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDynamicModule() {
+        return $this->dynamicModule;
+    }
+
+
 }

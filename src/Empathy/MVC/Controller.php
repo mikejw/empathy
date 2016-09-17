@@ -93,7 +93,7 @@ class Controller
         $this->plugin_manager = $boot->getPluginManager();
         $this->plugin_manager->setController($this);
         $this->environment = $boot->getEnvironment();
-        $this->stash = new Stash();
+        $this->stash =  DI::getContainer()->get('Stash');
         $this->connected = false;
         $this->module = (isset($_GET['module']))? $_GET['module']: NULL;
         $this->class = (isset($_GET['class']))? $_GET['class']: NULL;

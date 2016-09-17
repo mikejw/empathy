@@ -17,7 +17,7 @@ plugins:
   -
     name: ELibs
     version: 1.0
-    config: '{ "testing": true }'
+    config: '{ "testing": 1 }'
   -
     name: Smarty
     version: 1.0

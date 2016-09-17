@@ -5,7 +5,6 @@ namespace ESuite;
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
 use Empathy\MVC\Config as EmpConfig;
-use \Mockery as m;
 
 
 abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
@@ -50,11 +49,13 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $mvc = m::mock('Empathy\MVC\Empathy');
-        $mvc->shouldReceive('getPersistentMode')->times(1)->andReturn(true);
-        $bootstrap = new \Empathy\MVC\Bootstrap($dummyBootOptions, $plugins, $mvc);
+        $container = \Empathy\MVC\DI::init($doc_root, true);
+        $empathy = $container->get('Empathy');
+        $empathy->setBootOptions($dummyBootOptions);
+        $empathy->setPlugins($plugins);
+        $empathy->init();
 
-        $bootstrap->initPlugins();
+        $bootstrap = $container->get('Bootstrap');
         return $bootstrap;
     }
 
@@ -69,8 +70,6 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        m::close();
-
         global $suite;
         if (Util\Config::get('reset_db')) {
             $suite->dbReset();

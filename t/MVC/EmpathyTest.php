@@ -24,7 +24,11 @@ class EmpathyTest extends ESuiteTest
     private function createMVC($persistent=false)
     {   
         $this->expectOutputRegex('/(Setting header)/');
-        $this->mvc = new \Empathy\MVC\Empathy($this->config_dir, $persistent);
+
+        $container = \Empathy\MVC\DI::init($this->config_dir, $persistent);
+        $empathy = $container->get('Empathy');
+        $empathy->init();
+        $this->mvc = $empathy;
     }
 
 
@@ -46,14 +50,10 @@ class EmpathyTest extends ESuiteTest
     
 
     public function testNew()
-    {
-        //$this->markTestSkipped();
-
+    {    
         $this->setExpectedException(
             'Empathy\MVC\RequestException', 'Not found'
         );
-
-        //$this->expectOutputRegex('/Not found/');
         $this->mvc = $this->createMVC();
     }
 

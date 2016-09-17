@@ -20,5 +20,7 @@ if(false == @include('../vendor/autoload.php')) {
     
     include('./site_down.html');
 } else {
-    $boot = new Empathy\MVC\Empathy(realpath(dirname(__FILE__).'/../'));
+    $container = Empathy\MVC\DI::init(realpath(dirname(__FILE__).'/../'));
+	$empathy = $container->get('Empathy');
+	$empathy->init();
 }

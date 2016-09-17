@@ -36,16 +36,16 @@ class Testable
             echo 'Setting header:' . $header;
             $header_arr = explode(':', $header);
 
-	    if (sizeof($header_arr)) {
-	        $index = $header_arr[0];
-		array_shift($header_arr);
-		if (sizeof($header_arr) == 1 ) {
-		   $content = $header_arr[0];
-		} else {
-		   $content = implode(':', $header_arr);
-		}
-	        self::$headers[$index] = trim($content);
-	    }
+            if (sizeof($header_arr)) {
+                $index = $header_arr[0];
+                array_shift($header_arr);
+                if (sizeof($header_arr) == 1 ) {
+                    $content = $header_arr[0];
+                } else {
+                    $content = implode(':', $header_arr);
+                }
+                self::$headers[$index] = trim($content);
+            }
         } else {
             header($header);
         }

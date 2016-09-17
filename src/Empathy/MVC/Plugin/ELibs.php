@@ -19,19 +19,32 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class ELibs extends Plugin
 {
+    const TESTING_EMPATHY = 1;
+    const TESTING_LIB = 2;
+
+
     public function __construct($manager, $bootstrap, $config)
     {
         parent::__construct($manager, $bootstrap, $config);
 	 	
 	 	if (isset($this->config['testing']) && $this->config['testing']) {
-            $path = '/../vendor/mikejw/elibs';
+
+            switch ($this->config['testing']) {
+                case self::TESTING_EMPATHY:
+                    $path = '/../vendor/mikejw/elibs';
+                    break;
+                case self::TESTING_LIB:
+                    $path = '/../../../../vendor/mikejw/elibs';
+                    break;
+                default:
+                    break;
+            }
+            
         } else {
             $path = '/vendor/mikejw/elibs';
         }
 
         \Empathy\MVC\Util\Lib::addToIncludePath(Config::get('DOC_ROOT').$path);
-
-
     }
 }
 
