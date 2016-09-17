@@ -45,6 +45,11 @@ class DI {
 		    'PluginManager' => new PluginManager(),
 		    'Stash' => new Stash()
 		]);
+
+		if (file_exists($configDir.'/services.php')) {
+			$builder->addDefinitions($configDir.'/services.php');
+		}
+
 		self::$container = $builder->build();
 		return self::$container;
 	}
