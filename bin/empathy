@@ -217,9 +217,10 @@ function option_misc($action)
 
 function boot()
 {
-    \Empathy\MVC\Util\Lib::addToIncludePath(getcwd().'/../libs');
-    //class R extends RedBean_Facade{}
-    return new Empathy\MVC\Empathy(getcwd().'/', true);
+    $container = Empathy\MVC\DI::init(getcwd().'/', true);
+    $empathy = $container->get('Empathy');
+    $empathy->init();
+    return $empathy;
 }
 
 
