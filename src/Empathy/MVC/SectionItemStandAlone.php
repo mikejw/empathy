@@ -34,7 +34,7 @@ class SectionItemStandAlone extends Entity
     {
         $uri_data = array();
 
-        $sql = "SELECT id, label, friendly_url FROM ".SectionItemStandAlone::$table;
+        $sql = "SELECT id, section_id, label, friendly_url FROM ".SectionItemStandAlone::$table;
         $error = "Could not get URI data.";
         $result = $this->query($sql, $error);
         $i = 0;
@@ -61,4 +61,43 @@ class SectionItemStandAlone extends Entity
             //echo "Whoops!";
         }
     }
+
+
+    public function findSection($rows, $slug, $parent_id)
+    {
+        $matched = array();
+        foreach ($rows as $row) {
+            $comp = str_replace(' ', '', strtolower($row['label']));
+            if ($comp == $slug && $parent_id == $row['section_id']) {
+                $matched = $row;
+                break;
+            }
+        }
+        return $matched;
+    }
+
+    public function resolveURI($uri)
+    {
+        $matched = false;
+        $rows = $this->getURIData();
+        $id = 0;
+        $sections = array();
+
+        foreach ($uri as $slug) {
+            $section = $this->findSection($rows, $slug, $id);
+            if (sizeof($section)) {
+                $id = $section['id'];
+                $sections[] = $section;
+            } else {
+                break;
+            }
+        }
+
+        if (sizeof($sections) == sizeof($uri)) {
+            $matched = true;
+            $_GET['section'] = $sections[sizeof($sections) - 1]['id'];
+        }
+        return $matched;
+    }
+
 }

@@ -330,29 +330,15 @@ class URI
         if (sizeof($this->uri) > 0) {
             $section_index = (sizeof($this->uri) - 1);
             if (is_numeric($this->uri[$section_index])) {
-                $_GET['id'] = $this->uri[$section_index--];
-            }
-            if ($section_index >= 0) {
-                $section_uri = $this->uri[$section_index];
-            }
-        } elseif (defined('DEFAULT_SECTION')) {
-            $section_uri = DEFAULT_SECTION;
-        }
-
-        $rows = $section->getURIData();
-        if (isset($section_uri)) {
-            for ($i = 0; $i < sizeof($rows); $i++) {
-                if ($rows[$i]['friendly_url'] != NULL) {
-                    $comp = str_replace(" ", "", strtolower($rows[$i]['friendly_url']));
-                } else {
-                    $comp = str_replace(" ", "", strtolower($rows[$i]['label']));
-                }
-                if ($comp == $section_uri) {
-                    $_GET['section'] = $rows[$i]['id'];
-                }
+                $_GET['id'] = $this->uri[$section_index];
+                array_pop($this->uri);
             }
         }
 
+        if (!$section->resolveURI($this->uri)) {
+            $this->error = URI::ERROR_404;
+        }
+    
         if (isset($_GET['section'])) {
             $section->getItem($_GET['section']);
         }
