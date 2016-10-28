@@ -26,7 +26,11 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
     protected function makeBootstrap()
     {
         global $base_dir;
-        $this->boot = new \Empathy\MVC\Empathy(realpath($base_dir), true);
+
+        $container = \Empathy\MVC\DI::init($base_dir, true);
+        $empathy = $container->get('Empathy');
+        $empathy->init();
+        $this->boot = $empathy;
     }
 
 
