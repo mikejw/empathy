@@ -31,7 +31,7 @@ class Boot
 
             $class = str_replace('ESuite\\', '', $class);
             $class = str_replace('\\', '/', $class);
-            $class_file = self::$base."/$class.php";
+            $class_file = self::$base."/t/$class.php";
             
             if (!@include($class_file)) {
                 echo '[[['.$class_file.']]]';

@@ -19,7 +19,7 @@ use Empathy\MVC\Config as EmpConfig;
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
  */
-abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
+abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
 {
     private $boot;
     

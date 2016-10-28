@@ -12,19 +12,27 @@ class Testable
 
     private static function testMode()
     {        
-        return ((defined('MVC_TEST_MODE') && MVC_TEST_MODE) &&
-            (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON));        
+        return (defined('MVC_TEST_MODE') && MVC_TEST_MODE);
     }
 
-    private static function testModeOnly()
+
+    private static function testModeOutput()
     {
-        return (defined('MVC_TEST_MODE') && MVC_TEST_MODE);
+        return (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON);  
+    }
+
+
+    private static function output($msg)
+    {
+        if (self::testModeOutput()) {
+            echo $msg."\n";
+        }
     }
 
     public static function doDie($msg='')
     {
         if (self::testMode()) {
-            echo 'die: ' . $msg;       
+            self::output('die: ' . $msg);
         } else {
             die($msg);
         }
@@ -33,7 +41,7 @@ class Testable
     public static function header($header)
     {
         if (self::testMode()) {
-            echo 'Setting header:' . $header;
+            self::output('Setting header:' . $header);
             $header_arr = explode(':', $header);
 
             if (sizeof($header_arr)) {
@@ -54,7 +62,7 @@ class Testable
     public static function session_start()
     {
         if (self::testMode()) {
-            echo 'session start';
+            self::output('session start');
         } else {
             session_start();
         }
@@ -64,7 +72,7 @@ class Testable
     public static function session_unset()
     {
         if (self::testMode()) {
-            echo 'session unset';
+            self::output('session unset');
         } else {
             session_unset();
         }
@@ -74,7 +82,7 @@ class Testable
     public static function session_destroy()
     {
         if (self::testMode()) {
-            echo 'session destroy';
+            self::output('session destroy');
         } else {
             session_destroy();
         }
@@ -84,7 +92,7 @@ class Testable
     public static function session_write_close()
     {
         if (self::testMode()) {
-            echo 'session_write_close';
+            self::output('session_write_close');
         } else {
             session_write_close();
         }
