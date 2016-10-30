@@ -288,6 +288,22 @@ function option_set_publicdir($new)
 }
 
 
+function option_set_dbuser($new)
+{
+    global $app_config;    
+    $app_config['db_user'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+function option_set_dbpass($new)
+{
+    global $app_config;    
+    $app_config['db_pass'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+
+
 
 function boot()
 {
@@ -334,6 +350,12 @@ function main()
     $arguments->addOption('set_publicdir', array(
                               'default'     => null,
                               'description' => 'Set the public dir app-wide.'));
+    $arguments->addOption('set_dbuser', array(
+                              'default'     => null,
+                              'description' => 'Set the db name.'));
+    $arguments->addOption('set_dbpassword', array(
+                              'default'     => null,
+                              'description' => 'Set the db password.'));
 
     $arguments->parse();
 
@@ -347,8 +369,12 @@ function main()
         new_app();
 
     } else {
-        $valid_options = array('mysql', 'node', 'misc',
-            'inst_mod', 'set_docroot', 'set_webroot', 'set_publicdir');
+        $valid_options = array(
+            'mysql', 'node', 'misc',
+            'inst_mod', 'set_docroot',
+            'set_webroot', 'set_publicdir'
+            'set_dbuser', 'set_dbpass'
+        );
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {
                 $func = 'option_'.$o;
