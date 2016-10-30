@@ -372,7 +372,7 @@ function main()
         $valid_options = array(
             'mysql', 'node', 'misc',
             'inst_mod', 'set_docroot',
-            'set_webroot', 'set_publicdir'
+            'set_webroot', 'set_publicdir',
             'set_dbuser', 'set_dbpass'
         );
         foreach($valid_options as $o) {
