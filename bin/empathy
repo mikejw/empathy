@@ -215,6 +215,22 @@ function option_misc($action)
 
 }
 
+
+function assertConfig()
+{
+    if (!file_exists('./config.yml')) {
+        copy('./config.yml.sample', './config.yml');
+    }
+}
+
+
+function option_set_docroot($new)
+{
+    assertConfig();
+
+}
+
+
 function boot()
 {
     $container = Empathy\MVC\DI::init(getcwd().'/', true);
@@ -251,6 +267,13 @@ function main()
     $arguments->addOption('inst_mod', array(
                               'default'     => null,
                               'description' => 'Install/generate application extension module.'));
+    $arguments->addOption('set_docroot', array(
+                              'default'     => null,
+                              'description' => 'Set the document root app-wide.'));
+    $arguments->addOption('set_webroot', array(
+                              'default'     => null,
+                              'description' => 'Set the web root app-wide.'));
+
     $arguments->parse();
 
     //echo $arguments->asJSON(); exit();
@@ -263,7 +286,8 @@ function main()
         new_app();
 
     } else {
-        $valid_options = array('mysql', 'node', 'misc', 'inst_mod');
+        $valid_options = array('mysql', 'node', 'misc',
+            'inst_mod', 'set_docroot', 'set_webroot');
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {
                 $func = 'option_'.$o;
