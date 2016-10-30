@@ -232,6 +232,26 @@ function assertConfig()
     if (!file_exists('./config.yml')) {
         copy('./config.yml.sample', './config.yml');
     }
+    if (!file_exists('./public_html/.htaccess')) {
+        copy('./public_html/htaccess', './public_html/.htaccess');
+    }
+}
+
+function writeNewHTAccess()
+{
+    global $app_config;
+    $web_arr = explode('/', $app_config['web_root']);
+    array_shift($web_arr);
+
+    if (sizeof($web_arr) > 0) {
+        $ht_base = '/';
+    } else {
+        $ht_base = '';
+    }
+    $ht_base .= implode('/', $web_arr).$app_config['public_dir'].'/';
+
+    $exec = "sed -i '/^RewriteBase/c ". 'RewriteBase '.$ht_base."' ./public_html/.htaccess";
+    execute($exec);
 }
 
 
@@ -242,18 +262,28 @@ function option_set_docroot($new)
     return write_yaml($app_config, './config.yml');
 }
 
+
+/* web root expected to begin with host
+ * name or domain and not end in '/'
+ *
+ */
 function option_set_webroot($new)
 {
     global $app_config;    
     $app_config['web_root'] = $new;
+    writeNewHTAccess();
     return write_yaml($app_config, './config.yml');
 }
 
-
+/* public dir expected to begin
+ * with '/'. e.g. '/public_html'
+ *
+ */
 function option_set_publicdir($new)
 {
     global $app_config;    
     $app_config['public_dir'] = $new;
+    writeNewHTAccess();
     return write_yaml($app_config, './config.yml');
 }
 
