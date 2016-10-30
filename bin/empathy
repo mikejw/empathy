@@ -353,7 +353,7 @@ function main()
     $arguments->addOption('set_dbuser', array(
                               'default'     => null,
                               'description' => 'Set the db name.'));
-    $arguments->addOption('set_dbpassword', array(
+    $arguments->addOption('set_dbpass', array(
                               'default'     => null,
                               'description' => 'Set the db password.'));
 
