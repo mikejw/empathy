@@ -59,6 +59,17 @@ function read_yaml($file)
     return $rtnd;
 }
 
+function write_yaml($data, $file)
+{
+    $rtnd = false;
+    if(file_exists($file)) {
+        $s = new \spyc();
+        $rtnd = file_put_contents($file, $s->YAMLDump($data, 4, 60));
+    }
+    return $rtnd;   
+}
+
+
 function read_app_config()
 {
     return read_yaml('./config.yml');
@@ -226,9 +237,26 @@ function assertConfig()
 
 function option_set_docroot($new)
 {
-    assertConfig();
-
+    global $app_config;    
+    $app_config['doc_root'] = $new;
+    return write_yaml($app_config, './config.yml');
 }
+
+function option_set_webroot($new)
+{
+    global $app_config;    
+    $app_config['web_root'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+
+function option_set_publicdir($new)
+{
+    global $app_config;    
+    $app_config['public_dir'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
 
 
 function boot()
@@ -273,6 +301,9 @@ function main()
     $arguments->addOption('set_webroot', array(
                               'default'     => null,
                               'description' => 'Set the web root app-wide.'));
+    $arguments->addOption('set_publicdir', array(
+                              'default'     => null,
+                              'description' => 'Set the public dir app-wide.'));
 
     $arguments->parse();
 
@@ -287,7 +318,7 @@ function main()
 
     } else {
         $valid_options = array('mysql', 'node', 'misc',
-            'inst_mod', 'set_docroot', 'set_webroot');
+            'inst_mod', 'set_docroot', 'set_webroot', 'set_publicdir');
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {
                 $func = 'option_'.$o;
@@ -306,6 +337,7 @@ function option_inst_mod($module) {
 
 
 $boot = null;
+assertConfig();
 $app_config = read_app_config();
 $config = read_global_config();
 
