@@ -302,6 +302,12 @@ function option_set_dbpass($new)
     return write_yaml($app_config, './config.yml');
 }
 
+function option_set_elib()
+{
+    global $app_config;    
+    $app_config['boot_options']['use_elib'] = true;
+    return write_yaml($app_config, './config.yml');
+}
 
 
 
@@ -356,6 +362,8 @@ function main()
     $arguments->addOption('set_dbpass', array(
                               'default'     => null,
                               'description' => 'Set the db password.'));
+    $arguments->addOption('set_elib', array(                              
+                              'description' => 'Enable elib.'));
 
     $arguments->parse();
 
@@ -373,7 +381,7 @@ function main()
             'mysql', 'node', 'misc',
             'inst_mod', 'set_docroot',
             'set_webroot', 'set_publicdir',
-            'set_dbuser', 'set_dbpass'
+            'set_dbuser', 'set_dbpass', 'set_elib'
         );
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {
