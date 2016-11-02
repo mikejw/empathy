@@ -1,20 +1,20 @@
 <?php
+/**
+ * This file is part of the Empathy package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @copyright 2008-2016 Mike Whiting
+ * @license   https://opensource.org/licenses/LGPL-3.0 LGPL
+ * @link      http://www.empathyphp.co.uk
+ */
 
 namespace Empathy\MVC;
 
 /**
- * Empathy Controller
- * @package         Empathy
- * @file            Empathy/Controller.php
- * @description     Controller superclass. Application controllers (found within modules) inherit from this class.
- *                  Usually through CustomController.php which resides in the top-level applicaition directory.
+ * Main parent controller class.
  *
- * @author          Mike Whiting
- * @license         LGPLv3
- *
- * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
- * with this source code in the file licence.txt
+ * @author Mike Whiting mike@ai-em.net
  */
 class Controller
 {
@@ -81,11 +81,10 @@ class Controller
      * Controller constructor.  Grabs certain properties from the boot object, establishes the view
      * from the plugin manager and assigns certain information to view making it available to templates.
      *
-     * @param Bootstrap $boot the current bootstrap object
+     * @param Bootstrap $boot The current bootstrap object
      */
     public function __construct($boot)
     {
-
         $this->boot = $boot;
         $this->cli_mode = $boot->getURICliMode();
         $this->initError = $boot->getURIError();
@@ -124,7 +123,7 @@ class Controller
     /**
      * Assigns the value of some of the main settings from the application config to the view.
      *
-     * @return void
+     * @return null
      */
     private function assignConstants()
     {
@@ -146,7 +145,7 @@ class Controller
     /**
      * Assign key controller attributes to the view
      *
-     * @return void
+     * @return null
      *
      */
     private function assignControllerInfo()
@@ -160,7 +159,7 @@ class Controller
   /**
      * Assign environment value to the view
      *
-     * @return void
+     * @return null
      *
      */
     private function assignEnvironment()
@@ -173,8 +172,7 @@ class Controller
      * Set the name of the current view template
      *
      * @param string $tpl tempalte name (including file extension.)
-     *
-     * @return void
+     * @return null
      */
     public function setTemplate($tpl)
     {
@@ -182,11 +180,10 @@ class Controller
     }
 
     /**
-     * Initialise the view for rendering
+     * Initialise the view for rendering.
      *
-     * @param boolean $i Whether the template is internal.
-     *
-     * @return void
+     * @param boolean $internal Whether the template is internal.
+     * @return null
      */
     public function initDisplay($internal)
     {        
@@ -198,10 +195,9 @@ class Controller
      * Redirect the user to another location within the application
      *
      * @param string $endString the new URI to redirect to.
-     *
-     * @return void
+     * @return null
      */
-    public function redirect($endString='')
+    public function redirect($endString = '')
     {
         $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';        
         Session::write();
@@ -217,10 +213,9 @@ class Controller
      * Redirect to a local cgi script.
      *
      * @param string $endString path to the script.
-     *
-     * @return void
+     * @return null
      */
-    public function redirect_cgi($endString='')
+    public function redirect_cgi($endString = '')
     {
         Session::write();
         $location = 'Location: ';
@@ -234,7 +229,7 @@ class Controller
     /**
      * End current user session
      *
-     * @return void
+     * @return null
      */
     public function sessionDown()
     {
@@ -244,7 +239,7 @@ class Controller
     /**
      * Determines whether current request is an ajax request from the browser.
      *
-     * @return void
+     * @return null
      */
     public function isXMLHttpRequest()
     {
@@ -259,14 +254,12 @@ class Controller
     /**
      * Assign value to the current view.
      *
-     * @param string $name
-     *
-     * @param mixed $data
-     *
-     *
-     * @return void
+     * @param string $name Key name.
+     * @param mixed $data Data.
+     * @param boolean $no_array Determine if data should be stored 'flat'
+     * @return null
      */
-    public function assign($name, $data, $no_array=false)
+    public function assign($name, $data, $no_array = false)
     {
         $this->presenter->assign($name, $data, $no_array);
     }
@@ -274,7 +267,7 @@ class Controller
     /**
      * Retrieve name of current module
      *
-     * @return string $module
+     * @return string $module Module name.
      */
     public function getModule()
     {
@@ -284,7 +277,7 @@ class Controller
     /**
      * Retrieve name of current controller class
      *
-     * @return string $class
+     * @return string $class Class name.
      */
     public function getClass()
     {
@@ -292,13 +285,11 @@ class Controller
     }
 
 
-   /**
+    /**
      * Obtain user interface control values from request/session.
-     * @param string $ui name of interface control set
-     *
-     * @param array $ui_array set of control settings
-     *
-     * @return void
+     * @param string $ui Name of interface control set.
+     * @param array $ui_array Set of control settings.
+     * @return null
      */
     public function loadUIVars($ui, $ui_array)
     {
@@ -319,7 +310,13 @@ class Controller
     }
 
 
-    // when $def is 0, valid is true when id is 0
+    /**
+     * When $def is 0, valid is true when id is 0
+     * @param int $id The ID.
+     * @param mixed $def The default value.
+     * @param boolean $assertSet Assert ID is set.
+     * @return boolean Init is valid.
+     */
     public function initID($id, $def, $assertSet = false)
     {
         $valid = true;
@@ -343,25 +340,38 @@ class Controller
         return $valid;
     }
 
+    /**
+     * Send exception to the view.
+     * @param boolean $debug Debug mode.
+     * @param Exception $exception The exception object.
+     * @param boolean $req_error Is request error. e.g. 404.
+     * @return null
+     */
     public function viewException($debug, $exception, $req_error)
     {
         $this->presenter->exception($debug, $exception, $req_error);
 
     }
 
+    /**
+     * Set the presenter/view object.
+     * @param Empathy\MVC\Plugin\Presentation $view The view.
+     * @return nulll
+     */
     public function setPresenter($view)
     {       
         $this->presenter = $view;
     }
 
 
+    /**
+     * Assign generated token.
+     * @return null
+     */
     protected function assignCSRFToken()
     {
         $token = md5(uniqid(rand(), true));
         $this->assign('csrf_token', $token);
         Session::set('csrf_token', $token);
     }
-
-
 }
-

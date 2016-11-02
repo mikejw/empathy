@@ -1,17 +1,20 @@
 <?php
+/**
+ * This file is part of the Empathy package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @copyright 2008-2016 Mike Whiting
+ * @license   https://opensource.org/licenses/LGPL-3.0 LGPL
+ * @link      http://www.empathyphp.co.uk
+ */
 
 namespace Empathy\MVC;
 
 /**
- * Empathy Bootstrap
- * @file            Empathy/Bootstrap.php
- * @description     Bootstrap object for an application using Empathy.
- * @author          Mike Whiting
- * @license         LGPLv3
+ * Main boot class that handles plugins and dispatches to controllers.
  *
- * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
- * with this source code in the file licence.txt
+ * @author Mike Whiting mike@ai-em.net
  */
 class Bootstrap
 {
@@ -19,14 +22,12 @@ class Bootstrap
     /**
      * This is used to store a reference to the controller object
      * which is instatiated before an action can be dispatchted.
-     * @var Controller
      */
     private $controller = NULL;
 
     /**
      * Default module read from application config file.
      * Used for resolving routes e.g. when URI is empty.
-     * @var string
      */
     private $defaultModule;
 
@@ -36,21 +37,18 @@ class Bootstrap
      * A dynamic module is a module
      * served through the DSection CMS, which
      * is available through ELib.
-     * @var string
      */
     private $dynamicModule;
 
     /**
      * The URI object is used for determining
      * the correct application controller to dispatch to.
-     * @var URI
      */
     private $uri;
 
     /**
      * This property is used to contain a reference to
      * the current instance of the web application.
-     * @var Empathy
      */
     private $mvc;
 
@@ -58,14 +56,12 @@ class Bootstrap
      * This property contains a data structure
      * that contains the descrition of plugins to be initialized.
      * Read from the application config.
-     * @var array
      */
     private $plugins;
 
     /**
      * This property contains a reference to
      * the plugin manager object.
-     * @var PluginManager
      */
     private $plugin_manager;
 
@@ -75,7 +71,6 @@ class Bootstrap
      * When in persistent mode the application
      * is initialized but dispatchment to a
      * controller is prevented. Useful for testing etc.
-     * @var boolean
      */
     private $persistent_mode;
 
@@ -84,7 +79,6 @@ class Bootstrap
      * Introduced to prevent
      * low level error messages being returned in
      * an application serving a JSON api.
-     * @var boolean
      */
     private $debug_mode;
 
@@ -92,9 +86,9 @@ class Bootstrap
      * New property as of 0.9.5.
      * Application can now run in different environment modes.
      * Currently restricted (enumerated) to 'dev', 'stag', or 'live'.
-     * @var string
      */
     private $environment;
+
 
     /**
      * Creates the bootstrap object and passes boot options
@@ -119,9 +113,15 @@ class Bootstrap
     }
 
 
-    public function initBootOptions($bootOptions = NULL)
+    /**
+     * Sets local boot options including environment. 
+     *
+     * @param array $bootOptions boot options config
+     * @return null
+     */
+    public function initBootOptions($bootOptions = null)
     {
-        if ($bootOptions === NULL) {
+        if ($bootOptions === null) {
             $bootOptions = Config::get('BOOT_OPTIONS');
         }    
         if (isset($bootOptions['default_module'])) {
@@ -145,11 +145,12 @@ class Bootstrap
 
     /**
      * Create URI object which determines dispatch method and
-     * perform dispatch
+     * perform dispatch.
      *
-     * @param bool $fake
-     *
-     * @return void
+     * @param boolean $fake Can be used to prevent final action event call.
+     * useful for testing.
+     * @param string $controller Force controller name. Used in testing.
+     * @return null
      */
     public function dispatch($fake = false, $controller = null)
     {
@@ -169,7 +170,7 @@ class Bootstrap
                     $error == URI::MISSING_EVENT_DEF ||
                     $error == URI::ERROR_404
                 ) {
-                        throw new RequestException('Not found', RequestException::NOT_FOUND);
+                    throw new RequestException('Not found', RequestException::NOT_FOUND);
                 }
             } else {
                 throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
@@ -203,10 +204,9 @@ class Bootstrap
 
     /**
      * If an exception is detected this is used to dispatch
-     * to an internal controller and view
-     * @param Exception $e the exception object.
-     *
-     * @return void
+     * to an internal controller and view.
+     * @param Exception $e The exception object.
+     * @return null
      */
     public function dispatchException($e)
     {
@@ -219,11 +219,10 @@ class Bootstrap
     }
 
     /**
-     * Invoke the view through the controller
-     * @param boolean $i Whether the current template is internal
-     * e.g. an exception has occurred.
-     *
-     * @return void
+     * Invoke the view through the controller.
+     * @param boolean $i Whether the current template is internal.
+     * E.g. an exception has occurred.
+     * @return null
      */
     private function display($i = false)
     {
@@ -238,7 +237,7 @@ class Bootstrap
      * followed by the application dying silently with no attempt
      * to initialize the view.
      *
-     * @return void
+     * @return null
      */
     public function initPlugins()
     {
@@ -290,15 +289,16 @@ class Bootstrap
 
     /**
      * Gets value of error property from URI object
-     * @return integer $error See error class constants in URI class
+     * @return integer $error See error class constants in URI class.
      */
     public function getURIError()
     {
         return (isset($this->uri))? $this->uri->getError(): null;
     }
 
+
     /**
-     * Gets value of cli mode detected during
+     * Gets value of CLI mode detected during dispatch.
      * by URI object.
      * i.e. the value of $_SERVER['HTTP_HOST'] is null
      * and the value of $_SERVER['REQUEST_URI'] is also null
@@ -347,18 +347,18 @@ class Bootstrap
     }
 
     /**
-     *  @return string
+     * Get default module.
+     *  @return string Module.
      */
     public function getDefaultModule() {
         return $this->defaultModule;
     }
 
     /**
-     * @return string
+     * Get dynamic module.
+     * @return string Dynamic module.
      */
     public function getDynamicModule() {
         return $this->dynamicModule;
     }
-
-
 }

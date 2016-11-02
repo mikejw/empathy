@@ -1,12 +1,31 @@
 <?php
+/**
+ * This file is part of the Empathy package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @copyright 2008-2016 Mike Whiting
+ * @license   https://opensource.org/licenses/LGPL-3.0 LGPL
+ * @link      http://www.empathyphp.co.uk
+ */
 
 namespace Empathy\MVC\Controller;
 
+/**
+ * Default controller that reveals info about Empathy
+ *
+ * @author Mike Whiting mike@ai-em.net
+ */
 class empathy extends CustomController
 {
+
+
+    /**
+     * Default controller event.
+     * @return null
+     */
     public function default_event()
     {
         $this->assign('about', true);
     }
 }
-

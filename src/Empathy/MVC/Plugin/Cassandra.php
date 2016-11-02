@@ -1,24 +1,31 @@
 <?php
+/**
+ * This file is part of the Empathy package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @copyright 2008-2016 Mike Whiting
+ * @license   https://opensource.org/licenses/LGPL-3.0 LGPL
+ * @link      http://www.empathyphp.co.uk
+ */
 
 namespace Empathy\MVC\Plugin;
 
-
-/**
- * Empathy Cassandra Plugin
- * @file            Empathy/MVC/Plugin/Cassandra.php
- * @description     
- * @author          Mike Whiting
- * @license         LGPLv3
- *
- * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
- * with this source code in the file licence.txt
- */
 use Empathy\MVC\Plugin as Plugin;
 
+/**
+ * Cassandra integration.
+ *
+ * @author Mike Whiting mike@ai-em.net
+ */
 class Cassandra extends Plugin
 {
 
+    /**
+     * Imports cassandra code.
+     *
+     * @return null
+     */
     public function __construct()
     {
         require 'Cassandra/gen-php/cassandra/Cassandra.php';
