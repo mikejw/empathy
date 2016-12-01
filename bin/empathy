@@ -257,6 +257,7 @@ function writeNewHTAccess()
 
 function option_set_docroot($new)
 {
+    assertConfig();
     global $app_config;    
     $app_config['doc_root'] = $new;
     return write_yaml($app_config, './config.yml');
@@ -269,6 +270,7 @@ function option_set_docroot($new)
  */
 function option_set_webroot($new)
 {
+    assertConfig();
     global $app_config;    
     $app_config['web_root'] = $new;
     writeNewHTAccess();
@@ -281,6 +283,7 @@ function option_set_webroot($new)
  */
 function option_set_publicdir($new)
 {
+    assertConfig();
     global $app_config;    
     $app_config['public_dir'] = $new;
     writeNewHTAccess();
@@ -290,6 +293,7 @@ function option_set_publicdir($new)
 
 function option_set_dbuser($new)
 {
+    assertConfig();
     global $app_config;    
     $app_config['db_user'] = $new;
     return write_yaml($app_config, './config.yml');
@@ -297,6 +301,7 @@ function option_set_dbuser($new)
 
 function option_set_dbpass($new)
 {
+    assertConfig();
     global $app_config;    
     $app_config['db_pass'] = $new;
     return write_yaml($app_config, './config.yml');
@@ -304,6 +309,7 @@ function option_set_dbpass($new)
 
 function option_set_elib()
 {
+    assertConfig();
     global $app_config;    
     $app_config['boot_options']['use_elib'] = true;
     return write_yaml($app_config, './config.yml');
@@ -401,7 +407,6 @@ function option_inst_mod($module) {
 
 
 $boot = null;
-assertConfig();
 $app_config = read_app_config();
 $config = read_global_config();
 
