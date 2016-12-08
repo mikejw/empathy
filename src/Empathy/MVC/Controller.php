@@ -206,7 +206,8 @@ class Controller
         if ($endString != '') {
             $location .= $endString;
         }
-        Testable::header($location);         
+        Testable::header($location);
+        Testable::doDie('');
     }
 
     /**
