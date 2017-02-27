@@ -343,7 +343,7 @@ function main()
     $arguments->addFlag(array('new_app'), 'Create new app.');
     //$arguments->addFlag('version', 'Display the MVC version.');
     $arguments->addOption(array('mysql', 'm'), array(
-                              'default'     => 'dump',
+                              'default'     => null,
                               'description' => 'Perform MySQL operation. Default is database dump.'));
     $arguments->addOption(array('node', 'n'), array(
                               'default'     => null,
@@ -376,11 +376,11 @@ function main()
 
     //echo $arguments->asJSON(); exit();
 
-    if($arguments['help']) {
+    if(isset($arguments['help']) && $arguments['help']) {
         \cli\out_padded($arguments->getHelpScreen());
         \cli\out_padded("\n");
 
-    } elseif (isset($arguments['new_app'])) {
+    } elseif (isset($arguments['new_app']) && $arguments['new_app']) {
         new_app();
 
     } else {
