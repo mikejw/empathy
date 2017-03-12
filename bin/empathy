@@ -230,8 +230,11 @@ function option_misc($action)
 
 function assertConfig()
 {
+    global $app_config;
+
     if (!file_exists('./config.yml')) {
         copy('./config.yml.sample', './config.yml');
+        $app_config = read_app_config();
     }
     if (!file_exists('./public_html/.htaccess')) {
         copy('./public_html/htaccess', './public_html/.htaccess');
@@ -259,7 +262,7 @@ function writeNewHTAccess()
 function option_set_docroot($new)
 {
     assertConfig();
-    global $app_config;    
+    global $app_config;
     $app_config['doc_root'] = $new;
     return write_yaml($app_config, './config.yml');
 }
