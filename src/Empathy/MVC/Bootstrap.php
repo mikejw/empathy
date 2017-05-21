@@ -167,6 +167,7 @@ class Bootstrap
         if ($error > 0 && $controller === null) {
             if ($this->environment == 'prod' || $this->debug_mode == false) {
                 if (
+                    $error == URI::MISSING_CLASS_DEF ||
                     $error == URI::MISSING_EVENT_DEF ||
                     $error == URI::ERROR_404
                 ) {
