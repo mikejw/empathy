@@ -23,7 +23,7 @@ class Bootstrap
      * This is used to store a reference to the controller object
      * which is instatiated before an action can be dispatchted.
      */
-    private $controller = NULL;
+    private $controller = null;
 
     /**
      * Default module read from application config file.
@@ -114,7 +114,7 @@ class Bootstrap
 
 
     /**
-     * Sets local boot options including environment. 
+     * Sets local boot options including environment.
      *
      * @param array $bootOptions boot options config
      * @return null
@@ -123,7 +123,7 @@ class Bootstrap
     {
         if ($bootOptions === null) {
             $bootOptions = Config::get('BOOT_OPTIONS');
-        }    
+        }
         if (isset($bootOptions['default_module'])) {
             $this->defaultModule = $bootOptions['default_module'];
         }
@@ -166,8 +166,7 @@ class Bootstrap
 
         if ($error > 0 && $controller === null) {
             if ($this->environment == 'prod' || $this->debug_mode == false) {
-                if (
-                    $error == URI::MISSING_CLASS_DEF ||
+                if ($error == URI::MISSING_CLASS_DEF ||
                     $error == URI::MISSING_EVENT_DEF ||
                     $error == URI::ERROR_404
                 ) {
@@ -176,7 +175,7 @@ class Bootstrap
             } else {
                 throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
             }
-        }    
+        }
 
         if ($controller === null) {
             $controller_name = $this->uri->getControllerName();
@@ -256,12 +255,12 @@ class Bootstrap
                                 spl_autoload_register(array($p['class_name'], $p['loader']));
                             }
                         }
-                    }                    
-                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name']; 
+                    }
+                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
                     $n = (isset($p['config']))?
                         new $plugin($plugin_manager, $this, $p['config']):
-                        new $plugin($plugin_manager, $this, NULL);
-                    $plugin_manager->register($n);                    
+                        new $plugin($plugin_manager, $this, null);
+                    $plugin_manager->register($n);
                 }
                 $plugin_manager->preDispatch();
             }
@@ -351,7 +350,8 @@ class Bootstrap
      * Get default module.
      *  @return string Module.
      */
-    public function getDefaultModule() {
+    public function getDefaultModule()
+    {
         return $this->defaultModule;
     }
 
@@ -359,7 +359,8 @@ class Bootstrap
      * Get dynamic module.
      * @return string Dynamic module.
      */
-    public function getDynamicModule() {
+    public function getDynamicModule()
+    {
         return $this->dynamicModule;
     }
 }

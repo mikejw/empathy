@@ -2,11 +2,10 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy PluginManager
  * @file            Empathy/MVC/PluginManager.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -73,11 +72,10 @@ class PluginManager
     }
 
     public function getView()
-    {    
+    {
         if (sizeof($this->view_plugins) == 0) {
             throw new \Exception('No plugin loaded for view.');
         } else {
-            
             return $this->view_plugins[0];
         }
     }
@@ -96,5 +94,4 @@ class PluginManager
         }
         return $mode;
     }
-
 }

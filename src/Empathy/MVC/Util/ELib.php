@@ -4,11 +4,10 @@ namespace Empathy\MVC\Util;
 
 use ELib\MVC\Util;
 
-
 /**
  * Empathy ELib Plugin
  * @file            Empathy/MVC/Util/ELib.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *

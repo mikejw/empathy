@@ -7,7 +7,7 @@ use Empathy\MVC\Plugin as Plugin;
 /**
  * Empathy Phirehose Plugin
  * @file            Empathy/MVC/Plugin/Phirehose.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *

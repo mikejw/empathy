@@ -7,7 +7,7 @@ use Empathy\MVC\Plugin as Plugin;
 /**
  * Empathy EForceEndSlash Plugin
  * @file            Empathy/MVC/Plugin/EForceEndSlash.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -19,7 +19,7 @@ class EForceEndSlash extends Plugin implements PreDispatch
 {
    
     public function onPreDispatch()
-    {   
+    {
         // check if target looks life a file first
         $uri_arr = explode('/', $_SERVER['REQUEST_URI']);
         if (!strpos($uri_arr[sizeof($uri_arr)-1], '.')) {

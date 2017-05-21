@@ -2,7 +2,6 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy SectionItemStandAlone class
  * @file            Empathy/MVC/SectionItemStandAlone.php
@@ -99,5 +98,4 @@ class SectionItemStandAlone extends Entity
         }
         return $matched;
     }
-
 }

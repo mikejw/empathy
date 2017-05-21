@@ -7,7 +7,7 @@ use Empathy\MVC\Plugin as Plugin;
 /**
  * Empathy Pheanstalk Plugin
  * @file            Empathy/MVC/Plugin/Pheanstalk.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *

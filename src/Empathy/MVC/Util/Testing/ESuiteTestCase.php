@@ -6,12 +6,10 @@ use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
 use Empathy\MVC\Config as EmpConfig;
 
-
-
 /**
  * Empathy test suite base class
  * @file            Empathy/MVC/Util/Testing/ESuite.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -34,18 +32,19 @@ abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function appRequest($uri, $mode=CLIMode::CAPTURED)
+    protected function appRequest($uri, $mode = CLIMode::CAPTURED)
     {
         if (!isset($this->boot)) {
             throw new \Exception('app not inited.');
         } else {
             CLI::setReqMode($mode);
-            return CLI::request($this->boot, $uri);            
+            return CLI::request($this->boot, $uri);
         }
     }
 
 
-    protected function makeFakeBootstrap($testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY) {
+    protected function makeFakeBootstrap($testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY)
+    {
 
         // use eaa archive as root
         $doc_root = realpath(
@@ -83,7 +82,7 @@ abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
         $this->setConfig('NAME', 'empathytest');
         $this->setConfig('TITLE', 'empathy testing');
         $this->setConfig('DOC_ROOT', $doc_root);
-        $this->setConfig('WEB_ROOT' , 'localhost/empathytest');
+        $this->setConfig('WEB_ROOT', 'localhost/empathytest');
         $this->setConfig('PUBLIC_DIR', '/public_html');
 
 
@@ -94,8 +93,8 @@ abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function setConfig($key, $value) {
+    protected function setConfig($key, $value)
+    {
         EmpConfig::store($key, $value);
     }
-
 }

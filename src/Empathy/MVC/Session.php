@@ -2,11 +2,10 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy Session class
  * @file            Empathy/MVC/Session.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -139,5 +138,4 @@ class Session
     {
         Testable::session_write_close();
     }
-
 }

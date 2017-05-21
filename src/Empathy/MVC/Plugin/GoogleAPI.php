@@ -7,7 +7,7 @@ use Empathy\MVC\Plugin as Plugin;
 /**
  * Empathy GoogleAPI Plugin
  * @file            Empathy/MVC/Plugin/GoogleAPI.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *

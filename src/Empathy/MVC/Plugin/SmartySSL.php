@@ -8,7 +8,7 @@ use Empathy\MVC\Config;
 /**
  * Empathy Smarty Plugin
  * @file            Empathy/MVC/Plugin/Smarty.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -20,7 +20,7 @@ class SmartySSL extends Smarty
 {
 
 
-    public function display($template, $internal=false)
+    public function display($template, $internal = false)
     {
         if ($internal) {
             $this->switchInternal();
@@ -34,5 +34,4 @@ class SmartySSL extends Smarty
             $this->smarty->display($template);
         }
     }
-
 }

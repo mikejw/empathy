@@ -8,7 +8,7 @@ use Empathy\MVC\Config;
 /**
  * Empathy module code generation
  * @file            Empathy/MVC/Util/ModuleGen.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -19,7 +19,7 @@ use Empathy\MVC\Config;
 class ModuleGen
 {
     
-    public static function generate($module, $lib = NULL)
+    public static function generate($module, $lib = null)
     {
         Libs::detect();
         $installed = Libs::getInstalled();
@@ -29,13 +29,11 @@ class ModuleGen
         foreach ($installed as $i) {
             $gen_root = Config::get('DOC_ROOT').'/vendor/'.$i.'/src/Empathy/ELib/Gen';
             if (file_exists($gen_root)) {
-
                 $files = glob($gen_root.'/*.php');
                 foreach ($files as $f) {
                     $matches = array();
                     preg_match('/Gen\/(.+)\.php$/', $f, $matches);
                     $class_list[] = 'Empathy\\ELib\\Gen\\'.$matches[1];
-                    
                 }
             }
         }

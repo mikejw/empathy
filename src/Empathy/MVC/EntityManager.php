@@ -4,7 +4,6 @@ namespace Empathy\MVC;
 
 use Nelmio\Alice\PersisterInterface;
 
-
 /**
  * Empathy EntityManager
  * @package         Empathy
@@ -27,7 +26,6 @@ class EntityManager implements PersisterInterface
     public function persist(array $objects)
     {
         foreach ($objects as $object) {
-
             $object->init();
             foreach ($object->getProperties() as $property) {
                 if (is_object($object->$property)) {

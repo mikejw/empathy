@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC\Util;
+
 use Empathy\MVC\Config;
 
 /**
@@ -44,14 +45,14 @@ ENDBLOB;
     }
 
     public function write()
-    {       
+    {
         $success = false;
         $module = Config::get('DOC_ROOT').'/application/'.$this->module;
-        $controller = $module.'/'.$this->name.'.php'; 
+        $controller = $module.'/'.$this->name.'.php';
         if (!file_exists($module)) {
             mkdir($module);
         }
-        if (!file_exists($controller)) {        
+        if (!file_exists($controller)) {
             $file = sprintf(self::BLOB, $this->name, $this->parent);
             if (file_put_contents($controller, $file)) {
                 $success = true;

@@ -8,7 +8,7 @@ use Empathy\MVC\Plugin as Plugin;
 /**
  * Empathy Smarty Plugin
  * @file            Empathy/MVC/Plugin/Smarty.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -40,7 +40,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
     }
 
-    public function assign($name, $data, $no_array=false)
+    public function assign($name, $data, $no_array = false)
     {
         $this->smarty->assign($name, $data);
     }
@@ -50,7 +50,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template, $internal=false)
+    public function display($template, $internal = false)
     {
         if ($internal) {
             $this->switchInternal();
@@ -85,17 +85,17 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     }
 
     protected function switchInternal()
-    {        
+    {
         $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
     }
 
     public function exception($debug, $exception, $req_error)
     {
-        $this->assign('error', $exception->getMessage());                    
-        if($req_error) {
+        $this->assign('error', $exception->getMessage());
+        if ($req_error) {
              $this->assign('code', $exception->getCode());
              $this->display('elib:/req_error.tpl');
-        } else {            
+        } else {
             $this->display('empathy.tpl', true);
         }
     }
@@ -109,6 +109,4 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     {
         $this->smarty->clear_all_assign();
     }
-
-
 }

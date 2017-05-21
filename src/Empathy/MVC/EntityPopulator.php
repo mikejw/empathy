@@ -5,7 +5,6 @@ namespace Empathy\MVC;
 use Nelmio\Alice\Fixtures\Fixture;
 use Nelmio\Alice\Instances\Populator\Methods\MethodInterface;
 
-
 /**
  * Empathy EntityPopulator
  * @package         Empathy
@@ -26,9 +25,9 @@ class EntityPopulator implements MethodInterface
     
 
     public function canSet(Fixture $fixture, $object, $property, $value)
-    {        
+    {
         return true;
-    }    
+    }
 
 
     public function set(Fixture $fixture, $object, $property, $value)

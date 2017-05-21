@@ -11,14 +11,14 @@ class Testable
 
 
     private static function testMode()
-    {        
+    {
         return (defined('MVC_TEST_MODE') && MVC_TEST_MODE);
     }
 
 
     private static function testModeOutput()
     {
-        return (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON);  
+        return (defined('MVC_TEST_OUTPUT_ON') && MVC_TEST_OUTPUT_ON);
     }
 
 
@@ -29,7 +29,7 @@ class Testable
         }
     }
 
-    public static function doDie($msg='')
+    public static function doDie($msg = '')
     {
         if (self::testMode()) {
             self::output('die: ' . $msg);
@@ -47,7 +47,7 @@ class Testable
             if (sizeof($header_arr)) {
                 $index = $header_arr[0];
                 array_shift($header_arr);
-                if (sizeof($header_arr) == 1 ) {
+                if (sizeof($header_arr) == 1) {
                     $content = $header_arr[0];
                 } else {
                     $content = implode(':', $header_arr);
@@ -100,15 +100,15 @@ class Testable
 
     public static function getHeaders()
     {
-        if (self::testMode()) {            
+        if (self::testMode()) {
             return self::$headers;
         } else {
             if (function_exists('apache_response_headers')) {
-                return apache_response_headers(); 
+                return apache_response_headers();
             } else {
                 $h = array();
                 foreach ($_SERVER as $key => $value) {
-                    if (strpos($key, 'HTTP_') === 0) {                        
+                    if (strpos($key, 'HTTP_') === 0) {
                         $new_key = str_replace(' ', '-', ucwords(str_replace('_', ' ', substr(strtolower($key), 5))));
                         $h[$new_key] = $value;
                     }
@@ -122,5 +122,4 @@ class Testable
     {
         self::$headers = array();
     }
-
 }

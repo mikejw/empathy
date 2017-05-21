@@ -2,7 +2,6 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy Stash class
  * @file            Empathy/MVC/Stash.php

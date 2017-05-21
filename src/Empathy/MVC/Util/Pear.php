@@ -2,11 +2,10 @@
 
 namespace Empathy\MVC\Util;
 
-
 /**
  * Empathy Pear util
  * @file            Empathy/MVC/Util/Pear.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *

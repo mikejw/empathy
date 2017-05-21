@@ -2,7 +2,6 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy URI
  * @file            Empathy/URI.php
@@ -157,10 +156,15 @@ class URI
         
         $temp_uri_string = implode('/', $uri);
         if (preg_match('/[A-Z]/', $temp_uri_string)) {
-            header('Location: http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/'.strtolower($temp_uri_string).$args, true, 301);
+            header(
+                'Location: http://'.Config::get('WEB_ROOT')
+                    .Config::get('PUBLIC_DIR')
+                    .'/'.strtolower($temp_uri_string).$args,
+                true,
+                301
+            );
             exit();
         }
-        
         $this->uri = $uri;
     }
 

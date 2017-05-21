@@ -94,9 +94,9 @@ class Controller
         $this->environment = $boot->getEnvironment();
         $this->stash =  DI::getContainer()->get('Stash');
         $this->connected = false;
-        $this->module = (isset($_GET['module']))? $_GET['module']: NULL;
-        $this->class = (isset($_GET['class']))? $_GET['class']: NULL;
-        $this->event = (isset($_GET['event']))? $_GET['event']: NULL;
+        $this->module = (isset($_GET['module']))? $_GET['module']: null;
+        $this->class = (isset($_GET['class']))? $_GET['class']: null;
+        $this->event = (isset($_GET['event']))? $_GET['event']: null;
         if (Config::get('TPL_BY_CLASS')) {
             $this->templateFile = $this->class.'.tpl';
         } else {
@@ -104,7 +104,7 @@ class Controller
         }
         Session::up();
         $this->presenter = $this->plugin_manager->getView();
-        if ($this->presenter !== NULL) {
+        if ($this->presenter !== null) {
             $this->assignControllerInfo();
             $this->assignConstants();
             $this->assignEnvironment();
@@ -115,7 +115,7 @@ class Controller
 
         // create a plugin for this?
         // taken from mikejw custom controller
-        if($boot->getEnvironment() == 'dev') {
+        if ($boot->getEnvironment() == 'dev') {
             $this->assign('dev_rand', uniqid());
         }
     }
@@ -186,7 +186,7 @@ class Controller
      * @return null
      */
     public function initDisplay($internal)
-    {        
+    {
         $this->presenter->display($this->templateFile, $internal);
     }
 
@@ -199,7 +199,7 @@ class Controller
      */
     public function redirect($endString = '')
     {
-        $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';        
+        $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';
         Session::write();
         $location = 'Location: ';
         $location .= $proto.'://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
@@ -351,7 +351,6 @@ class Controller
     public function viewException($debug, $exception, $req_error)
     {
         $this->presenter->exception($debug, $exception, $req_error);
-
     }
 
     /**
@@ -360,7 +359,7 @@ class Controller
      * @return nulll
      */
     public function setPresenter($view)
-    {       
+    {
         $this->presenter = $view;
     }
 

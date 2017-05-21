@@ -2,7 +2,6 @@
 
 namespace Empathy\MVC;
 
-
 define('MVC_VERSION', '0.9.7');
 
 
@@ -270,7 +269,6 @@ class Empathy
 
         switch (get_class($e)) {
             case 'Empathy\MVC\SafeException':
-                
                 Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
             case 'Empathy\MVC\TestModeException':
@@ -278,7 +276,7 @@ class Empathy
                 break;
             case 'Empathy\MVC\RequestException':
                 $response = '';
-                switch($e->getCode()) {
+                switch ($e->getCode()) {
                     case RequestException::BAD_REQUEST:
                         $response = 'HTTP/1.1 400 Bad Request';
                         $message = 'Bad request';
@@ -303,7 +301,7 @@ class Empathy
      * @param  string $configDir
      * @return void
      */
-    private function loadConfig($configDir, $hard=false)
+    private function loadConfig($configDir, $hard = false)
     {
         $configFile = $configDir.'/config.yml';
         if (!file_exists($configFile)) {
@@ -314,7 +312,6 @@ class Empathy
 
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
-
             // auto fix of doc root
             if (!is_array($item)) {
                 if ($index == 'doc_root') {
@@ -329,7 +326,7 @@ class Empathy
                     define(strtoupper($index), $item);
                 }
             } else {
-                Config::store(strtoupper($index), $item);                
+                Config::store(strtoupper($index), $item);
             }
         }
         if (isset($config['boot_options'])) {
@@ -377,28 +374,31 @@ class Empathy
 
 
     // DI
-    public function init() {
+    public function init()
+    {
 
-        $this->boot = DI::getContainer()->get('Bootstrap'); 
+        $this->boot = DI::getContainer()->get('Bootstrap');
         $this->initPlugins();
         if ($this->persistent_mode !== true) {
             $this->beginDispatch();
         }
     }
 
-    public function getBootOptions() {
+    public function getBootOptions()
+    {
         return $this->bootOptions;
     }
-    public function getPlugins() {
+    public function getPlugins()
+    {
         return $this->plugins;
     }
 
-    public function setBootOptions($options) {
+    public function setBootOptions($options)
+    {
         $this->bootOptions = $options;
     }
-    public function setPlugins($plugins) {
+    public function setPlugins($plugins)
+    {
         $this->plugins = $plugins;
     }
-
-
 }

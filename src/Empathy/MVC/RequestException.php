@@ -5,7 +5,7 @@ namespace Empathy\MVC;
 /**
  * Empathy RequestException class
  * @file            Empathy/MVC/RequestException.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *

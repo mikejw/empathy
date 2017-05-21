@@ -19,7 +19,6 @@
 
 namespace Empathy\MVC\Util;
 
-
 /**
  * Empathy CLI Utility class.
  * Make various requests to the MVC from the command line.
@@ -33,7 +32,7 @@ namespace Empathy\MVC\Util;
 class CLI
 {
 
-    private static $_reqMode = CLIMode::STREAMED;
+    private static $reqMode = CLIMode::STREAMED;
 
 
     /**
@@ -45,7 +44,7 @@ class CLI
      */
     public static function setReqMode($mode)
     {
-        self::$_reqMode = $mode;
+        self::$reqMode = $mode;
     }
 
 
@@ -54,10 +53,9 @@ class CLI
      *
      * @return float microtime
      */
-    private static function _realMicrotime()
+    private static function realMicrotime()
     {
         list($micro, $seconds) = explode(' ', microtime());
-
         return ((float) $micro + (float) $seconds);
     }
 
@@ -66,7 +64,7 @@ class CLI
      *
      * @return void
      */
-    private static function _requestEnd()
+    private static function requestEnd()
     {
         $_GET = array();
         $_POST = array();
@@ -76,50 +74,48 @@ class CLI
      * Performm request to mvc using active method.
      *
      * @param Empathy $e   MVC boot object
-     * @param string  $uri URI of request 
+     * @param string  $uri URI of request
      *
      * @return float/string/Controller
      */
     public static function request($e, $uri)
     {
 
-        switch (self::$_reqMode) {
+        switch (self::$reqMode) {
             case CLIMode::TIMED:
-
-                $t_request_start = self::_realMicrotime();
+                $t_request_start = self::realMicrotime();
                 $_SERVER['REQUEST_URI'] = $uri;
 
                 ob_start();
                 $e->beginDispatch();
-                $t_request_finish = self::_realMicrotime();
+                $t_request_finish = self::realMicrotime();
                 ob_end_clean();
 
                 $t_elapsed = ($t_request_finish - $t_request_start);
                 $t_elapsed = number_format($t_elapsed, 4);
-                self::_requestEnd();
+                self::requestEnd();
 
                 return $t_elapsed;
                 break;
 
             case CLIMode::CAPTURED:
-
                 ob_start();
 
                 $_SERVER['REQUEST_URI'] = $uri;
                 $e->beginDispatch();
                 $response = ob_get_contents();
                 ob_end_clean();
-                self::_requestEnd();
+                self::requestEnd();
 
                 return $response;
                 break;
 
             case CLIMode::FAKED:
                 ob_start();
-                $_SERVER['REQUEST_URI'] = $uri;            
+                $_SERVER['REQUEST_URI'] = $uri;
                 $controller = $e->beginDispatch(true);
                 ob_end_clean();
-                self::_requestEnd();
+                self::requestEnd();
 
                 return $controller;
                 break;

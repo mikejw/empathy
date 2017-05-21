@@ -5,7 +5,7 @@ namespace Empathy\MVC\Plugin;
 /**
  * Empathy PreDispatch interface
  * @file            Empathy/MVC/Plugin/PreDispatch.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *

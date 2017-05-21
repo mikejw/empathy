@@ -5,7 +5,7 @@ namespace Empathy\MVC\Plugin;
 /**
  * Empathy PreEvent interface
  * @file            Empathy/MVC/Plugin/PreEvent.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -17,4 +17,3 @@ interface PreEvent
 {
     public function onPreEvent();
 }
-

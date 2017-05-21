@@ -8,7 +8,7 @@ use Empathy\MVC\Plugin as Plugin;
 /**
  * Empathy EDefault Plugin
  * @file            Empathy/MVC/Plugin/EDefault.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *

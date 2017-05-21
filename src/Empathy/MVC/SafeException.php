@@ -2,11 +2,10 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy SafeException class
  * @file            Empathy/MVC/SafeException.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
@@ -16,5 +15,5 @@ namespace Empathy\MVC;
  */
 class SafeException extends Exception
 {
-	//
+    //
 }

@@ -7,7 +7,7 @@ use Empathy\MVC\Plugin as Plugin;
 /**
  * Empathy FacebookSDK Plugin
  * @file            Empathy/MVC/Plugin/FacebookSDK.php
- * @description     
+ * @description
  * @author          Mike Whiting
  * @license         LGPLv3
  *
