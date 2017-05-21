@@ -13,7 +13,11 @@ namespace Empathy\MVC;
  * (c) copyright Mike Whiting
  * This source file is subject to the LGPLv3 License that is bundled
  * with this source code in the file licence.txt
- * 
+ *
+ * Ensure legacy model classes (that are instantiated directly)
+ * are still initialised properly and connected to database as if they
+ * have been loaded through the Model class.
+ *
  * Usage: Entity requires the following constructor:
  * public function __construct()
  * {
