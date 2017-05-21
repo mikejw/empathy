@@ -71,18 +71,12 @@ class Empathy
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode = null, $system_mode = false)
+    public function __construct($configDir, $persistent_mode = false)
     {
         $this->persistent_mode = $persistent_mode;
-        if ($system_mode) {
-            spl_autoload_register(array($this, 'loadClass'));
-        }
-        $this->loadConfig($configDir);        
-        if ($system_mode) {
-            $this->loadConfig(Util\Pear::getConfigDir().'/Empathy', true);
-        } else {
-            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'), true);
-        }
+        spl_autoload_register(array($this, 'loadClass'));
+        $this->loadConfig($configDir);
+        $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'), true);
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
             self::$use_elib = true;
@@ -351,40 +345,28 @@ class Empathy
      * @param  string $class the name of class that PHP is attempting to load
      * @return void
      */
-    public static function loadClass($class)
-    {       
-        $i = 0;
-        $load_error = 1;
-        $location = array('');
-        if (strpos($class, 'Controller\\')
-           || strpos($class, 'Model\\')) {
-            $class_arr = explode('\\', $class);
-            $class = $class_arr[sizeof($class_arr)-1];
+    public static function loadClass($classPath)
+    {
+        $classNameArr = explode('\\', $classPath);
+        $className = $classNameArr[ sizeof($classNameArr) -1 ];
 
+        $location = '';
+        if (strpos($classPath, 'Empathy\\MVC\\Controller\\') === 0) {
             if (isset($_GET['module'])) {
-                array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
-            }
-            array_push($location, DOC_ROOT.'/storage/');
-        } elseif (strpos($class, 'Empathy') === 0) {
-            $class = str_replace('\\', '/', $class);
-        }
-        array_push($location, DOC_ROOT.'/application/');
-
-        while ($i < sizeof($location) && $load_error == 1) {
-            $class_file = $location[$i].$class.'.php';
-
-            //echo $class_file.'<br />';
-
-            if (@include($class_file)) {
-                $class_file.": 1<br />\n";
-                $load_error = 0;
+                if ($className != 'CustomController') {
+                    $location = Config::get('DOC_ROOT') . '/application/' . $_GET['module'] . '/';
+                }
             } else {
-                $class_file.": 0<br />\n";
+                throw new \Exception('Module not set.');
             }
-            $i++;
+        } elseif (strpos($classPath, 'Empathy\\MVC\\Model\\') === 0) {
+            $location = Config::get('DOC_ROOT').'/storage/';
+        }
+        if (!empty($location)) {
+            $file = $location.$className.'.php';
+            @include($file);
         }
     }
-
 
 
     public function reloadBootOptions()

@@ -16,31 +16,25 @@ namespace Empathy\MVC;
  */
 class URI
 {
-
-    /**
-     * Missing class constant
-     */
-    const MISSING_CLASS = 1;
-
     /**
      * Missing class definition constant
      */
-    const MISSING_CLASS_DEF = 2;
+    const MISSING_CLASS_DEF = 1;
 
     /**
      * Missing event/action definition
      */
-    const MISSING_EVENT_DEF = 3;
+    const MISSING_EVENT_DEF = 2;
 
     /**
      * 404 error contant
      */
-    const ERROR_404 = 4;
+    const ERROR_404 = 3;
 
     /**
      * No template defined constant
      */
-    const NO_TEMPLATE = 5;
+    const NO_TEMPLATE = 4;
 
     /**
      * Max comparisons contant
@@ -55,7 +49,6 @@ class URI
     private $dynamicModule;
     private $error;
     private $internal = false;
-    private $controllerPath = '';
     private $controllerName = '';
     private $cli_mode_detected;
     private $internal_controller = 'empathy';
@@ -85,11 +78,8 @@ class URI
         }
 
         $this->error = 0;
-
         $this->processRequest();
-
         $this->setController();
-
         //$this->printRouting();
     }
 
@@ -119,9 +109,8 @@ class URI
         echo "Module:\t\t\t".$_GET['module']."\n";
         echo "Class:\t\t\t".$_GET['class']."\n";
         echo "Event:\t\t\t".$_GET['event']."\n\n";
-        echo "Controller Path:\t".$this->controllerPath."\n";
         echo "Controller Name:\t".$this->controllerName."\n";
-        echo "Error:\t\t\t".$this->error."\n</pre>";
+        echo "Error:\t\t\t".$this->getErrorMessage()."\n</pre>";
     }
 
     public function processRequest()
@@ -129,7 +118,7 @@ class URI
         if (isset($_GET['module'])) {
             $this->setModule($_GET['module']);
         } elseif ($this->uriString == '') { // || strpos($this->uriString, '.')) {
-            if ($this->defaultModule === NULL) {
+            if ($this->defaultModule === null) {
                 $this->setModule($this->internal_controller);
             } else {
                 $this->setModule($this->defaultModule);
@@ -177,11 +166,8 @@ class URI
 
     public function analyzeURI()
     {
-        $modIndex = 0;
-        $completed = 0;
-        $j = 0;
         $i = 0;
-        $current = '';
+
 
         $length = sizeof($this->uri);
         if ($length > URI::MAX_COMP) {
@@ -198,20 +184,6 @@ class URI
             }
 
             if (!isset($_GET['module'])) {
-                /*
-                  while ($j < sizeof($this->module) && $current != $this->module[$j]) {
-                  $j++;
-                  }
-                  $modIndex = $j;
-
-                  if ($modIndex == sizeof($this->module)) {
-                  $modIndex = DEF_MOD;
-                  $_GET['class'] = $current;
-
-                  $this->error = URI::MISSING_CLASS;
-                  }
-                */
-
                 $this->setModule($current);
                 $i++;
                 continue;
@@ -242,59 +214,41 @@ class URI
         }
     }
 
-    public function setControllerPath()
+    private function buildControllerName($controller)
     {
-        $this->controllerPath = Config::get('DOC_ROOT').'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
+        return 'Empathy\\MVC\\Controller\\'.$controller;
     }
+
 
     // cause of error
     private function setController()
     {
-
-
+        require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
 
         if (!(isset($_GET['class'])) && isset($_GET['module'])) {
             $_GET['class'] = $_GET['module'];
         }
 
-
-
         if (isset($_GET['class'])) {
             $this->controllerName = $_GET['class'];
-            $this->setControllerPath();
         }
 
-
-
-        if (!$this->internal && !is_file($this->controllerPath)) {
+        if (!$this->internal && !class_exists($this->buildControllerName($this->controllerName))) {
             if (isset($_GET['class'])) {
                 $_GET['event'] = $_GET['class'];
             }
-
             // module must be set?
             if (isset($_GET['module'])) {
                 $_GET['class'] = $_GET['module'];
                 $this->controllerName = $_GET['module'];
-                $this->setControllerPath();
-            }
-
-            if (!is_file($this->controllerPath)) {
-                $this->error = URI::MISSING_CLASS;
             }
         }
     
-        $this->controllerName = 'Empathy\\MVC\\Controller\\'.$this->controllerName;
-        require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
+        $this->controllerName = $this->buildControllerName($this->controllerName);
 
         if (!$this->error) {
-    
             if (!class_exists($this->controllerName)) {
-                // try manual include
-                // make sure custom controller has been loaded
-                @include($this->controllerPath);
-                if (!class_exists($this->controllerName)) {
-                    $this->error = URI::MISSING_CLASS_DEF;
-                }
+                $this->error = URI::MISSING_CLASS_DEF;
             }
         }
 
@@ -381,9 +335,6 @@ class URI
     {
         $message = '';
         switch ($this->error) {
-            case URI::MISSING_CLASS:
-                $message = 'Missing class file';
-                break;
             case URI::MISSING_CLASS_DEF:
                 $message = 'Missing or incorrect class definition';
                 break;

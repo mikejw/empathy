@@ -54,7 +54,7 @@ class Bootstrap
 
     /**
      * This property contains a data structure
-     * that contains the descrition of plugins to be initialized.
+     * that contains the description of plugins to be initialized.
      * Read from the application config.
      */
     private $plugins;
@@ -158,7 +158,7 @@ class Bootstrap
 
         $error = $this->uri->getError();
 
-        if ($error == URI::MISSING_CLASS
+        if ($error == URI::MISSING_CLASS_DEF
            && isset($this->dynamicModule)
            && $this->dynamicModule != '') {
             $error = $this->uri->dynamicSection();
@@ -166,7 +166,7 @@ class Bootstrap
 
         if ($error > 0 && $controller === null) {
             if ($this->environment == 'prod' || $this->debug_mode == false) {
-                if ($error == URI::MISSING_CLASS ||
+                if (
                     $error == URI::MISSING_EVENT_DEF ||
                     $error == URI::ERROR_404
                 ) {
