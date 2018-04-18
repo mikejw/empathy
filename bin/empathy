@@ -253,8 +253,8 @@ function writeNewHTAccess()
         $ht_base = '';
     }
     $ht_base .= implode('/', $web_arr).$app_config['public_dir'].'/';
-
-    $exec = "sed -i '/^RewriteBase/c ". 'RewriteBase '.$ht_base."' ./public_html/.htaccess";
+    $ht_base = preg_replace('/\//', '\\/', $ht_base);
+    $exec = "sed -i '' 's/^RewriteBase.*/".'RewriteBase '.$ht_base."/g' ./public_html/.htaccess";
     execute($exec);
 }
 
