@@ -65,7 +65,7 @@ function write_yaml($data, $file)
     $rtnd = false;
     if(file_exists($file)) {
         $s = new \spyc();
-        $rtnd = file_put_contents($file, $s->YAMLDump($data, 4, 60));
+        $rtnd = file_put_contents($file, $s->YAMLDump($data, 2, 60));
     }
     return $rtnd;   
 }
