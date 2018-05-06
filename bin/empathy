@@ -420,7 +420,9 @@ function main()
             'mysql', 'node', 'misc',
             'inst_mod', 'set_docroot',
             'set_webroot', 'set_publicdir',
-            'set_dbuser', 'set_dbpass', 'set_elib'
+            'set_dbuser', 'set_dbpass',
+            'set_dbname', 'set_dbserver',
+            'set_elib'
         );
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {
