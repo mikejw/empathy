@@ -281,6 +281,18 @@ function option_set_webroot($new)
     return write_yaml($app_config, './config.yml');
 }
 
+/* db server/host
+ *
+ */
+function option_set_dbserver($new)
+{
+    assertConfig();
+    global $app_config;
+    $app_config['db_server'] = $new;
+    writeNewHTAccess();
+    return write_yaml($app_config, './config.yml');
+}
+
 /* public dir expected to begin
  * with '/'. e.g. '/public_html'
  *
@@ -372,6 +384,9 @@ function main()
     $arguments->addOption('set_dbpass', array(
                               'default'     => null,
                               'description' => 'Set the db password.'));
+    $arguments->addOption('set_dbserver', array(
+                              'default'     => null,
+                              'description' => 'Set the db host.'));
     $arguments->addOption('set_elib', array(                              
                               'description' => 'Enable elib.'));
 
