@@ -289,7 +289,6 @@ function option_set_dbserver($new)
     assertConfig();
     global $app_config;
     $app_config['db_server'] = $new;
-    writeNewHTAccess();
     return write_yaml($app_config, './config.yml');
 }
 
