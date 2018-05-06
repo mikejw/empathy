@@ -293,6 +293,17 @@ function option_set_dbserver($new)
     return write_yaml($app_config, './config.yml');
 }
 
+/**
+ * set db name
+ */
+function option_set_dbname($new)
+{
+    assertConfig();
+    global $app_config;
+    $app_config['db_name'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
 /* public dir expected to begin
  * with '/'. e.g. '/public_html'
  *
@@ -387,6 +398,9 @@ function main()
     $arguments->addOption('set_dbserver', array(
                               'default'     => null,
                               'description' => 'Set the db host.'));
+    $arguments->addOption('set_dbname', array(
+                              'default'     => null,
+                              'description' => 'Set the db name.'));
     $arguments->addOption('set_elib', array(                              
                               'description' => 'Enable elib.'));
 
