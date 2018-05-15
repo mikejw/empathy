@@ -65,7 +65,7 @@ function write_yaml($data, $file)
     $rtnd = false;
     if(file_exists($file)) {
         $s = new \spyc();
-        $rtnd = file_put_contents($file, $s->YAMLDump($data, 4, 60));
+        $rtnd = file_put_contents($file, $s->YAMLDump($data, 2, 60));
     }
     return $rtnd;   
 }
@@ -254,7 +254,7 @@ function writeNewHTAccess()
     }
     $ht_base .= implode('/', $web_arr).$app_config['public_dir'].'/';
     $ht_base = preg_replace('/\//', '\\/', $ht_base);
-    $exec = "sed -i '' 's/^RewriteBase.*/".'RewriteBase '.$ht_base."/g' ./public_html/.htaccess";
+    $exec = "sed -i.bak 's/^RewriteBase.*/".'RewriteBase '.$ht_base."/g' ./public_html/.htaccess";
     execute($exec);
 }
 
@@ -278,6 +278,28 @@ function option_set_webroot($new)
     global $app_config;    
     $app_config['web_root'] = $new;
     writeNewHTAccess();
+    return write_yaml($app_config, './config.yml');
+}
+
+/* db server/host
+ *
+ */
+function option_set_dbserver($new)
+{
+    assertConfig();
+    global $app_config;
+    $app_config['db_server'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+/**
+ * set db name
+ */
+function option_set_dbname($new)
+{
+    assertConfig();
+    global $app_config;
+    $app_config['db_name'] = $new;
     return write_yaml($app_config, './config.yml');
 }
 
@@ -372,6 +394,12 @@ function main()
     $arguments->addOption('set_dbpass', array(
                               'default'     => null,
                               'description' => 'Set the db password.'));
+    $arguments->addOption('set_dbserver', array(
+                              'default'     => null,
+                              'description' => 'Set the db host.'));
+    $arguments->addOption('set_dbname', array(
+                              'default'     => null,
+                              'description' => 'Set the db name.'));
     $arguments->addOption('set_elib', array(                              
                               'description' => 'Enable elib.'));
 
@@ -391,7 +419,9 @@ function main()
             'mysql', 'node', 'misc',
             'inst_mod', 'set_docroot',
             'set_webroot', 'set_publicdir',
-            'set_dbuser', 'set_dbpass', 'set_elib'
+            'set_dbuser', 'set_dbpass',
+            'set_dbname', 'set_dbserver',
+            'set_elib'
         );
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {

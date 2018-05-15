@@ -56,7 +56,8 @@ namespace Empathy\MVC\Plugin {
                 if (Config::get('DB_SERVER') === false) {
                     throw new \Empathy\MVC\Exception('Database server is not defined in config.');
                 }
-                if (!$this->isIP(Config::get('DB_SERVER'))) {
+                // disable IP check
+                if (false && !$this->isIP(Config::get('DB_SERVER'))) {
                     throw new \Empathy\MVC\Exception('Database server must be an IP address.');
                 }
                 $dsn = $dbms.':host='.Config::get('DB_SERVER').';dbname='.Config::get('DB_NAME').';';
