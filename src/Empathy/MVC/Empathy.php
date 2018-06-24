@@ -260,7 +260,7 @@ class Empathy
             if ($this->boot->getDebugMode()) {
                 $message = $e->getMessage();
             }
-            $e = new RequestException($message, RequestException::BAD_REQUEST);
+            $e = new RequestException($message, RequestException::INTERNAL_ERROR);
         }
 
         // force safe exception
@@ -283,6 +283,9 @@ class Empathy
                         break;
                     case RequestException::NOT_FOUND:
                         $response = 'HTTP/1.0 404 Not Found';
+                        break;
+                    case RequestException::INTERNAL_ERROR:
+                        $response = 'HTTP/1.0 500 Internal Server Error';
                         break;
                     default:
                         break;
