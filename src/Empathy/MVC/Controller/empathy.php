@@ -11,6 +11,10 @@
 
 namespace Empathy\MVC\Controller;
 
+use Empathy\MVC\Config;
+use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
+
 /**
  * Default controller that reveals info about Empathy
  *
@@ -27,5 +31,22 @@ class empathy extends CustomController
     public function default_event()
     {
         $this->assign('about', true);
+    }
+
+    /**
+     * Default controller event.
+     * @return null
+     */
+    public function status()
+    {
+    	$status = 'Unknown';
+    	if (Config::get('DB_NAME') !== false) {
+	    	$e = new Entity();
+    		$model = Model::connectModel($e);
+    		$status = 'Ok';
+    	} else {
+    		$status = 'Ok';
+    	}
+    	$this->assign('status', $status);
     }
 }
