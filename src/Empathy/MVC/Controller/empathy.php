@@ -43,9 +43,9 @@ class empathy extends CustomController
     	if (Config::get('DB_NAME') !== false) {
 	    	$e = new Entity();
     		$model = Model::connectModel($e);
-    		$status = 'Ok';
+    		$status = 'OK';
     	} else {
-    		$status = 'Ok';
+    		$status = 'OK';
     	}
     	$this->assign('status', $status);
     }
