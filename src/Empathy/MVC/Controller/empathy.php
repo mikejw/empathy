@@ -11,6 +11,7 @@
 
 namespace Empathy\MVC\Controller;
 
+use Empathy\MVC\Controller as BaseController;
 use Empathy\MVC\Config;
 use Empathy\MVC\Entity;
 use Empathy\MVC\Model;
@@ -20,10 +21,8 @@ use Empathy\MVC\Model;
  *
  * @author Mike Whiting mike@ai-em.net
  */
-class empathy extends CustomController
+class empathy extends BaseController
 {
-
-
     /**
      * Default controller event.
      * @return null
