@@ -362,7 +362,7 @@ class Empathy
         } elseif (strpos($classPath, 'Empathy\\MVC\\Model\\') === 0) {
             $location = Config::get('DOC_ROOT').'/storage/';
         }
-        if (!empty($location) && file_exists($location.$className.'.php') {
+        if (!empty($location) && file_exists($location.$className.'.php')) {
             $file = $location.$className.'.php';
             include($file);
         }
