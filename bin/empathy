@@ -342,6 +342,18 @@ function option_set_elib()
 }
 
 
+function option_set_https()
+{
+    assertConfig();
+    global $app_config;
+    $app_config['force_secure'] = true;
+    $app_config['plugins']['SmartySSL'] = $app_config['plugins']['Smarty'];
+    unset($app_config['plugins']['Smarty']);
+
+    return write_yaml($app_config, './config.yml');
+}
+
+
 
 function boot()
 {
@@ -402,6 +414,8 @@ function main()
                               'description' => 'Set the db name.'));
     $arguments->addOption('set_elib', array(                              
                               'description' => 'Enable elib.'));
+    $arguments->addOption('set_https', array(
+                              'description' => 'Enable SSL.'));
 
     $arguments->parse();
 
@@ -421,7 +435,7 @@ function main()
             'set_webroot', 'set_publicdir',
             'set_dbuser', 'set_dbpass',
             'set_dbname', 'set_dbserver',
-            'set_elib'
+            'set_elib', 'set_https'
         );
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {
