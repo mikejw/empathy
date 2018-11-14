@@ -347,9 +347,12 @@ function option_set_https()
     assertConfig();
     global $app_config;
     $app_config['force_secure'] = true;
-    $app_config['plugins']['SmartySSL'] = $app_config['plugins']['Smarty'];
-    unset($app_config['plugins']['Smarty']);
-
+    foreach ($app_config['plugins'] as $index => &$item) {
+        if ($item['name'] === "Smarty") {
+            $item['name'] = 'SmartySSL';
+            break;
+        }
+    }
     return write_yaml($app_config, './config.yml');
 }
 
