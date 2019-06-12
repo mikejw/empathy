@@ -36,8 +36,8 @@ aims to have the following properties:
 
 Licence
 ---
-Please see `licences.txt` for licence information.
-NB: this software is and has alsway been under the GNU LGPL v3.
+This software is and has always been under GNU LGPL v3.
+Please see `LICENSE` for more information.
 
 
 On Gitter
