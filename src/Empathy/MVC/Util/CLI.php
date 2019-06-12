@@ -10,7 +10,7 @@
  *
  * @category  Framework
  * @package   Empathy
- * @author    Mike Whiting <mail@mikejw.co.uk>
+ * @author    Mike Whiting <mikejw3@gmail.com>
  * @copyright 2008-2015 Mike Whiting
  * @license   http://www.gnu.org/licenses/gpl-3.0-standalone.html LGPL v3.0
  * @link      http://empathyphp.co.uk
@@ -25,7 +25,7 @@ namespace Empathy\MVC\Util;
  *
  * @category Framework
  * @package  Empathy
- * @author   Mike Whiting <mail@mikejw.co.uk>
+ * @author   Mike Whiting <mmikejw3@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-3.0-standalone.html LGPL v3.0
  * @link     http://empathyphp.co.uk
  */
