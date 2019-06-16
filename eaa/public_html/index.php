@@ -1,6 +1,6 @@
 <?php
 
-// Copyright 2008-2015 Mike Whiting (mail@mikejw.co.uk).
+// Copyright 2008-2015 Mike Whiting (mikejw3@gmail.com).
 // This file is part of the Empathy MVC framework.
 
 // Empathy is free software: you can redistribute it and/or modify
@@ -20,5 +20,7 @@ if(false == @include('../vendor/autoload.php')) {
     
     include('./site_down.html');
 } else {
-    $boot = new Empathy\MVC\Empathy(realpath(dirname(__FILE__).'/../'));
+    $container = Empathy\MVC\DI::init(realpath(dirname(__FILE__).'/../'));
+	$empathy = $container->get('Empathy');
+	$empathy->init();
 }

@@ -1,0 +1,18 @@
+
+
+ESuite\FakeEntity:
+  fakeentity{1..10}:
+    name: <firstName()>
+    age: <randomDigit()>
+    stamp: 'MYSQLTIME'
+    empty: <randomDigit()>
+    foo: 'DEFAULT'
+
+
+ESuite\FakeRelatedEntity:
+  fakerelated{1..10}:
+    fake_id: "@fakeentity<current()>"
+    name: <firstName()>
+
+
+

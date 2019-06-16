@@ -1,5 +1,6 @@
+#!/usr/bin/env php
 <?php
-// Copyright 2008-2015 Mike Whiting (mail@mikejw.co.uk).
+// Copyright 2008-2015 Mike Whiting (mikejw3@gmail.com).
 // This file is part of the Empathy MVC framework.
 
 // Empathy is free software: you can redistribute it and/or modify
@@ -58,6 +59,17 @@ function read_yaml($file)
     }
     return $rtnd;
 }
+
+function write_yaml($data, $file)
+{
+    $rtnd = false;
+    if(file_exists($file)) {
+        $s = new \spyc();
+        $rtnd = file_put_contents($file, $s->YAMLDump($data, 2, 60));
+    }
+    return $rtnd;   
+}
+
 
 function read_app_config()
 {
@@ -142,20 +154,20 @@ function option_mysql($action)
 
     switch($action){
         case 'setup':
-            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' < setup.sql');
-            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' < inserts.sql');   
+            execute($config['mysql'].' -u root -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' < setup.sql');
+            execute($config['mysql'].' -u root -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' < inserts.sql');   
             break;
         case 'dump':
             \cli\out_padded("Performing dump...");
-            execute($config['mysql_dump'].' -u root --password='.$app_config['db_pass']
+            execute($config['mysql_dump'].' -u root -h '.$app_config['db_server'].' --password='.$app_config['db_pass']
                 .' --no-create-info --complete-insert '.$app_config['db_name'].' > dump.sql');
             break;
         case 'populate':
-            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' < setup.sql');
-            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' '.$app_config['db_name'].' < dump.sql');
+            execute($config['mysql'].' -u root -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' < setup.sql');
+            execute($config['mysql'].' -u root -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' '.$app_config['db_name'].' < dump.sql');
             break;
         case 'extra':
-            execute($config['mysql'].' -u root --password='.$app_config['db_pass'].' < extra.sql');
+            execute($config['mysql'].' -u root -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' < extra.sql');
             break;
         default:
             invalid_action();
@@ -215,11 +227,143 @@ function option_misc($action)
 
 }
 
+
+function assertConfig()
+{
+    global $app_config;
+
+    if (!file_exists('./config.yml')) {
+        copy('./config.yml.sample', './config.yml');
+        $app_config = read_app_config();
+    }
+    if (!file_exists('./public_html/.htaccess')) {
+        copy('./public_html/htaccess', './public_html/.htaccess');
+    }
+}
+
+function writeNewHTAccess()
+{
+    global $app_config;
+    $web_arr = explode('/', $app_config['web_root']);
+    array_shift($web_arr);
+
+    if (sizeof($web_arr) > 0) {
+        $ht_base = '/';
+    } else {
+        $ht_base = '';
+    }
+    $ht_base .= implode('/', $web_arr).$app_config['public_dir'].'/';
+    $ht_base = preg_replace('/\//', '\\/', $ht_base);
+    $exec = "sed -i.bak 's/^RewriteBase.*/".'RewriteBase '.$ht_base."/g' ./public_html/.htaccess";
+    execute($exec);
+}
+
+
+function option_set_docroot($new)
+{
+    assertConfig();
+    global $app_config;
+    $app_config['doc_root'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+
+/* web root expected to begin with host
+ * name or domain and not end in '/'
+ *
+ */
+function option_set_webroot($new)
+{
+    assertConfig();
+    global $app_config;    
+    $app_config['web_root'] = $new;
+    writeNewHTAccess();
+    return write_yaml($app_config, './config.yml');
+}
+
+/* db server/host
+ *
+ */
+function option_set_dbserver($new)
+{
+    assertConfig();
+    global $app_config;
+    $app_config['db_server'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+/**
+ * set db name
+ */
+function option_set_dbname($new)
+{
+    assertConfig();
+    global $app_config;
+    $app_config['db_name'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+/* public dir expected to begin
+ * with '/'. e.g. '/public_html'
+ *
+ */
+function option_set_publicdir($new)
+{
+    assertConfig();
+    global $app_config;    
+    $app_config['public_dir'] = $new;
+    writeNewHTAccess();
+    return write_yaml($app_config, './config.yml');
+}
+
+
+function option_set_dbuser($new)
+{
+    assertConfig();
+    global $app_config;    
+    $app_config['db_user'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+function option_set_dbpass($new)
+{
+    assertConfig();
+    global $app_config;    
+    $app_config['db_pass'] = $new;
+    return write_yaml($app_config, './config.yml');
+}
+
+function option_set_elib()
+{
+    assertConfig();
+    global $app_config;    
+    $app_config['boot_options']['use_elib'] = true;
+    return write_yaml($app_config, './config.yml');
+}
+
+
+function option_set_https()
+{
+    assertConfig();
+    global $app_config;
+    $app_config['force_secure'] = true;
+    foreach ($app_config['plugins'] as $index => &$item) {
+        if ($item['name'] === "Smarty") {
+            $item['name'] = 'SmartySSL';
+            break;
+        }
+    }
+    return write_yaml($app_config, './config.yml');
+}
+
+
+
 function boot()
 {
-    \Empathy\MVC\Util\Lib::addToIncludePath(getcwd().'/../libs');
-    //class R extends RedBean_Facade{}
-    return new Empathy\MVC\Empathy(getcwd().'/', true);
+    $container = Empathy\MVC\DI::init(getcwd().'/', true);
+    $empathy = $container->get('Empathy');
+    $empathy->init();
+    return $empathy;
 }
 
 
@@ -239,7 +383,7 @@ function main()
     $arguments->addFlag(array('new_app'), 'Create new app.');
     //$arguments->addFlag('version', 'Display the MVC version.');
     $arguments->addOption(array('mysql', 'm'), array(
-                              'default'     => 'dump',
+                              'default'     => null,
                               'description' => 'Perform MySQL operation. Default is database dump.'));
     $arguments->addOption(array('node', 'n'), array(
                               'default'     => null,
@@ -250,19 +394,52 @@ function main()
     $arguments->addOption('inst_mod', array(
                               'default'     => null,
                               'description' => 'Install/generate application extension module.'));
+    $arguments->addOption('set_docroot', array(
+                              'default'     => null,
+                              'description' => 'Set the document root app-wide.'));
+    $arguments->addOption('set_webroot', array(
+                              'default'     => null,
+                              'description' => 'Set the web root app-wide.'));
+    $arguments->addOption('set_publicdir', array(
+                              'default'     => null,
+                              'description' => 'Set the public dir app-wide.'));
+    $arguments->addOption('set_dbuser', array(
+                              'default'     => null,
+                              'description' => 'Set the db name.'));
+    $arguments->addOption('set_dbpass', array(
+                              'default'     => null,
+                              'description' => 'Set the db password.'));
+    $arguments->addOption('set_dbserver', array(
+                              'default'     => null,
+                              'description' => 'Set the db host.'));
+    $arguments->addOption('set_dbname', array(
+                              'default'     => null,
+                              'description' => 'Set the db name.'));
+    $arguments->addOption('set_elib', array(                              
+                              'description' => 'Enable elib.'));
+    $arguments->addOption('set_https', array(
+                              'description' => 'Enable SSL.'));
+
     $arguments->parse();
 
     //echo $arguments->asJSON(); exit();
 
-    if($arguments['help']) {
+    if(isset($arguments['help']) && $arguments['help']) {
         \cli\out_padded($arguments->getHelpScreen());
         \cli\out_padded("\n");
 
-    } elseif (isset($arguments['new_app'])) {
+    } elseif (isset($arguments['new_app']) && $arguments['new_app']) {
         new_app();
 
     } else {
-        $valid_options = array('mysql', 'node', 'misc', 'inst_mod');
+        $valid_options = array(
+            'mysql', 'node', 'misc',
+            'inst_mod', 'set_docroot',
+            'set_webroot', 'set_publicdir',
+            'set_dbuser', 'set_dbpass',
+            'set_dbname', 'set_dbserver',
+            'set_elib', 'set_https'
+        );
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {
                 $func = 'option_'.$o;

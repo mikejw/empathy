@@ -2,16 +2,15 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy Session class
  * @file            Empathy/MVC/Session.php
- * @description     
+ * @description
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Session
@@ -30,14 +29,14 @@ class Session
 
     public static function up()
     {
-        if (!defined('NAME')) {
+        if (empty($name = Config::get('NAME'))) {
             self::$app = 'unnamed';
         } else {
-            self::$app = NAME;
+            self::$app = $name;
         }
 
         if (self::$up === false) {
-            @session_start();
+            Testable::session_start();
             if (!isset($_SESSION['app']) ||
                !isset($_SESSION['app'][self::$app])) {
                 $_SESSION['app'][self::$app] = array();
@@ -50,7 +49,9 @@ class Session
     public static function getNewApp()
     {
         $new_app = false;
-        if (sizeof($_SESSION['app'][self::$app]) > 0) {
+        if (isset($_SESSION['app'][self::$app]) &&
+            sizeof($_SESSION['app'][self::$app]) > 0
+        ) {
             $new_app = true;
         }
 
@@ -64,9 +65,6 @@ class Session
 
     public static function getUISetting($ui, $setting)
     {
-
-        //    echo $_SESSION['app'][self::$app][$ui][$setting];
-
         if (isset($_SESSION['app'][self::$app][$ui][$setting])) {
             return $_SESSION['app'][self::$app][$ui][$setting];
         } else {
@@ -82,8 +80,8 @@ class Session
         // main logic
         unset($_SESSION['app'][self::$app]);
         if (sizeof($_SESSION['app']) == 0) {
-            session_unset();
-            session_destroy();
+            Testable::session_unset();
+            Testable::session_destroy();
         }
 
         // backwards compatibility
@@ -115,7 +113,8 @@ class Session
         unset($_SESSION['app'][self::$app][$key]);
     }
 
-    // taken from controller
+    
+    
     public static function loadUIVars($ui, $ui_array)
     {
         $new_app = self::getNewApp();
@@ -132,5 +131,11 @@ class Session
                 $_GET[$setting] = $_SESSION[$ui][$setting];
             }
         }
+    }
+
+
+    public static function write()
+    {
+        Testable::session_write_close();
     }
 }

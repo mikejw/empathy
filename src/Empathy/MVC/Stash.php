@@ -2,16 +2,15 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy Stash class
  * @file            Empathy/MVC/Stash.php
  * @description     Global key/value store.
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Stash

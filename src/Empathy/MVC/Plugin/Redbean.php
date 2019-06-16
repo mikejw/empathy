@@ -2,40 +2,40 @@
 
 
 namespace {
-    class R extends RedBeanPHP\Facade{} 
+
+    class R extends RedBeanPHP\Facade
+    {
+    }
 }
 
 namespace Empathy\MVC\Plugin {
 
+    use Empathy\MVC\Config;
+
     /**
      * Empathy Redbean Plugin
      * @file            Empathy/MVC/Plugin/Redbean.php
-     * @description     
+     * @description
      * @author          Mike Whiting
-     * @license         LGPLv3
+     * @license         See LICENCE
      *
      * (c) copyright Mike Whiting
-     * This source file is subject to the LGPLv3 License that is bundled
+
      * with this source code in the file licence.txt
      */
     class Redbean extends \Empathy\MVC\Plugin implements PreDispatch
-    {    
-        public function __construct()
-        {
-            //
-        }
+    {
         
         private function isIP($server)
         {
             $ip = false;
             $count = 0;
-            $stripped = str_replace('.', '', DB_SERVER, $count);
+            $stripped = str_replace('.', '', Config::get('DB_SERVER'), $count);
             if ($count) {
                 if (is_numeric($stripped)) {
                     $ip = true;
                 }
             }
-            
             return $ip;
         }
         
@@ -53,18 +53,20 @@ namespace Empathy\MVC\Plugin {
                 }
                 \R::setup('sqlite:'.$db);
             } else {
-
-                if (!defined('DB_SERVER')) {
+                if (Config::get('DB_SERVER') === false) {
                     throw new \Empathy\MVC\Exception('Database server is not defined in config.');
                 }
-                if (!$this->isIP(DB_SERVER)) {
+                // disable IP check
+                if (false && !$this->isIP(Config::get('DB_SERVER'))) {
                     throw new \Empathy\MVC\Exception('Database server must be an IP address.');
                 }
-                $dsn = $dbms.':host='.DB_SERVER.';dbname='.DB_NAME.';';
-                if(defined('DB_PORT') && is_numeric(DB_PORT)) {
-                    $dsn .= 'port='.DB_PORT.';';
-                }                    
-                \R::setup($dsn, DB_USER, DB_PASS);                
+                $dsn = $dbms.':host='.Config::get('DB_SERVER').';dbname='.Config::get('DB_NAME').';';
+
+                $db_port = Config::get('DB_PORT');
+                if (is_numeric($db_port)) {
+                    $dsn .= 'port='.$db_port.';';
+                }
+                \R::setup($dsn, Config::get('DB_USER'), Config::get('DB_PASS'));
             }
         }
     }

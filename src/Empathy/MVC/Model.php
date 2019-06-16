@@ -2,26 +2,27 @@
 
 namespace Empathy\MVC;
 
+use Empathy\MVC\Config;
 
 /**
  * Empathy model class
  * @file            Empathy/MVC/Model.php
- * @description     
+ * @description
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Model
 {
     protected static $db_handle = null;
 
-    protected static function connectModel($model, $host)
+    public static function connectModel($model, $host = null)
     {
-        // cached handle is not null
-        // and new host is null
+        // cached handle is not NULL
+        // and new host is NULL
         // use cached
         if (self::$db_handle !== null && $host === null) {
             $model->setDBH(self::$db_handle);
@@ -30,27 +31,25 @@ class Model
             $dbh = DBPool::getConnection($host);
             $model->setDBH($dbh);
         } elseif (self::$db_handle == null && $host == null) {
-            // db_handle is null and host is null
+            // db_handle is NULL and host is NULL
             // (initiate default)
             $handle = DBPool::getDefCX();
             $model->setDBH($handle);
             self::$db_handle = $handle;
         }
-
     }
 
     public static function load($model, $id = null, $params = array(), $host = null)
     {
         if (class_exists($model)) {
             $storage_object = new $model($params);
-
         } else {
             $class = '\Empathy\\MVC\\Model\\'.$model;
             // manually add entity class
             // (for cases when not in 'system-mode' and this code lies outside
             // the reach of the composer autoload
             $file = $model.'.php';
-            require_once(DOC_ROOT.'/storage/'.$file);
+            require_once(Config::get('DOC_ROOT').'/storage/'.$file);
 
             $reflect  = new \ReflectionClass($class);
             $storage_object = $reflect->newInstanceArgs($params);

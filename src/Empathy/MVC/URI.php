@@ -7,39 +7,33 @@ namespace Empathy\MVC;
  * @file            Empathy/URI.php
  * @description     Analyize URI and determine route to appliction module, controller class and event/action.
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class URI
 {
-
-    /**
-     * Missing class constant
-     */
-    const MISSING_CLASS = 1;
-
     /**
      * Missing class definition constant
      */
-    const MISSING_CLASS_DEF = 2;
+    const MISSING_CLASS_DEF = 1;
 
     /**
      * Missing event/action definition
      */
-    const MISSING_EVENT_DEF = 3;
+    const MISSING_EVENT_DEF = 2;
 
     /**
      * 404 error contant
      */
-    const ERROR_404 = 4;
+    const ERROR_404 = 3;
 
     /**
      * No template defined constant
      */
-    const NO_TEMPLATE = 5;
+    const NO_TEMPLATE = 4;
 
     /**
      * Max comparisons contant
@@ -54,20 +48,21 @@ class URI
     private $dynamicModule;
     private $error;
     private $internal = false;
-    private $controllerPath = '';
     private $controllerName = '';
     private $cli_mode_detected;
     private $internal_controller = 'empathy';
 
     public function __construct($default_module, $dynamic_module)
     {
-        if (isset($_SERVER['HTTP_HOST']) && strpos(WEB_ROOT, $_SERVER['HTTP_HOST']) === false) {
+
+
+        if (isset($_SERVER['HTTP_HOST']) && strpos(Config::get('WEB_ROOT'), $_SERVER['HTTP_HOST']) === false) {
             throw new SafeException('Host name mismatch.');
         }
 
         $this->cli_mode_detected = false;
         $this->sanity($default_module);
-        $removeLength = strlen(WEB_ROOT.PUBLIC_DIR);
+        $removeLength = strlen(Config::get('WEB_ROOT').Config::get('PUBLIC_DIR'));
         $this->defaultModule = $default_module;
         $this->dynamicModule = $dynamic_module;
         if (isset($_SERVER['HTTP_HOST'])) {
@@ -113,9 +108,8 @@ class URI
         echo "Module:\t\t\t".$_GET['module']."\n";
         echo "Class:\t\t\t".$_GET['class']."\n";
         echo "Event:\t\t\t".$_GET['event']."\n\n";
-        echo "Controller Path:\t".$this->controllerPath."\n";
         echo "Controller Name:\t".$this->controllerName."\n";
-        echo "Error:\t\t\t".$this->error."\n</pre>";
+        echo "Error:\t\t\t".$this->getErrorMessage()."\n</pre>";
     }
 
     public function processRequest()
@@ -162,20 +156,22 @@ class URI
         
         $temp_uri_string = implode('/', $uri);
         if (preg_match('/[A-Z]/', $temp_uri_string)) {
-            header('Location: http://'.WEB_ROOT.PUBLIC_DIR.'/'.strtolower($temp_uri_string).$args, true, 301);
+            header(
+                'Location: http://'.Config::get('WEB_ROOT')
+                    .Config::get('PUBLIC_DIR')
+                    .'/'.strtolower($temp_uri_string).$args,
+                true,
+                301
+            );
             exit();
         }
-        
         $this->uri = $uri;
     }
 
     public function analyzeURI()
     {
-        $modIndex = 0;
-        $completed = 0;
-        $j = 0;
         $i = 0;
-        $current = '';
+
 
         $length = sizeof($this->uri);
         if ($length > URI::MAX_COMP) {
@@ -192,20 +188,6 @@ class URI
             }
 
             if (!isset($_GET['module'])) {
-                /*
-                  while ($j < sizeof($this->module) && $current != $this->module[$j]) {
-                  $j++;
-                  }
-                  $modIndex = $j;
-
-                  if ($modIndex == sizeof($this->module)) {
-                  $modIndex = DEF_MOD;
-                  $_GET['class'] = $current;
-
-                  $this->error = URI::MISSING_CLASS;
-                  }
-                */
-
                 $this->setModule($current);
                 $i++;
                 continue;
@@ -236,50 +218,41 @@ class URI
         }
     }
 
-    public function setControllerPath()
+    private function buildControllerName($controller)
     {
-        $this->controllerPath = DOC_ROOT.'/application/'.$_GET['module'].'/'.$_GET['class'].'.php';
+        return 'Empathy\\MVC\\Controller\\'.$controller;
     }
+
 
     // cause of error
     private function setController()
     {
+        require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
+
         if (!(isset($_GET['class'])) && isset($_GET['module'])) {
             $_GET['class'] = $_GET['module'];
         }
 
         if (isset($_GET['class'])) {
             $this->controllerName = $_GET['class'];
-            $this->setControllerPath();
         }
 
-        if (!$this->internal && !is_file($this->controllerPath)) {
+        if (!$this->internal && !class_exists($this->buildControllerName($this->controllerName))) {
             if (isset($_GET['class'])) {
                 $_GET['event'] = $_GET['class'];
             }
-
             // module must be set?
             if (isset($_GET['module'])) {
                 $_GET['class'] = $_GET['module'];
                 $this->controllerName = $_GET['module'];
-                $this->setControllerPath();
-            }
-
-            if (!is_file($this->controllerPath)) {
-                $this->error = URI::MISSING_CLASS;
             }
         }
-        $this->controllerName = 'Empathy\\MVC\\Controller\\'.$this->controllerName;
+    
+        $this->controllerName = $this->buildControllerName($this->controllerName);
+
         if (!$this->error) {
-            require_once(DOC_ROOT.'/application/CustomController.php');
-            
             if (!class_exists($this->controllerName)) {
-                // try manual include
-                // make sure custom controller has been loaded
-                @include($this->controllerPath);
-                if (!class_exists($this->controllerName)) {
-                    $this->error = URI::MISSING_CLASS_DEF;
-                }
+                $this->error = URI::MISSING_CLASS_DEF;
             }
         }
 
@@ -315,29 +288,15 @@ class URI
         if (sizeof($this->uri) > 0) {
             $section_index = (sizeof($this->uri) - 1);
             if (is_numeric($this->uri[$section_index])) {
-                $_GET['id'] = $this->uri[$section_index--];
-            }
-            if ($section_index >= 0) {
-                $section_uri = $this->uri[$section_index];
-            }
-        } elseif (defined('DEFAULT_SECTION')) {
-            $section_uri = DEFAULT_SECTION;
-        }
-
-        $rows = $section->getURIData();
-        if (isset($section_uri)) {
-            for ($i = 0; $i < sizeof($rows); $i++) {
-                if ($rows[$i]['friendly_url'] != null) {
-                    $comp = str_replace(" ", "", strtolower($rows[$i]['friendly_url']));
-                } else {
-                    $comp = str_replace(" ", "", strtolower($rows[$i]['label']));
-                }
-                if ($comp == $section_uri) {
-                    $_GET['section'] = $rows[$i]['id'];
-                }
+                $_GET['id'] = $this->uri[$section_index];
+                array_pop($this->uri);
             }
         }
 
+        if (!$section->resolveURI($this->uri)) {
+            $this->error = URI::ERROR_404;
+        }
+    
         if (isset($_GET['section'])) {
             $section->getItem($_GET['section']);
         }
@@ -380,9 +339,6 @@ class URI
     {
         $message = '';
         switch ($this->error) {
-            case URI::MISSING_CLASS:
-                $message = 'Missing class file';
-                break;
             case URI::MISSING_CLASS_DEF:
                 $message = 'Missing or incorrect class definition';
                 break;
@@ -403,13 +359,13 @@ class URI
 
     public function sanity($default_module)
     {
-        if (!defined('WEB_ROOT')) {
+        if (Config::get('WEB_ROOT') === false) {
             throw new SafeException('Dispatch error: Web root is not defined');
         }
-        if (!defined('PUBLIC_DIR')) {
+        if (Config::get('PUBLIC_DIR') === false) {
             throw new SafeException('Dispatch error: Public dir is not defined');
         }
-        if (!defined('DOC_ROOT')) {
+        if (Config::get('DOC_ROOT') === false) {
             throw new SafeException('Dispatch error: Doc root is not defined');
         }
     }

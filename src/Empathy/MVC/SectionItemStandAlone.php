@@ -2,16 +2,15 @@
 
 namespace Empathy\MVC;
 
-
 /**
  * Empathy SectionItemStandAlone class
  * @file            Empathy/MVC/SectionItemStandAlone.php
  * @description     For elib-cms modules.
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class SectionItemStandAlone extends Entity
@@ -34,7 +33,7 @@ class SectionItemStandAlone extends Entity
     {
         $uri_data = array();
 
-        $sql = "SELECT id, label, friendly_url FROM ".SectionItemStandAlone::$table;
+        $sql = "SELECT id, section_id, label, friendly_url FROM ".SectionItemStandAlone::$table;
         $error = "Could not get URI data.";
         $result = $this->query($sql, $error);
         $i = 0;
@@ -60,5 +59,43 @@ class SectionItemStandAlone extends Entity
         } else {
             //echo "Whoops!";
         }
+    }
+
+
+    public function findSection($rows, $slug, $parent_id)
+    {
+        $matched = array();
+        foreach ($rows as $row) {
+            $comp = str_replace(' ', '', strtolower($row['label']));
+            if ($comp == $slug && $parent_id == $row['section_id']) {
+                $matched = $row;
+                break;
+            }
+        }
+        return $matched;
+    }
+
+    public function resolveURI($uri)
+    {
+        $matched = false;
+        $rows = $this->getURIData();
+        $id = 0;
+        $sections = array();
+
+        foreach ($uri as $slug) {
+            $section = $this->findSection($rows, $slug, $id);
+            if (sizeof($section)) {
+                $id = $section['id'];
+                $sections[] = $section;
+            } else {
+                break;
+            }
+        }
+
+        if (sizeof($sections) == sizeof($uri)) {
+            $matched = true;
+            $_GET['section'] = $sections[sizeof($sections) - 1]['id'];
+        }
+        return $matched;
     }
 }

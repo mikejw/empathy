@@ -1,20 +1,20 @@
 <?php
+/**
+ * This file is part of the Empathy package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @copyright 2008-2016 Mike Whiting
+ * @license  See LICENSE
+ * @link      http://www.empathyphp.co.uk
+ */
 
 namespace Empathy\MVC;
 
 /**
- * Empathy Controller
- * @package         Empathy
- * @file            Empathy/Controller.php
- * @description     Controller superclass. Application controllers (found within modules) inherit from this class.
- *                  Usually through CustomController.php which resides in the top-level applicaition directory.
+ * Main parent controller class.
  *
- * @author          Mike Whiting
- * @license         LGPLv3
- *
- * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
- * with this source code in the file licence.txt
+ * @author Mike Whiting mike@ai-em.net
  */
 class Controller
 {
@@ -41,10 +41,6 @@ class Controller
      */
     private $templateFile;
 
-    /**
-     * The default title of the page taken from the application config file.
-     */
-    protected $title;
 
     /**
      * The view/presentation object that will be used to render the page.
@@ -85,78 +81,71 @@ class Controller
      * Controller constructor.  Grabs certain properties from the boot object, establishes the view
      * from the plugin manager and assigns certain information to view making it available to templates.
      *
-     * @param Bootstrap $boot the current bootstrap object
+     * @param Bootstrap $boot The current bootstrap object
      */
     public function __construct($boot)
     {
         $this->boot = $boot;
-
         $this->cli_mode = $boot->getURICliMode();
         $this->initError = $boot->getURIError();
         $this->uri_data = $boot->getURIData();
         $this->plugin_manager = $boot->getPluginManager();
         $this->plugin_manager->setController($this);
-
         $this->environment = $boot->getEnvironment();
-
-        $this->stash = new Stash();
-
+        $this->stash =  DI::getContainer()->get('Stash');
         $this->connected = false;
-        $this->module = $_GET['module'];
-        $this->class = $_GET['class'];
-        $this->event = $_GET['event'];
-
-        if (defined('TITLE')) {
-            $this->title = TITLE;
-        }
- 
-        if (!defined('TPL_BY_CLASS') || TPL_BY_CLASS) {
+        $this->module = (isset($_GET['module']))? $_GET['module']: null;
+        $this->class = (isset($_GET['class']))? $_GET['class']: null;
+        $this->event = (isset($_GET['event']))? $_GET['event']: null;
+        if (Config::get('TPL_BY_CLASS')) {
             $this->templateFile = $this->class.'.tpl';
         } else {
             $this->templateFile = $this->module.'.tpl';
         }
-
         Session::up();
-
-        // get presenter
         $this->presenter = $this->plugin_manager->getView();
-
         if ($this->presenter !== null) {
             $this->assignControllerInfo();
             $this->assignConstants();
             $this->assignEnvironment();
         }
-
-        // if within CMS assign the current section name to the template
         if (isset($_GET['section_uri'])) {
             $this->assign('section', $_GET['section_uri']);
+        }
+
+        // create a plugin for this?
+        // taken from mikejw custom controller
+        if ($boot->getEnvironment() == 'dev') {
+            $this->assign('dev_rand', uniqid());
         }
     }
 
     /**
      * Assigns the value of some of the main settings from the application config to the view.
      *
-     * @return void
+     * @return null
      */
     private function assignConstants()
     {
-        if (defined('NAME')) {
-            $this->assign('NAME', NAME);
+        if (Config::get('NAME') !== false) {
+            $this->assign('NAME', Config::get('NAME'));
         }
-        if (defined('TITLE')) {
-            $this->assign('TITLE', TITLE);
+        if (Config::get('TITLE') !== false) {
+            $this->assign('TITLE', Config::get('TITLE'));
         }
+        $this->assign('DOC_ROOT', Config::get('DOC_ROOT'));
+        $this->assign('WEB_ROOT', Config::get('WEB_ROOT'));
+        $this->assign('WEB_ROOT_DEFAULT', Config::get('WEB_ROOT_DEFAULT'));
+        $this->assign('SUBDOMAIN', Config::get('SUBDOMAIN'));
 
-        $this->assign('DOC_ROOT', DOC_ROOT);
-        $this->assign('WEB_ROOT', WEB_ROOT);
-        $this->assign('PUBLIC_DIR', PUBLIC_DIR);
+        $this->assign('PUBLIC_DIR', Config::get('PUBLIC_DIR'));
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
 
     /**
      * Assign key controller attributes to the view
      *
-     * @return void
+     * @return null
      *
      */
     private function assignControllerInfo()
@@ -170,7 +159,7 @@ class Controller
   /**
      * Assign environment value to the view
      *
-     * @return void
+     * @return null
      *
      */
     private function assignEnvironment()
@@ -183,8 +172,7 @@ class Controller
      * Set the name of the current view template
      *
      * @param string $tpl tempalte name (including file extension.)
-     *
-     * @return void
+     * @return null
      */
     public function setTemplate($tpl)
     {
@@ -192,68 +180,59 @@ class Controller
     }
 
     /**
-     * Initialise the view for rendering
+     * Initialise the view for rendering.
      *
-     * @param boolean $i Whether the template is internal.
-     *
-     * @return void
+     * @param boolean $internal Whether the template is internal.
+     * @return null
      */
     public function initDisplay($internal)
-    {        
+    {
         $this->presenter->display($this->templateFile, $internal);
     }
 
+
     /**
      * Redirect the user to another location within the application
-     * Redirection is disabled if the MVC_TEST_MODE global flag is detected to prevent tests breaking
-     * but execution always begins to end here
      *
      * @param string $endString the new URI to redirect to.
-     *
-     * @return void
+     * @return null
      */
-    public function redirect($endString)
+    public function redirect($endString = '')
     {
         $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';
-        if (!defined('MVC_TEST_MODE')) {
-            session_write_close();
-            $location = 'Location: ';
-            $location .= $proto.'://'.WEB_ROOT.PUBLIC_DIR.'/';
-            if ($endString != '') {
-                $location .= $endString;
-            }
-            header($location);
-        } else {
-            throw new TestModeException('Cannot redirect due to test mode.');
+        Session::write();
+        $location = 'Location: ';
+        $location .= $proto.'://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
+        if ($endString != '') {
+            $location .= $endString;
         }
-        
+        Testable::header($location);
+        Testable::doDie('');
     }
 
     /**
      * Redirect to a local cgi script.
      *
      * @param string $endString path to the script.
-     *
-     * @return void
+     * @return null
      */
-    protected function redirect_cgi($endString)
+    public function redirect_cgi($endString = '')
     {
-        session_write_close();
+        Session::write();
         $location = 'Location: ';
-        $location .= 'http://'.CGI.'/';
+        $location .= 'http://'.Config::get('CGI').'/';
         if ($endString != '') {
             $location .= $endString;
         }
-        header($location);
-        exit();
+        Testable::header($location);
     }
 
     /**
      * End current user session
      *
-     * @return void
+     * @return null
      */
-    protected function sessionDown()
+    public function sessionDown()
     {
         Session::down();
     }
@@ -261,30 +240,27 @@ class Controller
     /**
      * Determines whether current request is an ajax request from the browser.
      *
-     * @return void
+     * @return null
      */
-    protected function isXMLHttpRequest()
+    public function isXMLHttpRequest()
     {
-        $request = 0;
+        $request = false;
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
            ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
-            $request = 1;
+            $request = true;
         }
-
         return $request;
     }
 
     /**
      * Assign value to the current view.
      *
-     * @param string $name
-     *
-     * @param mixed $data
-     *
-     *
-     * @return void
+     * @param string $name Key name.
+     * @param mixed $data Data.
+     * @param boolean $no_array Determine if data should be stored 'flat'
+     * @return null
      */
-    public function assign($name, $data, $no_array=false)
+    public function assign($name, $data, $no_array = false)
     {
         $this->presenter->assign($name, $data, $no_array);
     }
@@ -292,7 +268,7 @@ class Controller
     /**
      * Retrieve name of current module
      *
-     * @return string $module
+     * @return string $module Module name.
      */
     public function getModule()
     {
@@ -302,20 +278,19 @@ class Controller
     /**
      * Retrieve name of current controller class
      *
-     * @return string $class
+     * @return string $class Class name.
      */
     public function getClass()
     {
         return $this->class;
     }
 
+
     /**
      * Obtain user interface control values from request/session.
-     * @param string $ui name of interface control set
-     *
-     * @param array $ui_array set of control settings
-     *
-     * @return void
+     * @param string $ui Name of interface control set.
+     * @param array $ui_array Set of control settings.
+     * @return null
      */
     public function loadUIVars($ui, $ui_array)
     {
@@ -335,7 +310,14 @@ class Controller
         }
     }
 
-    // when $def is 0, valid is true when id is 0
+
+    /**
+     * When $def is 0, valid is true when id is 0
+     * @param int $id The ID.
+     * @param mixed $def The default value.
+     * @param boolean $assertSet Assert ID is set.
+     * @return boolean Init is valid.
+     */
     public function initID($id, $def, $assertSet = false)
     {
         $valid = true;
@@ -359,15 +341,37 @@ class Controller
         return $valid;
     }
 
+    /**
+     * Send exception to the view.
+     * @param boolean $debug Debug mode.
+     * @param Exception $exception The exception object.
+     * @param boolean $req_error Is request error. e.g. 404.
+     * @return null
+     */
     public function viewException($debug, $exception, $req_error)
     {
         $this->presenter->exception($debug, $exception, $req_error);
-
     }
 
+    /**
+     * Set the presenter/view object.
+     * @param Empathy\MVC\Plugin\Presentation $view The view.
+     * @return nulll
+     */
     public function setPresenter($view)
-    {       
+    {
         $this->presenter = $view;
     }
-}
 
+
+    /**
+     * Assign generated token.
+     * @return null
+     */
+    protected function assignCSRFToken()
+    {
+        $token = md5(uniqid(rand(), true));
+        $this->assign('csrf_token', $token);
+        Session::set('csrf_token', $token);
+    }
+}

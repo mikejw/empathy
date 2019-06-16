@@ -2,17 +2,18 @@
 
 namespace Empathy\MVC;
 
-define('MVC_VERSION', '0.9.7');
+define('MVC_VERSION', '0.9.8');
+
 
 /**
  * Empathy
  * @file            Empathy/Empathy.php
  * @description     Creates global object that initializes an Empathy application
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Empathy
@@ -28,27 +29,27 @@ class Empathy
      * Boot options read from application config file.
      * @var array
      */
-    private $bootOptions;
+    private $bootOptions = array();
 
     /**
      * Plugin definition read from application config file.
      * @var array
      */
-    private $plugins;
+    private $plugins = array();
 
     /**
      * When application is set to handle errors
      * this array is used to collect the error messages.
      * @var array
      */
-    private $errors;
+    private $errors = array();
 
     /**
      * Application persistent mode. Implies there could be multiple requests to handle
      * following initialization. This flag is passed directly to the application.
      * @var boolean
      */
-    private $persistent_mode;
+    private $persistent_mode = false;
 
     /**
      * This flag is read from the boot_options section of the application config.
@@ -59,7 +60,7 @@ class Empathy
      *
      * @var boolean
      */
-    private static $use_elib;
+    private static $use_elib = false;
 
     /**
      * Create application object.
@@ -69,20 +70,12 @@ class Empathy
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode = null, $system_mode = false)
+    public function __construct($configDir, $persistent_mode = false)
     {
         $this->persistent_mode = $persistent_mode;
-        if ($system_mode) {
-            spl_autoload_register(array($this, 'loadClass'));
-        }
+        spl_autoload_register(array($this, 'loadClass'));
         $this->loadConfig($configDir);
-        
-        if ($system_mode) {
-            $this->loadConfig(Util\Pear::getConfigDir().'/Empathy');
-        } else {
-            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'));
-        }
-
+        $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'), true);
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
             self::$use_elib = true;
@@ -90,19 +83,11 @@ class Empathy
         } else {
             self::$use_elib = false;
         }
-
         if ($this->getHandlingErrors()) {
             set_error_handler(array($this, 'errorHandler'));
         }
-
-        $this->boot = new Bootstrap($this->bootOptions, $this->plugins, $this);
-
-        $this->initPlugins();
-
-        if ($this->persistent_mode !== true) {
-            $this->beginDispatch();
-        }
     }
+
 
     /**
      * Returns value of handle_errors setting from application config boot options.
@@ -180,6 +165,7 @@ class Empathy
         return $this->errors;
     }
 
+
     /**
      * Returns whether error handler has caught anything or not.
      * @return boolean
@@ -188,6 +174,7 @@ class Empathy
     {
         return (sizeof($this->errors) > 0);
     }
+
 
     /**
      * Return a concatenated string of all caught error messages.
@@ -223,7 +210,7 @@ class Empathy
                     $msg .= "  Fatal error on line $errline in file $errfile";
                     $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
                     $msg .= " Aborting...";
-                    die($msg);
+                    Testable::doDie($msg);
                     break;
                 case E_WARNING:
                 case E_USER_WARNING:
@@ -257,7 +244,7 @@ class Empathy
      * @return void
      *
      */
-    private function exceptionHandler($e)
+    public function exceptionHandler($e)
     {
         // prioritise any caught errors over exceptions thrown
         if ($this->hasErrors()) {
@@ -267,32 +254,29 @@ class Empathy
         // checks exception not already of type req
         // then checks env before forcing a req error class
         // (for diplaying standard error pages in prod)
-        // this in-turn depends on elib (elib smarty resource)
-        // for locating req_error template
         if ('Empathy\MVC\RequestException' != get_class($e) &&
             $this->boot->getEnvironment() == 'prod') {
             $message = '';
             if ($this->boot->getDebugMode()) {
                 $message = $e->getMessage();
             }
-            $e = new RequestException($message, RequestException::BAD_REQUEST);
+            $e = new RequestException($message, RequestException::INTERNAL_ERROR);
         }
 
         // force safe exception
         //$e = new Empathy\SafeException($e->getMessage());
 
+
         switch (get_class($e)) {
             case 'Empathy\MVC\SafeException':
-                echo 'Safe exception: '.$e->getMessage();
-                exit();
+                Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
             case 'Empathy\MVC\TestModeException':
                 // allow execution to end naturally
                 break;
             case 'Empathy\MVC\RequestException':
-
                 $response = '';
-                switch($e->getCode()) {
+                switch ($e->getCode()) {
                     case RequestException::BAD_REQUEST:
                         $response = 'HTTP/1.1 400 Bad Request';
                         $message = 'Bad request';
@@ -300,10 +284,13 @@ class Empathy
                     case RequestException::NOT_FOUND:
                         $response = 'HTTP/1.0 404 Not Found';
                         break;
+                    case RequestException::INTERNAL_ERROR:
+                        $response = 'HTTP/1.0 500 Internal Server Error';
+                        break;
                     default:
                         break;
                 }
-                header($response);
+                Testable::header($response);
                 //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
 
             default:
@@ -317,31 +304,37 @@ class Empathy
      * @param  string $configDir
      * @return void
      */
-    private function loadConfig($configDir)
+    private function loadConfig($configDir, $hard = false)
     {
         $configFile = $configDir.'/config.yml';
         if (!file_exists($configFile)) {
             die('Config error: '.$configFile.' does not exist');
         }
-        $s = new \Spyc();
+        
+        $s = DI::getContainer()->get('Spyc');
+
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
+            // auto fix of doc root
             if (!is_array($item)) {
                 if ($index == 'doc_root') {
                     if (!file_exists($item)) {
                         $item = $configDir;
                     }
                 }
+            }
+
+            if ($hard) {
                 if (!defined(strtoupper($index))) {
-                    define(strtoupper($index), $item);    
+                    define(strtoupper($index), $item);
                 }
-                
+            } else {
+                Config::store(strtoupper($index), $item);
             }
         }
         if (isset($config['boot_options'])) {
             $this->bootOptions = $config['boot_options'];
         }
-
         if (isset($config['plugins'])) {
             $this->plugins = $config['plugins'];
         }
@@ -352,37 +345,63 @@ class Empathy
      * @param  string $class the name of class that PHP is attempting to load
      * @return void
      */
-    public static function loadClass($class)
+    public static function loadClass($classPath)
     {
-        $i = 0;
-        $load_error = 1;
-        $location = array('');
-        if (strpos($class, 'Controller\\')
-           || strpos($class, 'Model\\')) {
-            $class_arr = explode('\\', $class);
-            $class = $class_arr[sizeof($class_arr)-1];
+        $classNameArr = explode('\\', $classPath);
+        $className = $classNameArr[ sizeof($classNameArr) -1 ];
 
+        $location = '';
+        if (strpos($classPath, 'Empathy\\MVC\\Controller\\') === 0) {
             if (isset($_GET['module'])) {
-                array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
-            }
-            array_push($location, DOC_ROOT.'/storage/');
-        } elseif (strpos($class, 'Empathy') === 0) {
-            $class = str_replace('\\', '/', $class);
-        }
-        array_push($location, DOC_ROOT.'/application/');
-
-        while ($i < sizeof($location) && $load_error == 1) {
-            $class_file = $location[$i].$class.'.php';
-
-            //echo $class_file.'<br />';
-
-            if (@include($class_file)) {
-                $class_file.": 1<br />\n";
-                $load_error = 0;
+                if ($className != 'CustomController') {
+                    $location = Config::get('DOC_ROOT') . '/application/' . $_GET['module'] . '/';
+                }
             } else {
-                $class_file.": 0<br />\n";
+                throw new \Exception('Module not set.');
             }
-            $i++;
+        } elseif (strpos($classPath, 'Empathy\\MVC\\Model\\') === 0) {
+            $location = Config::get('DOC_ROOT').'/storage/';
         }
+        if (!empty($location) && file_exists($location.$className.'.php')) {
+            $file = $location.$className.'.php';
+            include($file);
+        }
+    }
+
+
+    public function reloadBootOptions()
+    {
+        $this->boot->initBootOptions();
+    }
+
+
+
+    // DI
+    public function init()
+    {
+
+        $this->boot = DI::getContainer()->get('Bootstrap');
+        $this->initPlugins();
+        if ($this->persistent_mode !== true) {
+            $this->beginDispatch();
+        }
+    }
+
+    public function getBootOptions()
+    {
+        return $this->bootOptions;
+    }
+    public function getPlugins()
+    {
+        return $this->plugins;
+    }
+
+    public function setBootOptions($options)
+    {
+        $this->bootOptions = $options;
+    }
+    public function setPlugins($plugins)
+    {
+        $this->plugins = $plugins;
     }
 }

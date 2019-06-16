@@ -1,21 +1,24 @@
 {
-    "name": "empathy-project",
-    "description": "",
-    "private": false,
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mikejw/empathy-project/"
-    },
-    "dependencies": {
-        "grunt-bower-install-simple": "latest",
-        "grunt-contrib-concat": "latest",
-        "grunt-contrib-copy": "latest",
-        "grunt-contrib-uglify": "latest",
-        "grunt-cli": "latest",
-        "less": "latest",
-        "jquery": "latest",
-        "font-awesome": "latest",
-        "bootstrap": "latest"
-    }
+  "name": "empathy-project",
+  "description": "",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikejw/empathy-project/"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "font-awesome": "latest",
+    "grunt": "^1.0.3",
+    "grunt-bower-install-simple": "latest",
+    "grunt-browserify": "latest",
+    "grunt-cli": "latest",
+    "grunt-contrib-concat": "latest",
+    "grunt-contrib-copy": "latest",
+    "grunt-contrib-uglify": "latest",
+    "jquery": "~1.12",
+    "jquery-ui": "jquery/jquery-ui#1.11.4",
+    "less": "latest",
+    "tinymce": "^4.3.13"
+  }
 }
-

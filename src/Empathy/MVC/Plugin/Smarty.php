@@ -2,54 +2,45 @@
 
 namespace Empathy\MVC\Plugin;
 
+use Empathy\MVC\Config;
 use Empathy\MVC\Plugin as Plugin;
 
 /**
  * Empathy Smarty Plugin
  * @file            Empathy/MVC/Plugin/Smarty.php
- * @description     
+ * @description
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Smarty extends Plugin implements PreDispatch, Presentation
 {
     protected $smarty;
 
-    public function __construct()
-    {
-        $this->smarty = new \Smarty();
-    }
 
     public function onPreDispatch()
     {
-        if (defined('SMARTY_DEBUGGING') && SMARTY_DEBUGGING) {
+        $this->smarty = new \Smarty();
+
+        if (Config::get('SMARTY_DEBUGGING')) {
             $this->smarty->debugging = true;
         }
-
-        $this->smarty->template_dir = DOC_ROOT."/presentation";
-        $this->smarty->compile_dir = DOC_ROOT."/tpl/templates_c";
-        $this->smarty->cache_dir = DOC_ROOT."/tpl/cache";
-        $this->smarty->config_dir = DOC_ROOT."/tpl/configs";
-
-        if (defined('SMARTY_CACHING') && SMARTY_CACHING == true) {
+        if (Config::get('SMARTY_CACHING')) {
             $this->smarty->caching = 1;
         }
+        $this->smarty->template_dir = Config::get('DOC_ROOT')."/presentation";
+        $this->smarty->compile_dir = Config::get('DOC_ROOT')."/tpl/templates_c";
+        $this->smarty->cache_dir = Config::get('DOC_ROOT')."/tpl/cache";
+        $this->smarty->config_dir = Config::get('DOC_ROOT')."/tpl/configs";
 
-        // assign constants
-        if (defined('NAME')) {
-            $this->assign('NAME', NAME);
-        }
-        $this->assign('DOC_ROOT', DOC_ROOT);
-        $this->assign('WEB_ROOT', WEB_ROOT);
-        $this->assign('PUBLIC_DIR', PUBLIC_DIR);
-        $this->assign('MVC_VERSION', MVC_VERSION);
+        // for smarty 3 disable notices from view (like smarty 2)
+        $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
     }
 
-    public function assign($name, $data, $no_array=false)
+    public function assign($name, $data, $no_array = false)
     {
         $this->smarty->assign($name, $data);
     }
@@ -59,13 +50,34 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template, $internal=false)
+    public function display($template, $internal = false)
     {
         if ($internal) {
             $this->switchInternal();
         }
+
+        $this->assignEmpathyDir();
+
         $this->smarty->display($template);
     }
+
+
+
+    public function assignEmpathyDir()
+    {
+        // @todo: optimise somehow?
+        // for default templates check test mode
+        // derived from elibs plugin
+        if ($this->manager->eLibsTestMode()) {
+            $empathy_dir = Config::get('DOC_ROOT').'/../';
+        } else {
+            $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
+        }
+        $empathy_dir = realpath($empathy_dir);
+        $this->assign('EMPATHY_DIR', $empathy_dir);
+    }
+
+
 
     public function loadFilter($type, $name)
     {
@@ -73,17 +85,17 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     }
 
     protected function switchInternal()
-    {        
+    {
         $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
     }
 
     public function exception($debug, $exception, $req_error)
     {
-        $this->assign('error', $exception->getMessage());                    
-        if($req_error) {
+        $this->assign('error', $exception->getMessage());
+        if ($req_error) {
              $this->assign('code', $exception->getCode());
              $this->display('elib:/req_error.tpl');
-        } else {            
+        } else {
             $this->display('empathy.tpl', true);
         }
     }
@@ -97,5 +109,4 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     {
         $this->smarty->clear_all_assign();
     }
-
 }

@@ -3,23 +3,23 @@
 namespace Empathy\MVC\Util;
 
 use Empathy\ELib\Util\Libs;
-
+use Empathy\MVC\Config;
 
 /**
  * Empathy module code generation
  * @file            Empathy/MVC/Util/ModuleGen.php
- * @description     
+ * @description
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class ModuleGen
 {
     
-    public static function generate($module, $lib = NULL)
+    public static function generate($module, $lib = null)
     {
         Libs::detect();
         $installed = Libs::getInstalled();
@@ -27,15 +27,13 @@ class ModuleGen
         $generated = 0;
 
         foreach ($installed as $i) {
-            $gen_root = DOC_ROOT.'/vendor/'.$i.'/src/Empathy/ELib/Gen';
+            $gen_root = Config::get('DOC_ROOT').'/vendor/'.$i.'/src/Empathy/ELib/Gen';
             if (file_exists($gen_root)) {
-
                 $files = glob($gen_root.'/*.php');
                 foreach ($files as $f) {
                     $matches = array();
                     preg_match('/Gen\/(.+)\.php$/', $f, $matches);
                     $class_list[] = 'Empathy\\ELib\\Gen\\'.$matches[1];
-                    
                 }
             }
         }

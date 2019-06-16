@@ -1,19 +1,12 @@
 <?php
 
-// Copyright 2008-2015 Mike Whiting (mail@mikejw.co.uk).
-// This file is part of the Empathy MVC framework.
-
-// Empathy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// Empathy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-
-// You should have received a copy of the GNU Lesser General Public License
-// along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
-
+/**
+ * This file is part of the Empathy package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @copyright 2008-2016 Mike Whiting
+ * @license  See LICENSE
+ * @link      http://www.empathyphp.co.uk
+ */
 echo get_include_path();
