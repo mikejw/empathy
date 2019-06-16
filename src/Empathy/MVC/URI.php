@@ -7,10 +7,10 @@ namespace Empathy\MVC;
  * @file            Empathy/URI.php
  * @description     Analyize URI and determine route to appliction module, controller class and event/action.
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class URI
