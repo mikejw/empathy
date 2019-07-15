@@ -25,7 +25,10 @@ class SmartySSL extends Smarty
         if ($internal) {
             $this->switchInternal();
         }
-        if (\Empathy\MVC\Util\Misc::isSecure()) {
+        if (
+            isset($this->config['force']) && $this->config['force'] ||
+            \Empathy\MVC\Util\Misc::isSecure()
+        ) {
             echo str_replace('http://'.Config::get('WEB_ROOT'),
                 'https://'.Config::get('WEB_ROOT'),
                 $this->smarty->fetch($template)
