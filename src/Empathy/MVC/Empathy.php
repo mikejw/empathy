@@ -10,10 +10,10 @@ define('MVC_VERSION', '0.9.8');
  * @file            Empathy/Empathy.php
  * @description     Creates global object that initializes an Empathy application
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Empathy

@@ -10,13 +10,13 @@ use Nelmio\Alice\PersisterInterface;
  * @file            Empathy/MVC/EntityManager.php
  * @description     Simple "ORM style" model objects for Empathy.
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * Do things with entities in a doctrine style ObjectManager fashion
  * for use with fixture generation with Alice
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class EntityManager implements PersisterInterface

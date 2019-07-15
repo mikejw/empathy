@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-// Copyright 2008-2015 Mike Whiting (mail@mikejw.co.uk).
+// Copyright 2008-2015 Mike Whiting (mikejw3@gmail.com).
 // This file is part of the Empathy MVC framework.
 
 // Empathy is free software: you can redistribute it and/or modify
@@ -342,6 +342,21 @@ function option_set_elib()
 }
 
 
+function option_set_https()
+{
+    assertConfig();
+    global $app_config;
+    $app_config['force_secure'] = true;
+    foreach ($app_config['plugins'] as $index => &$item) {
+        if ($item['name'] === "Smarty") {
+            $item['name'] = 'SmartySSL';
+            break;
+        }
+    }
+    return write_yaml($app_config, './config.yml');
+}
+
+
 
 function boot()
 {
@@ -402,6 +417,8 @@ function main()
                               'description' => 'Set the db name.'));
     $arguments->addOption('set_elib', array(                              
                               'description' => 'Enable elib.'));
+    $arguments->addOption('set_https', array(
+                              'description' => 'Enable SSL.'));
 
     $arguments->parse();
 
@@ -421,7 +438,7 @@ function main()
             'set_webroot', 'set_publicdir',
             'set_dbuser', 'set_dbpass',
             'set_dbname', 'set_dbserver',
-            'set_elib'
+            'set_elib', 'set_https'
         );
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {

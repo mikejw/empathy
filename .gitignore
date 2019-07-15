@@ -5,3 +5,4 @@
 /vendor
 /tpl/templates_c
 cache.properties
+*~

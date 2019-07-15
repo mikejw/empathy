@@ -6,11 +6,11 @@
         "framework"
     ],
     "homepage": "http://empathyphp.co.uk",
-    "license": "GPL-3.0-only",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Mike Whiting",
-            "email": "mail@mikejw.co.uk"
+            "email": "mikejw3@gmail.comk"
         }
     ],
     "require": {
