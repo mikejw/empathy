@@ -27,8 +27,18 @@ class EmpathyTest extends ESuiteTest
 
         $container = \Empathy\MVC\DI::init($this->config_dir, $persistent);
         $empathy = $container->get('Empathy');
+
         $empathy->init();
         $this->mvc = $empathy;
+
+        // test mode fix
+        $plugins = $this->mvc->getPlugins();
+        $plugins[0]['config'] = '{ "testing": 1 }';
+        $this->mvc->setPlugins($plugins);
+
+        fwrite(STDERR, print_r($plugins, true));
+
+
     }
 
 

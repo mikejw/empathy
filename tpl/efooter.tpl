@@ -15,7 +15,7 @@
 {/if}
 
 <address>
-<a href="https://mikewhiting.co/empathy">Empathy MVC Framework</a> version {$MVC_VERSION} &copy; 2016 <a href="https://mikewhiting.co">Mike Whiting</a>.
+<a href="https://mikewhiting.co/empathy">Empathy MVC Framework</a> version {$MVC_VERSION} &copy; 2008-2019 <a href="https://mikewhiting.co">Mike Whiting</a>.
 
 </address>
 </footer>
