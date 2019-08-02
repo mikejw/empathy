@@ -93,10 +93,7 @@ class PluginManager
                 break;
             }
         }
-
-        fwrite(STDERR, print_r($mode, true));
-
-
+        
         return $mode;
     }
 }
