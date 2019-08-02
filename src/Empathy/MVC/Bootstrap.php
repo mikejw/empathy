@@ -256,7 +256,13 @@ class Bootstrap
                             }
                         }
                     }
-                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
+
+                    if (count(explode('\\', $p['name'])) > 1) {
+                        $plugin = '\\'.$p['name'];
+                    } else {
+                        $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
+                    }
+
                     $n = (isset($p['config']))?
                         new $plugin($plugin_manager, $this, $p['config']):
                         new $plugin($plugin_manager, $this, null);
