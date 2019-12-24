@@ -31,6 +31,8 @@ class BootstrapTest extends ESuiteTest
         $this->expectException('Empathy\MVC\RequestException');
         $this->expectExceptionMessage('Not found');
 
+        $_SERVER['HTTP_HOST'] = 'localhost';
+        $_SERVER['REQUEST_URI'] = '/eaa/public_html/foo';
         $this->bootstrap->dispatch();
     }
 
