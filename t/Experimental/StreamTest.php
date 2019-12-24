@@ -3,16 +3,16 @@
 namespace ESuite\Experimental;
 
 use ESuite\ESuiteTest;
-
+use ESuite\Fake\Stream;
 
 class StreamTest extends ESuiteTest
 {
     private $stream;
     
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->stream = new \ESuite\Fake\Stream();
+        $this->stream = new Stream();
         $this->stream->write('foo');
         $this->stream->rewind();
     }

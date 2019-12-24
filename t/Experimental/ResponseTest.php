@@ -9,7 +9,7 @@ class ResponseTest extends ESuiteTest
 {
     private $response;
     
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->response = new \ESuite\Fake\Response();
     }

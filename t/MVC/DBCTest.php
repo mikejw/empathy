@@ -10,7 +10,7 @@ class DBCTest extends ESuiteTest
 {
     private $dbc;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $creds = \ESuite\Util\DB::getDefDBCreds();
 

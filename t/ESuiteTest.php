@@ -5,18 +5,19 @@ namespace ESuite;
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
 use Empathy\MVC\Config as EmpConfig;
+use ESuite\Util\Config;
 
 
-abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
+abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
 {
    
-    protected function setUp()
-    {      
+    protected function setUp(): void
+    {
         //
     }    
     
 
-    protected function makeFakeBootstrap()
+    protected function makeFakeBootstrap($persistentMode=true)
     {
         // use eaa archive as root
         $doc_root = realpath(dirname(realpath(__FILE__)).'/../eaa/');
@@ -49,7 +50,7 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $container = \Empathy\MVC\DI::init($doc_root, true);
+        $container = \Empathy\MVC\DI::init($doc_root, $persistentMode);
         $empathy = $container->get('Empathy');
         $empathy->setBootOptions($dummyBootOptions);
         $empathy->setPlugins($plugins);
@@ -68,7 +69,7 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         global $suite;
         if (Util\Config::get('reset_db')) {
@@ -77,12 +78,12 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         //
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         //
     }

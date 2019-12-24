@@ -10,7 +10,7 @@ class BootstrapTest extends ESuiteTest
     private $bootstrap;
     
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,9 +28,9 @@ class BootstrapTest extends ESuiteTest
 
     public function testDispatch()
     {
-        $this->setExpectedException(
-             'Empathy\MVC\RequestException', 'Not found'
-        );
+        $this->expectException('Empathy\MVC\RequestException');
+        $this->expectExceptionMessage('Not found');
+
         $this->bootstrap->dispatch();
     }
 

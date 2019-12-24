@@ -60,30 +60,17 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     }
 
 
-
     public function assignEmpathyDir()
     {
-        // @todo: optimise somehow?
         // for default templates check test mode
         // derived from elibs plugin
         if ($this->manager->eLibsTestMode()) {
-            $empathy_dir = Config::get('DOC_ROOT').'/../';
+            $empathy_dir = realpath(Config::get('DOC_ROOT').'/../');
         } else {
             $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
         }
-
-
-        //fwrite(STDERR, $empathy_dir);
-
-        //$empathy_dir = realpath($empathy_dir);
-
-
-        //echo $empathy_dir;
-        //exit();
-
         $this->assign('EMPATHY_DIR', $empathy_dir);
     }
-
 
 
     public function loadFilter($type, $name)

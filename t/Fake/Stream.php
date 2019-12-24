@@ -123,10 +123,14 @@ class Stream implements StreamInterface
     public function getMetadata($key = null)
     {
         $meta = @stream_get_meta_data($this->data);
-        if ($key === null) {
-            return $meta;
+        if (!$meta) {
+            return null;
         } else {
-            return $meta[$key];
+            if ($key === null) {
+                return $meta;
+            } else {
+                return $meta[$key];
+            }
         }
     }
 }

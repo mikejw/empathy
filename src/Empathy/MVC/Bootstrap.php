@@ -372,4 +372,13 @@ class Bootstrap
     {
         return $this->dynamicModule;
     }
+
+    /**
+     * Return mvc object
+     */
+    public function getMVC()
+    {
+        return $this->mvc;
+    }
+
 }
