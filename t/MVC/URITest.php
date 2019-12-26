@@ -28,12 +28,21 @@ class URITest extends ESuiteTest
         DI::getContainer()->get('URI');
     }
 
-    public function testURI()
+    public function testURI1()
     {
         $this->initURI('');
         $this->assertEquals('front', $_GET['module']);
         $this->assertEquals('front', $_GET['class']);
         $this->assertEquals('default_event', $_GET['event']);
+    }
+
+    public function testURI2()
+    {
+        $this->initURI('blog/item/21');
+        $this->assertEquals('blog', $_GET['module']);
+        $this->assertEquals('blog', $_GET['class']);
+        $this->assertEquals('item', $_GET['event']);
+        $this->assertEquals(21, $_GET['id']);
     }
 }
 
