@@ -14,7 +14,7 @@ class EmpathyTest extends ESuiteTest
 {
     private $mvc;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         //
     }
@@ -45,9 +45,7 @@ class EmpathyTest extends ESuiteTest
 
     public function testNew()
     {    
-        $this->expectException('Empathy\MVC\RequestException');
-        $this->expectExceptionMessage('Not found');
-
+        $this->setExpectedException('Empathy\MVC\RequestException', 'Not found');
         $this->mvc = $this->createMVC();
     }
 

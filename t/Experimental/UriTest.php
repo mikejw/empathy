@@ -9,7 +9,7 @@ class UriTest extends ESuiteTest
 {
     private $uri;
     
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->uri = new \ESuite\Fake\Uri();
         $this->uri->initDummy();

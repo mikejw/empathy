@@ -11,7 +11,7 @@ class URITest extends ESuiteTest
     private $host = 'localhost';
     private $uri = '/eaa/public_html/';
 
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!$this->boot) {
             $this->boot = $this->makeFakeBootstrap(true);
@@ -23,6 +23,7 @@ class URITest extends ESuiteTest
         unset($_GET['module']);
         unset($_GET['class']);
         unset($_GET['event']);
+        unset($_GET['id']);
         $_SERVER['HTTP_HOST'] = $this->host;
         $_SERVER['REQUEST_URI'] = $this->uri . $hostString;
         DI::getContainer()->get('URI');

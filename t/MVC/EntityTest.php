@@ -18,7 +18,7 @@ use Nelmio\Alice\Fixtures\Loader;
 class EntityTest extends ESuiteTest
 {
     
-    protected function setUp(): void
+    protected function setUp()
     {
         \ESuite\Util\DB::loadDefDBCreds();
     }
@@ -53,8 +53,7 @@ class EntityTest extends ESuiteTest
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Entity class does not exist');
+        $this->setExpectedException(\Exception::class, 'Entity class does not exist');
         $fake = $objectManager->find('Esuite\FakeEntityz', 1);
     }
 

@@ -8,10 +8,10 @@ use Empathy\MVC\Config as EmpConfig;
 use Empathy\MVC\DI;
 
 
-abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
+abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
 {
    
-    protected function setUp(): void
+    protected function setUp()
     {
         //
     }    
@@ -69,7 +69,7 @@ abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         global $suite;
         if (Util\Config::get('reset_db')) {
@@ -78,20 +78,15 @@ abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public static function setUpBeforeClass(): void
+    public static function setUpBeforeClass()
     {
         //
     }
 
-    public static function tearDownAfterClass(): void
+    public static function tearDownAfterClass()
     {
         //
     }
-
-
-
-
-
 
     protected function appRequest($uri, $mode=CLIMode::FAKED)
     {

@@ -9,7 +9,7 @@ use ESuite\Util\Config;
 class SessionTest extends ESuiteTest
 {
 
-    protected function setUp(): void
+    protected function setUp()
     {
         //
     }

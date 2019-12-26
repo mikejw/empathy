@@ -10,7 +10,7 @@ class StreamTest extends ESuiteTest
     private $stream;
     
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->stream = new Stream();
         $this->stream->write('foo');
