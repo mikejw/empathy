@@ -6,11 +6,11 @@
         "framework"
     ],
     "homepage": "http://empathyphp.co.uk",
-    "license": "GPL3",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Mike Whiting",
-            "email": "mail@mikejw.co.uk"
+            "email": "mikejw3@gmail.comk"
         }
     ],
     "require": {
@@ -18,15 +18,15 @@
         "wp-cli/php-cli-tools": "dev-master",
         "mustangostang/spyc": "0.5.1",
         "mikejw/elibs": "dev-develop",
-        "php-di/php-di": "^5.3"
+        "php-di/php-di": "^5.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.7.*@dev",        
+        "phpunit/phpunit": "^4.8", 
         "squizlabs/php_codesniffer": "dev-master",
-        "mayflower/php-codebrowser": "dev-master",
+        "mayflower/php-codebrowser": "1.1.4",
         "mockery/mockery": "dev-master",
         "nelmio/alice": "2.2.2",
-        "phpDocumentor/phpDocumentor": "2.9.0"
+        "phpdocumentor/phpdocumentor": "2.9.0"
     },
     "autoload": {
         "psr-0": {
@@ -34,5 +34,6 @@
             "Psr": "src/"
         }
     },
-    "bin": [ "bin/empathy" ]
+    "bin": [ "bin/empathy" ],
+    "minimum-stability": "dev"
 }

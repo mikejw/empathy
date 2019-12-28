@@ -1,6 +1,8 @@
+/.idea
 /docs/build
 /composer.phar
 /build
 /vendor
 /tpl/templates_c
 cache.properties
+*~

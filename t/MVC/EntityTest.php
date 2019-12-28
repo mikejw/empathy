@@ -39,22 +39,21 @@ class EntityTest extends ESuiteTest
     }
 
 
-   
+   /*
+    * Commented out - no tests to run
     public function testAlice()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $this->loadFixtures('fixtures/dd2.sql', '/fixtures/fixtures2.yml');
         $this->loadFixtures('fixtures/dd3.sql', '/fixtures/fixtures3.yml');
     }
-
+    */
 
     public function testFindBadClass()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $this->setExpectedException(
-             'Exception', 'Entity class does not exist'
-        );
+        $this->setExpectedException(\Exception::class, 'Entity class does not exist');
         $fake = $objectManager->find('Esuite\FakeEntityz', 1);
     }
 

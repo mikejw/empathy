@@ -1,5 +1,8 @@
 <?php
 
+
+include(realpath(dirname(__FILE__).'/../vendor/autoload.php'));
+
 if (!function_exists('loadClass')) {
     function loadClass($class)
     {
@@ -22,7 +25,6 @@ if (!function_exists('loadClass')) {
 
 
 ESuite\Util\Config::init();
-
 if (ESuite\Util\Config::get('set_test_mode')) {
     define('MVC_TEST_MODE', ESuite\Util\Config::get('set_test_mode'));
 }

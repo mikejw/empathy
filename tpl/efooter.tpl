@@ -9,13 +9,12 @@
 {/if}
 <li><a id="github" href="http://github.com/mikejw/empathy"><span>GitHub</span></a></li>
 <li><a id="github" href="https://packagist.org/packages/mikejw"><span>Packagist</span></a></li>
-<li><a id="twitter" href="http://twitter.com/empathyphp"><span>twitter</span></a></li>
 </ul>
 </nav>
 {/if}
 
 <address>
-<a href="https://mikewhiting.co/empathy">Empathy MVC Framework</a> version {$MVC_VERSION} &copy; 2016 <a href="https://mikewhiting.co">Mike Whiting</a>.
+<a href="https://www.empathyphp.co.uk">Empathy MVC Framework</a> version {$MVC_VERSION} &copy; 2008-2019 <a href="mailto:mikejw3@gmail.com">Mike Whiting</a>.
 
 </address>
 </footer>

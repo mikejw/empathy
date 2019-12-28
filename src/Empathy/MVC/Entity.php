@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC;
+
 use Empathy\MVC\Config;
 
 /**
@@ -9,10 +10,10 @@ use Empathy\MVC\Config;
  * @file            Empathy/Entity.php
  * @description     Simple "ORM style" model objects for Empathy.
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Entity
@@ -129,7 +130,6 @@ class Entity
             $properties = array();
             foreach ($props as $p) {
                 foreach ($p as $rp) {
-                    
                     $name = $rp->name;
                     if (!in_array($name, $properties) && $name != 'table') {
                         $properties[] = $name;
@@ -172,7 +172,7 @@ class Entity
            }
         */
         $dsn = 'mysql:host='.DB_SERVER.';dbname='.DB_NAME.';';
-        if(defined('DB_PORT') && is_numeric(DB_PORT)) {
+        if (defined('DB_PORT') && is_numeric(DB_PORT)) {
             $dsn .= 'port='.DB_PORT.';';
         }
         $this->dbh = new \PDO($dsn, DB_USER, DB_PASS);
@@ -192,10 +192,10 @@ class Entity
 
 
    /**
-     * Clear associated PDO objects
-     *
-     * @return void
-     */
+    * Clear associated PDO objects
+    *
+    * @return void
+    */
     public function dbDisconnect()
     {
         unset($this->result);
@@ -215,13 +215,12 @@ class Entity
      */
     public function query($sql, $error)
     {
-        if(defined('ELIB_SQL_LOGGING') &&
-           ELIB_SQL_LOGGING == true)
-        {
+        if (defined('ELIB_SQL_LOGGING') &&
+           ELIB_SQL_LOGGING == true) {
             \Empathy\ELib\Util\SQLLog::log($sql);
         }
 
-        $result = NULL;
+        $result = null;
         if (($result = $this->dbh->query($sql)) == false) {
             $errors = $this->dbh->errorInfo();
 
@@ -280,16 +279,17 @@ class Entity
      *
      * @return array data structure of 'options'
      */
-    public function loadAsOptions($table, $field, $order = NULL)
+    public function loadAsOptions($table, $field, $order = null)
     {
         $data = array();
         $sql = 'SELECT id,'.$field.' FROM '.$table;
-        if ($order !== NULL && $order != '') {
+        if ($order !== null && $order != '') {
             $sql .= ' ORDER BY '.$order;
         } else {
             $sql .= ' ORDER BY '.$field;
         }
-        $error = 'Could not load '.$table.' as options';;
+        $error = 'Could not load '.$table.' as options';
+        ;
         $result = $this->query($sql, $error);
         foreach ($result as $row) {
             $id = $row['id'];
@@ -305,19 +305,16 @@ class Entity
      *
      * @return void
      */
-    public function sanitize($checkPostValues=true)
+    public function sanitize($checkPostValues = true)
     {
         foreach ($this->properties as $property) {
-
             if ((!$checkPostValues || ($checkPostValues && isset($_POST[$property]))) &&
                 !in_array($property, $this->globally_ignored_property) &&
                 $this->$property !== null &&
                 !is_numeric($this->$property)) {
-    
                 $this->$property = substr($this->dbh->quote($this->$property), 1, -1);
             }
         }
-      
     }
 
 
@@ -339,11 +336,12 @@ class Entity
      *
      * @param array $format List of fields to apply HTML filtering to.
      *
-     * @param integer $sanitize the form of anti-injection attack sanitization to apply. Either none, while checking POST data, while not checking POST data.
+     * @param integer $sanitize the form of anti-injection attack sanitization to apply.
+     * Either none, while checking POST data, while not checking POST data.
      *
      * @return void
      */
-    public function save($table=null, $format=null, $sanitize=self::SANITIZE_NO_POST)
+    public function save($table = null, $format = null, $sanitize = self::SANITIZE_NO_POST)
     {
         if ($table === null) {
             $table = $this::TABLE;
@@ -365,7 +363,6 @@ class Entity
         $properties = array();
 
         foreach ($this->properties as $property) {
-
             array_push($properties, $property);
         }
 
@@ -410,7 +407,7 @@ class Entity
      *
      * @return void
      */
-    public function insert($table, $id, $format, $sanitize, $force_id=false)
+    public function insert($table, $id, $format, $sanitize, $force_id = false)
     {
         $this->toXHTMLChris($format);
         if ($sanitize == self::SANITIZE) {
@@ -429,7 +426,6 @@ class Entity
 
         foreach ($this->properties as $property) {
             if (($force_id && $property == 'id') || !$force_id) {
-
                 if (is_numeric($this->$property) && !is_string($this->$property)) {
                     $sql .= $this->$property;
                 } elseif ($this->$property == '') {
@@ -461,7 +457,7 @@ class Entity
      *
      * @return array $all all rows from the table.
      */
-    public function getAll($table=null)
+    public function getAll($table = null)
     {
         if ($table === null) {
             $table = $this::TABLE;
@@ -573,8 +569,17 @@ class Entity
         return $nav;
     }
 
-    public function getPaginatePagesMultiJoinGroup($select, $table1, $table2, $table3, $sql_string, $page, $per_page, $group, $order)
-    {
+    public function getPaginatePagesMultiJoinGroup(
+        $select,
+        $table1,
+        $table2,
+        $table3,
+        $sql_string,
+        $page,
+        $per_page,
+        $group,
+        $order
+    ) {
         $nav = array();
         $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string;
         $sql .= ' GROUP BY '.$group.' ORDER BY '.$order;
@@ -635,7 +640,8 @@ class Entity
     {
         $all = array();
         $start = ($page - 1) * $per_page;
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string.' LIMIT '.$start.', '.$per_page;
+        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '
+            .$table3.' t3 '.$sql_string.' LIMIT '.$start.', '.$per_page;
         $error = 'Could not get rows from '.$table1;
         $result = $this->query($sql, $error);
         $i = 0;
@@ -647,11 +653,21 @@ class Entity
         return $all;
     }
 
-    public function getAllCustomPaginateMultiJoinGroup($select, $table1, $table2, $table3, $sql_string, $page, $per_page, $group, $order)
-    {
+    public function getAllCustomPaginateMultiJoinGroup(
+        $select,
+        $table1,
+        $table2,
+        $table3,
+        $sql_string,
+        $page,
+        $per_page,
+        $group,
+        $order
+    ) {
         $all = array();
         $start = ($page - 1) * $per_page;
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string.' GROUP BY '.$group
+        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '
+            .$table3.' t3 '.$sql_string.' GROUP BY '.$group
             .' ORDER BY '.$order.' LIMIT '.$start.', '.$per_page;
         $error = 'Could not get rows from '.$table1;
         $result = $this->query($sql, $error);
@@ -664,13 +680,12 @@ class Entity
         return $all;
     }
 
-    public function assignFromPost($ignore, $force_id=false)
+    public function assignFromPost($ignore, $force_id = false)
     {
         foreach ($this->properties as $property) {
-            if(($force_id && $property == 'id') ||
+            if (($force_id && $property == 'id') ||
                (!in_array($property, $this->globally_ignored_property)
-                && !in_array($property, $ignore)))
-            {
+                && !in_array($property, $ignore))) {
                 $this->$property = $_POST[$property];
             }
         }
@@ -704,10 +719,17 @@ class Entity
 
                 $markup = htmlentities($markup, ENT_QUOTES, 'UTF-8');
 
-                $markup = preg_replace('!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m',
-                                       '<a href="$1" title="$2">$3</a>', $markup);
+                $markup = preg_replace(
+                    '!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m',
+                    '<a href="$1" title="$2">$3</a>',
+                    $markup
+                );
 
-                $markup = preg_replace('!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m', '<img src="$1" id="$2" alt="$3" />', $markup);
+                $markup = preg_replace(
+                    '!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m',
+                    '<img src="$1" id="$2" alt="$3" />',
+                    $markup
+                );
                 $markup = preg_replace('/ +id=""/', '', $markup);
 
                 $markup = preg_replace('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup);
@@ -832,7 +854,7 @@ class Entity
         return $this->val->getErrors();
     }
 
-    public function addValError($error, $field='')
+    public function addValError($error, $field = '')
     {
         $this->val->addError($error, $field);
     }
@@ -854,5 +876,4 @@ class Entity
     {
         return $this->properties;
     }
-
 }

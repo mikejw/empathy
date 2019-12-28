@@ -5,12 +5,12 @@ namespace Empathy\MVC;
 /**
  * Empathy Plugin class
  * @file            Empathy/MVC/Plugin.php
- * @description     
+ * @description
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Plugin
@@ -20,11 +20,11 @@ class Plugin
     protected $manager;
     
 
-    public function __construct($manager, $bootstrap, $config = NULL)
+    public function __construct($manager, $bootstrap, $config = null)
     {
         $this->bootstrap = $bootstrap;
         $this->manager = $manager;
-        if ($config !== NULL) {
+        if ($config !== null) {
             $this->assignConfig($config);
         }
     }
@@ -32,7 +32,7 @@ class Plugin
 
     public function assignConfig($config)
     {
-        $this->config = json_decode($config, true);        
+        $this->config = json_decode($config, true);
     }
 
 
@@ -40,5 +40,4 @@ class Plugin
     {
         return $this->config;
     }
-
 }

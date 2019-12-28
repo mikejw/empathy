@@ -1,41 +1,33 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 
-<phpunit    
-    bootstrap="bootstrap.php"
-    backupGlobals="false"
-    stopOnFailure="false"
-    verbose="true"
-    colors="true">
+<phpunit
+        bootstrap="bootstrap.php"
+        backupGlobals="false"
+        stopOnFailure="false"
+        verbose="true"
+        colors="true">
 
-  <testsuites>
-    <testsuite name="exp">
-      <directory>Experimental</directory>
-    </testsuite>
-    <testsuite name="mvc">
-      <directory>MVC</directory>
-    </testsuite>
-  </testsuites>
-  
-  <logging>    
-    <log type="junit" target="../build/testsuite.xml" logIncompleteSkipped="false" /> 
-    <log type="coverage-html" target="../build/coverage" charset="UTF-8" yui="true" highlight="false" lowUpperBound="35" highLowerBound="70" />   
-  </logging>
-  
+    <testsuites>
+        <testsuite name="Experimental">
+            <directory suffix="Test.php">./Experimental</directory>
+        </testsuite>
+        <testsuite name="MVC">
+            <directory suffix="Test.php">./MVC</directory>
+        </testsuite>
+    </testsuites>
 
-  <filter>   
-    <blacklist>
-      <!--<directory suffix=".php">../../libs/</directory>-->
-      <directory suffix=".php">../vendor/</directory>
-      <directory suffix=".php">../eaa/</directory>
-      <directory suffix=".php">../bin/</directory>
-      <directory suffix=".php">./</directory>
-    </blacklist>
-    
-    <whitelist processUncoveredFilesFromWhitelist="false">
-      <directory suffix=".php">../src/</directory>
-      <directory suffix=".php">./Fake/</directory> <!-- for testing psr 7 stuff -->      
-    </whitelist>
-    
-  </filter>
-  
+    <logging>
+        <log type="junit" target="../build/testsuite.xml"/>
+        <log type="coverage-html" target="../build/coverage" lowUpperBound="35" highLowerBound="70"/>
+    </logging>
+
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="false">
+            <directory suffix=".php">../src/</directory>
+            <directory suffix=".php">./Fake/</directory>
+            <directory suffix=".php">../eaa/</directory>
+        </whitelist>
+    </filter>
+
 </phpunit>

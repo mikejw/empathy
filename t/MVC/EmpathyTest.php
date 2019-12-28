@@ -3,7 +3,6 @@
 namespace ESuite\MVC;
 
 use Empathy\MVC\Config;
-use Empathy\MVC\DBC;
 use ESuite\ESuiteTest;
 
 
@@ -13,22 +12,17 @@ use ESuite\ESuiteTest;
 
 class EmpathyTest extends ESuiteTest
 {
-    private $config_dir;
     private $mvc;
 
     protected function setUp()
     {
-        $this->config_dir = realpath(dirname(realpath(__FILE__)).'/../../eaa/');
+        //
     }
 
     private function createMVC($persistent=false)
-    {   
-        $this->expectOutputRegex('/(Setting header)/');
-
-        $container = \Empathy\MVC\DI::init($this->config_dir, $persistent);
-        $empathy = $container->get('Empathy');
-        $empathy->init();
-        $this->mvc = $empathy;
+    {
+        $bootstrap = $this->makeFakeBootstrap($persistent);
+        $this->mvc = $bootstrap->getMVC();
     }
 
 
@@ -51,17 +45,13 @@ class EmpathyTest extends ESuiteTest
 
     public function testNew()
     {    
-        $this->setExpectedException(
-            'Empathy\MVC\RequestException', 'Not found'
-        );
+        $this->setExpectedException('Empathy\MVC\RequestException', 'Not found');
         $this->mvc = $this->createMVC();
     }
 
 
     public function testErrors()
     {
-        //$this->markTestSkipped();
-
         $this->createMVC(true);
         $errors = $this->mvc->getErrors();
         $this->assertEmpty($errors);
@@ -86,8 +76,6 @@ class EmpathyTest extends ESuiteTest
 
     public function testExceptions()
     {
-        //$this->markTestSkipped();
-
         // what happens when there is just an error
         $this->createMVC(true);
         $this->changeDebug(true);

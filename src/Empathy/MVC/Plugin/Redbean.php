@@ -2,7 +2,10 @@
 
 
 namespace {
-    class R extends RedBeanPHP\Facade{} 
+
+    class R extends RedBeanPHP\Facade
+    {
+    }
 }
 
 namespace Empathy\MVC\Plugin {
@@ -12,12 +15,12 @@ namespace Empathy\MVC\Plugin {
     /**
      * Empathy Redbean Plugin
      * @file            Empathy/MVC/Plugin/Redbean.php
-     * @description     
+     * @description
      * @author          Mike Whiting
-     * @license         LGPLv3
+     * @license         See LICENCE
      *
      * (c) copyright Mike Whiting
-     * This source file is subject to the LGPLv3 License that is bundled
+
      * with this source code in the file licence.txt
      */
     class Redbean extends \Empathy\MVC\Plugin implements PreDispatch
@@ -32,7 +35,7 @@ namespace Empathy\MVC\Plugin {
                 if (is_numeric($stripped)) {
                     $ip = true;
                 }
-            }            
+            }
             return $ip;
         }
         
@@ -50,11 +53,11 @@ namespace Empathy\MVC\Plugin {
                 }
                 \R::setup('sqlite:'.$db);
             } else {
-
                 if (Config::get('DB_SERVER') === false) {
                     throw new \Empathy\MVC\Exception('Database server is not defined in config.');
                 }
-                if (!$this->isIP(Config::get('DB_SERVER'))) {
+                // disable IP check
+                if (false && !$this->isIP(Config::get('DB_SERVER'))) {
                     throw new \Empathy\MVC\Exception('Database server must be an IP address.');
                 }
                 $dsn = $dbms.':host='.Config::get('DB_SERVER').';dbname='.Config::get('DB_NAME').';';
@@ -62,8 +65,8 @@ namespace Empathy\MVC\Plugin {
                 $db_port = Config::get('DB_PORT');
                 if (is_numeric($db_port)) {
                     $dsn .= 'port='.$db_port.';';
-                }                    
-                \R::setup($dsn, Config::get('DB_USER'), Config::get('DB_PASS'));                
+                }
+                \R::setup($dsn, Config::get('DB_USER'), Config::get('DB_PASS'));
             }
         }
     }

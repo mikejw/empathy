@@ -2,8 +2,7 @@
 
 namespace Empathy\MVC;
 
-
-define('MVC_VERSION', '0.9.7');
+define('MVC_VERSION', '0.9.8');
 
 
 /**
@@ -11,10 +10,10 @@ define('MVC_VERSION', '0.9.7');
  * @file            Empathy/Empathy.php
  * @description     Creates global object that initializes an Empathy application
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Empathy
@@ -71,18 +70,12 @@ class Empathy
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode = null, $system_mode = false)
+    public function __construct($configDir, $persistent_mode = false)
     {
         $this->persistent_mode = $persistent_mode;
-        if ($system_mode) {
-            spl_autoload_register(array($this, 'loadClass'));
-        }
-        $this->loadConfig($configDir);        
-        if ($system_mode) {
-            $this->loadConfig(Util\Pear::getConfigDir().'/Empathy', true);
-        } else {
-            $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'), true);
-        }
+        spl_autoload_register(array($this, 'loadClass'));
+        $this->loadConfig($configDir);
+        $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'), true);
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
             self::$use_elib = true;
@@ -267,7 +260,7 @@ class Empathy
             if ($this->boot->getDebugMode()) {
                 $message = $e->getMessage();
             }
-            $e = new RequestException($message, RequestException::BAD_REQUEST);
+            $e = new RequestException($message, RequestException::INTERNAL_ERROR);
         }
 
         // force safe exception
@@ -276,7 +269,6 @@ class Empathy
 
         switch (get_class($e)) {
             case 'Empathy\MVC\SafeException':
-                
                 Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
             case 'Empathy\MVC\TestModeException':
@@ -284,13 +276,16 @@ class Empathy
                 break;
             case 'Empathy\MVC\RequestException':
                 $response = '';
-                switch($e->getCode()) {
+                switch ($e->getCode()) {
                     case RequestException::BAD_REQUEST:
                         $response = 'HTTP/1.1 400 Bad Request';
                         $message = 'Bad request';
                         break;
                     case RequestException::NOT_FOUND:
                         $response = 'HTTP/1.0 404 Not Found';
+                        break;
+                    case RequestException::INTERNAL_ERROR:
+                        $response = 'HTTP/1.0 500 Internal Server Error';
                         break;
                     default:
                         break;
@@ -309,7 +304,7 @@ class Empathy
      * @param  string $configDir
      * @return void
      */
-    private function loadConfig($configDir, $hard=false)
+    private function loadConfig($configDir, $hard = false)
     {
         $configFile = $configDir.'/config.yml';
         if (!file_exists($configFile)) {
@@ -320,7 +315,6 @@ class Empathy
 
         $config = $s->YAMLLoad($configFile);
         foreach ($config as $index => $item) {
-
             // auto fix of doc root
             if (!is_array($item)) {
                 if ($index == 'doc_root') {
@@ -335,7 +329,7 @@ class Empathy
                     define(strtoupper($index), $item);
                 }
             } else {
-                Config::store(strtoupper($index), $item);                
+                Config::store(strtoupper($index), $item);
             }
         }
         if (isset($config['boot_options'])) {
@@ -351,40 +345,28 @@ class Empathy
      * @param  string $class the name of class that PHP is attempting to load
      * @return void
      */
-    public static function loadClass($class)
-    {       
-        $i = 0;
-        $load_error = 1;
-        $location = array('');
-        if (strpos($class, 'Controller\\')
-           || strpos($class, 'Model\\')) {
-            $class_arr = explode('\\', $class);
-            $class = $class_arr[sizeof($class_arr)-1];
+    public static function loadClass($classPath)
+    {
+        $classNameArr = explode('\\', $classPath);
+        $className = $classNameArr[ sizeof($classNameArr) -1 ];
 
+        $location = '';
+        if (strpos($classPath, 'Empathy\\MVC\\Controller\\') === 0) {
             if (isset($_GET['module'])) {
-                array_push($location, DOC_ROOT.'/application/'.$_GET['module'].'/');
-            }
-            array_push($location, DOC_ROOT.'/storage/');
-        } elseif (strpos($class, 'Empathy') === 0) {
-            $class = str_replace('\\', '/', $class);
-        }
-        array_push($location, DOC_ROOT.'/application/');
-
-        while ($i < sizeof($location) && $load_error == 1) {
-            $class_file = $location[$i].$class.'.php';
-
-            //echo $class_file.'<br />';
-
-            if (@include($class_file)) {
-                $class_file.": 1<br />\n";
-                $load_error = 0;
+                if ($className != 'CustomController') {
+                    $location = Config::get('DOC_ROOT') . '/application/' . $_GET['module'] . '/';
+                }
             } else {
-                $class_file.": 0<br />\n";
+                throw new \Exception('Module not set.');
             }
-            $i++;
+        } elseif (strpos($classPath, 'Empathy\\MVC\\Model\\') === 0) {
+            $location = Config::get('DOC_ROOT').'/storage/';
+        }
+        if (!empty($location) && file_exists($location.$className.'.php')) {
+            $file = $location.$className.'.php';
+            include($file);
         }
     }
-
 
 
     public function reloadBootOptions()
@@ -395,28 +377,31 @@ class Empathy
 
 
     // DI
-    public function init() {
+    public function init()
+    {
 
-        $this->boot = DI::getContainer()->get('Bootstrap'); 
+        $this->boot = DI::getContainer()->get('Bootstrap');
         $this->initPlugins();
         if ($this->persistent_mode !== true) {
             $this->beginDispatch();
         }
     }
 
-    public function getBootOptions() {
+    public function getBootOptions()
+    {
         return $this->bootOptions;
     }
-    public function getPlugins() {
+    public function getPlugins()
+    {
         return $this->plugins;
     }
 
-    public function setBootOptions($options) {
+    public function setBootOptions($options)
+    {
         $this->bootOptions = $options;
     }
-    public function setPlugins($plugins) {
+    public function setPlugins($plugins)
+    {
         $this->plugins = $plugins;
     }
-
-
 }

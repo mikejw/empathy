@@ -7,12 +7,12 @@ use Empathy\MVC\Plugin as Plugin;
 /**
  * Empathy JSONView Plugin
  * @file            Empathy/MVC/Plugin/JSONView.php
- * @description     
+ * @description
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class JSONView extends Plugin implements PreEvent, Presentation
@@ -24,39 +24,38 @@ class JSONView extends Plugin implements PreEvent, Presentation
  
 
 
-    public function assign($name, $data, $no_array=false)
+    public function assign($name, $data, $no_array = false)
     {
-        if ($no_array) {            
-            $this->output = $data;    
+        if ($no_array) {
+            $this->output = $data;
         } else {
             if (isset($this->object) && is_object($this->output)) {
-                $this->clearVars();                
+                $this->clearVars();
             }
             $this->output[$name] = $data;
         }
     }
 
 
-    public function display($template, $internal=false)
-    {         
+    public function display($template, $internal = false)
+    {
         // check for existence of 'force formatted' config option
         // before displaying json responses in prettified format.
-        // the debug_mode boot option has stopped being used for this 
+        // the debug_mode boot option has stopped being used for this
         // purpose because of cases where debug information is sought but (slower) formatting
         // is not required.
         $force_formatted = (defined('ELIB_FORCE_FORMATTED') && ELIB_FORCE_FORMATTED);
 
-        if(!(defined('MVC_TEST_MODE') && MVC_TEST_MODE)) {
+        if (!(defined('MVC_TEST_MODE') && MVC_TEST_MODE)) {
             header('Content-type: application/json');
         }
 
-        if(is_object($this->output) &&
+        if (is_object($this->output) &&
            (get_class($this->output) ==  $this->return_ob ||
-            get_class($this->output) == $this->error_ob))
-        {           
+            get_class($this->output) == $this->error_ob)) {
             $output = (string) $this->output;
 
-            if(false !== ($callback = $this->output->getJSONPCallback())) {
+            if (false !== ($callback = $this->output->getJSONPCallback())) {
                 $output = $callback.'('.$output.')';
             }
 
@@ -66,14 +65,12 @@ class JSONView extends Plugin implements PreEvent, Presentation
                 echo $output;
             }
         } else {
-            if ($force_formatted) {                
+            if ($force_formatted) {
                 echo json_encode((array)$this->output, JSON_PRETTY_PRINT);
-            } else {               
+            } else {
                 echo json_encode((array)$this->output);
             }
-
         }
-
     }
 
 
@@ -88,18 +85,17 @@ class JSONView extends Plugin implements PreEvent, Presentation
             $this->return_codes = $mod_conf['return_codes'];
             $controller = $this->bootstrap->getController();
             $controller->setPresenter($this);
-         }
+        }
     }
 
     public function exception($debug, $exception, $req_error)
-    {               
+    {
         $rc = $this->return_codes;
         $e_ob = $this->error_ob;
 
         if (!$debug) {
             $r = new $e_ob($rc::SERVER_ERROR, 'Server error.');
         } else {
-           
             $r = new $e_ob(999, 'Exception: ' .$exception->getMessage(), 'SERVER_ERROR_EXPLICIT');
         }
         $this->assign('default', $r, true);
@@ -116,5 +112,4 @@ class JSONView extends Plugin implements PreEvent, Presentation
     {
         unset($this->output);
     }
-
 }

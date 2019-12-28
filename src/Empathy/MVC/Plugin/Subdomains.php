@@ -9,12 +9,12 @@ use Empathy\MVC\Config;
 /**
  * Empathy EDefault Plugin
  * @file            Empathy/MVC/Plugin/Subdomains.php
- * @description     
+ * @description
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class Subdomains extends Plugin implements PreDispatch
@@ -25,12 +25,11 @@ class Subdomains extends Plugin implements PreDispatch
     {
         Config::store('WEB_ROOT_DEFAULT', Config::get('WEB_ROOT'));
         if (isset($_SERVER['HTTP_HOST'])) {
-
             $matches = [];
             if (preg_match(
                '/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i',
                $_SERVER['HTTP_HOST'],
-               $matches)) {            
+               $matches)) {
                  Config::store('SUBDOMAIN', $matches[1]);
                  Config::store('WEB_ROOT', $matches[0].Config::get('WEB_ROOT'));
             }

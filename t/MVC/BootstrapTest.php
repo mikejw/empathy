@@ -28,9 +28,9 @@ class BootstrapTest extends ESuiteTest
 
     public function testDispatch()
     {
-        $this->setExpectedException(
-             'Empathy\MVC\RequestException', 'Not found'
-        );
+        $this->setExpectedException('Empathy\MVC\RequestException', 'Not found');
+        $_SERVER['HTTP_HOST'] = 'localhost';
+        $_SERVER['REQUEST_URI'] = '/eaa/public_html/foo';
         $this->bootstrap->dispatch();
     }
 

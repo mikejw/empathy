@@ -5,18 +5,19 @@ namespace ESuite;
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
 use Empathy\MVC\Config as EmpConfig;
+use Empathy\MVC\DI;
 
 
 abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
 {
    
     protected function setUp()
-    {      
+    {
         //
     }    
     
 
-    protected function makeFakeBootstrap()
+    protected function makeFakeBootstrap($persistentMode=true)
     {
         // use eaa archive as root
         $doc_root = realpath(dirname(realpath(__FILE__)).'/../eaa/');
@@ -28,8 +29,8 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
         $this->setConfig('PUBLIC_DIR', '/public_html');
 
         $dummyBootOptions = array(
-            'default_module' => 'foo',
-            'dynamic_module' => null,
+            'default_module' => 'front',
+            'dynamic_module' => false,
             'debug_mode' => false,
             'environment' => 'dev',
             'handle_errors' => false
@@ -49,7 +50,7 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $container = \Empathy\MVC\DI::init($doc_root, true);
+        $container = DI::init($doc_root, $persistentMode);
         $empathy = $container->get('Empathy');
         $empathy->setBootOptions($dummyBootOptions);
         $empathy->setPlugins($plugins);
@@ -86,11 +87,6 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
     {
         //
     }
-
-
-
-
-
 
     protected function appRequest($uri, $mode=CLIMode::FAKED)
     {

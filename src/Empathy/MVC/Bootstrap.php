@@ -5,7 +5,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  * @copyright 2008-2016 Mike Whiting
- * @license   https://opensource.org/licenses/LGPL-3.0 LGPL
+ * @license  See LICENSE
  * @link      http://www.empathyphp.co.uk
  */
 
@@ -23,7 +23,7 @@ class Bootstrap
      * This is used to store a reference to the controller object
      * which is instatiated before an action can be dispatchted.
      */
-    private $controller = NULL;
+    private $controller = null;
 
     /**
      * Default module read from application config file.
@@ -54,7 +54,7 @@ class Bootstrap
 
     /**
      * This property contains a data structure
-     * that contains the descrition of plugins to be initialized.
+     * that contains the description of plugins to be initialized.
      * Read from the application config.
      */
     private $plugins;
@@ -114,7 +114,7 @@ class Bootstrap
 
 
     /**
-     * Sets local boot options including environment. 
+     * Sets local boot options including environment.
      *
      * @param array $bootOptions boot options config
      * @return null
@@ -123,7 +123,7 @@ class Bootstrap
     {
         if ($bootOptions === null) {
             $bootOptions = Config::get('BOOT_OPTIONS');
-        }    
+        }
         if (isset($bootOptions['default_module'])) {
             $this->defaultModule = $bootOptions['default_module'];
         }
@@ -158,7 +158,7 @@ class Bootstrap
 
         $error = $this->uri->getError();
 
-        if ($error == URI::MISSING_CLASS
+        if ($error == URI::MISSING_CLASS_DEF
            && isset($this->dynamicModule)
            && $this->dynamicModule != '') {
             $error = $this->uri->dynamicSection();
@@ -166,7 +166,7 @@ class Bootstrap
 
         if ($error > 0 && $controller === null) {
             if ($this->environment == 'prod' || $this->debug_mode == false) {
-                if ($error == URI::MISSING_CLASS ||
+                if ($error == URI::MISSING_CLASS_DEF ||
                     $error == URI::MISSING_EVENT_DEF ||
                     $error == URI::ERROR_404
                 ) {
@@ -175,7 +175,7 @@ class Bootstrap
             } else {
                 throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
             }
-        }    
+        }
 
         if ($controller === null) {
             $controller_name = $this->uri->getControllerName();
@@ -255,13 +255,22 @@ class Bootstrap
                                 spl_autoload_register(array($p['class_name'], $p['loader']));
                             }
                         }
-                    }                    
-                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name']; 
+                    }
+
+                    if (count(explode('\\', $p['name'])) > 1) {
+                        $plugin = '\\'.$p['name'];
+                    } else {
+                        $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
+                    }
+
                     $n = (isset($p['config']))?
                         new $plugin($plugin_manager, $this, $p['config']):
-                        new $plugin($plugin_manager, $this, NULL);
-                    $plugin_manager->register($n);                    
+                        new $plugin($plugin_manager, $this, null);
+                    $plugin_manager->register($n);
                 }
+                
+                \Empathy\MVC\DI::getContainer()->set($p['name'], $n);
+                
                 $plugin_manager->preDispatch();
             }
         } catch (\Exception $e) {
@@ -350,7 +359,8 @@ class Bootstrap
      * Get default module.
      *  @return string Module.
      */
-    public function getDefaultModule() {
+    public function getDefaultModule()
+    {
         return $this->defaultModule;
     }
 
@@ -358,7 +368,17 @@ class Bootstrap
      * Get dynamic module.
      * @return string Dynamic module.
      */
-    public function getDynamicModule() {
+    public function getDynamicModule()
+    {
         return $this->dynamicModule;
     }
+
+    /**
+     * Return mvc object
+     */
+    public function getMVC()
+    {
+        return $this->mvc;
+    }
+
 }

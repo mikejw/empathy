@@ -7,8 +7,9 @@
     "url": "https://github.com/mikejw/empathy-project/"
   },
   "dependencies": {
-    "bootstrap": "latest",
+    "bootstrap": "^3.3.7",
     "font-awesome": "latest",
+    "grunt": "^1.0.3",
     "grunt-bower-install-simple": "latest",
     "grunt-browserify": "latest",
     "grunt-cli": "latest",

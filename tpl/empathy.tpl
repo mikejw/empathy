@@ -22,10 +22,14 @@
 <h1>Thank you<br />for choosing Empathy.</h1>
 
 <div id="about">
-<h2>Congratulaions!</h2>
+<h2>Congratulations!</h2>
 <p>You have successfully set up an empathy app.</p>
 </div>
 
+
+{elseif $status neq ''}
+
+<h1>Status is {$status}</h1>
 
 {else}
 

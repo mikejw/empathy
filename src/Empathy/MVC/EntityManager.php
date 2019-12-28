@@ -4,20 +4,19 @@ namespace Empathy\MVC;
 
 use Nelmio\Alice\PersisterInterface;
 
-
 /**
  * Empathy EntityManager
  * @package         Empathy
  * @file            Empathy/MVC/EntityManager.php
  * @description     Simple "ORM style" model objects for Empathy.
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * Do things with entities in a doctrine style ObjectManager fashion
  * for use with fixture generation with Alice
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class EntityManager implements PersisterInterface
@@ -27,7 +26,6 @@ class EntityManager implements PersisterInterface
     public function persist(array $objects)
     {
         foreach ($objects as $object) {
-
             $object->init();
             foreach ($object->getProperties() as $property) {
                 if (is_object($object->$property)) {

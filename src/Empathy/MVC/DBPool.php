@@ -11,10 +11,10 @@ use Empathy\MVC\Config;
  *                  keeping track of a default connection object and handle.
  *
  * @author          Mike Whiting
- * @license         LGPLv3
+ * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
- * This source file is subject to the LGPLv3 License that is bundled
+
  * with this source code in the file licence.txt
  */
 class DBPool
@@ -39,7 +39,7 @@ class DBPool
     *
     * @return void
     */
-    public static function addHost($s, $n, $u, $p, $host, $port = NULL)
+    public static function addHost($s, $n, $u, $p, $host, $port = null)
     {
         self::$pool[$host] = new DBC($s, $n, $u, $p, $port);
     }
@@ -78,13 +78,24 @@ class DBPool
     public static function getDefCX()
     {
         if (sizeof(self::$pool) < 1) {
-
             $db_port = Config::get('DB_PORT');
-
             if (is_numeric($db_port)) {
-                self::addHost(Config::get('DB_SERVER'), Config::get('DB_NAME'), Config::get('DB_USER'), Config::get('DB_PASS'), 'default', $db_port);
+                self::addHost(
+                    Config::get('DB_SERVER'),
+                    Config::get('DB_NAME'),
+                    Config::get('DB_USER'),
+                    Config::get('DB_PASS'),
+                    'default',
+                    $db_port
+                );
             } else {
-                self::addHost(Config::get('DB_SERVER'), Config::get('DB_NAME'), Config::get('DB_USER'), Config::get('DB_PASS'), 'default');
+                self::addHost(
+                    Config::get('DB_SERVER'),
+                    Config::get('DB_NAME'),
+                    Config::get('DB_USER'),
+                    Config::get('DB_PASS'),
+                    'default'
+                );
             }
         }
         return self::getConnection('default');
@@ -94,6 +105,4 @@ class DBPool
     {
         self::$pool = array();
     }
-
-
 }
