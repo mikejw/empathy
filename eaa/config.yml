@@ -1,23 +1,24 @@
 ---
 name: eaa
-doc_root: /Users/mike/code/mikejw/empathy/eaa
+doc_root: /var/www/project/vendor/mikejw/empathy/eaa
 web_root: localhost/eaa
 public_dir: /public_html
 boot_options:
-  handle_errors: false
+  handle_errors: true
   default_module: front
   use_elib: false
   environment: prod
   debug_mode: false
-db_server: 127.0.0.1
+  dynamic_module: false
+db_server: db
 db_user: root
-db_pass:
-db_name:
+db_pass: example
+db_name: project
 plugins:
   -
     name: ELibs
     version: 1.0
-    config: '{ "testing": 0 }'
+    config: '{ "testing": 1 }'
   -
     name: Smarty
     version: 1.0
