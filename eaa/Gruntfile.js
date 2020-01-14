@@ -1,6 +1,8 @@
 
 const yaml = require('js-yaml');
 const fs = require('fs');
+const touch = require("touch")
+
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
@@ -11,10 +13,13 @@ module.exports = function(grunt) {
 
     grunt.registerTask('common', 'Generate common.js.', function() {
         var config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
-        var output = '\n' +
-          'var WEB_ROOT   = "' + config.web_root + "\";\n" +
-          'var PUBLIC_DIR = "' + config.public_dir + "\";\n";
-        fs.writeFileSync('./public_html/js/common.js', output);
+        var file = './public_html/js/common.js';
+        touch(file, function() {
+            var output = '\n' +
+                'var WEB_ROOT   = "' + config.web_root + "\";\n" +
+                'var PUBLIC_DIR = "' + config.public_dir + "\";\n";
+            fs.writeFileSync(file, output);
+        });
     });
 
     grunt.initConfig({
