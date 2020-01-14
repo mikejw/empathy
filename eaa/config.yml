@@ -1,14 +1,14 @@
 ---
 name: eaa
-doc_root: /Users/mike/code/mikejw/empathy/eaa
-web_root: localhost/eaa
-public_dir: /public_html
+doc_root: /var/www/project
+web_root: dev.org
+public_dir:
 boot_options:
-  handle_errors: false
+  handle_errors: true
   default_module: front
   use_elib: false
-  environment: prod
-  debug_mode: false
+  environment: dev
+  debug_mode: true
 db_server: 127.0.0.1
 db_user: root
 db_pass:

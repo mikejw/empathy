@@ -4,21 +4,21 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/mikejw/empathy-project/"
+    "url": ""
   },
-  "dependencies": {
-    "bootstrap": "^3.3.7",
-    "font-awesome": "latest",
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.12.0",
+    "bootstrap": "^4.4.1",
     "grunt": "^1.0.3",
-    "grunt-bower-install-simple": "latest",
-    "grunt-browserify": "latest",
     "grunt-cli": "latest",
     "grunt-contrib-concat": "latest",
     "grunt-contrib-copy": "latest",
+    "grunt-contrib-cssmin": "^3.0.0",
+    "grunt-contrib-sass": "^1.0.0",
     "grunt-contrib-uglify": "latest",
-    "jquery": "~1.12",
-    "jquery-ui": "jquery/jquery-ui#1.11.4",
-    "less": "latest",
+    "jquery": "^3.4.1",
+    "jquery-ui": "^1.12.1",
+    "js-yaml": "^3.13.1",
     "tinymce": "^4.3.13"
   }
 }
