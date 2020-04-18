@@ -99,7 +99,7 @@ class JSONView extends Plugin implements PreEvent, Presentation
             $r = new $e_ob(999, 'Exception: ' .$exception->getMessage(), 'SERVER_ERROR_EXPLICIT');
         }
         $this->assign('default', $r, true);
-        $this->display();
+        $this->display('');
     }
 
    
