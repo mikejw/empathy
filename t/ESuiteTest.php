@@ -8,7 +8,7 @@ use Empathy\MVC\Config as EmpConfig;
 use Empathy\MVC\DI;
 
 
-abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
+abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
 {
    
     protected function setUp()
