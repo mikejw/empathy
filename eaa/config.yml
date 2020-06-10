@@ -1,8 +1,8 @@
 ---
 name: eaa
 doc_root: /var/www/project
-web_root: dev.org
-public_dir:
+web_root: localhost/eaa
+public_dir: /public_html
 boot_options:
   handle_errors: true
   default_module: front
