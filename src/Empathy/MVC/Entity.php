@@ -138,8 +138,8 @@ class Entity
             }
             $properties[] = 'table';
             $this->properties = $properties;
-        } else { // it's a straightforward single subclass
-            
+        } else {
+            // it's a straightforward single subclass
             foreach ($r->getProperties() as $item) {
                 if (!$item->isPrivate()) {
                     array_push($this->properties, $item->name);
@@ -710,7 +710,12 @@ class Entity
 
     public function toXHTMLChris($formatting)
     {
-        $markup = '';
+        $aTagPattern = '!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;'
+            .'(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m';
+
+        $imgTagPattern = '!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;'
+            .'(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m';
+
         foreach ($this->properties as $property) {
             if (!is_numeric($property) && in_array($property, $formatting)) {
                 $markup = $this->$property;
@@ -720,18 +725,18 @@ class Entity
                 $markup = htmlentities($markup, ENT_QUOTES, 'UTF-8');
 
                 $markup = preg_replace(
-                    '!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m',
+                    $aTagPattern,
                     '<a href="$1" title="$2">$3</a>',
                     $markup
                 );
 
                 $markup = preg_replace(
-                    '!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m',
+                    $imgTagPattern,
                     '<img src="$1" id="$2" alt="$3" />',
                     $markup
                 );
-                $markup = preg_replace('/ +id=""/', '', $markup);
 
+                $markup = preg_replace('/ +id=""/', '', $markup);
                 $markup = preg_replace('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup);
                 $markup = preg_replace('!&lt;em&gt;(.*?)&lt;/em&gt;!m', '<em>$1</em>', $markup);
 
