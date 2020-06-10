@@ -380,5 +380,4 @@ class Bootstrap
     {
         return $this->mvc;
     }
-
 }

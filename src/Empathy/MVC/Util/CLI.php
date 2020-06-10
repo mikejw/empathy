@@ -11,9 +11,7 @@
  * @link      http://empathyphp.co.uk
  *
  */
-
 namespace Empathy\MVC\Util;
-
 
 class CLI
 {

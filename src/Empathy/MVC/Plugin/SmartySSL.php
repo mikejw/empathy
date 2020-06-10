@@ -30,7 +30,8 @@ class SmartySSL extends Smarty
             isset($this->config['force']) && $this->config['force'] ||
             \Empathy\MVC\Util\Misc::isSecure()
         ) {
-            echo str_replace('http://'.Config::get('WEB_ROOT'),
+            echo str_replace(
+                'http://'.Config::get('WEB_ROOT'),
                 'https://'.Config::get('WEB_ROOT'),
                 $this->smarty->fetch($template)
             );

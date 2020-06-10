@@ -26,10 +26,8 @@ class Subdomains extends Plugin implements PreDispatch
         Config::store('WEB_ROOT_DEFAULT', Config::get('WEB_ROOT'));
         if (isset($_SERVER['HTTP_HOST'])) {
             $matches = [];
-            if (preg_match(
-               '/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i',
-               $_SERVER['HTTP_HOST'],
-               $matches)) {
+            $pattern = '/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i';
+            if (preg_match($pattern, $_SERVER['HTTP_HOST'], $matches)) {
                  Config::store('SUBDOMAIN', $matches[1]);
                  Config::store('WEB_ROOT', $matches[0].Config::get('WEB_ROOT'));
             }
