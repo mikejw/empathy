@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="centerpage">
+<html lang="en" class="{if $centerpage}centerpage{/if}">
 <head>
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -8,7 +8,6 @@
 
 <link href="http://{$WEB_ROOT}{$PUBLIC_DIR}/vendor/css/style.min.css" rel="stylesheet">
 
-
 </head>
-<body id="{$module}"{if $mode neq ''} class="{$mode}"{/if}>
-<div class="text-center">
+<body id="{$module}">
+

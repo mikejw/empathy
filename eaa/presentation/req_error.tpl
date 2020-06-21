@@ -1,9 +1,8 @@
-{include file="$EMPATHY_DIR/tpl/eheader.tpl" mode="default"}
+{include file="$EMPATHY_DIR/tpl/eheader.tpl"}
 
 
 
 {if $code eq 0}
-
 
     {if $module eq 'blog' and $event eq 'tags'}
         <h1 class="fail">Not found</h1>
