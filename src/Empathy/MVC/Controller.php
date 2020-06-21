@@ -350,6 +350,7 @@ class Controller
      */
     public function viewException($debug, $exception, $req_error)
     {
+        $this->assign('centerpage', true);
         $this->presenter->exception($debug, $exception, $req_error);
     }
 

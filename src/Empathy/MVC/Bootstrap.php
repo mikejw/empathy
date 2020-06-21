@@ -193,6 +193,7 @@ class Bootstrap
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($event_val !== false) {
                 if ($this->uri->getInternal()) {
+                    $this->controller->assign('centerpage', true);
                     $this->controller->setTemplate('empathy.tpl');
                     $this->display(true);
                 } else {
