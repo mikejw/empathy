@@ -26,7 +26,7 @@
         "mayflower/php-codebrowser": "dev-master",
         "mockery/mockery": "dev-master",
         "nelmio/alice": "2.2.2",
-        "phpDocumentor/phpDocumentor": "2.9.0"
+        "phpdocumentor/phpdocumentor": "2.9.0"
     },
     "autoload": {
         "psr-0": {
