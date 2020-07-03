@@ -26,6 +26,8 @@ class SmartySSL extends Smarty
             $this->switchInternal();
         }
 
+        $this->assignEmpathyDir();
+
         if (
             isset($this->config['force']) && $this->config['force'] ||
             \Empathy\MVC\Util\Misc::isSecure()
