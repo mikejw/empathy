@@ -29,11 +29,13 @@ class EDefault extends Plugin implements PreDispatch
     }
 
     private function wwwRedirect() {
-        $host = Config::get('WEB_ROOT');
-        $reqHost = $_SERVER['HTTP_HOST'];
-        if (0 === strpos($host, 'www') && false === strPos($reqHost,'www')) {
-            header("Location: //". $host . $_SERVER['REQUEST_URI']);
-            exit();
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $host = Config::get('WEB_ROOT');
+            $reqHost = $_SERVER['HTTP_HOST'];
+            if (0 === strpos($host, 'www') && false === strPos($reqHost, 'www')) {
+                header("Location: //" . $host . $_SERVER['REQUEST_URI']);
+                exit();
+            }
         }
     }
 }
