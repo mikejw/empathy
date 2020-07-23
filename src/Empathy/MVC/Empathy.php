@@ -282,10 +282,10 @@ class Empathy
                         $message = 'Bad request';
                         break;
                     case RequestException::NOT_FOUND:
-                        $response = 'HTTP/1.0 404 Not Found';
+                        $response = 'HTTP/1.1 404 Not Found';
                         break;
                     case RequestException::INTERNAL_ERROR:
-                        $response = 'HTTP/1.0 500 Internal Server Error';
+                        $response = 'HTTP/1.1 500 Internal Server Error';
                         break;
                     default:
                         break;
