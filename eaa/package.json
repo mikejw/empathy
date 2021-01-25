@@ -16,7 +16,7 @@
     "grunt-contrib-concat": "latest",
     "grunt-contrib-copy": "latest",
     "grunt-contrib-uglify": "latest",
-    "jquery": "~1.12",
+    "jquery": "~3.5",
     "jquery-ui": "jquery/jquery-ui#1.11.4",
     "less": "latest",
     "tinymce": "^4.3.13"
