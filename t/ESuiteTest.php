@@ -55,7 +55,6 @@ abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
         $empathy->setBootOptions($dummyBootOptions);
         $empathy->setPlugins($plugins);
         $empathy->init();
-
         $bootstrap = $container->get('Bootstrap');
         return $bootstrap;
     }
