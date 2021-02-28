@@ -41,19 +41,12 @@ class EmpathyTest extends ESuiteTest
         Config::store('BOOT_OPTIONS', $boot_options);
         $this->mvc->reloadBootOptions();   
     }
-    
-
-    public function testNew()
-    {    
-        $this->expectException('Empathy\MVC\RequestException', 'Not found');
-        $this->mvc = $this->createMVC();
-    }
-
 
     public function testErrors()
     {
         $this->createMVC(true);
         $errors = $this->mvc->getErrors();
+
         $this->assertEmpty($errors);
         $this->assertFalse($this->mvc->hasErrors());
         $this->assertEmpty($this->mvc->errorsToString());

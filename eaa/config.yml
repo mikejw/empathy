@@ -7,8 +7,9 @@ boot_options:
   handle_errors: true
   default_module: front
   use_elib: false
-  environment: dev
-  debug_mode: true
+  environment: prod
+  debug_mode: false
+  dynamic_module: false
 db_server: db
 db_user: root
 db_pass: example
