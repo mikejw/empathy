@@ -710,6 +710,7 @@ class Entity
 
     public function toXHTMLChris($formatting)
     {
+        $pTagPattern = '!&lt;p&gt;(.*?)&lt;/p&gt;!m';
         $aTagPattern = '!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;'
             .'(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m';
 
@@ -721,7 +722,6 @@ class Entity
                 $markup = $this->$property;
                 $markup = str_replace("\r", "\n", $markup);
                 $markup = preg_replace("!\n\n+!", "\n", $markup);
-
                 $markup = htmlentities($markup, ENT_QUOTES, 'UTF-8');
 
                 $markup = preg_replace(
@@ -736,15 +736,25 @@ class Entity
                     $markup
                 );
 
+                $markup = preg_replace(
+                    $pTagPattern,
+                    '<p>$1</p>',
+                    $markup
+                );
+
+                $markup = preg_replace('/&amp;nbsp;/', '&nbsp;', $markup);
                 $markup = preg_replace('/ +id=""/', '', $markup);
                 $markup = preg_replace('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup);
                 $markup = preg_replace('!&lt;em&gt;(.*?)&lt;/em&gt;!m', '<em>$1</em>', $markup);
+                $hasPTags = preg_match('/<p>/', $markup);
 
-                $lines = explode("\n", $markup);
-                foreach ($lines as $key => $line) {
-                    $lines[$key] = "<p>{$line}</p>";
+                if (!$hasPTags) {
+                    $lines = explode("\n", $markup);
+                    foreach ($lines as $key => $line) {
+                        $lines[$key] = "<p>{$line}</p>";
+                    }
+                    $markup = implode("\n", $lines);
                 }
-                $markup = implode("\n", $lines);
                 $this->$property = $markup;
             }
         }
