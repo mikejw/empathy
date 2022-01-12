@@ -57,6 +57,12 @@ module.exports = function(grunt) {
                         src: [ "*.*", "**/*.*" ],
                         dest: '<%= dest %>/js/skins'
                     },
+                    {
+                        expand: true,
+                        cwd: '<%= elibdir %>/public/',
+                        src: [ "blogImages.js" ],
+                        dest: '<%= dest %>/js'
+                    }
                 ]
             }
         },
