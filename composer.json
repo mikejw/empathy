@@ -36,5 +36,6 @@
         }
     },
     "bin": [ "bin/empathy" ],
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "prefer-stable" : true
 }
