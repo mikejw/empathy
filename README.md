@@ -48,3 +48,11 @@ For the `elibs` pluign configuration, set testing mode flag to true. i.e:
 	    config: '{ "testing": "true" }'
 
 
+Important
+===
+Use max PHP version 7.4 and Composer version 1 to successfully install all (dev) dependencies.
+
+    composer self-update --1
+
+
+
