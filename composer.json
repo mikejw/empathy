@@ -35,7 +35,5 @@
             "Psr": "src/"
         }
     },
-    "bin": [ "bin/empathy" ],
-    "minimum-stability": "dev",
-    "prefer-stable" : true
+    "bin": [ "bin/empathy" ]
 }
