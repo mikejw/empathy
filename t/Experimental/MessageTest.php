@@ -27,7 +27,7 @@ class MessageTest extends ESuiteTest
         $this->assertEquals($version, $this->message->getProtocolVersion());
 
         $version = '0.9';
-        $this->setExpectedException('Exception');
+        $this->expectException(\Exception::class);
         $this->message->withProtocolVersion($version);
     }
 

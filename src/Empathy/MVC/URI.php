@@ -54,8 +54,6 @@ class URI
 
     public function __construct($default_module, $dynamic_module)
     {
-
-
         if (isset($_SERVER['HTTP_HOST']) && strpos(Config::get('WEB_ROOT'), $_SERVER['HTTP_HOST']) === false) {
             throw new SafeException('Host name mismatch.');
         }

@@ -9,14 +9,13 @@ class DB
     private static $dbh;
     private static $db_criteria;
 
-
     public static function getDefDBCreds()
     {
         return array(
-            'db_host' => '127.0.0.1',
+            'db_host' => 'db',
             'db_name' => 'etest',
             'db_user' => 'root',
-            'db_pass' => '',
+            'db_pass' => 'example',
             'db_port' => 3306
         );
     }
@@ -31,11 +30,14 @@ class DB
         EmpConfig::store('DB_PORT', $creds['db_port']);
     }
 
-
-    private static function connect()
+    public static function create($name)
     {
-        self::$dbh = new \PDO('mysql:host='.EmpConfig::get('DB_SERVER'),
-            EmpConfig::get('DB_USER'), EmpConfig::get('DB_PASS'));
+        if (self::$dbh === NULL) {
+            self::connect();
+        }
+
+        $sql = 'DROP DATABASE IF EXISTS '.$name.'; CREATE DATABASE '.$name.';';      
+        $result = self::$dbh->query($sql);
     }
 
     public static function reset($db_name = NULL)
@@ -47,26 +49,19 @@ class DB
         self::load($db_name);
     }
 
-    private static function create($name)
+    private static function connect()
     {
-        if (self::$dbh === NULL) {
-            self::connect();
-        }
-
-        $sql = 'DROP DATABASE IF EXISTS '.$name.'; CREATE DATABASE '.$name.';';      
-        $result = self::$dbh->query($sql);
+        self::$dbh = new \PDO('mysql:host='.EmpConfig::get('DB_SERVER'),
+            EmpConfig::get('DB_USER'), EmpConfig::get('DB_PASS'));
     }
-
+    
     private static function load($file)
     {
         $exec = Config::get('mysql').' -u '.EmpConfig::get('DB_USER').' --password=\''.EmpConfig::get('DB_PASS').'\' '
+            .'-h '.EmpConfig::get('DB_SERVER').' '
             .EmpConfig::get('DB_NAME').' < '.$file;
         exec($exec);
-        //echo $exec;
     }
-
-
-
 
     // not used as yet
     private static function getCriteria()
@@ -78,7 +73,4 @@ class DB
             'database' => Config::get('db_name')
             );
     }
-
-
-
 }

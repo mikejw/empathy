@@ -82,6 +82,7 @@ class PluginManager
 
     public function eLibsTestMode()
     {
+
         $mode = false;
         foreach ($this->plugins as $p) {
             if (get_class($p) == 'Empathy\MVC\Plugin\ELibs') {
@@ -92,6 +93,7 @@ class PluginManager
                 break;
             }
         }
+        
         return $mode;
     }
 }

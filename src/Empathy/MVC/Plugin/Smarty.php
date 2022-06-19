@@ -55,28 +55,22 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         if ($internal) {
             $this->switchInternal();
         }
-
         $this->assignEmpathyDir();
-
         $this->smarty->display($template);
     }
 
 
-
     public function assignEmpathyDir()
     {
-        // @todo: optimise somehow?
         // for default templates check test mode
         // derived from elibs plugin
         if ($this->manager->eLibsTestMode()) {
-            $empathy_dir = Config::get('DOC_ROOT').'/../';
+            $empathy_dir = realpath(Config::get('DOC_ROOT').'/../');
         } else {
             $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
         }
-        $empathy_dir = realpath($empathy_dir);
         $this->assign('EMPATHY_DIR', $empathy_dir);
     }
-
 
 
     public function loadFilter($type, $name)
@@ -91,6 +85,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     public function exception($debug, $exception, $req_error)
     {
+        $this->assign('centerpage', true);
         $this->assign('error', $exception->getMessage());
         if ($req_error) {
              $this->assign('code', $exception->getCode());
@@ -102,7 +97,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     public function getVars()
     {
-        return $this->smarty->get_template_vars();
+        return $this->smarty->getTemplateVars();
     }
 
     public function clearVars()

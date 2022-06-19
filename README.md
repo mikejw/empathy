@@ -29,3 +29,30 @@ On Gitter
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mikejw/empathy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+Testing
+===
+
+Within the 'Empathy Architype Application' config file (`/eaa/config.yml`), set: `doc_root` to
+the full location of the `eaa` directory, e.g:
+
+    ---
+    doc_root: /var/www/project/vendor/mikejw/empathy/eaa
+
+
+For the `elibs` pluign configuration, set testing mode flag to true. i.e:
+
+	plugins:
+	  -
+	    name: ELibs
+	    version: 1.0
+	    config: '{ "testing": "true" }'
+
+
+Important
+===
+Use max PHP version 7.4 and Composer version 1 to successfully install all (dev) dependencies.
+
+    composer self-update --1
+
+
+

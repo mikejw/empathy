@@ -76,6 +76,7 @@ class DBC
             $dsn .= 'port='.$this->port.';';
         }
         $this->handle = new \PDO($dsn, $this->user, $this->pass);
+        $this->handle->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
     }
 
     /**

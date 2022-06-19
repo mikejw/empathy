@@ -193,6 +193,7 @@ class Bootstrap
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($event_val !== false) {
                 if ($this->uri->getInternal()) {
+                    $this->controller->assign('centerpage', true);
                     $this->controller->setTemplate('empathy.tpl');
                     $this->display(true);
                 } else {
@@ -256,12 +257,21 @@ class Bootstrap
                             }
                         }
                     }
-                    $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
+
+                    if (count(explode('\\', $p['name'])) > 1) {
+                        $plugin = '\\'.$p['name'];
+                    } else {
+                        $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
+                    }
+
                     $n = (isset($p['config']))?
                         new $plugin($plugin_manager, $this, $p['config']):
                         new $plugin($plugin_manager, $this, null);
                     $plugin_manager->register($n);
                 }
+                
+                \Empathy\MVC\DI::getContainer()->set($p['name'], $n);
+                
                 $plugin_manager->preDispatch();
             }
         } catch (\Exception $e) {
@@ -362,5 +372,13 @@ class Bootstrap
     public function getDynamicModule()
     {
         return $this->dynamicModule;
+    }
+
+    /**
+     * Return mvc object
+     */
+    public function getMVC()
+    {
+        return $this->mvc;
     }
 }
