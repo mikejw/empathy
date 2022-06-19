@@ -21,7 +21,7 @@ aims to have the following properties:
 
 Licence
 ---
-Please see `LICENSE` for more information.
+All previous versions, official extensions and current versions, inclusively, are now under Apache 2 license. Please see `LICENSE` for more information.
 
 
 On Gitter
