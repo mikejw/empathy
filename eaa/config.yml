@@ -2,7 +2,7 @@
 name: eaa
 doc_root: /var/www/project/vendor/mikejw/empathy/eaa
 web_root: localhost/eaa
-public_dir: /public_html
+public_dir:
 boot_options:
   handle_errors: true
   default_module: front
