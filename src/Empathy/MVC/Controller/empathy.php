@@ -38,14 +38,14 @@ class empathy extends BaseController
      */
     public function status()
     {
-    	$status = 'Unknown';
-    	if (Config::get('DB_NAME') !== false) {
-	    	$e = new Entity();
-    		$model = Model::connectModel($e);
-    		$status = 'OK';
-    	} else {
-    		$status = 'OK';
-    	}
-    	$this->assign('status', $status);
+        $status = 'Unknown';
+        if (Config::get('DB_NAME') !== false) {
+            $e = new Entity();
+            $model = Model::connectModel($e);
+            $status = 'OK';
+        } else {
+            $status = 'OK';
+        }
+        $this->assign('status', $status);
     }
 }

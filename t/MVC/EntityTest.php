@@ -53,7 +53,7 @@ class EntityTest extends ESuiteTest
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $this->setExpectedException(\Exception::class, 'Entity class does not exist');
+        $this->expectException(\Exception::class, 'Entity class does not exist');
         $fake = $objectManager->find('Esuite\FakeEntityz', 1);
     }
 

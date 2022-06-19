@@ -1,11 +1,9 @@
 /vendor
 /node_modules
-/public_html/components
 /public_html/.htaccess
-/public_html/fonts
 /public_html/vendor
+/public_html/js/common.js
 /tpl
 /config.yml
-/node_modules
 /.idea
 *~

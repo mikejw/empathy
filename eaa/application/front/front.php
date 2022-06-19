@@ -6,7 +6,7 @@ class front extends CustomController
 {
     public function default_event()
     {
-        // do nothing
+        $this->assign('centerpage', true);
     }
 
 }

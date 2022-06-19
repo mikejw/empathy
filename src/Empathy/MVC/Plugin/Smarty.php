@@ -85,6 +85,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
 
     public function exception($debug, $exception, $req_error)
     {
+        $this->assign('centerpage', true);
         $this->assign('error', $exception->getMessage());
         if ($req_error) {
              $this->assign('code', $exception->getCode());

@@ -1,0 +1,169 @@
+
+@import url("https://fonts.googleapis.com/css?family=Pattaya&display=swap");
+
+@import "variables";
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+
+$fa-font-path: "../fonts" !default;
+@import "../../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+@import "../../../node_modules/@fortawesome/fontawesome-free/scss/regular";
+
+
+/* new styles */
+.navbar, .breadcrumb {
+  margin-top: 1rem;
+}
+
+/* login page css */
+html.centerpage {
+  &,
+  body {
+    height: 100%;
+  }
+
+  body {
+    text-align: center;
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: flex;
+    -ms-flex-align: center;
+    -ms-flex-pack: center;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .form-signin {
+    width: 100%;
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+  }
+
+  .form-signin .checkbox {
+    font-weight: 400;
+  }
+
+  .form-signin .form-control {
+    position: relative;
+    box-sizing: border-box;
+    height: auto;
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .form-signin .form-control:focus {
+    z-index: 2;
+  }
+
+  .form-signin input[type="email"] {
+    margin-bottom: 30px;
+  }
+
+  .form-signin input[type="password"] {
+    margin-bottom: 30px;
+  }
+
+  .form-signin button {
+    width: 75%;
+    margin: 0 auto;
+  }
+
+  h2, h1 {
+    font-family: 'Pattaya', sans-serif;
+    color: $gray-600;
+  }
+}
+
+
+/* old styles */
+ul#tree {
+  background-color: $gray-200;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border: 0px solid #000000;
+  margin-bottom: 3rem;
+  padding: 1rem 0.3rem 1rem 1rem;
+
+  [class*="fa-folder"] {
+    color: red;
+  }
+  [class*="fa-file"] {
+    color: green;
+  }
+}
+
+ul#tree ul {
+  padding: 0 0 0 22px;
+  margin: 0;
+  clear: both;
+}
+
+ul#tree li, ul#tree ul li {
+  list-style: none;
+  clear: both;
+  padding: 0;
+  margin: 0;
+  height: auto;
+  overflow-y: visible;
+  line-height: 1em;
+  a {
+    text-decoration: none;
+  }
+}
+
+
+ul#tree li span.toggle, ul#tree ul li span.toggle,
+ul#tree li a.toggle, ul#tree ul li a.toggle {
+  width: 16px;
+  float: left;
+  padding: 0.22em 0 0.5em 0;
+}
+
+ul#tree li i, ul#tree ul li i,
+ul#tree li img, ul#tree ul li img {
+  display: block;
+  float: left;
+}
+
+ul#tree li i, ul#tree ul li i {
+  padding: 0.2rem;
+  font-size: 1.1rem;
+  min-width: 2rem;
+}
+
+ul#tree li span.label, ul#tree ul li span.label {
+  float: left;
+  margin: 0;
+  padding: 0.3rem 0 0 0;
+}
+
+ul#tree li.hidden {
+  opacity: 0.5;
+}
+
+
+.hidden_sections {
+  display: none;
+}
+
+.cms-actions {
+  line-height: 2.2rem;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+
+
+fieldset input[type="radio"] {
+  margin-right: 0.7rem;
+}

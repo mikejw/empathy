@@ -1,96 +1,91 @@
-// The MIT License (MIT)
 
-// Copyright (c) 2015 Mike Whiting
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+const yaml = require('js-yaml');
+const fs = require('fs');
+const touch = require("touch")
 
 
 module.exports = function(grunt) {
-    
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
+
+    grunt.registerTask('common', 'Generate common.js.', function() {
+        var config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
+        var file = './public_html/js/common.js';
+        touch(file, function() {
+            var output = '\n' +
+                'var WEB_ROOT   = "' + config.web_root + "\";\n" +
+                'var PUBLIC_DIR = "' + config.public_dir + "\";\n";
+            fs.writeFileSync(file, output);
+        });
+    });
 
     grunt.initConfig({
 
         node: './node_modules',
         dest: './public_html/vendor',
-        destfaf: './public_html/fonts',
+        destfaf: './public_html/vendor/fonts',
+        elibdir: './vendor/mikejw/elib-base',
 
         copy: {
             main: {
-                files: [                    
+                files: [
                     {
                         expand: true,
                         flatten: true,
-                        src: ['<%= node %>/font-awesome/fonts/fontawesome-webfont.*'],
-                        dest: '<%= destfaf %>/', 
+                        src: ['<%= node %>/@fortawesome/fontawesome-free/webfonts/fa-*'],
+                        dest: '<%= destfaf %>/',
                         filter: 'isFile'
                     },
                     {
                         expand: true,
-                        flatten: true,
-                        src: ['<%= node %>/bootstrap/fonts/glyphicons-halflings-regular.*'],
-                        dest: '<%= destfaf %>/', 
-                        filter: 'isFile'
+                        cwd: '<%= node %>/tinymce/icons/',
+                        src: [ "*.*", "**/*.*" ],
+                        dest: '<%= dest %>/js/icons'
                     },
                     {
-                        expand: true,                
+                        expand: true,
                         cwd: '<%= node %>/tinymce/plugins/',
                         src: [ "*.*", "**/*.*" ],
-                        dest: '<%= dest %>/plugins'
+                        dest: '<%= dest %>/js/plugins'
                     },
                     {
-                        expand: true,                
+                        expand: true,
                         cwd: '<%= node %>/tinymce/themes/',
                         src: [ "*.*", "**/*.*" ],
-                        dest: '<%= dest %>/themes'
+                        dest: '<%= dest %>/js/themes'
                     },
                     {
-                        expand: true,                
+                        expand: true,
                         cwd: '<%= node %>/tinymce/skins/',
                         src: [ "*.*", "**/*.*" ],
-                        dest: '<%= dest %>/skins'
+                        dest: '<%= dest %>/js/skins'
                     },
+                    {
+                        expand: true,
+                        cwd: '<%= elibdir %>/public/',
+                        src: [ "blogImages.js" ],
+                        dest: '<%= dest %>/js'
+                    }
                 ]
             }
         },
-        concat: {           
-            css: {
-                files: {
-                    '<%= dest %>/css.css': [
-                            '<%= node %>/bootstrap/dist/css/bootstrap.min.css',
-                            '<%= node %>/font-awesome/css/font-awesome.min.css'
-                    ]
-                }
-            },
+        concat: {
             js: {
                 files: {
-                    '<%= dest %>/js.js': [
-                            '<%= node %>/jquery/dist/jquery.min.js',
-                            '<%= node %>/bootstrap/dist/js/bootstrap.min.js',
-                            '<%= node %>/less/dist/less.min.js',                            
-                            '<%= node %>/jquery-ui/ui/core.js',
-                            '<%= node %>/jquery-ui/ui/widget.js',
-                            '<%= node %>/jquery-ui/ui/mouse.js',
-                            '<%= node %>/jquery-ui/ui/sortable.js',
-                            '<%= node %>/tinymce/tinymce.jquery.js'
+                    '<%= dest %>/js/main.js': [
+                        '<%= node %>/jquery/dist/jquery.min.js',
+                        '<%= node %>/bootstrap/dist/js/bootstrap.min.js',
+                        '<%= node %>/jquery-ui/ui/data.js',
+                        '<%= node %>/jquery-ui/ui/scroll-parent.js',
+                        '<%= node %>/jquery-ui/ui/widget.js',
+                        '<%= node %>/jquery-ui/ui/widgets/mouse.js',
+                        '<%= node %>/jquery-ui/ui/widgets/sortable.js',
+                        '<%= node %>/tinymce/tinymce.min.js',
+                        '<%= node %>/tinymce/jquery.tinymce.min.js',
+                        '<%= elibdir %>/public/admin.js'
                     ]
                 }
             }
@@ -98,16 +93,43 @@ module.exports = function(grunt) {
         uglify: {
             build: {
                 files: {
-                    '<%= dest %>/js.min.js': [ '<%= dest %>/js.js' ]
+                    '<%= dest %>/js/main.min.js': [ '<%= dest %>/js/main.js' ]
                 }
+            }
+        },
+
+        sass: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: './public_html/css/scss/',
+                    src: ['**/*.scss'],
+                    dest: '<%= dest %>/css',
+                    ext: '.css'
+                }]
+            }
+        },
+
+        cssmin: {
+            target: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= dest %>/css',
+                    src: ['*.css', '!*.min.css'],
+                    dest: '<%= dest %>/css',
+                    ext: '.min.css'
+                }]
             }
         }
     });
 
     grunt.registerTask('def', [
-        'concat',
+        'common',
+        'concat:js',
         'copy',
-        'uglify'
+        'uglify',
+        'sass',
+        'cssmin'
     ]);
 
     grunt.registerTask('default', ['def']);

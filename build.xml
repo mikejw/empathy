@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="build" name="moveittest">
     
-    <target depends="prepare,lint,composer,phpunit,phpcs,phpcb,phpdoc" name="build"/>
+    <target depends="prepare,lint,composer,phpunit,phpcs,phpcs-sast,phpcb,phpdoc" name="build"/>
 
     <target name="clean" description="Cleanup build artifacts">
         <delete dir="${basedir}/build/doc"/>
@@ -30,13 +30,20 @@
 
     <target description="Installing dependencies" name="composer">
         <exec executable="wget" failonerror="true">
-            <arg value="-nc"/>
-            <arg value="http://getcomposer.org/composer.phar"/>
-        </exec>        
+            <!--<arg value="-nc"/>-->
+            <arg value="https://getcomposer.org/composer-stable.phar"/>
+	    <arg value="-O"/>
+	    <arg value="composer.phar"/>
+        </exec>
+	<exec executable="php" failonerror="true">
+	  <arg value="composer.phar"/>
+	  <arg value="global"/>
+	  <arg value="require"/>
+	  <arg value="hirak/prestissimo"/>
+	</exec>
         <exec executable="php" failonerror="true">
             <arg value="composer.phar"/>
             <arg value="install"/>
-            <arg value="--dev"/>
             <arg value="--prefer-dist"/>
             <arg value="--no-progress"/>            
         </exec>
@@ -58,9 +65,16 @@
 
     <target description="Find coding standard violations using PHP_CodeSniffer and create log file." name="phpcs">
         <exec executable="vendor/bin/phpcs">
-            <arg value="--report=checkstyle" />
-            <arg value="--report-file=${basedir}/build/logs/phpcs.xml" />
             <arg value="--standard=PSR2" />
+            <!--<arg value="\-\report=checkstyle" />-->
+            <!--<arg value="\-\-report-file=${basedir}/build/logs/phpcs.xml" />-->
+            <arg path="${basedir}/src" />
+        </exec>
+    </target>
+
+    <target description="SAST security checks." name="phpcs-sast">
+        <exec executable="vendor/bin/phpcs">
+            <arg value="--standard=vendor/pheromone/phpcs-security-audit/example_base_ruleset.xml" />
             <arg path="${basedir}/src" />
         </exec>
     </target>
