@@ -369,7 +369,7 @@ function boot()
 
 function main()
 {
-    $version = defined('MVC_VERSION')? MVC_VERSION: '0.9.x';
+    $version = defined('MVC_VERSION')? MVC_VERSION: '0.10.x';
     echo "\n
                                   __  __         
       ___  ____ ___  ____  ____ _/ /_/ /_  __  __
