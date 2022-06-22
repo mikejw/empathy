@@ -1,12 +1,12 @@
 {
     "name": "mikejw/empathy",
-    "type": "framework",
+    "type": "library",
     "description": "Empathy PHP Framework",
     "keywords": [
-        "framework"
+        "framework",
+        "mvc"
     ],
-    "homepage": "http://empathyphp.co.uk",
-    "license": "Apache-2.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Mike Whiting",

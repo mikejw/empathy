@@ -1,36 +1,34 @@
  
 
-Copyright 2008-2019 Mike Whiting (mikejw3@gmail.com).
+Copyright 2008-2022 Mike Whiting (mikejw3@gmail.com).
 
 
 Empathy PHP Framework
-===
+---
 
-Welcome to the Empathy PHP Framework project. The project
-has existed since 2008 and is geared towards allowing anyone
-to create PHP web applications based on a platform, which
-aims to have the following properties:
+Welcome to the Empathy (micro MVC) PHP Framework project.
+The project has existed since 2008 and is geared towards allowing anyone
+to create PHP web applications, with following properties:
 
 - Strict MVC pattern
-- Compontent/module based
+- Modular compatible libraries
 - Lightweight
 - Fast
 - Extensible
-- Exploits latest stable features of the language
+
+Documentation
+---
+See [getting-started.md](./docs/getting-started.md).
 
 
 Licence
 ---
-All previous versions, official extensions and current versions, inclusively, are now under Apache 2 license. Please see `LICENSE` for more information.
+Empathy and officially released extension libraries are now distributed under an
+MIT license.  See [LICENSE](./LICENSE).
 
 
-On Gitter
+Testing the code itself
 ---
-
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mikejw/empathy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Testing
-===
 
 Within the 'Empathy Architype Application' config file (`/eaa/config.yml`), set: `doc_root` to
 the full location of the `eaa` directory, e.g:
@@ -48,9 +46,10 @@ For the `elibs` pluign configuration, set testing mode flag to true. i.e:
 	    config: '{ "testing": "true" }'
 
 
-Important
-===
-Use max PHP version 7.4 and Composer version 1 to successfully install all (dev) dependencies.
+###Important
+
+Use max PHP version 7.4 and potentially Composer version 1 to successfully install all 
+(dev) dependencies.
 
     composer self-update --1
 
