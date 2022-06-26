@@ -32,7 +32,7 @@ If no module can be resolved the module is set the default module in `/config.ym
 If a class cannot be resolved from the URI, the class defaults to a PHP file/class with the same
 name as the current module.
 
-    `application/front/front.php`
+    application/front/front.php
 
 
 If an action cannot be resolved it will default to the action "default_event".
