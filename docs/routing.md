@@ -12,7 +12,7 @@ This matching process produces global GET param variables:
     $_GET['module']
     $_GET['class']
     $_GET['event']
-    $_GET['id'] optional
+    $_GET['id']        # optional
 
 These params must then resolve in the filesystem within `application` to files with the following structure:
 
