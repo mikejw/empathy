@@ -95,3 +95,8 @@ To aid development it is recommended to use the following configuration in `/con
 This means all errors/exceptions will be caught by empathy and an error page displayed to you
 giving you the error details. If this isn't helping reveal the issue, you can always set 
 `handle_errors` to false to use default PHP error handling.
+
+
+Next
+---
+Go to [Understanding Routing]('./routing.md').
