@@ -86,13 +86,26 @@ class JSONView extends Plugin implements PreEvent, Presentation
     {
         $module = $this->bootstrap->getController()->getModule();
 
-        if (isset($this->config) && in_array($module, array_keys($this->config))) {
-            $mod_conf = $this->config[$module];
-            $this->error_ob = $mod_conf['error_ob'];
-            $this->return_ob = $mod_conf['return_ob'];
-            $this->return_codes = $mod_conf['return_codes'];
-            $controller = $this->bootstrap->getController();
-            $controller->setPresenter($this);
+        if (isset($this->config)) {
+            if (count($this->config) === 1) {
+                $this->config[0] = $this->config;
+            }
+            foreach ($this->config as $item => $value) {
+                if (in_array($module, array_keys($value))) {
+                    $mod_conf = $value[$module];
+                    $this->error_ob = isset($mod_conf['error_ob'])
+                        ? $mod_conf['error_ob']
+                        : 'Empathy\MVC\Plugin\JSONView\EROb';
+                    $this->return_ob = isset($mod_conf['return_ob'])
+                        ? $mod_conf['return_ob']
+                        : 'Empathy\MVC\Plugin\JSONView\ROb';
+                    $this->return_codes = isset($mod_conf['return_codes'])
+                        ? $mod_conf['return_codes']
+                        : 'Empathy\MVC\Plugin\JSONView\ReturnCodes';
+                    $controller = $this->bootstrap->getController();
+                    $controller->setPresenter($this);
+                }
+            }
         }
     }
 
