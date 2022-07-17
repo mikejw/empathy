@@ -95,10 +95,9 @@ for a blog based on ELib-Blog.
     
     RewriteRule ^([_a-zA-Z0-9-]/*)*$ index.php
 
-
-
-    
-
+Next
+---
+Go to [JSON View Plugin](./json-view-plugin.md).
 
 
     
