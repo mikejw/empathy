@@ -41,6 +41,7 @@ There were few key concerns when developing the plugin:
 * There are core objects to use when creating JSON view responses. These are:
 
 
+
     vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/EROb.php
     vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/ROb.php
     vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/ReturnCodes.php
@@ -51,6 +52,7 @@ There were few key concerns when developing the plugin:
   As an example here is sample
   config that uses classes that reside in the application's `/src` directory.
   (NB: for composer PSR autoloading see: https://getcomposer.org/doc/04-schema.md#autoload):
+
 
 
     plugins:
