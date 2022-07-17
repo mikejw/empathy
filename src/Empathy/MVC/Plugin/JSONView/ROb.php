@@ -1,60 +1,44 @@
 <?php
+
 namespace Empathy\MVC\Plugin\JSONView;
-use Empathy\MVC\Plugin\JSONView\ReturnCodes as RC;
 
 
-class ROb
+class ROb extends BaseROb
 {
     protected $meta;
     protected $data;
     protected $pagination;
-    private $jsonp_callback;
-
+    
     public function __construct()
     {
         $this->meta = new \stdClass();
-        $this->meta->code = RC::OK;
-
         $this->data = new \stdClass();
         $this->pagination = new \stdClass();
+        $this->meta = new \stdClass();
+        $this->meta->code = ReturnCodes::OK;
     }
 
-    public function __call($name, $args)
+    public function setData($data) 
     {
-        if (strpos($name, 'get') === 0) {
-            $prop = strtolower(substr($name, 3));
-
-            return $this->$prop;
-        } elseif (strpos($name, 'set') === 0) {
-            $prop = strtolower(substr($name, 3));
-            $this->$prop = $args[0];
-        }
+        $this->data = $data;
     }
 
-    public function __toString()
-    {        
+    public function setPagination($pagination) 
+    {
+        $this->pagination = $pagination;
+    }
+    
+    public function getCode()
+    {
+        return $this->meta->code;
+    }
+
+    public function serialize() 
+    {
         $ob = new \stdClass();
         $ob->meta = $this->meta;
         $ob->data = $this->data;
         $ob->pagination = $this->pagination;
-
-        return json_encode($ob);
-    }
-
-    public function setJSONPCallback($callback) {
-        $this->jsonp_callback = $callback;
-    }
-
-    public function getJSONPCallback() {
-        $callback = false;
-        if($this->jsonp_callback !== null) {
-            $callback = $this->jsonp_callback;
-        }
-        return $callback;
-    }
-
-    public function getCode()
-    {
-        return $this->meta->code;
+        return $ob;
     }
 }
