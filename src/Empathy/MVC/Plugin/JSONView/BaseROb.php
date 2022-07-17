@@ -5,21 +5,21 @@ namespace Empathy\MVC\Plugin\JSONView;
 
 abstract class BaseROb
 {
-	private $jsonp_callback;
+    private $jsonp_callback;
     private $pretty;
 
 
-	public function __construct()
+    public function __construct()
     {
         $this->pretty = false;        
     }
 
-	public function setPretty($pretty)
+    public function setPretty($pretty)
     {
         $this->pretty = $pretty;
     }
 
-	public function __toString()
+    public function __toString()
     {        
         return json_encode($this->serialize(), $this->pretty ? JSON_PRETTY_PRINT : 0);
     }
