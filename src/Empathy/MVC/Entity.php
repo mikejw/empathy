@@ -880,7 +880,6 @@ class Entity
     }
 
 
-
     /**
      * get entity properties
      *

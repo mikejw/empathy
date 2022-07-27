@@ -126,7 +126,7 @@ class Validate
     {
         if ($field != '') {
             if (isset($this->error['field'])) {
-                die('Attempt to overwrite error field.');
+                throw new \Exception('Attempted to overwrite error field value');
             } else {
                 $this->error[$field] = $message;
             }
