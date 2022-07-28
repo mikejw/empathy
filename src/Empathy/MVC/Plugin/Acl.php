@@ -25,35 +25,35 @@ class Acl extends Plugin implements PreEvent
 {
     public function onPreEvent()
     {
-    	$controller = $this->bootstrap->getController();
-    	$class = get_class($controller);
+        $controller = $this->bootstrap->getController();
+        $class = get_class($controller);
 
-    	// don't run when running internal action
-    	if ($class !== 'Empathy\MVC\Controller') {
+        // don't run when running internal action
+        if ($class !== 'Empathy\MVC\Controller') {
 
-    		$r = new \ReflectionClass($class);
+            $r = new \ReflectionClass($class);
             if (in_array('Laminas\Permissions\Acl\Resource\ResourceInterface', $r->getInterfaceNames())) {               
-				$acl = DI::getContainer()->get('Acl');
-				CurrentUser::detectUser();
-				$allowed = false;
-				if (CurrentUser::loggedIn()) {
-			        $user = CurrentUser::getUser();			     
-			        $r = Model::load('UserRole');
-			        $roles = $r->getRoles($user->id);
-			    } else {
-			    	$roles = ['guest'];
-			    }
-			        
-		        foreach ($roles as $role) {
-		            $allowed = $acl->isAllowed($role, $controller->getResourceId());
-		            if ($allowed) {
-		                break;
-		            }
-		        }			
-		        if (!$allowed) {
-		            throw new RequestException('Denied', RequestException::NOT_AUTHORIZED);
-		        }
-			}
-    	}
+                $acl = DI::getContainer()->get('Acl');
+                CurrentUser::detectUser();
+                $allowed = false;
+                if (CurrentUser::loggedIn()) {
+                    $user = CurrentUser::getUser();              
+                    $r = Model::load('UserRole');
+                    $roles = $r->getRoles($user->id);
+                } else {
+                    $roles = ['guest'];
+                }
+                    
+                foreach ($roles as $role) {
+                    $allowed = $acl->isAllowed($role, $controller->getResourceId());
+                    if ($allowed) {
+                        break;
+                    }
+                }           
+                if (!$allowed) {
+                    throw new RequestException('Denied', RequestException::NOT_AUTHORIZED);
+                }
+            }
+        }
     }
 }
