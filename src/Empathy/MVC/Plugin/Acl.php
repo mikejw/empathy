@@ -9,6 +9,9 @@ use Empathy\ELib\User\CurrentUser;
 use Empathy\ELib\Model;
 use Empathy\MVC\Testable;
 use Empathy\MVC\RequestException;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+
 
 /**
  * Empathy Acl Plugin
@@ -34,10 +37,10 @@ class Acl extends Plugin implements PreEvent
     		$r = new \ReflectionClass($class);
             if (in_array('Laminas\Permissions\Acl\Resource\ResourceInterface', $r->getInterfaceNames())) {               
 				$acl = DI::getContainer()->get('Acl');
-				CurrentUser::detectUser();
+				CurrentUser::detectUser();                
 				$allowed = false;
 				if (CurrentUser::loggedIn()) {
-			        $user = CurrentUser::getUser();			     
+			        $user = CurrentUser::getUser();                    		  
 			        $r = Model::load('UserRole');
 			        $roles = $r->getRoles($user->id);
 			    } else {
@@ -49,7 +52,30 @@ class Acl extends Plugin implements PreEvent
 		            if ($allowed) {
 		                break;
 		            }
-		        }			
+		        }
+
+                if (!$allowed) {
+                    // check individual permissions                
+                    AnnotationRegistry::registerLoader('class_exists');
+                    $reflectionClass = new \ReflectionClass($class);
+                    $property = $reflectionClass->getMethod($controller->getEvent());
+                    $reader = new AnnotationReader();
+                    $annotation = $reader->getMethodAnnotation(
+                        $property,
+                        AclAnnotation::class
+                    );
+
+                    if ($annotation && sizeof($annotation->permissions)) {
+                        foreach ($annotation->permissions as $perm) {
+                            if ($allowed = $acl->isAllowed($role, $controller->getResourceId(), $perm)) {
+                                $allowed = true;
+                                break;    
+                            }                    
+                        }    
+                    }
+                                        
+                }
+
 		        if (!$allowed) {
 		            throw new RequestException('Denied', RequestException::NOT_AUTHORIZED);
 		        }

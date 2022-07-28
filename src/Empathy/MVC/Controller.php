@@ -285,6 +285,10 @@ class Controller
         return $this->class;
     }
 
+    public function getEvent() 
+    {
+        return $this->event;
+    }
 
     /**
      * Obtain user interface control values from request/session.
