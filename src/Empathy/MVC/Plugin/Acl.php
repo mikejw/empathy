@@ -36,23 +36,23 @@ class Acl extends Plugin implements PreEvent
 
             $r = new \ReflectionClass($class);
             if (in_array('Laminas\Permissions\Acl\Resource\ResourceInterface', $r->getInterfaceNames())) {
-				$acl = DI::getContainer()->get('Acl');
-				CurrentUser::detectUser();                
-				$allowed = false;
-				if (CurrentUser::loggedIn()) {
-			        $user = CurrentUser::getUser();                    		  
-			        $r = Model::load('UserRole');
-			        $roles = $r->getRoles($user->id);
-			    } else {
-			    	$roles = ['guest'];
-			    }
-			        
-		        foreach ($roles as $role) {
-		            $allowed = $acl->isAllowed($role, $controller->getResourceId());
-		            if ($allowed) {
-		                break;
-		            }
-		        }
+                $acl = DI::getContainer()->get('Acl');
+                CurrentUser::detectUser();                
+                $allowed = false;
+                if (CurrentUser::loggedIn()) {
+                    $user = CurrentUser::getUser();                           
+                    $r = Model::load('UserRole');
+                    $roles = $r->getRoles($user->id);
+                } else {
+                    $roles = ['guest'];
+                }
+                    
+                foreach ($roles as $role) {
+                    $allowed = $acl->isAllowed($role, $controller->getResourceId());
+                    if ($allowed) {
+                        break;
+                    }
+                }
 
                 if (!$allowed) {
                     // check individual permissions                
@@ -76,11 +76,11 @@ class Acl extends Plugin implements PreEvent
                                         
                 }
 
-		        if (!$allowed) {
-		            throw new RequestException('Denied', RequestException::NOT_AUTHORIZED);
-		        }
-			}
-    	}
+                if (!$allowed) {
+                    throw new RequestException('Denied', RequestException::NOT_AUTHORIZED);
+                }
+            }
+        }
 
     }
 }
