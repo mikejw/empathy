@@ -28,14 +28,14 @@ class Acl extends Plugin implements PreEvent
 {
     public function onPreEvent()
     {
-    	$controller = $this->bootstrap->getController();
-    	$class = get_class($controller);
+        $controller = $this->bootstrap->getController();
+        $class = get_class($controller);
 
-    	// don't run when running internal action
-    	if ($class !== 'Empathy\MVC\Controller') {
+        // don't run when running internal action
+        if ($class !== 'Empathy\MVC\Controller') {
 
-    		$r = new \ReflectionClass($class);
-            if (in_array('Laminas\Permissions\Acl\Resource\ResourceInterface', $r->getInterfaceNames())) {               
+            $r = new \ReflectionClass($class);
+            if (in_array('Laminas\Permissions\Acl\Resource\ResourceInterface', $r->getInterfaceNames())) {
 				$acl = DI::getContainer()->get('Acl');
 				CurrentUser::detectUser();                
 				$allowed = false;
@@ -81,5 +81,6 @@ class Acl extends Plugin implements PreEvent
 		        }
 			}
     	}
+
     }
 }
