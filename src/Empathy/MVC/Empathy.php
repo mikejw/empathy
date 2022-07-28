@@ -113,7 +113,7 @@ class Empathy
         } else {
             try {
                 $this->boot->initPlugins();
-            } catch (\Exception $e) {
+            } catch (\Exception $e) {                
                 $this->exceptionHandler($e);
             }
         }
@@ -254,8 +254,10 @@ class Empathy
         // checks exception not already of type req
         // then checks env before forcing a req error class
         // (for diplaying standard error pages in prod)
-        if ('Empathy\MVC\RequestException' != get_class($e) &&
-            $this->boot->getEnvironment() == 'prod') {
+        if (
+            'Empathy\MVC\RequestException' != get_class($e) &&
+            $this->boot->getEnvironment() == 'prod'
+        ) {
             $message = '';
             if ($this->boot->getDebugMode()) {
                 $message = $e->getMessage();
@@ -287,6 +289,10 @@ class Empathy
                     case RequestException::INTERNAL_ERROR:
                         $response = 'HTTP/1.1 500 Internal Server Error';
                         break;
+                     case RequestException::NOT_AUTHORIZED:
+                        $response = 'HTTP/1.1 403 Forbidden';
+                        $message = 'Forbidden';
+                        break;    
                     default:
                         break;
                 }
