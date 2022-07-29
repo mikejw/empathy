@@ -2,7 +2,7 @@
 
 namespace Empathy\MVC\Util;
 
-use ELib\MVC\Util;
+use Empathy\ELib\Util;
 
 /**
  * Empathy ELib Plugin

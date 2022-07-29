@@ -63,6 +63,43 @@ class Empathy
     private static $use_elib = false;
 
     /**
+     * Set config into memory.
+     * 
+     * @param $config Configuration data 
+     * 
+     * @param $hard   Set constants  
+     * 
+     * @return void
+     */
+    private function consumeConfig($config, $hard = false)
+    {
+        foreach ($config as $index => &$item) {
+            // auto fix of doc root
+            if (!is_array($item)) {
+                if ($index === 'doc_root') {
+                    if (!file_exists($item)) {
+                        $item = $configDir;
+                    }
+                }
+            }
+
+            if ($hard) {
+                if (!defined(strtoupper($index))) {
+                    define(strtoupper($index), $item);
+                }
+            } else {
+                Config::store(strtoupper($index), $item);
+            }
+        }
+        if (isset($config['boot_options'])) {
+            $this->bootOptions = $config['boot_options'];
+        }
+        if (isset($config['plugins'])) {
+            $this->plugins = $config['plugins'];
+        }
+    }
+
+    /**
      * Create application object.
      * @param string $configDir the location of the application config file
      *
@@ -74,8 +111,11 @@ class Empathy
     {
         $this->persistent_mode = $persistent_mode;
         spl_autoload_register(array($this, 'loadClass'));
-        $this->loadConfig($configDir);
-        $this->loadConfig(realpath(dirname(realpath(__FILE__)).'/../../../'), true);
+
+        list($appConfig, $globalConfig) = DI::getContainer()->get('Config');
+        $this->consumeConfig($appConfig);
+        $this->consumeConfig($globalConfig, true);        
+
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
             self::$use_elib = true;
@@ -305,46 +345,6 @@ class Empathy
         }
     }
 
-    /**
-     * read config file from specified location
-     * @param  string $configDir
-     * @return void
-     */
-    private function loadConfig($configDir, $hard = false)
-    {
-        $configFile = $configDir.'/config.yml';
-        if (!file_exists($configFile)) {
-            die('Config error: '.$configFile.' does not exist');
-        }
-        
-        $s = DI::getContainer()->get('Spyc');
-
-        $config = $s->YAMLLoad($configFile);
-        foreach ($config as $index => $item) {
-            // auto fix of doc root
-            if (!is_array($item)) {
-                if ($index == 'doc_root') {
-                    if (!file_exists($item)) {
-                        $item = $configDir;
-                    }
-                }
-            }
-
-            if ($hard) {
-                if (!defined(strtoupper($index))) {
-                    define(strtoupper($index), $item);
-                }
-            } else {
-                Config::store(strtoupper($index), $item);
-            }
-        }
-        if (isset($config['boot_options'])) {
-            $this->bootOptions = $config['boot_options'];
-        }
-        if (isset($config['plugins'])) {
-            $this->plugins = $config['plugins'];
-        }
-    }
 
     /**
      * the autoload function.
