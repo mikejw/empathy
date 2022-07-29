@@ -65,7 +65,7 @@ class DI
             'Config' => function (\DI\Container $c) {
                 return [
                     self::loadConfig($c->get('configDir')),
-                    self::loadConfig('./../vendor/mikejw/empathy')
+                    self::loadConfig(dirname(realpath(__FILE__)).'/../../../')
                 ];
             }
         ]);
