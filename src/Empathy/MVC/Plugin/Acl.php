@@ -5,7 +5,6 @@ namespace Empathy\MVC\Plugin;
 use Empathy\MVC\Plugin\PreEvent;
 use Empathy\MVC\Plugin as Plugin;
 use Empathy\MVC\DI;
-use Empathy\ELib\User\CurrentUser;
 use Empathy\ELib\Model;
 use Empathy\MVC\Testable;
 use Empathy\MVC\RequestException;
@@ -37,10 +36,10 @@ class Acl extends Plugin implements PreEvent
             $r = new \ReflectionClass($class);
             if (in_array('Laminas\Permissions\Acl\Resource\ResourceInterface', $r->getInterfaceNames())) {
                 $acl = DI::getContainer()->get('Acl');
-                CurrentUser::detectUser();                
+                DI::getContainer()->get('CurrentUser')->detectUser();                
                 $allowed = false;
-                if (CurrentUser::loggedIn()) {
-                    $user = CurrentUser::getUser();                           
+                if (DI::getContainer()->get('CurrentUser')->loggedIn()) {
+                    $user = DI::getContainer()->get('CurrentUser')->getUser();                           
                     $r = Model::load('UserRole');
                     $roles = $r->getRoles($user->id);
                 } else {
