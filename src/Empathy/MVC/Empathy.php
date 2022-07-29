@@ -71,7 +71,7 @@ class Empathy
      * 
      * @return void
      */
-    private function consumeConfig($config, $hard = false)
+    private function consumeConfig($config, $configDir, $hard = false)
     {
         foreach ($config as $index => &$item) {
             // auto fix of doc root
@@ -113,8 +113,8 @@ class Empathy
         spl_autoload_register(array($this, 'loadClass'));
 
         list($appConfig, $globalConfig) = DI::getContainer()->get('Config');
-        $this->consumeConfig($appConfig);
-        $this->consumeConfig($globalConfig, true);        
+        $this->consumeConfig($appConfig, $configDir);
+        $this->consumeConfig($globalConfig, $configDir, true);        
 
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
