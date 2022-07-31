@@ -212,10 +212,9 @@ class Bootstrap
     public function dispatchException($e)
     {
         $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
-        $this->controller = new Controller($this);
- 
-        $this->plugin_manager->preEvent();
 
+        $this->controller = new Controller($this, $this->controller->getUseSession()); 
+        $this->plugin_manager->preEvent();
         $this->controller->viewException($this->debug_mode, $e, $req_error);
     }
 

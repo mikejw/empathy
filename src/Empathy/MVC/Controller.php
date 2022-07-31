@@ -80,7 +80,7 @@ class Controller
     /**
      * Use session flag
      */
-    protected $useSession = true;
+    protected $useSession;
 
     /**
      * Controller constructor.  Grabs certain properties from the boot object, establishes the view
@@ -88,8 +88,9 @@ class Controller
      *
      * @param Bootstrap $boot The current bootstrap object
      */
-    public function __construct($boot)
+    public function __construct($boot, $useSession)
     {
+        $this->useSession = $useSession;
         $this->boot = $boot;
         $this->cli_mode = $boot->getURICliMode();
         $this->initError = $boot->getURIError();
@@ -396,4 +397,10 @@ class Controller
             Session::set('csrf_token', $token);    
         }
     }
+
+    public function getUseSession()
+    {
+        return $this->useSession;
+    }
+
 }
