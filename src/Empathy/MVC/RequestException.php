@@ -19,6 +19,7 @@ class RequestException extends Exception
     const BAD_REQUEST = 1;
     const INTERNAL_ERROR = 2;
     const NOT_AUTHORIZED = 3;
+    const NOT_AUTHENTICATED = 4;
 
     public function __construct($message, $code = 0, \Exception $previous = null)
     {

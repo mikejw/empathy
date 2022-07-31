@@ -78,6 +78,11 @@ class Controller
     protected $environment;
 
     /**
+     * Use session flag
+     */
+    protected $useSession = true;
+
+    /**
      * Controller constructor.  Grabs certain properties from the boot object, establishes the view
      * from the plugin manager and assigns certain information to view making it available to templates.
      *
@@ -102,7 +107,9 @@ class Controller
         } else {
             $this->templateFile = $this->module.'.tpl';
         }
-        Session::up();
+        if ($this->useSession) {
+            Session::up();    
+        }
         $this->presenter = $this->plugin_manager->getView();
         if ($this->presenter !== null) {
             $this->assignControllerInfo();
@@ -200,7 +207,10 @@ class Controller
     public function redirect($endString = '')
     {
         $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';
-        Session::write();
+        if ($this->useSession) {
+            Session::write();    
+        }
+        
         $location = 'Location: ';
         $location .= $proto.'://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
         if ($endString != '') {
@@ -218,7 +228,9 @@ class Controller
      */
     public function redirect_cgi($endString = '')
     {
-        Session::write();
+        if ($this->useSession) {
+            Session::write();    
+        }  
         $location = 'Location: ';
         $location .= 'http://'.Config::get('CGI').'/';
         if ($endString != '') {
@@ -234,7 +246,9 @@ class Controller
      */
     public function sessionDown()
     {
-        Session::down();
+        if ($this->useSession) {
+            Session::down();
+        }
     }
 
     /**
@@ -298,18 +312,20 @@ class Controller
      */
     public function loadUIVars($ui, $ui_array)
     {
-        $new_app = Session::getNewApp();
-        foreach ($ui_array as $setting) {
-            if (isset($_GET[$setting])) {
-                if (!$new_app) {
-                    $_SESSION[$ui][$setting] = $_GET[$setting];
-                } else {
-                    Session::setUISetting($ui, $setting, $_GET[$setting]);
+        if ($this->useSession) {
+            $new_app = Session::getNewApp();
+            foreach ($ui_array as $setting) {
+                if (isset($_GET[$setting])) {
+                    if (!$new_app) {
+                        $_SESSION[$ui][$setting] = $_GET[$setting];
+                    } else {
+                        Session::setUISetting($ui, $setting, $_GET[$setting]);
+                    }
+                } elseif (Session::getUISetting($ui, $setting) !== false) {
+                    $_GET[$setting] = Session::getUISetting($ui, $setting);
+                } elseif (isset($_SESSION[$ui][$setting])) {
+                    $_GET[$setting] = $_SESSION[$ui][$setting];
                 }
-            } elseif (Session::getUISetting($ui, $setting) !== false) {
-                $_GET[$setting] = Session::getUISetting($ui, $setting);
-            } elseif (isset($_SESSION[$ui][$setting])) {
-                $_GET[$setting] = $_SESSION[$ui][$setting];
             }
         }
     }
@@ -376,6 +392,8 @@ class Controller
     {
         $token = md5(uniqid(rand(), true));
         $this->assign('csrf_token', $token);
-        Session::set('csrf_token', $token);
+        if ($this->useSession) {
+            Session::set('csrf_token', $token);    
+        }
     }
 }

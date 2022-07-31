@@ -145,6 +145,12 @@ class JSONView extends Plugin implements PreEvent, Presentation
                 case RequestException::INTERNAL_ERROR:
                     $code = $rc::Internal_Server_Error;
                     break;
+                case RequestException::NOT_AUTHENTICATED:
+                    $code = $rc::Unauthorized;
+                    break;
+                case RequestException::NOT_AUTHORIZED:
+                    $code = $rc::Forbidden;
+                    break;        
                 default:
                     break;
             }

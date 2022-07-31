@@ -20,10 +20,10 @@ class DI
         return $spyc->YAMLLoad($configFile);
     }
 
-    private static function loadAdditional($location)
+    private static function loadAdditional($location, $docRoot = '')
     {
-        if (file_exists($location)) {
-            self::$builder->addDefinitions($location);
+        if (file_exists($docRoot.$location)) {
+            self::$builder->addDefinitions($docRoot.$location);
         }
     }
 
@@ -72,9 +72,9 @@ class DI
 
         $appConfig = self::loadConfig($configDir, new \Spyc());
         if ($appConfig['boot_options']['use_elib']) {
-            $elibDirs = \Empathy\ELib\Util\Libs::findAll();
+            $elibDirs = \Empathy\ELib\Util\Libs::findAll($appConfig['doc_root']);
             foreach ($elibDirs as $lib) {
-                self::loadAdditional($lib.'/services.php');
+                self::loadAdditional($lib.'/services.php', $appConfig['doc_root']);
             }            
         }
 
