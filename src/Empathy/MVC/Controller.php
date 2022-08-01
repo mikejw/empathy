@@ -88,7 +88,7 @@ class Controller
      *
      * @param Bootstrap $boot The current bootstrap object
      */
-    public function __construct($boot, $useSession)
+    public function __construct($boot, $useSession = true)
     {
         $this->useSession = $useSession;
         $this->boot = $boot;

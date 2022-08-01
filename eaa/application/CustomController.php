@@ -20,9 +20,9 @@ class CustomController extends Controller
      *
      * @return void
      */
-    public function __construct($boot)
+    public function __construct($boot, $useSession = true)
     {
-        parent::__construct($boot);
+        parent::__construct($boot, $useSession);
     }
 
 }

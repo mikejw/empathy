@@ -419,6 +419,9 @@ function main()
                               'description' => 'Enable elib.'));
     $arguments->addOption('set_https', array(
                               'description' => 'Enable SSL.'));
+    $arguments->addOption('clear_cache', array(
+                              'default'     => null,
+                              'description' => 'Clear APCu cache.'));
 
     $arguments->parse();
 
@@ -438,7 +441,8 @@ function main()
             'set_webroot', 'set_publicdir',
             'set_dbuser', 'set_dbpass',
             'set_dbname', 'set_dbserver',
-            'set_elib', 'set_https'
+            'set_elib', 'set_https',
+            'clear_cache'
         );
         foreach($valid_options as $o) {
             if(isset($arguments[$o])) {
@@ -449,12 +453,33 @@ function main()
     }
 }
 
+function option_clear_cache() {
+    assertConfig();
+    global $app_config;
+    $route = $app_config['web_root'].$app_config['public_dir'].'/empathy/empathy/cc';
+    $proto = 'http';
+    foreach ($app_config['plugins'] as $index => &$item) {
+        if ($item['name'] === "SmartySSL") {
+            $proto = 'https';
+            break;
+        }
+    }
+    $matches = array();
+    preg_match('/Cache cleared/', file_get_contents($proto.'://'.$route), $matches);
+    if ($matches[0]) {
+        echo "Cache cleared.\n";
+    }
+}
+
+
 function option_inst_mod($module) {
 
     // currently no checks for lib
     $count = \Empathy\MVC\Util\ModuleGen::generate($module);
     \cli\out_padded($count.' controller(s) generated.');
 }
+
+
 
 
 $boot = null;

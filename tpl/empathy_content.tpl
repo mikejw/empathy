@@ -28,6 +28,9 @@
     {elseif $status neq ''}
         <h1>Status is {$status}</h1>
 
+    {elseif $cc}
+        <h1>Cache cleared.</h1>    
+
     {else}
         <h1>Empathy</h1>
     {/if}

@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC;
+use Empathy\MVC\FileContentsCache;
 
 class DI
 {
@@ -14,10 +15,9 @@ class DI
             $spyc = DI::getContainer()->get('Spyc');
         }
         $configFile = $configDir.'/config.yml';
-        if (!file_exists($configFile)) {
-            throw new \Exception('Config error: '.$configFile.' does not exist');
-        }
-        return $spyc->YAMLLoad($configFile);
+        return FileContentsCache::cachedCallback($configFile, function($data) use (&$spyc) {
+            return $spyc->YamlLoadString($data);
+        });
     }
 
     private static function loadAdditional($location, $docRoot = '')

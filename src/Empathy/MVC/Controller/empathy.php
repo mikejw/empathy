@@ -48,4 +48,19 @@ class empathy extends BaseController
         }
         $this->assign('status', $status);
     }
+
+
+    /**
+     * Clear APCu cache.
+     */
+    public function cc()
+    {
+        $apcuAvailable = function_exists('apcu_enabled') && \apcu_enabled();
+        if (!$apcuAvailable) {
+            throw new \Exception('APCu is not available!');
+        }
+        \apcu_clear_cache();
+        $this->assign('cc', true);
+    }
+
 }
