@@ -295,8 +295,8 @@ class Empathy
         // then checks env before forcing a req error class
         // (for diplaying standard error pages in prod)
         if (
-            'Empathy\MVC\RequestException' != get_class($e) &&
-            $this->boot->getEnvironment() == 'prod'
+            Empathy\MVC\RequestException::class != get_class($e) &&
+            $this->boot->getEnvironment() != 'dev'
         ) {
             $message = '';
             if ($this->boot->getDebugMode()) {
@@ -308,15 +308,14 @@ class Empathy
         // force safe exception
         //$e = new Empathy\SafeException($e->getMessage());
 
-
         switch (get_class($e)) {
-            case 'Empathy\MVC\SafeException':
+            case Empathy\MVC\SafeException::class:
                 Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
-            case 'Empathy\MVC\TestModeException':
+            case Empathy\MVC\TestModeException::class:
                 // allow execution to end naturally
                 break;
-            case 'Empathy\MVC\RequestException':
+            case Empathy\MVC\RequestException::class:
                 $response = '';
                 switch ($e->getCode()) {
                     case RequestException::BAD_REQUEST:

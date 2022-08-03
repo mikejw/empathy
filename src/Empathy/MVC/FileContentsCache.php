@@ -7,13 +7,10 @@ class FileContentsCache
 	
 	public static function cachedCallback($filename, $callback = null)
 	{
-		$apcuAvailable = function_exists('apcu_enabled') && \apcu_enabled();
-		if (!$apcuAvailable) {
-			throw new \Exception('APCu is not available!');
-		}
-
+		$apcuAvailable = function_exists('apcu_enabled') && apcu_enabled();
 		$data = false;
-        if ((false !== ($data = \apcu_fetch($filename)))) {
+
+        if ($apcuAvailable && (false !== ($data = apcu_fetch($filename)))) {
             // received cached
         } else {
         	//echo 'reading file';
@@ -24,8 +21,11 @@ class FileContentsCache
         	$data = file_get_contents($filename);
         	if (is_callable($callback)) {
         		$data = $callback($data);
-        	}                
-            \apcu_add($filename, $data);
+        	}
+        	if ($apcuAvailable) {
+        		apcu_add($filename, $data);	
+        	}             
+            
         }
         return $data;
 	}
