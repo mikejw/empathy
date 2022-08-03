@@ -11,6 +11,7 @@
 
 namespace Empathy\MVC;
 
+
 /**
  * Main boot class that handles plugins and dispatches to controllers.
  *
@@ -134,7 +135,7 @@ class Bootstrap
             $this->debug_mode = ($bootOptions['debug_mode'] === true);
         }
         $this->environment = 'dev';
-        $valid_env = array('dev', 'stag', 'prod');
+        $valid_env = array('dev', 'uat', 'stag', 'prod');
         if (isset($bootOptions['environment'])) {
             if (in_array($bootOptions['environment'], $valid_env)) {
                 $this->environment = $bootOptions['environment'];
@@ -165,7 +166,7 @@ class Bootstrap
         }
 
         if ($error > 0 && $controller === null) {
-            if ($this->environment == 'prod' || $this->debug_mode == false) {
+            if ($this->environment != 'dev' || $this->debug_mode == false) {
                 if ($error == URI::MISSING_CLASS_DEF ||
                     $error == URI::MISSING_EVENT_DEF ||
                     $error == URI::ERROR_404
@@ -212,8 +213,7 @@ class Bootstrap
      */
     public function dispatchException($e)
     {
-        $req_error = (get_class($e) == 'Empathy\MVC\RequestException')? true: false;
-
+        $req_error = (get_class($e) == RequestException::class) ? true : false;
         $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;
         $this->controller = new Controller($this, $useSession); 
         $this->plugin_manager->preEvent();

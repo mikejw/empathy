@@ -286,41 +286,35 @@ class Empathy
      */
     public function exceptionHandler($e)
     {
-        // prioritise any caught errors over exceptions thrown
+        $response = '';
         if ($this->hasErrors()) {
             $e = new ErrorException($this->errorsToString());
         }
 
-        // checks exception not already of type req
-        // then checks env before forcing a req error class
-        // (for diplaying standard error pages in prod)
         if (
-            Empathy\MVC\RequestException::class != get_class($e) &&
+            RequestException::class != get_class($e) &&
             $this->boot->getEnvironment() != 'dev'
         ) {
             $message = '';
             if ($this->boot->getDebugMode()) {
                 $message = $e->getMessage();
             }
-            $e = new RequestException($message, RequestException::INTERNAL_ERROR);
+            // the default is now BAD_REQUEST as we assume the user
+            // has done something wrong
+            $e = new RequestException($message, RequestException::BAD_REQUEST);
         }
 
-        // force safe exception
-        //$e = new Empathy\SafeException($e->getMessage());
-
         switch (get_class($e)) {
-            case Empathy\MVC\SafeException::class:
+            case SafeException::class:
                 Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
-            case Empathy\MVC\TestModeException::class:
+            case TestModeException::class:
                 // allow execution to end naturally
                 break;
-            case Empathy\MVC\RequestException::class:
-                $response = '';
+            case RequestException::class:
                 switch ($e->getCode()) {
                     case RequestException::BAD_REQUEST:
                         $response = 'HTTP/1.1 400 Bad Request';
-                        $message = 'Bad request';
                         break;
                     case RequestException::NOT_FOUND:
                         $response = 'HTTP/1.1 404 Not Found';
@@ -330,19 +324,18 @@ class Empathy
                         break;
                     case RequestException::NOT_AUTHORIZED:
                         $response = 'HTTP/1.1 403 Forbidden';
-                        $message = 'Forbidden';
                         break;   
                     case RequestException::NOT_AUTHENTICATED:
                         $response = 'HTTP/1.1 401 Unauthorized';
-                        $message = 'Not authenticated';
                         break;        
                     default:
                         break;
                 }
-                Testable::header($response);
-                //break; do not break! => we want to continue execution to allow exception to be 'dispatched'
-
             default:
+                if ($response == '') {
+                    $response = 'HTTP/1.1 500 Internal Server Error';
+                }
+                Testable::header($response);
                 $this->boot->dispatchException($e);
                 break;
         }

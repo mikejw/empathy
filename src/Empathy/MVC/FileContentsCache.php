@@ -4,29 +4,28 @@ namespace Empathy\MVC;
 
 class FileContentsCache
 {
-	
-	public static function cachedCallback($filename, $callback = null)
-	{
-		$apcuAvailable = function_exists('apcu_enabled') && apcu_enabled();
-		$data = false;
+    
+    public static function cachedCallback($filename, $callback = null)
+    {
+        $apcuAvailable = function_exists('apcu_enabled') && apcu_enabled();
+        $data = false;
 
         if ($apcuAvailable && (false !== ($data = apcu_fetch($filename)))) {
             // received cached
         } else {
-        	//echo 'reading file';
-			if (!file_exists($filename)) {
-	            throw new \Exception('Attempted to cache '.$filename.' but file was not found');
-    	    }
+            if (!file_exists($filename)) {
+                throw new \Exception('Attempted to cache '.$filename.' but file was not found');
+            }
 
-        	$data = file_get_contents($filename);
-        	if (is_callable($callback)) {
-        		$data = $callback($data);
-        	}
-        	if ($apcuAvailable) {
-        		apcu_add($filename, $data);	
-        	}             
+            $data = file_get_contents($filename);
+            if (is_callable($callback)) {
+                $data = $callback($data);
+            }
+            if ($apcuAvailable) {
+                apcu_add($filename, $data); 
+            }             
             
         }
         return $data;
-	}
+    }
 }
