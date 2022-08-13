@@ -21,6 +21,7 @@ class Validate
     const TEL = 5;
     const USERNAME = 6;
     const URL = 7;
+    const PASSWORD = 8;
 
     public $error = array();
     private $email_pattern;
@@ -34,9 +35,10 @@ class Validate
     public function __construct()
     {
         $this->email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
-        $this->allowed_pattern_1 = '/["\/\-\s:,\']/';
+        $this->allowed_pattern_1 = '/["\\/\\-\\s:,\\\']/';
         $this->unix_username_pattern = '/^[a-z][_a-zA-Z0-9-]{3,7}$/';
         $this->twitter_style_username = '/^\w{1,15}$/';
+        $this->allowed_pw_pattern = "/[\"\-\s:,\'\+&\|!\(\)\{\}\[\]\^~\*\?;@£\$]/";
 
         // taken from http://bit.ly/AQFAn
         $this->url_pattern = '|https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?|';
@@ -57,6 +59,17 @@ class Validate
                         $valid = false;
                     }
                     break;
+                case self::PASSWORD:
+                    $matches = array();
+                    $pattern = sprintf(
+                        "/^(?=.*[%s])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$/",
+                        substr($this->allowed_pw_pattern, 2, -2)
+                    );
+                    preg_match($pattern, $data, $matches, PREG_OFFSET_CAPTURE);
+                    if (!sizeof($matches)) {
+                        $valid = false;
+                    }
+                    break;    
                 case self::ALNUM:
                     if (!ctype_alnum($data)) {
                         $valid = false;
@@ -89,7 +102,7 @@ class Validate
                     }
                     break;
                 default:
-                    die('No valid validation type specified.');
+                    throw new \Exception('No valid validation type specified.');
                     break;
             }
 
