@@ -121,8 +121,8 @@ class Validate
             } else {
                 $this->addError('This is a required field', $field);
             }
+            $valid = false;
         }
-
         return $valid;
     }
 
