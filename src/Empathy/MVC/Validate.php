@@ -37,7 +37,7 @@ class Validate
         $this->email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
         $this->allowed_pattern_1 = '/["\\/\\-\\s:,\\\']/';
         $this->unix_username_pattern = '/^[a-z][_a-zA-Z0-9-]{3,7}$/';
-        $this->twitter_style_username = '/^\w{1,15}$/';
+        $this->twitter_style_username = '/^[_a-zA-Z0-9]{1,15}$/';
         $this->allowed_pw_pattern = "/[\"\-\s:,\'\+&\|!\(\)\{\}\[\]\^~\*\?;@£\$]/";
 
         // taken from http://bit.ly/AQFAn
@@ -55,7 +55,9 @@ class Validate
         if ($data != '') {
             switch ($type) {
                 case self::TEXT:
-                    if (!ctype_alnum(preg_replace($this->allowed_pattern_1, '', $data))) {
+                    $filtered = preg_replace($this->allowed_pattern_1, '', $data);
+                    $filtered = preg_replace($this->allowed_pw_pattern, '', $data);
+                    if (!ctype_alnum($filtered)) {
                         $valid = false;
                     }
                     break;
