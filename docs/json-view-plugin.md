@@ -167,4 +167,6 @@ set `pretty_print` flags per api module in `/config.json`:
           { "api": { "pretty_print": true } }
         ]
 
-
+Next
+---
+You may want to add users to your application. See [elib-base](https://github.com/mikejw/elib-base).
