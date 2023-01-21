@@ -12,12 +12,14 @@ Create a new project folder and inside a new composer configuration file:
     vim composer.json
 
 Enter the minimal config to include the Empathy library.
+
     {
         "require": {
             "mikejw/empathy": "dev-master"
         },
         "minimum-stability": "dev"
     }
+
 
 If composer is not installed, install it with instructions at `https://getcomposer.org/download/`
 or use `wget https://getcomposer.org/composer.phar`.
