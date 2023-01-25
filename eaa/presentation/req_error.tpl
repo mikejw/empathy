@@ -2,7 +2,7 @@
 
 <div class="container">
     <p>&nbsp;</p>
-    {if $code eq 0}
+    {if $code eq \Empathy\MVC\RequestException::NOT_FOUND}
 
         {if $module eq 'blog' and $event eq 'tags'}
             <h1 class="fail">Not found</h1>
@@ -19,9 +19,15 @@
 
         {/if}
 
-    {elseif $code eq 1}
+    {elseif $code eq \Empathy\MVC\RequestException::BAD_REQUEST}
 
         <h1 class="fail">Bad request</h1>
+        <p>That won't work. {$error}.</p>
+        <p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}">Home</a></p>
+
+    {elseif $code eq \Empathy\MVC\RequestException::NOT_AUTHORIZED}
+
+        <h1 class="fail">Forbidden</h1>
         <p>That won't work. {$error}.</p>
         <p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}">Home</a></p>
 
