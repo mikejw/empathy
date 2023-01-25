@@ -102,9 +102,10 @@ class JSONView extends Plugin implements PreEvent, Presentation
         $module = $this->bootstrap->getController()->getModule();
 
         if (isset($this->config)) {
-            if (count($this->config) === 1) {
+            if (count($this->config) === 1 && !isset($this->config[0])) {
                 $this->config[0] = $this->config;
             }
+
             foreach ($this->config as $item => $value) {
                 if (in_array($module, array_keys($value))) {
                     $mod_conf = $value[$module];
