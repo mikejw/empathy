@@ -1,5 +1,13 @@
 
 
+Empathy
+===
+
+Requirements
+---
+* 5.3 >= PHP Version <= 7.4  
+
+
 Getting Started
 ===
 
