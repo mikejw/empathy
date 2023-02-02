@@ -20,6 +20,7 @@ class RequestException extends Exception
     const INTERNAL_ERROR = 2;
     const NOT_AUTHORIZED = 3;
     const NOT_AUTHENTICATED = 4;
+    const METHOD_NOT_ALLOWED = 5;
 
     public function __construct($message, $code = 0, \Exception $previous = null)
     {

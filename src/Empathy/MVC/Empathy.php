@@ -327,7 +327,10 @@ class Empathy
                         break;   
                     case RequestException::NOT_AUTHENTICATED:
                         $response = 'HTTP/1.1 401 Unauthorized';
-                        break;        
+                        break;
+                    case RequestException::METHOD_NOT_ALLOWED:
+                        $response = 'HTTP/1.1 401 Method Not Allowed';
+                        break;                              
                     default:
                         break;
                 }

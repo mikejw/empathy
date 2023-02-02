@@ -151,7 +151,10 @@ class JSONView extends Plugin implements PreEvent, Presentation
                     break;
                 case RequestException::NOT_AUTHORIZED:
                     $code = $rc::Forbidden;
-                    break;        
+                    break;  
+                case RequestException::METHOD_NOT_ALLOWED:
+                    $code = $rc::Method_Not_Allowed;
+                    break;            
                 default:
                     break;
             }
