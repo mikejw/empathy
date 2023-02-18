@@ -6,7 +6,7 @@ Copyright 2008-2022 Mike Whiting (mikejw3@gmail.com).
 Empathy PHP Framework
 ---
 
-<p style="text-align: center;">
+<p align="center">
    <img src="https://raw.githubusercontent.com/mikejw/empathy/master/eaa/public_html/img/empathy.png" alt="Empathy logo" />
 </p>
 
