@@ -16,12 +16,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
-if(false == @include('./vendor/autoload.php')) {
+if (false == @include('./vendor/autoload.php')) {
 
     die('Please install composer deps.');
 }
 
-if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     define('SEPARATOR', '\\');
 } else {
     define('SEPARATOR', '/');
@@ -34,15 +34,15 @@ define('ELIB_PUBLIC', '../vendor/mikejw/elib-base/public'); # relative to direct
 function recursive_copy($src, $fdest, $app_name)
 {
     $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($src), RecursiveIteratorIterator::SELF_FIRST);
-    foreach($objects as $name => $object) {        
-        if(!preg_match('/\.$/', $name) && !is_dir($name)) {
+    foreach ($objects as $name => $object) {
+        if (!preg_match('/\.$/', $name) && !is_dir($name)) {
             $dest = str_replace($src, '.', $name);
             $dest_dir = (dirname($dest));
-            if(!is_dir($dest_dir)) {
+            if (!is_dir($dest_dir)) {
                 mkdir($dest_dir, 0777, true);
             }
-            if(strpos($name, 'eaa.css')) {
-                $dest = str_replace('eaa.css', $app_name.'.css', $dest);
+            if (strpos($name, 'eaa.css')) {
+                $dest = str_replace('eaa.css', $app_name . '.css', $dest);
             }
             copy($name, $dest);
         }
@@ -53,9 +53,9 @@ function recursive_copy($src, $fdest, $app_name)
 function read_yaml($file)
 {
     $rtnd = false;
-    if(file_exists($file)) {
+    if (file_exists($file)) {
         $s = new \Spyc();
-        $rtnd = $s->YAMLLoad($file); 
+        $rtnd = $s->YAMLLoad($file);
     }
     return $rtnd;
 }
@@ -63,11 +63,11 @@ function read_yaml($file)
 function write_yaml($data, $file)
 {
     $rtnd = false;
-    if(file_exists($file)) {
+    if (file_exists($file)) {
         $s = new \spyc();
         $rtnd = file_put_contents($file, $s->YAMLDump($data, 2, 60));
     }
-    return $rtnd;   
+    return $rtnd;
 }
 
 
@@ -78,7 +78,7 @@ function read_app_config()
 
 function read_global_config()
 {
-    return read_yaml(LIB_PATH.'/config.yml');
+    return read_yaml(LIB_PATH . '/config.yml');
 }
 
 function execute($command)
@@ -104,27 +104,27 @@ function new_app()
     $doc_root = getcwd();
     $tmp_name = '';
     $tmp_doc_root = \cli\prompt("Please enter document root [$doc_root]", $doc_root);
-    if($tmp_doc_root != '') {
+    if ($tmp_doc_root != '') {
         $doc_root = $tmp_doc_root;
     }
 
     $doc_root_arr = explode(SEPARATOR, $doc_root);
-    $name = $doc_root_arr[sizeof($doc_root_arr) - 1]; 
-    $web_root = 'localhost/'.$name;
-    $tmp_name = \cli\prompt("Please enter name: [$name]", $name);    
-    if($tmp_name != '') {
+    $name = $doc_root_arr[sizeof($doc_root_arr) - 1];
+    $web_root = 'localhost/' . $name;
+    $tmp_name = \cli\prompt("Please enter name: [$name]", $name);
+    if ($tmp_name != '') {
         $name = $tmp_name;
     }
 
-    $tmp_web_root = \cli\prompt("Please enter web root: [$web_root]", $web_root);      
-    if($tmp_web_root != '') {
+    $tmp_web_root = \cli\prompt("Please enter web root: [$web_root]", $web_root);
+    if ($tmp_web_root != '') {
         $web_root = $tmp_web_root;
     }
 
-    recursive_copy(LIB_PATH.'/eaa', './', $name);
+    recursive_copy(LIB_PATH . '/eaa', './', $name);
 
     $access_file = './public_html/htaccess';
-    $access = str_replace('WEB_ROOT', $name.'/public_html/', file_get_contents($access_file));
+    $access = str_replace('WEB_ROOT', $name . '/public_html/', file_get_contents($access_file));
     file_put_contents(str_replace('htaccess', '.htaccess', $access_file), $access);
     unlink($access_file);
 
@@ -143,31 +143,30 @@ function new_app()
 }
 
 
-
 function option_mysql($action)
 {
     global $config, $app_config;
 
-    if($action === "") {
+    if ($action === "") {
         $action = 'dump';
     }
 
-    switch($action){
+    switch ($action) {
         case 'setup':
-            execute($config['mysql'].' -u '.$app_config['db_user'].' -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' < setup.sql');
-            execute($config['mysql'].' -u '.$app_config['db_user'].' -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' < inserts.sql');   
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' < setup.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' < inserts.sql');
             break;
         case 'dump':
             \cli\out_padded("Performing dump...");
-            execute($config['mysql_dump'].' -u '.$app_config['db_user'].' -h '.$app_config['db_server'].' --password='.$app_config['db_pass']
-                .' --no-create-info --complete-insert '.$app_config['db_name'].' > dump.sql');
+            execute($config['mysql_dump'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass']
+                . ' --no-create-info --complete-insert ' . $app_config['db_name'] . ' > dump.sql');
             break;
         case 'populate':
-            execute($config['mysql'].' -u '.$app_config['db_user'].' -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' < setup.sql');
-            execute($config['mysql'].' -u '.$app_config['db_user'].' -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' '.$app_config['db_name'].' < dump.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' < setup.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' ' . $app_config['db_name'] . ' < dump.sql');
             break;
         case 'extra':
-            execute($config['mysql'].' -u '.$app_config['db_user'].' -h '.$app_config['db_server'].' --password='.$app_config['db_pass'].' < extra.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' < extra.sql');
             break;
         default:
             invalid_action();
@@ -178,19 +177,19 @@ function option_mysql($action)
 
 function option_node($action)
 {
-    switch($action){
+    switch ($action) {
         case 'compile_less':
 
             $css_dir = './public_html/css/less';
             $less_command = './node_modules/.bin/lessc --compress';
-            $less_files = $css_dir.'/*.less';
+            $less_files = $css_dir . '/*.less';
             $src_files = glob($less_files);
 
-            foreach($src_files as $file) { 
-                
+            foreach ($src_files as $file) {
+
                 $css = preg_replace('/\.less/', '.css', $file);
                 $command = "$less_command $file $css";
-                execute($command); 
+                execute($command);
             }
             $init_css = './public_html/css/less/init.min.css';
             execute("cat $init_css $css > ./tmp.css; mv tmp.css $css");
@@ -199,7 +198,7 @@ function option_node($action)
             $yui_command = './node_modules/.bin/yuicompressor';
             $js_dir = './public_html/js';
             execute("cat $js_dir/common.js $js_dir/mikejw.js > ./tmp.js");
-            $o_js = $js_dir.'/mikejw.min.js';
+            $o_js = $js_dir . '/mikejw.min.js';
             execute("$yui_command -o $o_js ./tmp.js");
             unlink('./tmp.js');
             break;
@@ -213,9 +212,9 @@ function option_node($action)
 
 function option_misc($action)
 {
-    switch($action){
+    switch ($action) {
         case 'tpl_cache':
-            if(!is_dir(TPL_CACHE)) {
+            if (!is_dir(TPL_CACHE)) {
                 mkdir(TPL_CACHE, 0777, true);
             }
             chmod(TPL_CACHE, 0777);
@@ -252,9 +251,9 @@ function writeNewHTAccess()
     } else {
         $ht_base = '';
     }
-    $ht_base .= implode('/', $web_arr).$app_config['public_dir'].'/';
+    $ht_base .= implode('/', $web_arr) . $app_config['public_dir'] . '/';
     $ht_base = preg_replace('/\//', '\\/', $ht_base);
-    $exec = "sed -i.bak 's/^RewriteBase.*/".'RewriteBase '.$ht_base."/g' ./public_html/.htaccess";
+    $exec = "sed -i.bak 's/^RewriteBase.*/" . 'RewriteBase ' . $ht_base . "/g' ./public_html/.htaccess";
     execute($exec);
 }
 
@@ -275,7 +274,7 @@ function option_set_docroot($new)
 function option_set_webroot($new)
 {
     assertConfig();
-    global $app_config;    
+    global $app_config;
     $app_config['web_root'] = $new;
     writeNewHTAccess();
     return write_yaml($app_config, './config.yml');
@@ -310,7 +309,7 @@ function option_set_dbname($new)
 function option_set_publicdir($new)
 {
     assertConfig();
-    global $app_config;    
+    global $app_config;
     $app_config['public_dir'] = $new;
     writeNewHTAccess();
     return write_yaml($app_config, './config.yml');
@@ -320,7 +319,7 @@ function option_set_publicdir($new)
 function option_set_dbuser($new)
 {
     assertConfig();
-    global $app_config;    
+    global $app_config;
     $app_config['db_user'] = $new;
     return write_yaml($app_config, './config.yml');
 }
@@ -328,7 +327,7 @@ function option_set_dbuser($new)
 function option_set_dbpass($new)
 {
     assertConfig();
-    global $app_config;    
+    global $app_config;
     $app_config['db_pass'] = $new;
     return write_yaml($app_config, './config.yml');
 }
@@ -336,7 +335,7 @@ function option_set_dbpass($new)
 function option_set_elib()
 {
     assertConfig();
-    global $app_config;    
+    global $app_config;
     $app_config['boot_options']['use_elib'] = true;
     return write_yaml($app_config, './config.yml');
 }
@@ -357,10 +356,9 @@ function option_set_https()
 }
 
 
-
 function boot()
 {
-    $container = Empathy\MVC\DI::init(getcwd().'/', true);
+    $container = Empathy\MVC\DI::init(getcwd() . '/', true);
     $empathy = $container->get('Empathy');
     $empathy->init();
     return $empathy;
@@ -369,7 +367,7 @@ function boot()
 
 function main()
 {
-    $version = defined('MVC_VERSION')? MVC_VERSION: '0.10.x';
+    $version = defined('MVC_VERSION') ? MVC_VERSION : '0.10.x';
     echo "\n
                                   __  __         
       ___  ____ ___  ____  ____ _/ /_/ /_  __  __
@@ -383,51 +381,51 @@ function main()
     $arguments->addFlag(array('new_app'), 'Create new app.');
     //$arguments->addFlag('version', 'Display the MVC version.');
     $arguments->addOption(array('mysql', 'm'), array(
-                              'default'     => null,
-                              'description' => 'Perform MySQL operation. Default is database dump.'));
+        'default' => null,
+        'description' => 'Perform MySQL operation. Default is database dump.'));
     $arguments->addOption(array('node', 'n'), array(
-                              'default'     => null,
-                              'description' => 'Perform node.js operation.'));
+        'default' => null,
+        'description' => 'Perform node.js operation.'));
     $arguments->addOption('misc', array(
-                              'default'     => null,
-                              'description' => 'Perform misc operation.'));
+        'default' => null,
+        'description' => 'Perform misc operation.'));
     $arguments->addOption('inst_mod', array(
-                              'default'     => null,
-                              'description' => 'Install/generate application extension module.'));
+        'default' => null,
+        'description' => 'Install/generate application extension module.'));
     $arguments->addOption('set_docroot', array(
-                              'default'     => null,
-                              'description' => 'Set the document root app-wide.'));
+        'default' => null,
+        'description' => 'Set the document root app-wide.'));
     $arguments->addOption('set_webroot', array(
-                              'default'     => null,
-                              'description' => 'Set the web root app-wide.'));
+        'default' => null,
+        'description' => 'Set the web root app-wide.'));
     $arguments->addOption('set_publicdir', array(
-                              'default'     => null,
-                              'description' => 'Set the public dir app-wide.'));
+        'default' => null,
+        'description' => 'Set the public dir app-wide.'));
     $arguments->addOption('set_dbuser', array(
-                              'default'     => null,
-                              'description' => 'Set the db name.'));
+        'default' => null,
+        'description' => 'Set the db name.'));
     $arguments->addOption('set_dbpass', array(
-                              'default'     => null,
-                              'description' => 'Set the db password.'));
+        'default' => null,
+        'description' => 'Set the db password.'));
     $arguments->addOption('set_dbserver', array(
-                              'default'     => null,
-                              'description' => 'Set the db host.'));
+        'default' => null,
+        'description' => 'Set the db host.'));
     $arguments->addOption('set_dbname', array(
-                              'default'     => null,
-                              'description' => 'Set the db name.'));
-    $arguments->addOption('set_elib', array(                              
-                              'description' => 'Enable elib.'));
+        'default' => null,
+        'description' => 'Set the db name.'));
+    $arguments->addOption('set_elib', array(
+        'description' => 'Enable elib.'));
     $arguments->addOption('set_https', array(
-                              'description' => 'Enable SSL.'));
+        'description' => 'Enable SSL.'));
     $arguments->addOption('clear_cache', array(
-                              'default'     => null,
-                              'description' => 'Clear APCu cache.'));
+        'default' => null,
+        'description' => 'Clear APCu cache.'));
 
     $arguments->parse();
 
     //echo $arguments->asJSON(); exit();
 
-    if(isset($arguments['help']) && $arguments['help']) {
+    if (isset($arguments['help']) && $arguments['help']) {
         \cli\out_padded($arguments->getHelpScreen());
         \cli\out_padded("\n");
 
@@ -444,19 +442,20 @@ function main()
             'set_elib', 'set_https',
             'clear_cache'
         );
-        foreach($valid_options as $o) {
-            if(isset($arguments[$o])) {
-                $func = 'option_'.$o;
+        foreach ($valid_options as $o) {
+            if (isset($arguments[$o])) {
+                $func = 'option_' . $o;
                 $func($arguments[$o]);
             }
         }
     }
 }
 
-function option_clear_cache() {
+function option_clear_cache()
+{
     assertConfig();
     global $app_config;
-    $route = $app_config['web_root'].$app_config['public_dir'].'/empathy/empathy/cc';
+    $route = $app_config['web_root'] . $app_config['public_dir'] . '/empathy/empathy/cc';
     $proto = 'http';
     foreach ($app_config['plugins'] as $index => &$item) {
         if ($item['name'] === "SmartySSL") {
@@ -465,28 +464,26 @@ function option_clear_cache() {
         }
     }
     $matches = array();
-    preg_match('/Cache cleared/', file_get_contents($proto.'://'.$route), $matches);
+    preg_match('/Cache cleared/', file_get_contents($proto . '://' . $route), $matches);
     if ($matches[0]) {
         echo "Cache cleared.\n";
     }
 }
 
 
-function option_inst_mod($module) {
-
+function option_inst_mod($module)
+{
     // currently no checks for lib
     $count = \Empathy\MVC\Util\ModuleGen::generate($module);
-    \cli\out_padded($count.' controller(s) generated.');
+    \cli\out_padded($count . ' controller(s) generated.');
 }
-
-
 
 
 $boot = null;
 $app_config = read_app_config();
 $config = read_global_config();
 
-if($app_config !== false) {
+if ($app_config !== false) {
     $boot = boot();
 }
 main();
