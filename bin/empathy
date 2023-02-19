@@ -94,6 +94,18 @@ function invalid_action()
     \cli\out_padded("Not a valid action. Run with --help (-h) flag.");
 }
 
+function print_motd()
+{
+    $version = defined('MVC_VERSION') ? MVC_VERSION : '0.10.x';
+    echo "\n
+                                  __  __         
+      ___  ____ ___  ____  ____ _/ /_/ /_  __  __
+     / _ \/ __ `__ \/ __ \/ __ `/ __/ __ \/ / / /
+    /  __/ / / / / / /_/ / /_/ / /_/ / / / /_/ / 
+    \___/_/ /_/ /_/ .___/\__,_/\__/_/ /_/\__, /  
+                 /_/                    /____/ v{$version}    
+    \n\n";
+}
 
 function new_app()
 {
@@ -145,7 +157,8 @@ function new_app()
 
 function option_mysql($action)
 {
-    global $config, $app_config;
+    global $config;
+    global $app_config;
 
     if ($action === "") {
         $action = 'dump';
@@ -179,14 +192,12 @@ function option_node($action)
 {
     switch ($action) {
         case 'compile_less':
-
             $css_dir = './public_html/css/less';
             $less_command = './node_modules/.bin/lessc --compress';
             $less_files = $css_dir . '/*.less';
             $src_files = glob($less_files);
 
             foreach ($src_files as $file) {
-
                 $css = preg_replace('/\.less/', '.css', $file);
                 $command = "$less_command $file $css";
                 execute($command);
@@ -206,7 +217,6 @@ function option_node($action)
             invalid_action();
             break;
     }
-
 }
 
 
@@ -223,7 +233,6 @@ function option_misc($action)
             invalid_action();
             break;
     }
-
 }
 
 
@@ -365,20 +374,21 @@ function boot()
 }
 
 
+
 function main()
 {
-    $version = defined('MVC_VERSION') ? MVC_VERSION : '0.10.x';
-    echo "\n
-                                  __  __         
-      ___  ____ ___  ____  ____ _/ /_/ /_  __  __
-     / _ \/ __ `__ \/ __ \/ __ `/ __/ __ \/ / / /
-    /  __/ / / / / / /_/ / /_/ / /_/ / / / /_/ / 
-    \___/_/ /_/ /_/ .___/\__,_/\__/_/ /_/\__, /  
-                 /_/                    /____/ v{$version}    
-    \n\n";
+    global $no_motd;
+
     $arguments = new \cli\Arguments(array('strict' => true));
     $arguments->addFlag(array('help', 'h'), 'Show this help screen');
     $arguments->addFlag(array('new_app'), 'Create new app.');
+
+    $arguments->addFlag(array('set_elib'), 'Enable elib.');
+    $arguments->addFlag(array('set_https'), 'Enable SSL.');
+    $arguments->addFlag(array('clear_cache'), 'Clear APCu cache.');
+    $arguments->addFlag(array('get_elibs'), 'Get list of installed elibs in json format.');
+    $arguments->addFlag(array('get_elib_tables'), 'Get data definition tables from elib dirs in json format.');
+
     //$arguments->addFlag('version', 'Display the MVC version.');
     $arguments->addOption(array('mysql', 'm'), array(
         'default' => null,
@@ -413,26 +423,21 @@ function main()
     $arguments->addOption('set_dbname', array(
         'default' => null,
         'description' => 'Set the db name.'));
-    $arguments->addOption('set_elib', array(
-        'description' => 'Enable elib.'));
-    $arguments->addOption('set_https', array(
-        'description' => 'Enable SSL.'));
-    $arguments->addOption('clear_cache', array(
-        'default' => null,
-        'description' => 'Clear APCu cache.'));
 
     $arguments->parse();
 
     //echo $arguments->asJSON(); exit();
 
     if (isset($arguments['help']) && $arguments['help']) {
+        print_motd();
         \cli\out_padded($arguments->getHelpScreen());
         \cli\out_padded("\n");
 
     } elseif (isset($arguments['new_app']) && $arguments['new_app']) {
+        print_motd();
         new_app();
-
     } else {
+        $func_to_call = [];
         $valid_options = array(
             'mysql', 'node', 'misc',
             'inst_mod', 'set_docroot',
@@ -440,13 +445,20 @@ function main()
             'set_dbuser', 'set_dbpass',
             'set_dbname', 'set_dbserver',
             'set_elib', 'set_https',
-            'clear_cache'
+            'clear_cache', 'get_elibs',
+            'get_elib_tables'
         );
         foreach ($valid_options as $o) {
-            if (isset($arguments[$o])) {
-                $func = 'option_' . $o;
-                $func($arguments[$o]);
+            if (isset($arguments[$o]) && !!($arguments[$o])) {
+                array_push($func_to_call, $o);
             }
+        }
+        if (empty(array_intersect($func_to_call, $no_motd))) {
+            print_motd();
+        }
+        foreach ($func_to_call as $item) {
+            $func = 'option_' . $item;
+            $func($arguments[$item]);
         }
     }
 }
@@ -470,6 +482,14 @@ function option_clear_cache()
     }
 }
 
+function assertUsesElib($elib)
+{
+    assertConfig();
+    if (!isset($elib) || !$elib) {
+        \cli\out_padded('Elibs support not enabled in config.');
+        exit(1);
+    }
+}
 
 function option_inst_mod($module)
 {
@@ -478,10 +498,34 @@ function option_inst_mod($module)
     \cli\out_padded($count . ' controller(s) generated.');
 }
 
+function option_get_elibs()
+{
+    global $app_config;
+    assertUsesElib($app_config['boot_options']['use_elib']);
+    echo json_encode(\Empathy\ELib\Util\Libs::getInstalled());
+    exit(0);
+}
+
+function option_get_elib_tables()
+{
+    global $app_config;
+    assertUsesElib($app_config['boot_options']['use_elib']);
+    $tables = [];
+    $installed = \Empathy\ELib\Util\Libs::getInstalled();
+    foreach ($installed as $elib) {
+        $matches = [];
+        $dd = file_get_contents($app_config['doc_root'] . '/vendor/' . $elib . '/dd.sql');
+        preg_match_all('/create\stable\s(\w+)/i', $dd, $matches);
+        $tables = array_merge($tables, $matches[sizeof($matches) - 1]);
+    }
+    echo json_encode($tables);
+    exit(0);
+}
 
 $boot = null;
 $app_config = read_app_config();
 $config = read_global_config();
+$no_motd = ['get_elibs', 'get_elib_tables'];
 
 if ($app_config !== false) {
     $boot = boot();
