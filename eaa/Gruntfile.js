@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         touch(file, function() {
             var output = '\n' +
                 'var WEB_ROOT   = "' + config.web_root + "\";\n" +
-                'var PUBLIC_DIR = "' + config.public_dir + "\";\n";
+                'var PUBLIC_DIR = "' + config.public_dir || '' + "\";\n";
             fs.writeFileSync(file, output);
         });
     });
