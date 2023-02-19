@@ -482,7 +482,7 @@ function option_clear_cache()
     }
 }
 
-function assertUsesElib($elib)
+function assertUsesELib($elib)
 {
     assertConfig();
     if (!isset($elib) || !$elib) {
@@ -501,7 +501,7 @@ function option_inst_mod($module)
 function option_get_elibs()
 {
     global $app_config;
-    assertUsesElib($app_config['boot_options']['use_elib']);
+    assertUsesELib($app_config['boot_options']['use_elib']);
     echo json_encode(\Empathy\ELib\Util\Libs::getInstalled());
     exit(0);
 }
@@ -509,7 +509,7 @@ function option_get_elibs()
 function option_get_elib_tables()
 {
     global $app_config;
-    assertUsesElib($app_config['boot_options']['use_elib']);
+    assertUsesELib($app_config['boot_options']['use_elib']);
     $tables = [];
     $installed = \Empathy\ELib\Util\Libs::getInstalled();
     foreach ($installed as $elib) {
