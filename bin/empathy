@@ -374,6 +374,27 @@ function boot()
 }
 
 
+function option_assert_plugin($plugin)
+{
+    assertConfig();
+    global $app_config;
+    $data = json_decode($plugin, true);
+    $found = -1;
+    foreach ($app_config['plugins'] as $index => $item) {
+        if ($item['name'] === $data['name']) {
+            $found = $index;
+            break;
+        }
+    }
+    if ($found > -1) {
+        $app_config['plugins'][$found] = $data;
+    } else {
+        $app_config['plugins'][] = $data;
+    }
+    return write_yaml($app_config, './config.yml');
+}
+
+
 
 function main()
 {
@@ -424,6 +445,10 @@ function main()
         'default' => null,
         'description' => 'Set the db name.'));
 
+    $arguments->addOption('assert_plugin', array(
+        'default' => null,
+        'description' => 'Assert a plugin config exists.'));
+
     $arguments->parse();
 
     //echo $arguments->asJSON(); exit();
@@ -446,7 +471,7 @@ function main()
             'set_dbname', 'set_dbserver',
             'set_elib', 'set_https',
             'clear_cache', 'get_elibs',
-            'get_elib_tables'
+            'get_elib_tables', 'assert_plugin'
         );
         foreach ($valid_options as $o) {
             if (isset($arguments[$o]) && !!($arguments[$o])) {
