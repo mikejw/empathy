@@ -15,9 +15,10 @@ module.exports = function(grunt) {
         var config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
         var file = './public_html/js/common.js';
         touch(file, function() {
+            var public_dir = config.public_dir || '';
             var output = '\n' +
                 'var WEB_ROOT   = "' + config.web_root + "\";\n" +
-                'var PUBLIC_DIR = "' + config.public_dir || '' + "\";\n";
+                'var PUBLIC_DIR = "' + public_dir + "\";\n";
             fs.writeFileSync(file, output);
         });
     });
