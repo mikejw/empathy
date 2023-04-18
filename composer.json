@@ -18,7 +18,8 @@
         "wp-cli/php-cli-tools": "dev-master",
         "mustangostang/spyc": "0.6.3",
         "mikejw/elibs": "dev-develop",
-        "php-di/php-di": "^6.0"
+        "php-di/php-di": "^6.0",
+        "monolog/monolog": "2.x-dev"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0", 
