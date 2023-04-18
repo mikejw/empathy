@@ -89,8 +89,8 @@ Build frontend assets for the application by running from the root directory:
     npm install
     make grunt
 
-These assets are used for all internal routes served by Empathy and for backend/admin area
-modules when using `elib-base`. E.g.  "/empathy/empathy/status" and "/empathy".
+These assets are used for internal routes served by Empathy. E.g.  "/empathy/status" and "/empathy".
+They are also for backend/admin area modules when using `elib-base`. 
 
 Development settings
 ---

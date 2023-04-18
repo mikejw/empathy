@@ -114,7 +114,7 @@ class Empathy
 
         list($appConfig, $globalConfig) = DI::getContainer()->get('Config');
         $this->consumeConfig($appConfig, $configDir);
-        $this->consumeConfig($globalConfig, $configDir, true);        
+        $this->consumeConfig($globalConfig, $configDir, true);
 
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {

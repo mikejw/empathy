@@ -449,6 +449,10 @@ function main()
         'default' => null,
         'description' => 'Assert a plugin config exists.'));
 
+    $arguments->addOption('gen_password', array(
+        'default' => null,
+        'description' => 'Generate a password hash. Enclose argument with single quotes.'));
+
     $arguments->parse();
 
     //echo $arguments->asJSON(); exit();
@@ -471,7 +475,7 @@ function main()
             'set_dbname', 'set_dbserver',
             'set_elib', 'set_https',
             'clear_cache', 'get_elibs',
-            'get_elib_tables', 'assert_plugin'
+            'get_elib_tables', 'assert_plugin', 'gen_password'
         );
         foreach ($valid_options as $o) {
             if (isset($arguments[$o]) && !!($arguments[$o])) {
@@ -492,7 +496,7 @@ function option_clear_cache()
 {
     assertConfig();
     global $app_config;
-    $route = $app_config['web_root'] . $app_config['public_dir'] . '/empathy/empathy/cc';
+    $route = $app_config['web_root'] . $app_config['public_dir'] . "/empathy/empathy/cc";
     $proto = 'http';
     foreach ($app_config['plugins'] as $index => &$item) {
         if ($item['name'] === "SmartySSL") {
@@ -547,10 +551,25 @@ function option_get_elib_tables()
     exit(0);
 }
 
+function option_gen_password($password)
+{
+    $model = \Empathy\MVC\DI::getContainer()->get('UserModel') ?? 'UserItem';
+    $obj = \Empathy\ELib\Model::load($model);
+    $obj->password = $password;
+    $obj->validates();
+    $errors = $obj->getValErrors();
+
+    if (isset($errors['password']) && $errors['password'] !== "") {
+        echo "\nError: ${errors['password']}\n\n";
+    } else {
+        echo password_hash($password, PASSWORD_DEFAULT) . "\n";
+    }
+}
+
 $boot = null;
 $app_config = read_app_config();
 $config = read_global_config();
-$no_motd = ['get_elibs', 'get_elib_tables'];
+$no_motd = ['get_elibs', 'get_elib_tables', 'gen_password'];
 
 if ($app_config !== false) {
     $boot = boot();

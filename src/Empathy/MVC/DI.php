@@ -1,13 +1,13 @@
 <?php
 
 namespace Empathy\MVC;
-use Empathy\MVC\FileContentsCache;
+use DI\Container;
+use DI\ContainerBuilder;
 
 class DI
 {
     private static $builder;
     private static $container;
-    private static $useELib = false;
 
     private static function loadConfig($configDir, $spyc = null)
     {
@@ -32,20 +32,20 @@ class DI
         $persistentMode = false,
         $systemMode = false
     ) {
-        self::$builder = new \DI\ContainerBuilder();
+        self::$builder = new ContainerBuilder();
         self::$builder->addDefinitions([
             'configDir' => $configDir,
             'persistentMode' => $persistentMode,
             'systemMode' => $systemMode,
             'Spyc' => new \Spyc(),
-            'Empathy' => function (\DI\Container $c) {
+            'Empathy' => function (Container $c) {
                 return new Empathy(
                     $c->get('configDir'),
                     $c->get('persistentMode'),
                     $c->get('systemMode')
                 );
             },
-            'Bootstrap' => function (\DI\Container $c) {
+            'Bootstrap' => function (Container $c) {
                 $empathy = $c->get('Empathy');
                 return new Bootstrap(
                     $empathy->getBootOptions(),
@@ -53,7 +53,7 @@ class DI
                     $empathy
                 );
             },
-            'URI' => function (\DI\Container $c) {
+            'URI' => function (Container $c) {
                 $bootstrap = $c->get('Bootstrap');
                 return new URI(
                     $bootstrap->getDefaultModule(),
@@ -62,11 +62,19 @@ class DI
             },
             'PluginManager' => new PluginManager(),
             'Stash' => new Stash(),
-            'Config' => function (\DI\Container $c) {
+            'Config' => function (Container $c) {
                 return [
                     self::loadConfig($c->get('configDir')),
-                    self::loadConfig(dirname(realpath(__FILE__)).'/../../../')
+                    self::loadConfig(dirname(realpath(__FILE__)).'/../../..')
                 ];
+            },
+            'LoggingOn' => false,
+            'Log' => function (Container $c) {
+                if (!$c->get('LoggingOn')) {
+                    throw new Exception('Logging disabled');
+                }
+                $logging = new Logging();
+                return $logging->getLog();
             }
         ]);
 

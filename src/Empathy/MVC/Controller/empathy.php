@@ -1,13 +1,4 @@
 <?php
-/**
- * This file is part of the Empathy package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- * @copyright 2008-2016 Mike Whiting
- * @license  See LICENSE
- * @link      http://www.empathyphp.co.uk
- */
 
 namespace Empathy\MVC\Controller;
 
@@ -15,6 +6,8 @@ use Empathy\MVC\Controller as BaseController;
 use Empathy\MVC\Config;
 use Empathy\MVC\Entity;
 use Empathy\MVC\Model;
+use Empathy\MVC\FileContentsCache;
+use Empathy\MVC\DI;
 
 /**
  * Default controller that reveals info about Empathy
@@ -55,8 +48,15 @@ class empathy extends BaseController
      */
     public function cc()
     {
-        $success = function_exists('apcu_enabled') && apcu_enabled() && apcu_clear_cache();
+        $success = false;
+
+        if (
+            !DI::getContainer()->get('ApcuDebug')
+        ) {
+            $this->redirect();
+        } else {
+            $success = FileContentsCache::clear();
+        }
         $this->assign('cc', $success);
     }
-
 }

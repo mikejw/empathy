@@ -46,7 +46,7 @@ class URI
     private $uri;
     private $defaultModule;
     private $dynamicModule;
-    private $error;
+    private $error = 0;
     private $internal = false;
     private $controllerName = '';
     private $cli_mode_detected;
@@ -77,7 +77,7 @@ class URI
         $this->error = 0;
         $this->processRequest();
         $this->setController();
-        //$this->printRouting();
+        $this->logRouting();
     }
 
     public function getData()
@@ -100,14 +100,19 @@ class URI
         return $this->controllerName;
     }
 
-    public function printRouting()
+    public function logRouting()
     {
-        echo "<pre>\n";
-        echo "Module:\t\t\t".$_GET['module']."\n";
-        echo "Class:\t\t\t".$_GET['class']."\n";
-        echo "Event:\t\t\t".$_GET['event']."\n\n";
-        echo "Controller Name:\t".$this->controllerName."\n";
-        echo "Error:\t\t\t".$this->getErrorMessage()."\n</pre>";
+        $log = DI::getContainer()->get('LoggingOn') ? DI::getContainer()->get('Log') : false;
+        if ($log !== false) {
+            $msg = [
+                'Module' => $_GET['module'] ?? 'Undefined',
+                'Class' => $_GET['class'] ?? 'Undefined',
+                'Event' => $_GET['event'] ?? 'Undefined',
+                'Controller Name' => $this->controllerName,
+                'Error' => $this->getErrorMessage()
+            ];
+            $log->debug(json_encode($msg));
+        }
     }
 
     public function processRequest()
@@ -170,7 +175,6 @@ class URI
     {
         $i = 0;
 
-
         $length = sizeof($this->uri);
         if ($length > URI::MAX_COMP) {
             $length = URI::MAX_COMP;
@@ -221,8 +225,6 @@ class URI
         return 'Empathy\\MVC\\Controller\\'.$controller;
     }
 
-
-    // cause of error
     private function setController()
     {
         require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
@@ -235,15 +237,12 @@ class URI
             $this->controllerName = $_GET['class'];
         }
 
-        if (!$this->internal && !class_exists($this->buildControllerName($this->controllerName))) {
+        if (!class_exists($this->buildControllerName($this->controllerName))) {
             if (isset($_GET['class'])) {
                 $_GET['event'] = $_GET['class'];
             }
-            // module must be set?
-            if (isset($_GET['module'])) {
-                $_GET['class'] = $_GET['module'];
-                $this->controllerName = $_GET['module'];
-            }
+            $_GET['class'] = $_GET['module'];
+            $this->controllerName = $_GET['module'];
         }
     
         $this->controllerName = $this->buildControllerName($this->controllerName);
