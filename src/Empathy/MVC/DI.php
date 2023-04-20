@@ -79,7 +79,10 @@ class DI
         ]);
 
         $appConfig = self::loadConfig($configDir, new \Spyc());
-        if ($appConfig['boot_options']['use_elib']) {
+        if (
+            isset($appConfig['boot_options']['use_elib']) &&
+            $appConfig['boot_options']['use_elib']
+        ) {
             $elibDirs = \Empathy\ELib\Util\Libs::findAll($appConfig['doc_root']);
             foreach ($elibDirs as $lib) {
                 self::loadAdditional($lib.'/services.php', $appConfig['doc_root']);
