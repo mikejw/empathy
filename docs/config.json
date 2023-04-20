@@ -1,0 +1,21 @@
+{
+  "title": "Empathy MVC Framework",
+  "contents": [
+    {
+      "file": "README.md",
+      "title": "Readme Doc"
+    },
+    {
+      "file": "getting-started.md",
+      "title": "Getting Started"
+    },
+    {
+      "file": "routing.md",
+      "title": "Understanding routing",
+    },
+    {
+      "file": "json-view-plugin.md",
+      "title": "JSON View"
+    }
+  ]
+}
