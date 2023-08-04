@@ -63,6 +63,12 @@ class Empathy
     private static $use_elib = false;
 
     /**
+     * @var bool Prevent multiple dispatch.
+     */
+    private $dispatchedException = false;
+
+
+    /**
      * Set config into memory.
      * 
      * @param $config Configuration data 
@@ -286,13 +292,17 @@ class Empathy
      */
     public function exceptionHandler($e)
     {
+        if ($this->dispatchedException) {
+            return false;
+        }
+
         $response = '';
         if ($this->hasErrors()) {
             $e = new ErrorException($this->errorsToString());
         }
 
         if (
-            RequestException::class != get_class($e) &&
+            RequestException::class !== get_class($e) &&
             $this->boot->getEnvironment() != 'dev'
         ) {
             $message = '';
@@ -342,6 +352,7 @@ class Empathy
                 $this->boot->dispatchException($e);
                 break;
         }
+        $this->dispatchedException = true;
     }
 
 

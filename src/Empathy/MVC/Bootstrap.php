@@ -276,7 +276,11 @@ class Bootstrap
                 $plugin_manager->preDispatch();
             }
         } catch (\Exception $e) {
-            throw new \Empathy\MVC\SafeException($e->getMessage());
+            if (RequestException::class === get_class($e)) {
+                throw $e;
+            } else {
+                throw new \Empathy\MVC\SafeException($e->getMessage());
+            }
         }
     }
 
