@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC\Plugin;
+use Empathy\MVC\DI;
 
 use Empathy\MVC\Testable;
 use Empathy\MVC\Plugin as Plugin;
@@ -29,9 +30,7 @@ class Subdomains extends Plugin implements PreDispatch
     {
         $validSubs = array();
         if (isset($this->config)) {
-            if (isset($this->config['valid'])) {
-                $validSubs = $this->config['valid'];
-            }
+            $validSubs = array_keys($this->config);
         }
 
         $webRoot = Config::get('WEB_ROOT');
@@ -47,6 +46,15 @@ class Subdomains extends Plugin implements PreDispatch
                 } else {
                     Config::store('SUBDOMAIN', $matches[1]);
                     Config::store('WEB_ROOT', $matches[0] . $saneWebRoot);
+                    if (isset($this->config[$matches[1]]['boot_options'])) {
+                        $newOptions = array_merge(
+                            Config::get('BOOT_OPTIONS'),
+                            $this->config[$matches[1]]['boot_options']
+                        );
+                        Config::store('BOOT_OPTIONS', $newOptions);
+                        DI::getContainer()->get('Empathy')->setBootOptions($newOptions);
+                        DI::getContainer()->get('Bootstrap')->initBootOptions();
+                    }
                 }
             }
         }
