@@ -213,24 +213,36 @@ class Entity
      *
      * @return void
      */
-    public function query($sql, $error)
+    public function query($sql, $error = '', $params = array())
     {
-        if (defined('ELIB_SQL_LOGGING') &&
-           ELIB_SQL_LOGGING == true) {
-            \Empathy\ELib\Util\SQLLog::log($sql);
+        $log = DI::getContainer()->get('LoggingOn') ? DI::getContainer()->get('Log') : false;
+        if ($log !== false && (!sizeof($params))) {
+            $msg = [
+                'SQL Query' => $sql,
+                'Error message' => $error,
+                'Params' => $params
+            ];
+            $log->debug(json_encode($msg));
         }
 
         $result = null;
-        if (($result = $this->dbh->query($sql)) == false) {
-            $errors = $this->dbh->errorInfo();
-
-            throw new \Exception("[".htmlentities($sql)
-                                 ."]<br /><strong>MySQL</strong>: ($error): "
-                                 .htmlentities($errors[2]));
+        
+        if (sizeof($params)) {
+            $sth = $this->dbh->prepare($sql, array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION));
+            $sth->execute($params);
+            $result = $sth;
         } else {
-            $this->result = $result;
-        }
+            if (($result = $this->dbh->query($sql)) == false) {
+                $errors = $this->dbh->errorInfo();
 
+                throw new \Exception("[".htmlentities($sql)
+                    ."]<br /><strong>MySQL</strong>: ($error): "
+                    .htmlentities($errors[2]));
+            } else {
+                $this->result = $result;
+            }    
+        }
+        
         return $result;
     }
 
@@ -777,24 +789,8 @@ class Entity
 
     public function buildUnionString($ids)
     {
-        $str = '(0,';
-        $i = 0;
-        foreach ($ids as $id) {
-            $str .= $id;
-            if (($i + 1) != sizeof($ids)) {
-                $str .= ',';
-            }
-            $i++;
-        }
-        $str .= ')';
-
-        /* does this really fix anything?
-           if ($str == '(0,)') {
-           $str = '(0)';
-           }
-        */
-
-        return $str;
+        array_unshift($ids, 0);
+        return '(' . implode(',', array_unique($ids)) . ')';
     }
 
     public function stripMSWordChars()
