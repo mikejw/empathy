@@ -18,7 +18,13 @@ use Empathy\MVC\Config;
  */
 class SmartySSL extends Smarty
 {
-
+    public function isSecure()
+    {
+        return (
+            isset($this->config['force']) && $this->config['force'] ||
+            \Empathy\MVC\Util\Misc::isSecure()
+        );
+    }
 
     public function display($template, $internal = false)
     {
@@ -29,8 +35,7 @@ class SmartySSL extends Smarty
         $this->assignEmpathyDir();
 
         if (
-            isset($this->config['force']) && $this->config['force'] ||
-            \Empathy\MVC\Util\Misc::isSecure()
+            $this->isSecure()
         ) {
             echo str_replace(
                 'http://'.Config::get('WEB_ROOT'),
