@@ -61,7 +61,9 @@ class DI
                 );
             },
             'PluginManager' => new PluginManager(),
-            'Stash' => new Stash(),
+            'Stash' => function (Container $c) {
+                return new Stash();
+            },
             'Config' => function (Container $c) {
                 return [
                     self::loadConfig($c->get('configDir')),
