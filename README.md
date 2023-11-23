@@ -10,7 +10,7 @@ Empathy PHP Framework
 <p align="center">
    <img src="https://raw.githubusercontent.com/mikejw/empathy/master/eaa/public_html/img/empathy.png" alt="Empathy logo" />
 </p>
-<p>&nbsp;</p>
+<p align="center">[empathy.sh](https://empathy.sh)</p>
 
 Welcome to the Empathy (micro MVC) PHP Framework project.
 The project has existed since 2008 and is geared towards allowing anyone
