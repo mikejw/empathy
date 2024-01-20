@@ -1,10 +1,7 @@
  
 
-Copyright 2008-2022 Mike Whiting (mikejw3@gmail.com).
-
-
 Empathy PHP Framework
----
+===
 
 <p>&nbsp;</p>
 <p align="center">
