@@ -30,7 +30,7 @@ See [getting-started.md](./docs/getting-started.md).
 Licence
 ---
 Empathy and officially released extension libraries are now distributed under an
-MIT license.  See [LICENSE](./LICENSE).
+MIT license.  See [LICENSE.txt](./LICENSE.txt).
 
 
 Testing the code itself

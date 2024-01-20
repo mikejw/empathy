@@ -6,15 +6,15 @@
       "title": "Readme Doc"
     },
     {
-      "file": "getting-started.md",
+      "file": "./docs/getting-started.md",
       "title": "Getting Started"
     },
     {
-      "file": "routing.md",
+      "file": "./docs/routing.md",
       "title": "Understanding routing"
     },
     {
-      "file": "json-view-plugin.md",
+      "file": "./docs/json-view-plugin.md",
       "title": "JSON View"
     }
   ]
