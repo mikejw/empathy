@@ -5,7 +5,7 @@ Empathy PHP Framework
 
 <p>&nbsp;</p>
 <p align="center">
-   <img src="https://raw.githubusercontent.com/mikejw/empathy/master/eaa/public_html/img/empathy.png" alt="Empathy logo" />
+   <img width="210" height="209" src="https://raw.githubusercontent.com/mikejw/empathy/master/eaa/public_html/img/empathy.png" alt="Empathy logo" />
 </p>
 <p align="center"><a href="https://empathy.sh" target="_blank">empathy.sh</a></p>
 
