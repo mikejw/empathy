@@ -537,11 +537,18 @@ class Entity
         return $nav;
     }
 
-    public function getPaginatePagesSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page)
+    public function getPaginatePagesSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page, $leftJoins = '')
     {
         $nav = array();
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2 '.$sql_string;
+        $sql = 'SELECT '.$select.' FROM '.$table1.' t1';
+
+        if ($leftJoins === '') {
+            $sql .= ', ';
+        }
+        $sql .= $leftJoins.$table2.' t2 '.$sql_string;
+
         $error = 'Could not get rows from '.$table1;
+        
         $result = $this->query($sql, $error);
         $rows = $result->rowCount();
         $p_rows = $rows;
@@ -631,11 +638,16 @@ class Entity
         return $all;
     }
 
-    public function getAllCustomPaginateSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page)
+    public function getAllCustomPaginateSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page, $leftJoins)
     {
         $all = array();
         $start = ($page - 1) * $per_page;
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2 '.$sql_string.' LIMIT '.$start.', '.$per_page;
+        $sql = 'SELECT '.$select.' FROM '.$table1.' t1';
+
+        if ($leftJoins === '') {
+            $sql .= ', ';
+        }
+        $sql .= $leftJoins.$table2.' t2 '.$sql_string.' LIMIT '.$start.', '.$per_page;
         $error = 'Could not get rows from '.$table1;
 
         $result = $this->query($sql, $error);
