@@ -638,7 +638,7 @@ class Entity
         return $all;
     }
 
-    public function getAllCustomPaginateSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page, $leftJoins)
+    public function getAllCustomPaginateSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page, $leftJoins = '')
     {
         $all = array();
         $start = ($page - 1) * $per_page;
