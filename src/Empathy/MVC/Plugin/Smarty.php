@@ -36,8 +36,12 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->cache_dir = Config::get('DOC_ROOT')."/tpl/cache";
         $this->smarty->config_dir = Config::get('DOC_ROOT')."/tpl/configs";
 
-        // for smarty 3 disable notices from view (like smarty 2)
-        $this->smarty->error_reporting = E_ALL & ~E_NOTICE;
+        $this->smarty->error_reporting = E_ALL  & ~E_NOTICE & ~E_WARNING;
+
+
+        if (class_exists('Empathy\ELib\Plugin\SmartyResourceELib')) {
+            $this->smarty->registerResource('elib', new \Empathy\ELib\Plugin\SmartyResourceELib());
+        }
     }
 
     public function assign($name, $data, $no_array = false)
