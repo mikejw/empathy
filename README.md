@@ -33,28 +33,36 @@ MIT license.  See [LICENSE](./LICENSE).
 Testing the code itself
 ---
 
+If you want to run tests from a version of Empathy that has been checked out in [base-docker](/docs/base-docker/)
+connect to the app container first, change to the empathy vendor directory and run composer install:
+
+<pre><code class="language-bash">docker exec -it -u www-data app /bin/bash
+cd ./vendor/mikejw/empathy/
+php ../../../composer.phar install --prefer-source
+</code></pre>
+
 Within the 'Empathy Architype Application' config file (`/eaa/config.yml`), set: `doc_root` to
-the full location of the `eaa` directory, e.g:
+the full location of the `eaa` directory, (which is used for dummy configuration) e.g:
 
-    ---
-    doc_root: /var/www/project/vendor/mikejw/empathy/eaa
+<pre><code class="language-yaml">---
+doc_root: /var/www/project/vendor/mikejw/empathy/eaa
+</code></pre>
 
+For the `elibs` plugin configuration (within `/eaa/config.yml`), set testing mode to 1. (This makes sure
+that the elibs repo containing Smarty can be found.) i.e:
 
-For the `elibs` pluign configuration, set testing mode flag to true. i.e:
+<pre><code class="language-yaml">plugins:
+  -
+    name: ELibs
+    version: 1.0
+    config: '{ "testing": 1 }'
+</code></pre>
 
-	plugins:
-	  -
-	    name: ELibs
-	    version: 1.0
-	    config: '{ "testing": "true" }'
+Change to the `t` directory from the root of the empathy repo and run phpunit:
 
-
-###Important
-
-Use max PHP version 7.4 and potentially Composer version 1 to successfully install all 
-(dev) dependencies.
-
-    composer self-update --1
+<pre><code class="language-bash">cd /var/www/project/vendor/mikejw/empathy/t
+php ../vendor/bin/phpunit .
+</code></pre>
 
 
 
