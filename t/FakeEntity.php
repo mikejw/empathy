@@ -10,7 +10,7 @@ class FakeEntity extends Entity
     public $name;
     public $age;
     public $stamp;
-    public $empty;
+    public $nonempty;
     public $foo;
 
     const TABLE = 'fake';

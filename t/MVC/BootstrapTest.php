@@ -10,7 +10,7 @@ class BootstrapTest extends ESuiteTest
     private $bootstrap;
     
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,8 +29,8 @@ class BootstrapTest extends ESuiteTest
     public function testDispatch()
     {
         $this->expectException('Empathy\MVC\RequestException', 'Not found');
-        $_SERVER['HTTP_HOST'] = 'localhost';
-        $_SERVER['REQUEST_URI'] = '/eaa/public_html/foo';
+        $_SERVER['HTTP_HOST'] = 'www.dev.org';
+        $_SERVER['REQUEST_URI'] = '/foo';
         $this->bootstrap->dispatch();
     }
 

@@ -11,7 +11,7 @@ class ControllerTest extends ESuiteTest
     private $bootstrap;
     private $controller;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->bootstrap = $this->makeFakeBootstrap();

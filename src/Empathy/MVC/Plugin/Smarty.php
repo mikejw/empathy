@@ -93,7 +93,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->assign('error', $exception->getMessage());
         if ($req_error) {
             $this->assign('code', $exception->getCode());
-            $this->display('elib:/req_error.tpl');
+            $this->display('req_error.tpl');
         } else {
             $this->display('empathy.tpl', true);
         }

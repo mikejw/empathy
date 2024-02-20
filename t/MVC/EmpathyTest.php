@@ -14,7 +14,7 @@ class EmpathyTest extends ESuiteTest
 {
     private $mvc;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         //
     }

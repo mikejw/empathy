@@ -10,7 +10,7 @@ use ESuite\ESuiteTest;
 class DBPoolTest extends ESuiteTest
 {
 
-    protected function setUp()
+    protected function setUp(): void
     {
         \ESuite\Util\DB::loadDefDBCreds();
     }

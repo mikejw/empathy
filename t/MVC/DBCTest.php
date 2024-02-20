@@ -4,15 +4,19 @@ namespace ESuite\MVC;
 
 use Empathy\MVC\DBC;
 use ESuite\ESuiteTest;
+use ESuite\Util\DB;
 
 
 class DBCTest extends ESuiteTest
 {
     private $dbc;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $creds = \ESuite\Util\DB::getDefDBCreds();
+        DB::loadDefDBCreds();
+        DB::reset();
+
+        $creds = DB::getDefDBCreds();
 
         $this->dbc = new DBC(
             $creds['db_host'],

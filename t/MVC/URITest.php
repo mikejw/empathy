@@ -8,10 +8,10 @@ use Empathy\MVC\DI;
 class URITest extends ESuiteTest
 {
     private $boot;
-    private $host = 'localhost';
-    private $uri = '/eaa/public_html/';
+    private $host = 'www.dev.org';
+    private $uri = '';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!$this->boot) {
             $this->boot = $this->makeFakeBootstrap(true);
@@ -31,7 +31,7 @@ class URITest extends ESuiteTest
 
     public function testURI1()
     {
-        $this->initURI('');
+        $this->initURI('/');
         $this->assertEquals('front', $_GET['module']);
         $this->assertEquals('front', $_GET['class']);
         $this->assertEquals('default_event', $_GET['event']);
@@ -39,7 +39,7 @@ class URITest extends ESuiteTest
 
     public function testURI2()
     {
-        $this->initURI('blog/item/21');
+        $this->initURI('/blog/item/21');
         $this->assertEquals('blog', $_GET['module']);
         $this->assertEquals('blog', $_GET['class']);
         $this->assertEquals('item', $_GET['event']);

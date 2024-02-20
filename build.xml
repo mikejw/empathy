@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="build" name="moveittest">
     
-    <target depends="prepare,lint,composer,phpunit,phpcs,phpcs-sast,phpcb,phpdoc" name="build"/>
+    <target depends="prepare,lint,composer,phpunit,phpcs,phpcs-sast" name="build"/>
 
     <target name="clean" description="Cleanup build artifacts">
         <delete dir="${basedir}/build/doc"/>
@@ -31,16 +31,10 @@
     <target description="Installing dependencies" name="composer">
         <exec executable="wget" failonerror="true">
             <!--<arg value="-nc"/>-->
-            <arg value="https://getcomposer.org/composer-stable.phar"/>
+            <arg value="https://getcomposer.org/composer.phar"/>
 	    <arg value="-O"/>
 	    <arg value="composer.phar"/>
         </exec>
-	<exec executable="php" failonerror="true">
-	  <arg value="composer.phar"/>
-	  <arg value="global"/>
-	  <arg value="require"/>
-	  <arg value="hirak/prestissimo"/>
-	</exec>
         <exec executable="php" failonerror="true">
             <arg value="composer.phar"/>
             <arg value="install"/>
@@ -52,15 +46,6 @@
     <target description="Run unit tests with PHPUnit" name="phpunit">
         <exec dir="./t" executable="./run_tests.sh" failonerror="true">
         </exec>
-    </target>
-
-    <target description="Run phpDoc" name="phpdoc">
-      <exec executable="./vendor/bin/phpdoc" failonerror="true">
-        <arg value="-d"/>
-        <arg path="${basedir}/src"/>
-        <arg value="-t"/>
-        <arg path="${basedir}/build/doc"/>
-      </exec>
     </target>
 
     <target description="Find coding standard violations using PHP_CodeSniffer and create log file." name="phpcs">
@@ -76,17 +61,6 @@
         <exec executable="vendor/bin/phpcs">
             <arg value="--standard=vendor/pheromone/phpcs-security-audit/example_base_ruleset.xml" />
             <arg path="${basedir}/src" />
-        </exec>
-    </target>
-
-    <target description="Aggregate tool output with PHP_CodeBrowser" name="phpcb">
-        <exec executable="vendor/bin/phpcb">
-            <arg value="--log" />
-            <arg path="${basedir}/build/logs" />
-            <arg value="--source" />
-            <arg path="${basedir}/src" />
-            <arg value="--output" />
-            <arg path="${basedir}/build/code-browser" />
         </exec>
     </target>
 </project>

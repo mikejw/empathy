@@ -11,7 +11,7 @@ id                      INT(11)                 AUTO_INCREMENT PRIMARY KEY,
 name                    VARCHAR(64)             NOT NULL,
 age                     INT(11)                 NOT NULL,
 stamp                   TIMESTAMP               NOT NULL,
-empty                   INT(11)                 NULL,
+nonempty                   INT(11)                 NULL,
 foo                     VARCHAR(3)              NULL DEFAULT 'bar'
 ) ENGINE=InnoDB;
 

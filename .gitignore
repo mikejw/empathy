@@ -1,3 +1,5 @@
+
+/eaa/logs
 /.idea
 /docs/build
 /composer.phar
@@ -5,4 +7,5 @@
 /vendor
 /tpl/templates_c
 cache.properties
+/t/.phpunit.result.cache
 *~

@@ -1,7 +1,7 @@
 ---
 name: eaa
-doc_root: /var/www/project/vendor/mikejw/empathy/eaa
-web_root: localhost/eaa
+doc_root: /var/www/project
+web_root: www.dev.org
 public_dir:
 boot_options:
   handle_errors: true

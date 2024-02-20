@@ -5,7 +5,7 @@ ESuite\FakeEntityAlt:
     name: <firstName()>
     age: <randomDigit()>
     stamp: 'MYSQLTIME'
-    empty: <randomDigit()>
+    nonempty: <randomDigit()>
     foo: 'DEFAULT'
     anotherfield: 'some val'
 
