@@ -9,15 +9,17 @@ one or more application modules as JSON speaking RESTFul apis.
 It can be enabled on modules by adding the following to your 
 `/config.yml` file:
 
-    plugins:
-      - 
-        name: JSONView
-        version: 1.0
-        config: |
-          [
-            { "api": {} },
-            { "api2": {} } 
-          ]
+<pre><code class="lang-yml">plugins:
+  - 
+    name: JSONView
+    version: 1.0
+    config: |
+      [
+        { "api": {} },
+        { "api2": {} } 
+      ]
+</code></pre>
+
 
 In this example both the `api` and `api2` modules will be 
 configured to act as RESTful APIs.
@@ -40,26 +42,24 @@ There were few key concerns when developing the plugin:
   unless in 'dev' environment with `debug: true` in `/config.yml`.
 * There are core objects to use when creating JSON view responses. These are:
 
-
-
-    vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/EROb.php
-    vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/ROb.php
-    vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/ReturnCodes.php
+<pre><code class="lang-vim">vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/EROb.php
+vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/ROb.php
+vendor/mikejw/empathy/src/Empathy/MVC/Plugin/JSONView/ReturnCodes.php
+</code></pre>
 
 * The response classes provide defaults out the box with simple
   api for setting response output in generic response properties.
 * These classes can be replaced with custom ones (or extended from). 
   As an example here is sample
   config that uses classes that reside in the application's `/src` directory.
-  (NB: for composer PSR autoloading see: https://getcomposer.org/doc/04-schema.md#autoload):
+  (NB: for composer PSR autoloading see [here](https://getcomposer.org/doc/04-schema.md#autoload):
 
-
-
-    plugins:
-      -
-        name: JSONView
-        version: 1.0
-        config: '{"api": {"error_ob":"Ace\\EROb","return_ob":"Ace\\ROb","return_codes":"Ace\\ReturnCodes"}}'
+<pre><code class="lang-yml">plugins:
+  -
+    name: JSONView
+    version: 1.0
+    config: '{"api": {"error_ob":"Ace\\EROb","return_ob":"Ace\\ROb","return_codes":"Ace\\ReturnCodes"}}'
+</code></pre>
 
 
 Response Examples
@@ -68,21 +68,22 @@ Response Examples
 Basic example, using the default `ROb` response
 object:
 
-    <?php
-    namespace Empathy\MVC\Controller;
-    use Empathy\MVC\Plugin\JSONView\ROb;
-    
-    class api extends CustomController
+<pre><code class="lang-php">&lt;?php
+namespace Empathy\MVC\Controller;
+use Empathy\MVC\Plugin\JSONView\ROb;
+
+class api extends CustomController
+{
+    public function default_event()
     {
-        public function default_event()
-        {
-            $rob = new ROb();
-            $data = new \stdClass();
-            $data->foo = 'bar';
-            $rob->setData($data);
-            $this->assign('default', $rob, true);
-        }
-    } 
+        $rob = new ROb();
+        $data = new \stdClass();
+        $data->foo = 'bar';
+        $rob->setData($data);
+        $this->assign('default', $rob, true);
+    }
+}
+</code></pre>
 
 NB: the third argument used in `assign` will enable or disable
 the `no_array` option, which is off by default. When set to
@@ -95,62 +96,66 @@ However in most cases you will want to pass a single piece of data
 and you will need to do so when passing an error in order for it
 to be handled properly, like in the following example:
 
-    <?php
-    namespace Empathy\MVC\Controller;
-    use Empathy\MVC\Plugin\JSONView\EROb;
-    use Empathy\MVC\Plugin\JSONView\ReturnCodes;
+<pre><code class="lang-php">&lt;?php
+namespace Empathy\MVC\Controller;
+use Empathy\MVC\Plugin\JSONView\EROb;
+use Empathy\MVC\Plugin\JSONView\ReturnCodes;
 
-    class api2 extends CustomController
-    {
-        public function default_event()
-        { 
-            $response = EROb::getObject(ReturnCodes::Not_Found);
-            $this->assign('default', $response, true);
-        }
+class api2 extends CustomController
+{
+    public function default_event()
+    { 
+        $response = EROb::getObject(ReturnCodes::Not_Found);
+        $this->assign('default', $response, true);
     }
+}
+</code></pre>
 
 To enable a JSONP response simply check for a callback value
 and then call `setJSONPCallback` on your response object:
 
-    $r = new ROb();
-    $data = new \stdClass();
-    $data->foor = 'bar';
-    if (isset($_GET['callback'])) {
-        $r->setJSONPCallback($_GET['callback']);
-    }
-    $this->assign('default', $r, true);
+<pre><code class="lang-php">$r = new ROb();
+$data = new \stdClass();
+$data->foor = 'bar';
+if (isset($_GET['callback'])) {
+    $r->setJSONPCallback($_GET['callback']);
+}
+$this->assign('default', $r, true);
+</code></pre>
 
 When not returning errors, you do not need to use or extend 
 your response objects and data from the included response object
 classes.  You can return any variables, arrays, and vanilla objects:
 
-    $this->assign('default', [1, 2, 3, 4, 5], true);
+<pre><code class="lang-php">$this->assign('default', [1, 2, 3, 4, 5], true);</code></pre>
 
 Produces:
 
-    [
+<pre><code class="lang-json">[
+    1,
+    2,
+    3,
+    4,
+    5
+]
+</code></pre>
+
+Or:
+
+<pre><code class="lang-php">$this->assign('default', [1, 2, 3, 4, 5], false);</code></pre>
+
+Produces:
+
+<pre><code class="lang-json">{
+    "default": [
         1,
         2,
         3,
         4,
         5
     ]
-
-Or:
-
-    $this->assign('default', [1, 2, 3, 4, 5], false);
-
-Produces:
-
-    {
-        "default": [
-            1,
-            2,
-            3,
-            4,
-            5
-        ]
-    }
+}
+</code></pre>
 
 Pretty Print Flags
 ---
@@ -158,14 +163,15 @@ Pretty Print Flags
 To enable pretty printing in returned JSON you can
 set `pretty_print` flags per api module in `/config.json`:
 
-    plugins:
-      -
-        name: JSONView
-        version: 1.0
-        config: |
-        [
-          { "api": { "pretty_print": true } }
-        ]
+<pre><code class="lang-yml">plugins:
+  -
+    name: JSONView
+    version: 1.0
+    config: |
+    [
+      { "api": { "pretty_print": true } }
+    ]
+</code></pre>
 
 Next
 ---
