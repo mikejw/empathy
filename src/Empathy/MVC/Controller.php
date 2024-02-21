@@ -82,6 +82,10 @@ class Controller
      */
     protected $useSession;
 
+    private $initError;
+
+
+
     /**
      * Controller constructor.  Grabs certain properties from the boot object, establishes the view
      * from the plugin manager and assigns certain information to view making it available to templates.
@@ -99,7 +103,6 @@ class Controller
         $this->plugin_manager->setController($this);
         $this->environment = $boot->getEnvironment();
         $this->stash =  DI::getContainer()->get('Stash');
-        $this->connected = false;
         $this->module = (isset($_GET['module']))? $_GET['module']: null;
         $this->class = (isset($_GET['class']))? $_GET['class']: null;
         $this->event = (isset($_GET['event']))? $_GET['event']: null;
