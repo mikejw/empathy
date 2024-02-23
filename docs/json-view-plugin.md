@@ -29,7 +29,7 @@ presentation of your application at the routes (resources) you choose
 within these modules.  From your controller actions
 you will be able to pass data to the plugin for it to render.
 
-There were few key concerns when developing the plugin:
+There were a few key concerns when developing the plugin:
 
 * One or more modules can be configured to act as JSON APIs.
 * The presentation object should always "speak JSON" even
@@ -175,4 +175,4 @@ set `pretty_print` flags per api module in `/config.json`:
 
 Next
 ---
-You may want to add users to your application. See [elib-base](https://github.com/mikejw/elib-base).
+You may want to add users to your application. See [elib-base](/docs/elib-base/).
