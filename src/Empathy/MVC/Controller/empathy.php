@@ -56,6 +56,13 @@ class empathy extends BaseController
             $this->redirect();
         } else {
             $success = FileContentsCache::clear();
+
+	    // presume to clear memcache
+	    try {
+	        $cache = DI::getContainer()->get('Cache')->clear();
+            } catch (\Exception $e) {
+                // do nothing
+            }
         }
         $this->assign('cc', $success);
     }
