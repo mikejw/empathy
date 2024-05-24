@@ -379,9 +379,17 @@ function option_assert_plugin($plugin)
     assertConfig();
     global $app_config;
     $data = json_decode($plugin, true);
+
+    $aliases = array($data['name']);
+    if ($data['name'] === 'SmartySSL') {
+        $aliases[] = 'Smarty';
+    } elseif ($data['name'] === 'Smarty') {
+        $aliases[] = 'SmartySSL';
+    }
+
     $found = -1;
     foreach ($app_config['plugins'] as $index => $item) {
-        if ($item['name'] === $data['name']) {
+        if (array_search($item['name'], $aliases) !== false) {
             $found = $index;
             break;
         }
