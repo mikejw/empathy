@@ -78,7 +78,7 @@ module.exports = function(grunt) {
         files: {
           '<%= dest %>/js/main.js': [
             '<%= node %>/jquery/dist/jquery.min.js',
-            '<%= node %>/bootstrap/dist/js/bootstrap.min.js',
+            '<%= node %>/bootstrap/dist/js/bootstrap.bundle.min.js',
             '<%= node %>/jquery-ui/ui/data.js',
             '<%= node %>/jquery-ui/ui/scroll-parent.js',
             '<%= node %>/jquery-ui/ui/widget.js',
