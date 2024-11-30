@@ -498,12 +498,12 @@ class Entity
      *
      * @return array $all the rows returned as a result of the query
      */
-    public function getAllCustom($table, $sql_string)
+    public function getAllCustom($table, $sql_string, $params = array())
     {
         $all = array();
         $sql = 'SELECT * FROM '.$table.' '.$sql_string;
         $error = 'Could not get all rows from '.$table;
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
 
         $i = 0;
         foreach ($result as $row) {
