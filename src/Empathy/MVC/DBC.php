@@ -71,7 +71,7 @@ class DBC
         $this->pass = $p;
         $this->port = $port;
 
-        $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';';
+        $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';charset=utf8mb4';
         if ($this->port !== null) {
             $dsn .= 'port='.$this->port.';';
         }
