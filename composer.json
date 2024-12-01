@@ -6,6 +6,7 @@
         "framework",
         "mvc"
     ],
+    "homepage": "https://empathy.sh",
     "license": "MIT",
     "authors": [
         {
