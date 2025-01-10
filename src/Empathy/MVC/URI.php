@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC;
+use Empathy\MVC\LogItem;
 
 /**
  * Empathy URI
@@ -102,17 +103,22 @@ class URI
 
     public function logRouting()
     {
-        $log = DI::getContainer()->get('LoggingOn') ? DI::getContainer()->get('Log') : false;
-        if ($log !== false) {
-            $msg = [
-                'Module' => $_GET['module'] ?? 'Undefined',
-                'Class' => $_GET['class'] ?? 'Undefined',
-                'Event' => $_GET['event'] ?? 'Undefined',
-                'Controller Name' => $this->controllerName,
-                'Error' => $this->getErrorMessage()
-            ];
-            $log->debug(json_encode($msg));
+       $log = new LogItem(
+           'route loaded',
+           array(
+               'module' => $_GET['module'] ?? 'Undefined',
+               'class' => $_GET['class'] ?? 'Undefined',
+               'event' => $_GET['event'] ?? 'Undefined',
+               'controller name' => $this->controllerName,
+           ),
+           self::class
+       );
+        if ($error = $this->getErrorMessage()) {
+            $log->append('error', $error);
+            $log->setMsg('route not loaded');
+            $log->setLevel('error');
         }
+        $log->fire();
     }
 
     public function processRequest()

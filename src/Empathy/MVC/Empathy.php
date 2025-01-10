@@ -297,10 +297,11 @@ class Empathy
         }
 
         $response = '';
+        $errors = '';
         if ($this->hasErrors()) {
-            $e = new ErrorException($this->errorsToString());
+            $errors = $this->errorsToString();
+            $e = new ErrorException($errors);
         }
-
         if (
             RequestException::class !== get_class($e) &&
             $this->boot->getEnvironment() != 'dev'
@@ -348,6 +349,25 @@ class Empathy
                 if ($response == '') {
                     $response = 'HTTP/1.1 500 Internal Server Error';
                 }
+
+                $message = $e->getMessage();
+                $log = new LogItem(
+                    'application error',
+                    array(),
+                    self::class,
+                    'error'
+                );
+                if ($message != '') {
+                    $log->append('exception', $message);
+                }
+                if ($response) {
+                    $log->append('response', $response);
+                }
+                if ($errors) {
+                    $log->append('error', $errors);
+                }
+                $log->fire();
+                
                 Testable::header($response);
                 $this->boot->dispatchException($e);
                 break;

@@ -3,6 +3,7 @@
 namespace Empathy\MVC;
 
 use Empathy\MVC\Config;
+use Empathy\MVC\LogItem;
 
 /**
  * Empathy Entity
@@ -13,7 +14,6 @@ use Empathy\MVC\Config;
  * @license         See LICENCE
  *
  * (c) copyright Mike Whiting
-
  * with this source code in the file licence.txt
  */
 class Entity
@@ -80,7 +80,7 @@ class Entity
      */
     public function MYSQLTime()
     {
-        return '\''.date('Y:m:d H:i:s', time()).'\'';
+        return '\'' . date('Y:m:d H:i:s', time()) . '\'';
     }
 
 
@@ -171,9 +171,9 @@ class Entity
            throw new SafeException('DB Error: No database password');
            }
         */
-        $dsn = 'mysql:host='.DB_SERVER.';dbname='.DB_NAME.';';
+        $dsn = 'mysql:host=' . DB_SERVER . ';dbname=' . DB_NAME . ';';
         if (defined('DB_PORT') && is_numeric(DB_PORT)) {
-            $dsn .= 'port='.DB_PORT.';';
+            $dsn .= 'port=' . DB_PORT . ';';
         }
         $this->dbh = new \PDO($dsn, DB_USER, DB_PASS);
     }
@@ -191,18 +191,38 @@ class Entity
     }
 
 
-   /**
-    * Clear associated PDO objects
-    *
-    * @return void
-    */
+    /**
+     * Clear associated PDO objects
+     *
+     * @return void
+     */
     public function dbDisconnect()
     {
         unset($this->result);
         $this->dbh = null;
     }
 
+    private function logQuery($sql, $error, $params, $level)
+    {
+        $log = new LogItem(
+            'sql query',
+            array(
+                'query' => $sql
+            ),
+            self::class,
+            $level
+        );
 
+        if (sizeof($params) > 0) {
+            $log->append('params', $params);
+        }
+
+        if ($level != 'debug') {
+            $log->setMessage('sql query error');
+            $log->append('error', $error);
+        }
+        $log->fire();
+    }
 
     /**
      * Perform MySQL query
@@ -215,32 +235,27 @@ class Entity
      */
     public function query($sql, $error = '', $params = array())
     {
-        $log = DI::getContainer()->get('LoggingOn') ? DI::getContainer()->get('Log') : false;
-        if ($log !== false && (!sizeof($params))) {
-            $msg = [
-                'SQL Query' => $sql,
-                'Error message' => $error,
-                'Params' => $params
-            ];
-            $log->debug(json_encode($msg));
-        }
-
         $result = null;
-        
-        if (sizeof($params)) {
-            $sth = $this->dbh->prepare($sql, array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION));
-            $sth->execute($params);
-            $result = $sth;
-        } else {
-            if (($result = $this->dbh->query($sql)) == false) {
-                $errors = $this->dbh->errorInfo();
-
-                throw new \Exception("[".htmlentities($sql)
-                    ."]<br /><strong>MySQL</strong>: ($error): "
-                    .htmlentities($errors[2]));
+        try {
+            if (sizeof($params)) {
+                $sth = $this->dbh->prepare($sql, array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION));
+                $sth->execute($params);
+                $result = $sth;
             } else {
-                $this->result = $result;
-            }    
+                if (($result = $this->dbh->query($sql)) == false) {
+                    $errors = $this->dbh->errorInfo();
+
+                    throw new \Exception("[" . htmlentities($sql)
+                        . "]<br /><strong>MySQL</strong>: ($error): "
+                        . htmlentities($errors[2]));
+                } else {
+                    $this->result = $result;
+                }
+            }
+            $this->logQuery($sql, $error, $params, 'debug');
+        } catch (\Exception $e) {
+            $this->logQuery($sql, $error . $errors[2], $params, 'error');
+            throw $e;
         }
         
         return $result;
@@ -294,14 +309,13 @@ class Entity
     public function loadAsOptions($table, $field, $order = null)
     {
         $data = array();
-        $sql = 'SELECT id,'.$field.' FROM '.$table;
+        $sql = 'SELECT id,' . $field . ' FROM ' . $table;
         if ($order !== null && $order != '') {
-            $sql .= ' ORDER BY '.$order;
+            $sql .= ' ORDER BY ' . $order;
         } else {
-            $sql .= ' ORDER BY '.$field;
+            $sql .= ' ORDER BY ' . $field;
         }
-        $error = 'Could not load '.$table.' as options';
-        ;
+        $error = 'Could not load ' . $table . ' as options';;
         $result = $this->query($sql, $error);
         foreach ($result as $row) {
             $id = $row['id'];
@@ -390,7 +404,7 @@ class Entity
             } elseif ($this->$property == 'MYSQLTIME') {
                 $sql .= $this->MYSQLTime();
             } else {
-                $sql .= "'".$this->$property."'";
+                $sql .= "'" . $this->$property . "'";
             }
 
             if ($i + 1 < sizeof($properties)) {
@@ -428,7 +442,7 @@ class Entity
             $this->sanitizeNoPost();
         }
 
-        $sql = 'INSERT INTO '.$table.' VALUES(';
+        $sql = 'INSERT INTO ' . $table . ' VALUES(';
         if ($id) {
             $sql .= 'NULL, ';
         }
@@ -447,7 +461,7 @@ class Entity
                 } elseif ($this->$property == 'MYSQLTIME') {
                     $sql .= $this->MYSQLTime();
                 } else {
-                    $sql .= "'".$this->$property."'";
+                    $sql .= "'" . $this->$property . "'";
                 }
 
                 if (($i + 1) < sizeof($this->properties)) {
@@ -476,8 +490,8 @@ class Entity
         }
 
         $all = array();
-        $sql = 'SELECT * FROM '.$table;
-        $error = 'Could not get all rows from '.$table;
+        $sql = 'SELECT * FROM ' . $table;
+        $error = 'Could not get all rows from ' . $table;
         $result = $this->query($sql, $error);
 
         $i = 0;
@@ -501,8 +515,8 @@ class Entity
     public function getAllCustom($table, $sql_string, $params = array())
     {
         $all = array();
-        $sql = 'SELECT * FROM '.$table.' '.$sql_string;
-        $error = 'Could not get all rows from '.$table;
+        $sql = 'SELECT * FROM ' . $table . ' ' . $sql_string;
+        $error = 'Could not get all rows from ' . $table;
         $result = $this->query($sql, $error, $params);
 
         $i = 0;
@@ -517,9 +531,9 @@ class Entity
     public function getPaginatePages($table, $sql_string, $page, $per_page)
     {
         $nav = array();
-        $sql = 'SELECT * FROM '.$table.' '.$sql_string;
+        $sql = 'SELECT * FROM ' . $table . ' ' . $sql_string;
         //$sql = 'SELECT FOUND_ROWS()';
-        $error = 'Could not get rows from '.$table;
+        $error = 'Could not get rows from ' . $table;
         $result = $this->query($sql, $error);
         $rows = $result->rowCount();
         $p_rows = $rows;
@@ -540,15 +554,15 @@ class Entity
     public function getPaginatePagesSimpleJoin($select, $table1, $table2, $sql_string, $page, $per_page, $leftJoins = '')
     {
         $nav = array();
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1';
+        $sql = 'SELECT ' . $select . ' FROM ' . $table1 . ' t1';
 
         if ($leftJoins === '') {
             $sql .= ', ';
         }
-        $sql .= $leftJoins.$table2.' t2 '.$sql_string;
+        $sql .= $leftJoins . $table2 . ' t2 ' . $sql_string;
 
-        $error = 'Could not get rows from '.$table1;
-        
+        $error = 'Could not get rows from ' . $table1;
+
         $result = $this->query($sql, $error);
         $rows = $result->rowCount();
         $p_rows = $rows;
@@ -569,8 +583,8 @@ class Entity
     public function getPaginatePagesMultiJoin($select, $table1, $table2, $table3, $sql_string, $page, $per_page)
     {
         $nav = array();
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string;
-        $error = 'Could not get rows from '.$table1;
+        $sql = 'SELECT ' . $select . ' FROM ' . $table1 . ' t1, ' . $table2 . ' t2, ' . $table3 . ' t3 ' . $sql_string;
+        $error = 'Could not get rows from ' . $table1;
         $result = $this->query($sql, $error);
         $rows = $result->rowCount();
         $p_rows = $rows;
@@ -598,11 +612,12 @@ class Entity
         $per_page,
         $group,
         $order
-    ) {
+    )
+    {
         $nav = array();
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '.$table3.' t3 '.$sql_string;
-        $sql .= ' GROUP BY '.$group.' ORDER BY '.$order;
-        $error = 'Could not get rows from '.$table1;
+        $sql = 'SELECT ' . $select . ' FROM ' . $table1 . ' t1, ' . $table2 . ' t2, ' . $table3 . ' t3 ' . $sql_string;
+        $sql .= ' GROUP BY ' . $group . ' ORDER BY ' . $order;
+        $error = 'Could not get rows from ' . $table1;
         $result = $this->query($sql, $error);
         $rows = $result->rowCount();
         $p_rows = $rows;
@@ -624,9 +639,9 @@ class Entity
     {
         $all = array();
         $start = ($page - 1) * $per_page;
-        $sql = 'SELECT * FROM '.$table.' '.$sql_string.' LIMIT '.$start.', '.$per_page;
+        $sql = 'SELECT * FROM ' . $table . ' ' . $sql_string . ' LIMIT ' . $start . ', ' . $per_page;
         //$sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM '.$table.' '.$sql_string.' LIMIT '.$start.', '.$per_page;
-        $error = 'Could not get rows from '.$table;
+        $error = 'Could not get rows from ' . $table;
 
         $result = $this->query($sql, $error);
         $i = 0;
@@ -642,13 +657,13 @@ class Entity
     {
         $all = array();
         $start = ($page - 1) * $per_page;
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1';
+        $sql = 'SELECT ' . $select . ' FROM ' . $table1 . ' t1';
 
         if ($leftJoins === '') {
             $sql .= ', ';
         }
-        $sql .= $leftJoins.$table2.' t2 '.$sql_string.' LIMIT '.$start.', '.$per_page;
-        $error = 'Could not get rows from '.$table1;
+        $sql .= $leftJoins . $table2 . ' t2 ' . $sql_string . ' LIMIT ' . $start . ', ' . $per_page;
+        $error = 'Could not get rows from ' . $table1;
 
         $result = $this->query($sql, $error);
         $i = 0;
@@ -664,9 +679,9 @@ class Entity
     {
         $all = array();
         $start = ($page - 1) * $per_page;
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '
-            .$table3.' t3 '.$sql_string.' LIMIT '.$start.', '.$per_page;
-        $error = 'Could not get rows from '.$table1;
+        $sql = 'SELECT ' . $select . ' FROM ' . $table1 . ' t1, ' . $table2 . ' t2, '
+            . $table3 . ' t3 ' . $sql_string . ' LIMIT ' . $start . ', ' . $per_page;
+        $error = 'Could not get rows from ' . $table1;
         $result = $this->query($sql, $error);
         $i = 0;
         foreach ($result as $row) {
@@ -687,13 +702,14 @@ class Entity
         $per_page,
         $group,
         $order
-    ) {
+    )
+    {
         $all = array();
         $start = ($page - 1) * $per_page;
-        $sql = 'SELECT '.$select.' FROM '.$table1.' t1, '.$table2.' t2, '
-            .$table3.' t3 '.$sql_string.' GROUP BY '.$group
-            .' ORDER BY '.$order.' LIMIT '.$start.', '.$per_page;
-        $error = 'Could not get rows from '.$table1;
+        $sql = 'SELECT ' . $select . ' FROM ' . $table1 . ' t1, ' . $table2 . ' t2, '
+            . $table3 . ' t3 ' . $sql_string . ' GROUP BY ' . $group
+            . ' ORDER BY ' . $order . ' LIMIT ' . $start . ', ' . $per_page;
+        $error = 'Could not get rows from ' . $table1;
         $result = $this->query($sql, $error);
         $i = 0;
         foreach ($result as $row) {
@@ -708,8 +724,8 @@ class Entity
     {
         foreach ($this->properties as $property) {
             if (($force_id && $property == 'id') ||
-               (!in_array($property, $this->globally_ignored_property)
-                && !in_array($property, $ignore))) {
+                (!in_array($property, $this->globally_ignored_property)
+                    && !in_array($property, $ignore))) {
                 $this->$property = $_POST[$property];
             }
         }
@@ -726,7 +742,7 @@ class Entity
 
         foreach ($data as $index => $value) {
             $id = $value['id'];
-            $option[$id]= $value[$label];
+            $option[$id] = $value[$label];
         }
 
         return $option;
@@ -736,10 +752,10 @@ class Entity
     {
         $pTagPattern = '!&lt;p&gt;(.*?)&lt;/p&gt;!m';
         $aTagPattern = '!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;'
-            .'(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m';
+            . '(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m';
 
         $imgTagPattern = '!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;'
-            .'(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m';
+            . '(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m';
 
         foreach ($this->properties as $property) {
             if (!is_numeric($property) && in_array($property, $formatting)) {
@@ -862,7 +878,7 @@ class Entity
             $c = get_class($this);
             $table = $c::TABLE;
         }
-        $sql = 'DELETE FROM '.$table.' WHERE id = '.$this->id;
+        $sql = 'DELETE FROM ' . $table . ' WHERE id = ' . $this->id;
         $error = 'Could not delete row.';
         $this->query($sql, $error);
     }

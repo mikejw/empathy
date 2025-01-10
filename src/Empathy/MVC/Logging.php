@@ -8,13 +8,13 @@ class Logging
 {
     private $log;
 
-    public function __construct()
+    public function __construct($level = Logger::DEBUG)
     {
         try {
             $logPath = Config::get('DOC_ROOT') . '/logs';
             $logFile = $logPath . '/main.log';
             $this->log = new Logger('default');
-            $this->log->pushHandler(new StreamHandler($logFile, Logger::DEBUG));
+            $this->log->pushHandler(new StreamHandler($logFile, $level));
         } catch (\Exception $e) {
             throw $e;
         }

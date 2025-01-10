@@ -3,6 +3,7 @@
 namespace Empathy\MVC;
 use DI\Container;
 use DI\ContainerBuilder;
+use Monolog\Logger;
 
 class DI
 {
@@ -71,11 +72,12 @@ class DI
                 ];
             },
             'LoggingOn' => false,
+            'LoggingLevel' => Logger::DEBUG,
             'Log' => function (Container $c) {
                 if (!$c->get('LoggingOn')) {
                     throw new Exception('Logging disabled');
                 }
-                $logging = new Logging();
+                $logging = new Logging($c->get('LoggingLevel'));
                 return $logging->getLog();
             }
         ]);
