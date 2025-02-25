@@ -236,6 +236,7 @@ class Entity
     public function query($sql, $error = '', $params = array())
     {
         $result = null;
+        $errors = array('', '', '');
         try {
             if (sizeof($params)) {
                 $sth = $this->dbh->prepare($sql, array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION));
