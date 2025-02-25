@@ -218,7 +218,7 @@ class Entity
         }
 
         if ($level != 'debug') {
-            $log->setMessage('sql query error');
+            $log->setMsg('sql query error');
             $log->append('error', $error);
         }
         $log->fire();
