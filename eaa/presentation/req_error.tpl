@@ -22,15 +22,14 @@
     {elseif $code eq \Empathy\MVC\RequestException::BAD_REQUEST}
 
         <h1 class="fail">Bad request</h1>
-        <p>That won't work. {$error}.</p>
+        <p>That won't work. {if $error neq ''}{$error}.{/if}</p>
         <p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}">Home</a></p>
 
     {elseif $code eq \Empathy\MVC\RequestException::NOT_AUTHORIZED}
 
         <h1 class="fail">Forbidden</h1>
-        <p>That won't work. {$error}.</p>
+        <p>That won't work. {if $error neq ''}{$error}.{/if}</p>
         <p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}">Home</a></p>
-
     {/if}
 
 </div>
