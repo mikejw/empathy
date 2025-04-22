@@ -10,6 +10,7 @@ boot_options:
   environment: prod
   debug_mode: false
   dynamic_module: false
+  dynamic_module_default_uri: false
 db_server: db
 db_user: root
 db_pass: example

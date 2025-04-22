@@ -58,7 +58,8 @@ class DI
                 $bootstrap = $c->get('Bootstrap');
                 return new URI(
                     $bootstrap->getDefaultModule(),
-                    $bootstrap->getDynamicModule()
+                    $bootstrap->getDynamicModule(),
+                    $bootstrap->getDynamicModuleDefaultURI()
                 );
             },
             'PluginManager' => new PluginManager(),

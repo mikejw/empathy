@@ -77,6 +77,10 @@ class SectionItemStandAlone extends Entity
 
     public function resolveURI($uri)
     {
+        if (!isset($uri)) {
+            return false;
+        }
+
         $matched = false;
         $rows = $this->getURIData();
         $id = 0;
@@ -92,7 +96,7 @@ class SectionItemStandAlone extends Entity
             }
         }
 
-        if (sizeof($sections) == sizeof($uri)) {
+        if (isset($uri) && sizeof($sections) === sizeof($uri)) {
             $matched = true;
             $_GET['section'] = $sections[sizeof($sections) - 1]['id'];
         }

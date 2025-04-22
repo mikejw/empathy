@@ -42,6 +42,11 @@ class Bootstrap
     private $dynamicModule;
 
     /**
+     * @var Dynamic module (ELib CMS) URI string as fallback
+     */
+    private $dynamicModuleDefaultURI;
+
+    /**
      * The URI object is used for determining
      * the correct application controller to dispatch to.
      */
@@ -131,6 +136,10 @@ class Bootstrap
         if (isset($bootOptions['dynamic_module'])) {
             $this->dynamicModule = $bootOptions['dynamic_module'];
         }
+        if (isset($bootOptions['dynamic_module_default_uri'])) {
+            $this->dynamicModuleDefaultURI = $bootOptions['dynamic_module_default_uri'];
+        }
+
         if (isset($bootOptions['debug_mode'])) {
             $this->debug_mode = ($bootOptions['debug_mode'] === true);
         }
@@ -377,6 +386,15 @@ class Bootstrap
     public function getDynamicModule()
     {
         return $this->dynamicModule;
+    }
+
+    /**
+     * Get dynamic module default uri.
+     * @return string Dynamic module default uri.
+     */
+    public function getDynamicModuleDefaultURI()
+    {
+        return $this->dynamicModuleDefaultURI;
     }
 
     /**

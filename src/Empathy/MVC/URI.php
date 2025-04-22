@@ -42,18 +42,24 @@ class URI
     const MAX_COMP = 4; // maxium relevant info stored in a URI
     // ie module, class, event, id
 
+    /**
+     * URI from config error
+     */
+    const INVALID_DYNAMIC_MODULE_DEFAULT_URI = 5;
+
     private $full;
     private $uriString;
     private $uri;
     private $defaultModule;
     private $dynamicModule;
+    private $dynamicModuleDefaultURI;
     private $error = 0;
     private $internal = false;
     private $controllerName = '';
     private $cli_mode_detected;
     private $internal_controller = 'empathy';
 
-    public function __construct($default_module, $dynamic_module)
+    public function __construct($default_module, $dynamic_module, $dynamic_module_default_uri = '')
     {
         if (isset($_SERVER['HTTP_HOST']) && strpos(Config::get('WEB_ROOT'), $_SERVER['HTTP_HOST']) === false) {
             throw new SafeException('Host name mismatch.');
@@ -64,6 +70,7 @@ class URI
         $removeLength = strlen(Config::get('WEB_ROOT').Config::get('PUBLIC_DIR'));
         $this->defaultModule = $default_module;
         $this->dynamicModule = $dynamic_module;
+        $this->dynamicModuleDefaultURI = $dynamic_module_default_uri;
         if (isset($_SERVER['HTTP_HOST'])) {
             $this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
             $this->uriString = substr($this->full, $removeLength + 1);
@@ -182,8 +189,8 @@ class URI
         $i = 0;
 
         $length = sizeof($this->uri);
-        if ($length > URI::MAX_COMP) {
-            $length = URI::MAX_COMP;
+        if ($length > self::MAX_COMP) {
+            $length = self::MAX_COMP;
         }
 
         while ($i < $length) {
@@ -255,7 +262,7 @@ class URI
 
         if (!$this->error) {
             if (!class_exists($this->controllerName)) {
-                $this->error = URI::MISSING_CLASS_DEF;
+                $this->error = self::MISSING_CLASS_DEF;
             }
         }
 
@@ -263,7 +270,7 @@ class URI
         if (!$this->error) {
             $r = new \ReflectionClass($this->controllerName);
             if (!$r->hasMethod($_GET['event'])) {
-                $this->error = URI::MISSING_EVENT_DEF;
+                $this->error = self::MISSING_EVENT_DEF;
             }
         }
     }
@@ -274,6 +281,7 @@ class URI
             $_GET['event'] = 'default_event';
         }
     }
+
 
     public function dynamicSection()
     {
@@ -288,7 +296,11 @@ class URI
             $_GET['module'] = $this->dynamicModule;
         }
 
-        if (sizeof($this->uri) > 0) {
+        if (!isset($this->uri)) {
+            $this->uri = explode('/', $this->dynamicModuleDefaultURI);
+        }
+
+        if (isset($this->uri) && sizeof($this->uri) > 0) {
             $section_index = (sizeof($this->uri) - 1);
             if (is_numeric($this->uri[$section_index])) {
                 $_GET['id'] = $this->uri[$section_index];
@@ -296,8 +308,14 @@ class URI
             }
         }
 
-        if (!$section->resolveURI($this->uri)) {
-            $this->error = URI::ERROR_404;
+        if (!!$this->dynamicModuleDefaultURI) {
+            if (!$section->resolveURI($this->uri)) {
+                $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
+            }
+        }
+
+        if ($this->error === 0 && !$section->resolveURI($this->uri)) {
+            $this->error = self::ERROR_404;
         }
     
         if (isset($_GET['section'])) {
@@ -306,7 +324,7 @@ class URI
 
         // section id is not set / found
         if (!(is_numeric($section->id))) {
-            $this->error = URI::ERROR_404;
+            $this->error = self::ERROR_404;
         }
 
         if (isset($section->url_name)) {
@@ -315,7 +333,7 @@ class URI
 
         if ($this->error < 1) {
             if ($section->template == "") {
-                $this->error = URI::NO_TEMPLATE;
+                $this->error = self::NO_TEMPLATE;
             } else {
                 if ($section->template == '0') { // section in 'specialised'
                     $controllerName = "template".$section->id;
@@ -342,17 +360,20 @@ class URI
     {
         $message = '';
         switch ($this->error) {
-            case URI::MISSING_CLASS_DEF:
+            case self::MISSING_CLASS_DEF:
                 $message = 'Missing or incorrect class definition';
                 break;
-            case URI::MISSING_EVENT_DEF:
+            case self::MISSING_EVENT_DEF:
                 $message = 'Controller event '.$_GET['event'].' has not been defined';
                 break;
-            case URI::ERROR_404:
+            case self::ERROR_404:
                 $message = 'Error 404';
                 break;
-            case URI::NO_TEMPLATE:
+            case self::NO_TEMPLATE:
                 $message = 'No DSection template specified';
+                break;
+            case self::INVALID_DYNAMIC_MODULE_DEFAULT_URI:
+                $message = 'Dynamic module default URI is invalid';
                 break;
             default:
                 break;
