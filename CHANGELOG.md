@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [1.1.1] - 2025-04-30
+	
+### Fixed
+
+- Update version number
+
+
 ## [1.1.0] - 2025-04-22
 
 _`dynamic_module_default_uri` `config.yml` setting will be documented soon in the ELib CMS extension._
