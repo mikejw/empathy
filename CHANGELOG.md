@@ -2,8 +2,15 @@
 # Changelog
 
 
+## [1.1.2] - 2025-04-30
+
+### Fixed
+
+- Allow database connections when port is specified
+
+
 ## [1.1.1] - 2025-04-30
-	
+
 ### Fixed
 
 - Update version number
@@ -16,6 +23,3 @@ _`dynamic_module_default_uri` `config.yml` setting will be documented soon in th
 ### Added
 
 - Introduce new `dynamic_module_default_uri` boot option config setting
-
-
-
