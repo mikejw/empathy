@@ -19,7 +19,7 @@
     "jquery": "^3.4.1",
     "jquery-ui": "^1.12.1",
     "js-yaml": "^3.13.1",
-    "tinymce": "^5.10.2",
+    "tinymce": "^7.0",
     "touch": "^3.1.0",
     "uglify-js": "3.17.4"
   }

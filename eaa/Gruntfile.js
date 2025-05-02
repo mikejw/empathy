@@ -66,6 +66,12 @@ module.exports = function(grunt) {
           },
           {
             expand: true,
+            cwd: '<%= node %>/tinymce/models/',
+            src: [ "*.*", "**/*.*" ],
+            dest: '<%= dest %>/js/models'
+          },
+          {
+            expand: true,
             cwd: '<%= elibdir %>/public/',
             src: [ "blogImages.js" ],
             dest: '<%= dest %>/js'
