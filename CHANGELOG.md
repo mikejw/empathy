@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [1.1.3] - 2025-05-02
+
+### Fixed
+
+- Upgrade to `tinymce` 7
+
+
 ## [1.1.2] - 2025-04-30
 
 ### Fixed
