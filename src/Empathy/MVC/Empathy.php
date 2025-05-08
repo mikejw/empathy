@@ -184,7 +184,7 @@ class Empathy
         } else {
             try {
                 $this->boot->dispatch($fake);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->exceptionHandler($e);
             }
         }
@@ -315,8 +315,11 @@ class Empathy
             $e = new RequestException($message, RequestException::BAD_REQUEST);
         }
 
+        $response500 = 'HTTP/1.1 500 Internal Server Error';
+
         switch (get_class($e)) {
             case SafeException::class:
+                Testable::header($response500);
                 Testable::doDie('Safe exception: '.$e->getMessage());
                 break;
             case TestModeException::class:
@@ -331,7 +334,7 @@ class Empathy
                         $response = 'HTTP/1.1 404 Not Found';
                         break;
                     case RequestException::INTERNAL_ERROR:
-                        $response = 'HTTP/1.1 500 Internal Server Error';
+                        $response = $response500;
                         break;
                     case RequestException::NOT_AUTHORIZED:
                         $response = 'HTTP/1.1 403 Forbidden';
@@ -347,7 +350,7 @@ class Empathy
                 }
             default:
                 if ($response == '') {
-                    $response = 'HTTP/1.1 500 Internal Server Error';
+                    $response = $response500;
                 }
 
                 $message = $e->getMessage();
