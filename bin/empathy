@@ -370,6 +370,12 @@ function boot()
     $container = Empathy\MVC\DI::init(getcwd() . '/', true);
     $empathy = $container->get('Empathy');
     $empathy->init();
+
+    $assertHost = '/home/www-data/assertHost/assertHost';
+    if (file_exists($assertHost)) {
+        execute($assertHost);
+    }
+
     return $empathy;
 }
 
