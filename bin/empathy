@@ -26,9 +26,16 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 } else {
     define('SEPARATOR', '/');
 }
+
+$assertHost = false;
+if (isset($_SERVER['ASSERT_HOST']) && $_SERVER['ASSERT_HOST'] == 'true') {
+    $assertHost = true;
+}
+
 define('TPL_CACHE', './tpl/templates_c');
 define('LIB_PATH', './vendor/mikejw/empathy');
 define('ELIB_PUBLIC', '../vendor/mikejw/elib-base/public'); # relative to directory where symlink is created
+define('ASSERT_HOST', $assertHost);
 
 
 function recursive_copy($src, $fdest, $app_name)
@@ -371,9 +378,11 @@ function boot()
     $empathy = $container->get('Empathy');
     $empathy->init();
 
-    $assertHost = '/home/www-data/assertHost/assertHost';
-    if (file_exists($assertHost)) {
-        execute($assertHost);
+    if (ASSERT_HOST) {
+        $assertHostFile = '/home/www-data/assertHost/assertHost';
+        if (file_exists($assertHostFile)) {
+            execute($assertHostFile);
+        }
     }
 
     return $empathy;
