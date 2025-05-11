@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [1.2.0] - 2025-05-11
+
+### Added
+
+- Check for and execute `assertHost` when environnent variable is set
+
+
 ## [1.1.4] - 2025-05-08
 
 ### Fixed
