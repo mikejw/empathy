@@ -298,6 +298,7 @@ class Empathy
 
         $response = '';
         $errors = '';
+
         if ($this->hasErrors()) {
             $errors = $this->errorsToString();
             $e = new ErrorException($errors);
@@ -307,6 +308,7 @@ class Empathy
             $this->boot->getEnvironment() != 'dev'
         ) {
             $message = '';
+            $errors = $e->getMessage();
             if ($this->boot->getDebugMode()) {
                 $message = $e->getMessage();
             }
@@ -372,10 +374,10 @@ class Empathy
                 $log->fire();
                 
                 Testable::header($response);
+                $this->dispatchedException = true;
                 $this->boot->dispatchException($e);
                 break;
         }
-        $this->dispatchedException = true;
     }
 
 
@@ -407,20 +409,14 @@ class Empathy
         }
     }
 
-
     public function reloadBootOptions()
     {
         $this->boot->initBootOptions();
     }
 
-
-
-    // DI
     public function init()
     {
-
-        $this->boot = DI::getContainer()->get('Bootstrap');
-        $this->initPlugins();
+        $this->boot = DI::getContainer()->get('Bootstrap');   
         if ($this->persistent_mode !== true) {
             $this->beginDispatch();
         }
@@ -430,6 +426,7 @@ class Empathy
     {
         return $this->bootOptions;
     }
+
     public function getPlugins()
     {
         return $this->plugins;
@@ -439,6 +436,7 @@ class Empathy
     {
         $this->bootOptions = $options;
     }
+    
     public function setPlugins($plugins)
     {
         $this->plugins = $plugins;

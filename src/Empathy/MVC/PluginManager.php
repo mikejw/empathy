@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC;
+use Empathy\MVC\PluginManager\Option;
 
 /**
  * Empathy PluginManager
@@ -19,6 +20,17 @@ class PluginManager
     private $view_plugins;
     private $initialized;
     private $controller;
+    private $options;
+    private $whitelist;
+
+    const DEF_WHITELIST_LIST = [
+        'ELibs',
+        'Smarty',
+        'SmartySSL',
+        'JSONView',
+        'EDefault'
+    ];
+
 
     public function __construct()
     {
@@ -26,6 +38,20 @@ class PluginManager
         $this->plugins = array();
         $this->view_plugins = array();
     }
+
+    public function setOptions($options)
+    {
+        $this->options = $options;
+    }
+
+    public function setWhitelist($whitelist)
+    {
+        if (in_array(Option::DefaultWhitelist, $this->options)) {
+            $whitelist = array_merge($whitelist, self::DEF_WHITELIST_LIST);
+        }
+        $this->whitelist = $whitelist;
+    }
+
 
     public function setController($c)
     {
@@ -96,4 +122,11 @@ class PluginManager
         
         return $mode;
     }
+
+
+    public function getWhitelist()
+    {
+        return $this->whitelist;
+    }
+
 }
