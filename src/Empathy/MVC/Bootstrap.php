@@ -193,7 +193,6 @@ class Bootstrap
         } else {
             $this->controller = new $controller($this);
         }
-
         
         $this->pluginManager->preEvent();
 

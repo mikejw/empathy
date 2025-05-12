@@ -71,7 +71,6 @@ class Controller
      */
     protected $useSession;
 
-
     /**
      * Controller constructor.  Grabs certain properties from the boot object, establishes the view
      * from the plugin manager and assigns certain information to view making it available to templates.
@@ -80,15 +79,18 @@ class Controller
      */
     public function __construct($boot, $useSession = true, $pluginOptions = [], $pluginWhitelist =[])
     {
-        $this->useSession = $useSession;
         $this->boot = $boot;
-       
         $this->pluginManager = $boot->getPluginManager();
         $this->pluginManager->setOptions($pluginOptions);
         $this->pluginManager->setWhitelist($pluginWhitelist);
-        $this->boot->getMVC()->initPlugins();
-        $this->pluginManager->setController($this);
         
+        if (!$this->boot->getMVC()->initPlugins()) {
+            return false;
+        }
+
+        $this->pluginManager->setController($this);
+
+        $this->useSession = $useSession;
         $this->environment = $boot->getEnvironment();
         $this->stash =  DI::getContainer()->get('Stash');
         $this->module = (isset($_GET['module']))? $_GET['module']: null;

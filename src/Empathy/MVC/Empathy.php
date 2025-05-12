@@ -154,6 +154,8 @@ class Empathy
      */
     public function initPlugins()
     {
+        $handleSuccess = true;
+
         if (!$this->getHandlingErrors()) {
             $this->boot->initPlugins();
         } else {
@@ -161,8 +163,10 @@ class Empathy
                 $this->boot->initPlugins();
             } catch (\Exception $e) {                
                 $this->exceptionHandler($e);
+                $handleSuccess = false;
             }
         }
+        return $handleSuccess;
     }
 
     /**
@@ -295,7 +299,7 @@ class Empathy
         if ($this->dispatchedException) {
             return false;
         }
-
+        
         $response = '';
         $errors = '';
 
