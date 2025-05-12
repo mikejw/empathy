@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [1.3.0] - 2025-05-12
+
+### Added
+
+- Move plugin init to controller to allow for controller-level plugin whitelists (see internal `empathy.php` controller)
+
+
 ## [1.2.0] - 2025-05-11
 
 ### Added
