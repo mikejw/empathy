@@ -63,9 +63,9 @@ class empathy extends BaseController
         } else {
             $success = FileContentsCache::clear();
 
-	    // presume to clear memcache
-	    try {
-	        $cache = DI::getContainer()->get('Cache')->clear();
+            // presume to clear memcache
+            try {
+                $cache = DI::getContainer()->get('Cache')->clear();
             } catch (\Exception $e) {
                 // do nothing
             }
