@@ -49,7 +49,7 @@ class Empathy
      * following initialization. This flag is passed directly to the application.
      * @var boolean
      */
-    private $persistent_mode = false;
+    private $persistentMode = false;
 
     /**
      * This flag is read from the boot_options section of the application config.
@@ -60,7 +60,7 @@ class Empathy
      *
      * @var boolean
      */
-    private static $use_elib = false;
+    private static $useElib = false;
 
     /**
      * @var bool Prevent multiple dispatch.
@@ -109,13 +109,13 @@ class Empathy
      * Create application object.
      * @param string $configDir the location of the application config file
      *
-     * @param boolean $persistent_mode Whether the application is running in persistent mode.
+     * @param boolean $persistentMode Whether the application is running in persistent mode.
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode = false)
+    public function __construct($configDir, $persistentMode = false)
     {
-        $this->persistent_mode = $persistent_mode;
+        $this->persistentMode = $persistentMode;
         spl_autoload_register(array($this, 'loadClass'));
 
         list($appConfig, $globalConfig) = DI::getContainer()->get('Config');
@@ -124,10 +124,10 @@ class Empathy
 
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
-            self::$use_elib = true;
+            self::$useElib = true;
             \Empathy\ELib\Config::load($configDir);
         } else {
-            self::$use_elib = false;
+            self::$useElib = false;
         }
         if ($this->getHandlingErrors()) {
             set_error_handler(array($this, 'errorHandler'));
@@ -198,12 +198,12 @@ class Empathy
     }
 
     /**
-     * Returns the $persistent_mode setting.
-     * @return boolean $persistent_mode
+     * Returns the $persistentMode setting.
+     * @return boolean $persistentMode
      */
     public function getPersistentMode()
     {
-        return $this->persistent_mode;
+        return $this->persistentMode;
     }
 
     /**
@@ -421,7 +421,7 @@ class Empathy
     public function init()
     {
         $this->boot = DI::getContainer()->get('Bootstrap');   
-        if ($this->persistent_mode !== true) {
+        if ($this->persistentMode !== true) {
             $this->beginDispatch();
         }
     }
