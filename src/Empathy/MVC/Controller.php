@@ -80,15 +80,16 @@ class Controller
     public function __construct($boot, $useSession = true, $pluginOptions = [], $pluginWhitelist =[])
     {
         $this->boot = $boot;
-        $this->pluginManager = $boot->getPluginManager();
+        $this->pluginManager = DI::getContainer()->get('PluginManager');
+        $this->pluginManager->setController($this);
         $this->pluginManager->setOptions($pluginOptions);
         $this->pluginManager->setWhitelist($pluginWhitelist);
-        
+
         if (!$this->boot->getMVC()->initPlugins()) {
             return false;
         }
 
-        $this->pluginManager->setController($this);
+        $this->presenter = $this->pluginManager->getView();
 
         $this->useSession = $useSession;
         $this->environment = $boot->getEnvironment();
@@ -96,20 +97,23 @@ class Controller
         $this->module = (isset($_GET['module']))? $_GET['module']: null;
         $this->class = (isset($_GET['class']))? $_GET['class']: null;
         $this->event = (isset($_GET['event']))? $_GET['event']: null;
+       
         if (Config::get('TPL_BY_CLASS')) {
             $this->templateFile = $this->class.'.tpl';
         } else {
             $this->templateFile = $this->module.'.tpl';
         }
+
         if ($this->useSession) {
             Session::up();    
         }
-        $this->presenter = $this->pluginManager->getView();
+
         if ($this->presenter !== null) {
             $this->assignControllerInfo();
             $this->assignConstants();
             $this->assignEnvironment();
         }
+
         if (isset($_GET['section_uri'])) {
             $this->assign('section', $_GET['section_uri']);
         }
@@ -366,17 +370,6 @@ class Controller
     {
         $this->presenter->exception($debug, $exception, $req_error);
     }
-
-    /**
-     * Set the presenter/view object.
-     * @param Empathy\MVC\Plugin\Presentation $view The view.
-     * @return nulll
-     */
-    public function setPresenter($view)
-    {
-        $this->presenter = $view;
-    }
-
 
     /**
      * Assign generated token.

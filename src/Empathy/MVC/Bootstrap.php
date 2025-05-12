@@ -4,12 +4,13 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- * @copyright 2008-2016 Mike Whiting
+ * @copyright 2008-2025 Michael J. Whiting
  * @license  See LICENSE
- * @link      http://www.empathyphp.co.uk
+ * @link      https://empathyphp.sh
  */
 
 namespace Empathy\MVC;
+use Empathy\MVC\PluginManager\Option as PMOption;
 
 
 /**
@@ -171,6 +172,12 @@ class Bootstrap
         if ($error == URI::MISSING_CLASS_DEF
            && isset($this->dynamicModule)
            && $this->dynamicModule != '') {
+
+            // anticipate dispatched errors
+            $this->pluginManager = DI::getContainer()->get('PluginManager');
+            $this->pluginManager->setOptions([PMOption::DefaultWhitelist]);
+            $this->mvc->initPlugins();
+
             $error = $this->uri->dynamicSection();
         }
 
@@ -222,8 +229,9 @@ class Bootstrap
     public function dispatchException($e)
     {
         $reqError = (get_class($e) == RequestException::class) ? true : false;
-        $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;
-        $this->controller = new Controller($this, $useSession); 
+        $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;   
+
+        $this->controller = new Controller($this, $useSession);
         $this->pluginManager->preEvent();
         $this->controller->viewException($this->debugMode, $e, $reqError);
     }
@@ -255,11 +263,11 @@ class Bootstrap
         $plugins = $this->plugins;
         $whitelist = $this->pluginManager->getWhitelist();
 
-        try {
-            if (!$pluginManager->getInitialized()) {
+        if (!$pluginManager->getInitialized()) {
+            try {       
                 $pluginManager->init();
-                foreach ($plugins as $p) {
 
+                foreach ($plugins as $p) {
                     if (count($whitelist)) {
                         if (!in_array($p['name'], $whitelist)) {
                             continue;
@@ -285,17 +293,18 @@ class Bootstrap
                         new $plugin($pluginManager, $this, $p['config']):
                         new $plugin($pluginManager, $this, null);
                     $pluginManager->register($n);
+                    $pluginManager->attemptSetView($n);
+                    \Empathy\MVC\DI::getContainer()->set($p['name'], $n);
                 }
                 
-                \Empathy\MVC\DI::getContainer()->set($p['name'], $n);
-                
                 $pluginManager->preDispatch();
-            }
-        } catch (\Exception $e) {
-            if (RequestException::class === get_class($e)) {
-                throw $e;
-            } else {
-                throw new \Empathy\MVC\SafeException($e->getMessage());
+
+            } catch (\Exception $e) {
+                if (RequestException::class === get_class($e)) {
+                    throw $e;
+                } else {
+                    throw new \Empathy\MVC\SafeException($e->getMessage());
+                }
             }
         }
     }
@@ -348,15 +357,6 @@ class Bootstrap
     public function getURIData()
     {
         return (isset($this->uri))? $this->uri->getData(): null;
-    }
-
-    /**
-     * Returns plugin manager object.
-     * @return PluginManager $pluginManager
-     */
-    public function getPluginManager()
-    {
-        return $this->pluginManager;
     }
 
     /**

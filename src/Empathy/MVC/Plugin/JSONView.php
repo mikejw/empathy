@@ -5,6 +5,7 @@ use Empathy\MVC\Plugin as Plugin;
 use Empathy\MVC\Testable;
 use Empathy\MVC\Config;
 use Empathy\MVC\RequestException;
+use Empathy\MVC\DI;
 
 
 /**
@@ -121,8 +122,8 @@ class JSONView extends Plugin implements PreEvent, Presentation
                     $this->prettyPrint = isset($mod_conf['pretty_print'])
                         ? $mod_conf['pretty_print']
                         : false;
-                    $controller = $this->bootstrap->getController();
-                    $controller->setPresenter($this);
+
+                    DI::getContainer()->get('PluginManager')->setView($this);
                 }
             }
         }

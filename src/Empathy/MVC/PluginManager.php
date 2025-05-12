@@ -17,11 +17,11 @@ use Empathy\MVC\PluginManager\Option;
 class PluginManager
 {
     private $plugins;
-    private $view_plugins;
     private $initialized;
     private $controller;
-    private $options;
-    private $whitelist;
+    private $options = [];
+    private $whitelist = [];
+    private $view;
 
     const DEF_WHITELIST_LIST = [
         'ELibs',
@@ -75,9 +75,6 @@ class PluginManager
             if (in_array('Empathy\MVC\Plugin\PreDispatch', $r->getInterfaceNames())) {
                 $p->onPreDispatch();
             }
-            if (in_array('Empathy\MVC\Plugin\Presentation', $r->getInterfaceNames())) {
-                $this->view_plugins[] = $p;
-            }
         }
     }
 
@@ -91,19 +88,27 @@ class PluginManager
         }
     }
 
-
-    public function getInitialized()
+    public function attemptSetView($p)
     {
-        return $this->initialized;
+        $r = new \ReflectionClass(get_class($p));
+        if (in_array('Empathy\MVC\Plugin\Presentation', $r->getInterfaceNames())) { 
+            $this->view = $p;
+        }
     }
 
     public function getView()
     {
-        if (sizeof($this->view_plugins) == 0) {
-            throw new \Exception('No plugin loaded for view.');
-        } else {
-            return $this->view_plugins[0];
-        }
+        return $this->view;
+    }
+
+    public function setView($view)
+    {
+        $this->view = $view;
+    }
+
+    public function getInitialized()
+    {
+        return $this->initialized;
     }
 
     public function eLibsTestMode()
@@ -122,7 +127,6 @@ class PluginManager
         
         return $mode;
     }
-
 
     public function getWhitelist()
     {
