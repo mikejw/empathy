@@ -90,7 +90,7 @@ class Controller
         }
 
         $this->presenter = $this->pluginManager->getView();
-
+    
         $this->useSession = $useSession;
         $this->environment = $boot->getEnvironment();
         $this->stash =  DI::getContainer()->get('Stash');
@@ -161,7 +161,7 @@ class Controller
     }
 
 
-  /**
+    /**
      * Assign environment value to the view
      *
      * @return null
@@ -194,7 +194,6 @@ class Controller
     {
         $this->presenter->display($this->templateFile, $internal);
     }
-
 
     /**
      * Redirect the user to another location within the application
@@ -387,6 +386,10 @@ class Controller
     public function getUseSession()
     {
         return $this->useSession;
+    }
+
+    public function setPresenter($view) {
+        $this->presenter = $view;
     }
 
 }

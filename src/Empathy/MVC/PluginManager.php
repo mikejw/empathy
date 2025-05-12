@@ -7,12 +7,12 @@ use Empathy\MVC\PluginManager\Option;
  * Empathy PluginManager
  * @file            Empathy/MVC/PluginManager.php
  * @description
- * @author          Mike Whiting
+ * @author          Michael J. Whiting
  * @license         See LICENCE
  *
- * (c) copyright Mike Whiting
+ * (c) copyright Michael J. Whiting
 
- * with this source code in the file licence.txt
+ * with this source code in the file LICENSE
  */
 class PluginManager
 {
@@ -36,7 +36,6 @@ class PluginManager
     {
         $this->initialized = false;
         $this->plugins = array();
-        $this->view_plugins = array();
     }
 
     public function setOptions($options)
@@ -68,13 +67,11 @@ class PluginManager
         $this->plugins[] = $p;
     }
 
-    public function preDispatch()
+    public function preDispatch($p)
     {
-        foreach ($this->plugins as $p) {
-            $r = new \ReflectionClass(get_class($p));
-            if (in_array('Empathy\MVC\Plugin\PreDispatch', $r->getInterfaceNames())) {
-                $p->onPreDispatch();
-            }
+        $r = new \ReflectionClass(get_class($p));
+        if (in_array('Empathy\MVC\Plugin\PreDispatch', $r->getInterfaceNames())) {
+            $p->onPreDispatch();
         }
     }
 
@@ -91,8 +88,10 @@ class PluginManager
     public function attemptSetView($p)
     {
         $r = new \ReflectionClass(get_class($p));
-        if (in_array('Empathy\MVC\Plugin\Presentation', $r->getInterfaceNames())) { 
-            $this->view = $p;
+        if (in_array('Empathy\MVC\Plugin\Presentation', $r->getInterfaceNames())) {
+            if ($p->getGlobal()) {
+                $this->setView($p);
+            }
         }
     }
 
@@ -113,7 +112,6 @@ class PluginManager
 
     public function eLibsTestMode()
     {
-
         $mode = false;
         foreach ($this->plugins as $p) {
             if (get_class($p) == 'Empathy\MVC\Plugin\ELibs') {
@@ -132,5 +130,4 @@ class PluginManager
     {
         return $this->whitelist;
     }
-
 }

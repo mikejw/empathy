@@ -193,7 +193,7 @@ class Empathy
             }
         }
         if ($fake) {
-            return $this->boot->getController();
+            return DI::getContainer()->get('Controller');
         }
     }
 

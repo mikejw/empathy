@@ -201,7 +201,10 @@ class Bootstrap
             $this->controller = new $controller($this);
         }
         
+        DI::getContainer()->set('Controller', $this->controller);
+
         $this->pluginManager->preEvent();
+        $this->controller->setPresenter($this->pluginManager->getView());
 
         if ($fake == false) {
             $event = $_GET['event'];
@@ -232,6 +235,8 @@ class Bootstrap
         $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;   
 
         $this->controller = new Controller($this, $useSession);
+         DI::getContainer()->set('Controller', $this->controller);
+
         $this->pluginManager->preEvent();
         $this->controller->viewException($this->debugMode, $e, $reqError);
     }
@@ -294,10 +299,10 @@ class Bootstrap
                         new $plugin($pluginManager, $this, null);
                     $pluginManager->register($n);
                     $pluginManager->attemptSetView($n);
+                    $pluginManager->preDispatch($n);
+
                     \Empathy\MVC\DI::getContainer()->set($p['name'], $n);
                 }
-                
-                $pluginManager->preDispatch();
 
             } catch (\Exception $e) {
                 if (RequestException::class === get_class($e)) {
@@ -366,15 +371,6 @@ class Bootstrap
     public function getDebugMode()
     {
         return $this->debugMode;
-    }
-
-    /**
-     * Returns controller.
-     * @return Controller
-     */
-    public function getController()
-    {
-        return $this->controller;
     }
 
     /**
