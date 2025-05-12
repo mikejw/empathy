@@ -4,12 +4,13 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- * @copyright 2008-2016 Mike Whiting
+ * @copyright 2008-2025 Michael J. Whiting
  * @license  See LICENSE
- * @link      http://www.empathyphp.co.uk
+ * @link      https://empathyphp.sh
  */
 
 namespace Empathy\MVC;
+use Empathy\MVC\PluginManager\Option as PMOption;
 
 
 /**
@@ -69,7 +70,7 @@ class Bootstrap
      * This property contains a reference to
      * the plugin manager object.
      */
-    private $plugin_manager;
+    private $pluginManager;
 
     /**
      * This value of this property is obtained
@@ -78,7 +79,7 @@ class Bootstrap
      * is initialized but dispatchment to a
      * controller is prevented. Useful for testing etc.
      */
-    private $persistent_mode;
+    private $persistentMode;
 
     /**
      * New property as of 0.9.5.
@@ -86,7 +87,7 @@ class Bootstrap
      * low level error messages being returned in
      * an application serving a JSON api.
      */
-    private $debug_mode;
+    private $debugMode;
 
     /**
      * New property as of 0.9.5.
@@ -111,10 +112,10 @@ class Bootstrap
      */
     public function __construct($bootOptions, $plugins, $mvc)
     {
-        $this->persistent_mode = $mvc->getPersistentMode();
+        $this->persistentMode = $mvc->getPersistentMode();
         $this->mvc = $mvc;
         $this->plugins = $plugins;
-        $this->plugin_manager = DI::getContainer()->get('PluginManager');
+        $this->pluginManager = DI::getContainer()->get('PluginManager');
         $this->initBootOptions($bootOptions);
     }
 
@@ -141,12 +142,12 @@ class Bootstrap
         }
 
         if (isset($bootOptions['debug_mode'])) {
-            $this->debug_mode = ($bootOptions['debug_mode'] === true);
+            $this->debugMode = ($bootOptions['debug_mode'] === true);
         }
         $this->environment = 'dev';
-        $valid_env = array('dev', 'uat', 'stag', 'prod');
+        $validEnv = array('dev', 'uat', 'stag', 'prod');
         if (isset($bootOptions['environment'])) {
-            if (in_array($bootOptions['environment'], $valid_env)) {
+            if (in_array($bootOptions['environment'], $validEnv)) {
                 $this->environment = $bootOptions['environment'];
             }
         }
@@ -171,11 +172,17 @@ class Bootstrap
         if ($error == URI::MISSING_CLASS_DEF
            && isset($this->dynamicModule)
            && $this->dynamicModule != '') {
+
+            // anticipate dispatched errors
+            $this->pluginManager = DI::getContainer()->get('PluginManager');
+            $this->pluginManager->setOptions([PMOption::DefaultWhitelist]);
+            $this->mvc->initPlugins();
+
             $error = $this->uri->dynamicSection();
         }
 
         if ($error > 0 && $controller === null) {
-            if ($this->environment != 'dev' || $this->debug_mode == false) {
+            if ($this->environment != 'dev' || $this->debugMode == false) {
                 if ($error == URI::MISSING_CLASS_DEF ||
                     $error == URI::MISSING_EVENT_DEF ||
                     $error == URI::ERROR_404
@@ -188,21 +195,23 @@ class Bootstrap
         }
 
         if ($controller === null) {
-            $controller_name = $this->uri->getControllerName();
-            $this->controller = new $controller_name($this);
+            $controllerName = $this->uri->getControllerName();
+            $this->controller = new $controllerName($this);
         } else {
             $this->controller = new $controller($this);
         }
-
         
-        $this->plugin_manager->preEvent();
+        DI::getContainer()->set('Controller', $this->controller);
+
+        $this->pluginManager->preEvent();
+        $this->controller->setPresenter($this->pluginManager->getView());
 
         if ($fake == false) {
             $event = $_GET['event'];
-            $event_val = $this->controller->$event();
+            $eventVal = $this->controller->$event();
             if ($this->mvc->hasErrors()) {
                 throw new ErrorException($this->mvc->errorsToString());
-            } elseif ($event_val !== false) {
+            } elseif ($eventVal !== false) {
                 if ($this->uri->getInternal()) {
                     $this->controller->assign('centerpage', true);
                     $this->controller->setTemplate('empathy.tpl');
@@ -222,11 +231,14 @@ class Bootstrap
      */
     public function dispatchException($e)
     {
-        $req_error = (get_class($e) == RequestException::class) ? true : false;
-        $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;
-        $this->controller = new Controller($this, $useSession); 
-        $this->plugin_manager->preEvent();
-        $this->controller->viewException($this->debug_mode, $e, $req_error);
+        $reqError = (get_class($e) == RequestException::class) ? true : false;
+        $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;   
+
+        $this->controller = new Controller($this, $useSession);
+         DI::getContainer()->set('Controller', $this->controller);
+
+        $this->pluginManager->preEvent();
+        $this->controller->viewException($this->debugMode, $e, $reqError);
     }
 
     /**
@@ -252,13 +264,21 @@ class Bootstrap
      */
     public function initPlugins()
     {
-        $plugin_manager = $this->plugin_manager;
+        $pluginManager = $this->pluginManager;
         $plugins = $this->plugins;
+        $whitelist = $this->pluginManager->getWhitelist();
 
-        try {
-            if (!$plugin_manager->getInitialized()) {
-                $plugin_manager->init();
+        if (!$pluginManager->getInitialized()) {
+            try {       
+                $pluginManager->init();
+
                 foreach ($plugins as $p) {
+                    if (count($whitelist)) {
+                        if (!in_array($p['name'], $whitelist)) {
+                            continue;
+                        }
+                    }
+
                     if (isset($p['class_path'])) {
                         if (!class_exists($p['class_name'])) {
                             require($p['class_path']);
@@ -275,20 +295,21 @@ class Bootstrap
                     }
 
                     $n = (isset($p['config']))?
-                        new $plugin($plugin_manager, $this, $p['config']):
-                        new $plugin($plugin_manager, $this, null);
-                    $plugin_manager->register($n);
+                        new $plugin($pluginManager, $this, $p['config']):
+                        new $plugin($pluginManager, $this, null);
+                    $pluginManager->register($n);
+                    $pluginManager->attemptSetView($n);
+                    $pluginManager->preDispatch($n);
+
+                    \Empathy\MVC\DI::getContainer()->set($p['name'], $n);
                 }
-                
-                \Empathy\MVC\DI::getContainer()->set($p['name'], $n);
-                
-                $plugin_manager->preDispatch();
-            }
-        } catch (\Exception $e) {
-            if (RequestException::class === get_class($e)) {
-                throw $e;
-            } else {
-                throw new \Empathy\MVC\SafeException($e->getMessage());
+
+            } catch (\Exception $e) {
+                if (RequestException::class === get_class($e)) {
+                    throw $e;
+                } else {
+                    throw new \Empathy\MVC\SafeException($e->getMessage());
+                }
             }
         }
     }
@@ -308,7 +329,7 @@ class Bootstrap
      */
     public function getPersistentMode()
     {
-        return $this->persistent_mode;
+        return $this->persistentMode;
     }
 
     /**
@@ -327,7 +348,7 @@ class Bootstrap
      * i.e. the value of $_SERVER['HTTP_HOST'] is null
      * and the value of $_SERVER['REQUEST_URI'] is also null
      *
-     * @return boolean $cli_mode Whether the application is running in cli mode.
+     * @return boolean $cliMode Whether the application is running in cli mode.
      */
     public function getURICliMode()
     {
@@ -336,7 +357,7 @@ class Bootstrap
 
     /**
      * Gets the URI data (data structure representing the current URI).
-     * @return array $uri_data
+     * @return array $uriData
      */
     public function getURIData()
     {
@@ -344,30 +365,12 @@ class Bootstrap
     }
 
     /**
-     * Returns plugin manager object.
-     * @return PluginManager $plugin_manager
-     */
-    public function getPluginManager()
-    {
-        return $this->plugin_manager;
-    }
-
-    /**
-     * Returns value of $debug_mode property.
-     * @return boolean $debug_mode.
+     * Returns value of $debugMode property.
+     * @return boolean $debugMode.
      */
     public function getDebugMode()
     {
-        return $this->debug_mode;
-    }
-
-    /**
-     * Returns controller.
-     * @return Controller
-     */
-    public function getController()
-    {
-        return $this->controller;
+        return $this->debugMode;
     }
 
     /**

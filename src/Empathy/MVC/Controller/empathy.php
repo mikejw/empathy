@@ -8,6 +8,7 @@ use Empathy\MVC\Entity;
 use Empathy\MVC\Model;
 use Empathy\MVC\FileContentsCache;
 use Empathy\MVC\DI;
+use Empathy\MVC\PluginManager\Option as PMOption;
 
 /**
  * Default controller that reveals info about Empathy
@@ -15,7 +16,12 @@ use Empathy\MVC\DI;
  * @author Mike Whiting mike@ai-em.net
  */
 class empathy extends BaseController
-{
+{    
+    public function __construct($boot)
+    {
+        parent::__construct($boot, false, [PMOption::DefaultWhitelist]);
+    }
+
     /**
      * Default controller event.
      * @return null

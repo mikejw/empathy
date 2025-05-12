@@ -49,7 +49,7 @@ class Empathy
      * following initialization. This flag is passed directly to the application.
      * @var boolean
      */
-    private $persistent_mode = false;
+    private $persistentMode = false;
 
     /**
      * This flag is read from the boot_options section of the application config.
@@ -60,7 +60,7 @@ class Empathy
      *
      * @var boolean
      */
-    private static $use_elib = false;
+    private static $useElib = false;
 
     /**
      * @var bool Prevent multiple dispatch.
@@ -109,13 +109,13 @@ class Empathy
      * Create application object.
      * @param string $configDir the location of the application config file
      *
-     * @param boolean $persistent_mode Whether the application is running in persistent mode.
+     * @param boolean $persistentMode Whether the application is running in persistent mode.
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistent_mode = false)
+    public function __construct($configDir, $persistentMode = false)
     {
-        $this->persistent_mode = $persistent_mode;
+        $this->persistentMode = $persistentMode;
         spl_autoload_register(array($this, 'loadClass'));
 
         list($appConfig, $globalConfig) = DI::getContainer()->get('Config');
@@ -124,10 +124,10 @@ class Empathy
 
         if (isset($this->bootOptions['use_elib']) &&
            $this->bootOptions['use_elib']) {
-            self::$use_elib = true;
+            self::$useElib = true;
             \Empathy\ELib\Config::load($configDir);
         } else {
-            self::$use_elib = false;
+            self::$useElib = false;
         }
         if ($this->getHandlingErrors()) {
             set_error_handler(array($this, 'errorHandler'));
@@ -154,6 +154,8 @@ class Empathy
      */
     public function initPlugins()
     {
+        $handleSuccess = true;
+
         if (!$this->getHandlingErrors()) {
             $this->boot->initPlugins();
         } else {
@@ -161,8 +163,10 @@ class Empathy
                 $this->boot->initPlugins();
             } catch (\Exception $e) {                
                 $this->exceptionHandler($e);
+                $handleSuccess = false;
             }
         }
+        return $handleSuccess;
     }
 
     /**
@@ -189,17 +193,17 @@ class Empathy
             }
         }
         if ($fake) {
-            return $this->boot->getController();
+            return DI::getContainer()->get('Controller');
         }
     }
 
     /**
-     * Returns the $persistent_mode setting.
-     * @return boolean $persistent_mode
+     * Returns the $persistentMode setting.
+     * @return boolean $persistentMode
      */
     public function getPersistentMode()
     {
-        return $this->persistent_mode;
+        return $this->persistentMode;
     }
 
     /**
@@ -295,9 +299,10 @@ class Empathy
         if ($this->dispatchedException) {
             return false;
         }
-
+        
         $response = '';
         $errors = '';
+
         if ($this->hasErrors()) {
             $errors = $this->errorsToString();
             $e = new ErrorException($errors);
@@ -307,6 +312,7 @@ class Empathy
             $this->boot->getEnvironment() != 'dev'
         ) {
             $message = '';
+            $errors = $e->getMessage();
             if ($this->boot->getDebugMode()) {
                 $message = $e->getMessage();
             }
@@ -372,10 +378,10 @@ class Empathy
                 $log->fire();
                 
                 Testable::header($response);
+                $this->dispatchedException = true;
                 $this->boot->dispatchException($e);
                 break;
         }
-        $this->dispatchedException = true;
     }
 
 
@@ -407,21 +413,15 @@ class Empathy
         }
     }
 
-
     public function reloadBootOptions()
     {
         $this->boot->initBootOptions();
     }
 
-
-
-    // DI
     public function init()
     {
-
-        $this->boot = DI::getContainer()->get('Bootstrap');
-        $this->initPlugins();
-        if ($this->persistent_mode !== true) {
+        $this->boot = DI::getContainer()->get('Bootstrap');   
+        if ($this->persistentMode !== true) {
             $this->beginDispatch();
         }
     }
@@ -430,6 +430,7 @@ class Empathy
     {
         return $this->bootOptions;
     }
+
     public function getPlugins()
     {
         return $this->plugins;
@@ -439,6 +440,7 @@ class Empathy
     {
         $this->bootOptions = $options;
     }
+    
     public function setPlugins($plugins)
     {
         $this->plugins = $plugins;

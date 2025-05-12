@@ -1,31 +1,56 @@
 <?php
 
 namespace Empathy\MVC;
+use Empathy\MVC\PluginManager\Option;
 
 /**
  * Empathy PluginManager
  * @file            Empathy/MVC/PluginManager.php
  * @description
- * @author          Mike Whiting
+ * @author          Michael J. Whiting
  * @license         See LICENCE
  *
- * (c) copyright Mike Whiting
+ * (c) copyright Michael J. Whiting
 
- * with this source code in the file licence.txt
+ * with this source code in the file LICENSE
  */
 class PluginManager
 {
     private $plugins;
-    private $view_plugins;
     private $initialized;
     private $controller;
+    private $options = [];
+    private $whitelist = [];
+    private $view;
+
+    const DEF_WHITELIST_LIST = [
+        'ELibs',
+        'Smarty',
+        'SmartySSL',
+        'JSONView',
+        'EDefault'
+    ];
+
 
     public function __construct()
     {
         $this->initialized = false;
         $this->plugins = array();
-        $this->view_plugins = array();
     }
+
+    public function setOptions($options)
+    {
+        $this->options = $options;
+    }
+
+    public function setWhitelist($whitelist)
+    {
+        if (in_array(Option::DefaultWhitelist, $this->options)) {
+            $whitelist = array_merge($whitelist, self::DEF_WHITELIST_LIST);
+        }
+        $this->whitelist = $whitelist;
+    }
+
 
     public function setController($c)
     {
@@ -42,16 +67,11 @@ class PluginManager
         $this->plugins[] = $p;
     }
 
-    public function preDispatch()
+    public function preDispatch($p)
     {
-        foreach ($this->plugins as $p) {
-            $r = new \ReflectionClass(get_class($p));
-            if (in_array('Empathy\MVC\Plugin\PreDispatch', $r->getInterfaceNames())) {
-                $p->onPreDispatch();
-            }
-            if (in_array('Empathy\MVC\Plugin\Presentation', $r->getInterfaceNames())) {
-                $this->view_plugins[] = $p;
-            }
+        $r = new \ReflectionClass(get_class($p));
+        if (in_array('Empathy\MVC\Plugin\PreDispatch', $r->getInterfaceNames())) {
+            $p->onPreDispatch();
         }
     }
 
@@ -65,24 +85,33 @@ class PluginManager
         }
     }
 
+    public function attemptSetView($p)
+    {
+        $r = new \ReflectionClass(get_class($p));
+        if (in_array('Empathy\MVC\Plugin\Presentation', $r->getInterfaceNames())) {
+            if ($p->getGlobal()) {
+                $this->setView($p);
+            }
+        }
+    }
+
+    public function getView()
+    {
+        return $this->view;
+    }
+
+    public function setView($view)
+    {
+        $this->view = $view;
+    }
 
     public function getInitialized()
     {
         return $this->initialized;
     }
 
-    public function getView()
-    {
-        if (sizeof($this->view_plugins) == 0) {
-            throw new \Exception('No plugin loaded for view.');
-        } else {
-            return $this->view_plugins[0];
-        }
-    }
-
     public function eLibsTestMode()
     {
-
         $mode = false;
         foreach ($this->plugins as $p) {
             if (get_class($p) == 'Empathy\MVC\Plugin\ELibs') {
@@ -95,5 +124,10 @@ class PluginManager
         }
         
         return $mode;
+    }
+
+    public function getWhitelist()
+    {
+        return $this->whitelist;
     }
 }

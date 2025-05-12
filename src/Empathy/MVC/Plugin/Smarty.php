@@ -3,7 +3,7 @@
 namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Config;
-use Empathy\MVC\Plugin as Plugin;
+use Empathy\MVC\DI;
 
 /**
  * Empathy Smarty Plugin
@@ -16,7 +16,7 @@ use Empathy\MVC\Plugin as Plugin;
 
  * with this source code in the file licence.txt
  */
-class Smarty extends Plugin implements PreDispatch, Presentation
+class Smarty extends PresentationPlugin implements PreDispatch, Presentation
 {
     protected $smarty;
 
@@ -68,7 +68,7 @@ class Smarty extends Plugin implements PreDispatch, Presentation
     {
         // for default templates check test mode
         // derived from elibs plugin
-        if ($this->manager->eLibsTestMode()) {
+        if (DI::getContainer()->get('PluginManager')->eLibsTestMode()) {
             $empathy_dir = realpath(Config::get('DOC_ROOT').'/../');
         } else {
             $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
@@ -87,11 +87,11 @@ class Smarty extends Plugin implements PreDispatch, Presentation
         $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
     }
 
-    public function exception($debug, $exception, $req_error)
+    public function exception($debug, $exception, $reqError)
     {
         $this->assign('centerpage', true);
         $this->assign('error', $exception->getMessage());
-        if ($req_error) {
+        if ($reqError) {
             $this->assign('code', $exception->getCode());
             $this->display('req_error.tpl');
         } else {

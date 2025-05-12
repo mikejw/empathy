@@ -6,12 +6,12 @@ namespace Empathy\MVC;
  * Empathy RequestException class
  * @file            Empathy/MVC/RequestException.php
  * @description
- * @author          Mike Whiting
+ * @author          Michael J. Whiting
  * @license         See LICENCE
  *
- * (c) copyright Mike Whiting
+ * (c) copyright Michael J. Whiting
 
- * with this source code in the file licence.txt
+ * with this source code in the file LICENSE
  */
 class RequestException extends Exception
 {

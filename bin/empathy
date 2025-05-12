@@ -519,7 +519,7 @@ function option_clear_cache()
 {
     assertConfig();
     global $app_config;
-    $route = $app_config['web_root'] . $app_config['public_dir'] . "/empathy/empathy/cc";
+    $route = $app_config['web_root'] . $app_config['public_dir'] . "/empathy/cc";
     $proto = 'http';
     foreach ($app_config['plugins'] as $index => &$item) {
         if ($item['name'] === "SmartySSL") {
