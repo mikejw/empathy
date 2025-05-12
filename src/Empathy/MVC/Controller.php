@@ -107,20 +107,26 @@ class Controller
         if ($this->useSession) {
             Session::up();    
         }
+    }
 
-        if ($this->presenter !== null) {
-            $this->assignControllerInfo();
-            $this->assignConstants();
-            $this->assignEnvironment();
-        }
+    public function doPreEvent()
+    {
+        $this->pluginManager->preEvent();
+        $this->setPresenter($this->pluginManager->getView());
+        $this->controllerAssigns();
+    }
 
+    private function controllerAssigns()
+    {    
+        $this->assignControllerInfo();
+        $this->assignConstants();
+        $this->assignEnvironment();
+    
         if (isset($_GET['section_uri'])) {
             $this->assign('section', $_GET['section_uri']);
         }
 
-        // @todo: create a plugin for this?
-        // taken from mikejw custom controller
-        if ($boot->getEnvironment() == 'dev') {
+        if ($this->boot->getEnvironment() == 'dev') {
             $this->assign('dev_rand', uniqid());
         }
     }
@@ -388,7 +394,7 @@ class Controller
         return $this->useSession;
     }
 
-    public function setPresenter($view) {
+    private function setPresenter($view) {
         $this->presenter = $view;
     }
 

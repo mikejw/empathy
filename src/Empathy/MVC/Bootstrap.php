@@ -202,9 +202,7 @@ class Bootstrap
         }
         
         DI::getContainer()->set('Controller', $this->controller);
-
-        $this->pluginManager->preEvent();
-        $this->controller->setPresenter($this->pluginManager->getView());
+        $this->controller->doPreEvent();
 
         if ($fake == false) {
             $event = $_GET['event'];
@@ -236,8 +234,8 @@ class Bootstrap
 
         $this->controller = new Controller($this, $useSession);
          DI::getContainer()->set('Controller', $this->controller);
+         $this->controller->doPreEvent();
 
-        $this->pluginManager->preEvent();
         $this->controller->viewException($this->debugMode, $e, $reqError);
     }
 

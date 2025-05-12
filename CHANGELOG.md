@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [1.3.1] - 2025-05-12
+
+### Fixed
+
+- Perform view assignments from controller during pre-event
+
+
 ## [1.3.0] - 2025-05-12
 
 ### Added
