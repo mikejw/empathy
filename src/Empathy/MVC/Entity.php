@@ -749,6 +749,8 @@ class Entity
         return $option;
     }
 
+    // @todo deprecate function name?
+    // `toFilteredHTML` might be better?
     public function toXHTMLChris($formatting)
     {
         $pTagPattern = '!&lt;p&gt;(.*?)&lt;/p&gt;!m';
@@ -756,7 +758,7 @@ class Entity
             . '(?: +title=&quot;(.*?)&quot;)?(?: +target=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m';
 
         $imgTagPattern = '!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;'
-            . '(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m';
+            . '(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? *&gt;!m';
 
         $preTagPattern1 = '!&lt;pre *&gt;\n*(.*?)&lt;/pre&gt;!ms';
         $preTagPattern2 = '!&lt;pre(?: +class=&quot;(.*?)&quot;)? *&gt;\n*(.*?)&lt;/pre&gt;!ms';
@@ -782,7 +784,7 @@ class Entity
 
                 $markup = preg_replace(
                     $imgTagPattern,
-                    '<img src="$1" id="$2" alt="$3" />',
+                    '<img src="$1" id="$2" alt="$3">',
                     $markup
                 );
 
