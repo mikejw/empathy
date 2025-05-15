@@ -753,10 +753,13 @@ class Entity
     {
         $pTagPattern = '!&lt;p&gt;(.*?)&lt;/p&gt;!m';
         $aTagPattern = '!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;'
-            . '(?: +title=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m';
+            . '(?: +title=&quot;(.*?)&quot;)?(?: +target=&quot;(.*?)&quot;)? *&gt;(.*?)&lt;/a&gt;!m';
 
         $imgTagPattern = '!&lt;img +src=&quot;(https?://.*?)?&quot;(?: +id=&quot;'
             . '(.*?)&quot;)?(?: +alt=&quot;(.*?)&quot;)? */&gt;!m';
+
+        $preTagPattern1 = '!&lt;pre *&gt;\n*(.*?)&lt;/pre&gt;!ms';
+        $preTagPattern2 = '!&lt;pre(?: +class=&quot;(.*?)&quot;)? *&gt;\n*(.*?)&lt;/pre&gt;!ms';
 
         foreach ($this->properties as $property) {
             if (!is_numeric($property) && in_array($property, $formatting)) {
@@ -766,8 +769,14 @@ class Entity
                 $markup = htmlentities($markup, ENT_QUOTES, 'UTF-8');
 
                 $markup = preg_replace(
+                    $pTagPattern,
+                    '<p>$1</p>',
+                    $markup
+                );
+
+                $markup = preg_replace(
                     $aTagPattern,
-                    '<a href="$1" title="$2">$3</a>',
+                    '<a href="$1" title="$2" target="$3">$4</a>',
                     $markup
                 );
 
@@ -778,8 +787,16 @@ class Entity
                 );
 
                 $markup = preg_replace(
-                    $pTagPattern,
-                    '<p>$1</p>',
+                    $preTagPattern1,
+                    // must specifiy a language and not include a code block
+                    // to get default prism styling
+                    "<pre class=\"line-number language-bash\">$1</pre>",
+                    $markup
+                );
+
+                $markup = preg_replace(
+                    $preTagPattern2,
+                    "<pre><code class=\"lang-$1\">$2</code></pre>",
                     $markup
                 );
 
@@ -791,8 +808,17 @@ class Entity
 
                 if (!$hasPTags) {
                     $lines = explode("\n", $markup);
+                    $insidePre = false;
                     foreach ($lines as $key => $line) {
-                        $lines[$key] = "<p>{$line}</p>";
+                        if (preg_match('/<pre/', $line)) {
+                            $insidePre = true;
+                        }
+                        if (!$insidePre) {
+                            $lines[$key] = "<p>{$line}</p>";
+                        }
+                        if (preg_match('/\/pre>/', $line)) {
+                            $insidePre = false;
+                        }
                     }
                     $markup = implode("\n", $lines);
                 }
