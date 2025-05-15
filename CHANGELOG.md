@@ -2,11 +2,19 @@
 # Changelog
 
 
+## [1.4.1] - 2025-05-15
+
+### Fixed
+
+- Give filtered image tags `img-fluid` class by default
+
+
 ## [1.4.0] - 2025-05-15
 
 ### Changed
 
 - Allow `pre` tags in filtered HTML as well as small fixes for other tags
+
 
 ## [1.3.1] - 2025-05-12
 

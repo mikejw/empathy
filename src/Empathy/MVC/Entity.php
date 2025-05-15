@@ -784,7 +784,7 @@ class Entity
 
                 $markup = preg_replace(
                     $imgTagPattern,
-                    '<img src="$1" id="$2" alt="$3">',
+                    '<img src="$1" id="$2" alt="$3" class="img-fluid">',
                     $markup
                 );
 
