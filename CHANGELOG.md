@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [2.0.1] - 2025-05-16
+
+### Fixed
+
+- Produce simpler `pre` output without language class
+
+
 ## [2.0.0] - 2025-05-16
 
 _Breaking changes for anything that relies on Empathy ORM Model (`Empathy\MVC\Entity` class)._

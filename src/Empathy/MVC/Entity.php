@@ -553,9 +553,7 @@ class Entity
 
                 $markup = preg_replace(
                     $preTagPattern1,
-                    // must specifiy a language and not include a code block
-                    // to get default prism styling
-                    "<pre class=\"line-number language-bash\">$1</pre>",
+                    "<pre>$1</pre>",
                     $markup
                 );
 
