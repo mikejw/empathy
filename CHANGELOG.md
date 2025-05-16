@@ -2,6 +2,15 @@
 # Changelog
 
 
+## [2.0.0] - 2025-05-16
+
+_Breaking changes for anything that relies on Empathy ORM Model (`Empathy\MVC\Entity` class)._
+
+### Changed
+
+- Tidy of overall `Entity.php` class
+
+
 ## [1.4.1] - 2025-05-15
 
 ### Fixed
