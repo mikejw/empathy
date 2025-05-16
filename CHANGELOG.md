@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [2.0.2] - 2025-05-16
+
+### Fixed
+
+- Introduce more robust id handling for `load` method
+
+
 ## [2.0.1] - 2025-05-16
 
 ### Fixed

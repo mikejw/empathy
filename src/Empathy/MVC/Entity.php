@@ -162,14 +162,16 @@ class Entity
         return $result;
     }
 
-    public function load($id = 0)
+    public function load($id = null)
     {
-        if ($id > 0) {
-            $this->id = $id;
+        if (isset($id) && is_numeric($id)) {
+            $this->id = intval($id);
+        } else {
+            $this->id = 0;
+            return false;
         }
 
         $table = $this::TABLE;
-        $loaded = true;
         $sql = "SELECT * FROM $table WHERE id = $this->id";
         $error = "Could not load record from $table.";
 
@@ -181,10 +183,10 @@ class Entity
                     $this->$index = $value;
                 }
             }
+            return true;
         } else {
-            $loaded = false;
+            return false;
         }
-        return $loaded;
     }
 
     public function loadAsOptions($field, $order = null)
