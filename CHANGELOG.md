@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [2.1.0] - 2025-05-17
+
+### Added
+
+- Create plugin `find` method
+
+
 ## [2.0.2] - 2025-05-16
 
 ### Fixed

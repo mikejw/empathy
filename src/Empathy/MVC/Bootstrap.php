@@ -298,8 +298,6 @@ class Bootstrap
                     $pluginManager->register($n);
                     $pluginManager->attemptSetView($n);
                     $pluginManager->preDispatch($n);
-
-                    \Empathy\MVC\DI::getContainer()->set($p['name'], $n);
                 }
 
             } catch (\Exception $e) {

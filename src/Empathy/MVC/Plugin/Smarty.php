@@ -20,7 +20,6 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
 {
     protected $smarty;
 
-
     public function onPreDispatch()
     {
         $this->smarty = new \Smarty();
@@ -35,9 +34,7 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         $this->smarty->compile_dir = Config::get('DOC_ROOT')."/tpl/templates_c";
         $this->smarty->cache_dir = Config::get('DOC_ROOT')."/tpl/cache";
         $this->smarty->config_dir = Config::get('DOC_ROOT')."/tpl/configs";
-
         $this->smarty->error_reporting = E_ALL  & ~E_NOTICE & ~E_WARNING;
-
 
         if (class_exists('Empathy\ELib\Plugin\SmartyResourceELib')) {
             $this->smarty->registerResource('elib', new \Empathy\ELib\Plugin\SmartyResourceELib());
@@ -108,4 +105,10 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
     {
         $this->smarty->clear_all_assign();
     }
+
+    public function getSmarty()
+    {
+        return $this->smarty;
+    }
+
 }

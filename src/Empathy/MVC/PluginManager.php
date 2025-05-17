@@ -2,6 +2,7 @@
 
 namespace Empathy\MVC;
 use Empathy\MVC\PluginManager\Option;
+use Empathy\MVC\DI;
 
 /**
  * Empathy PluginManager
@@ -16,11 +17,11 @@ use Empathy\MVC\PluginManager\Option;
  */
 class PluginManager
 {
-    private $plugins;
     private $initialized;
     private $controller;
     private $options = [];
     private $whitelist = [];
+    private $plugins = [];
     private $view;
 
     const DEF_WHITELIST_LIST = [
@@ -31,11 +32,9 @@ class PluginManager
         'EDefault'
     ];
 
-
     public function __construct()
     {
         $this->initialized = false;
-        $this->plugins = array();
     }
 
     public function setOptions($options)
@@ -65,6 +64,7 @@ class PluginManager
     public function register($p)
     {
         $this->plugins[] = $p;
+        DI::getContainer()->set(get_class($p), $p);
     }
 
     public function preDispatch($p)
@@ -122,12 +122,29 @@ class PluginManager
                 break;
             }
         }
-        
         return $mode;
     }
 
     public function getWhitelist()
     {
         return $this->whitelist;
+    }
+
+    public function find($names = []) {
+        foreach ($names as $name) {
+            if (count(explode('\\', $name)) === 1) {
+                $name = 'Empathy\\MVC\\Plugin\\' . $name;
+            }
+            try {
+                return DI::getContainer()->get($name);
+            } catch (\Exception $e) {
+                if (get_class($e) == 'DI\Definition\Exception\InvalidDefinition') {
+                    continue;
+                } else {
+                    throw $e;
+                }
+            }
+        }
+        throw new \Exception('Could not find plugin in list: '. implode(', ', $names) . '.');
     }
 }
