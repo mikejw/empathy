@@ -6,7 +6,7 @@
 
 ### Fixed
 
-- ORM improvements
+- Improve ORM code
 
 
 ## [2.1.0] - 2025-05-17
