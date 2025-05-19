@@ -46,9 +46,11 @@ class SectionItemStandAlone extends Entity
 
     public function getItem($id)
     {
-        $sql = "SELECT * FROM ".SectionItemStandAlone::$table." WHERE id = $id";
-        $error = "Could not load record.";
-        $result = $this->query($sql, $error);
+        $params = [];
+        $sql = 'SELECT * FROM ' . SectionItemStandAlone::$table . ' WHERE id = ?';
+        $params[] = $id;
+        $error = 'Could not load record.';
+        $result = $this->query($sql, $error, $params);
         if (1 == $result->rowCount()) {
             $row = $result->fetch();
             foreach ($row as $index => $value) {

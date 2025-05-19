@@ -172,10 +172,12 @@ class Entity
         }
 
         $table = $this::TABLE;
-        $sql = "SELECT * FROM $table WHERE id = $this->id";
+        $params = [];
+        $sql = "SELECT * FROM $table WHERE id = ?";
+        $params[] = $this->id;
         $error = "Could not load record from $table.";
 
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             foreach ($row as $index => $value) {
@@ -193,14 +195,17 @@ class Entity
     {
         $data = [];
         $table = $this::TABLE;
+        $params = [];
         $sql = "SELECT id, $field FROM $table";
         if ($order !== null && $order != '') {
-            $sql .= " ORDER BY $order";
+            $sql .= ' ORDER BY ?';
+            $params[] = $order;
         } else {
-            $sql .= " ORDER BY $field";
+            $sql .= ' ORDER BY ?';
+            $params[] = $field;
         }
-        $error = "Could not load $table as options";
-        $result = $this->query($sql, $error);
+        $error = 'Could not load $table as options';
+        $result = $this->query($sql, $error, $params);
         foreach ($result as $row) {
             $id = $row['id'];
             $data[$id] = $row[$field];
@@ -594,17 +599,26 @@ class Entity
 
     public function buildUnionString($ids)
     {
-        array_unshift($ids, 0);
-        return '(' . implode(',', array_unique($ids)) . ')';
+        $ids = array_unique(array_unshift($ids, 0));
+        $params = [];
+        foreach ($ids as $id) {
+            $params[] = '?';
+        }
+        return [
+            '(' . implode(',', $params) . ')',
+            $ids
+        ];
     }
 
     public function delete()
     {
         $table = $this::TABLE;
         $id = $this->id;
-        $sql = "DELETE FROM $table WHERE id = $id";
+        $params = [];
+        $sql = "DELETE FROM $table WHERE id = ?";
+        $params[] = $id;
         $error = "Could not delete row.";
-        $this->query($sql, $error);
+        $this->query($sql, $error, $params);
     }
 
     public function hasValErrors()
