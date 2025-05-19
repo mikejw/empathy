@@ -599,7 +599,8 @@ class Entity
 
     public function buildUnionString($ids)
     {
-        $ids = array_unique(array_unshift($ids, 0));
+        array_unshift($ids, 0);
+        $ids = array_unique($ids);
         $params = [];
         foreach ($ids as $id) {
             $params[] = '?';
