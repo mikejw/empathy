@@ -126,7 +126,7 @@ class Controller
             $this->assign('section', $_GET['section_uri']);
         }
 
-        if ($this->boot->getEnvironment() == 'dev') {
+        if ($this->module === 'admin' || $this->boot->getEnvironment() === 'dev') {
             $this->assign('dev_rand', uniqid());
         }
     }

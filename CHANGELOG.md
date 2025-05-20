@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [2.1.2] - 2025-05-20
+
+### Fixed
+
+- Set `dev_rand` string when admin module
+
+
 ## [2.1.1] - 2025-05-19
 
 ### Fixed
