@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [3.1.0] - 2025-05-23
+
+### Added
+
+- Add default `favicon.ico`
+
 
 ## [3.0.0] - 2025-05-23
 
