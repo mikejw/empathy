@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [3.0.0] - 2025-05-23
+
+### Changed
+
+- Tidy up `Model.php` class (Model class removed from `elib-base`)
+
+
 ## [2.1.2] - 2025-05-20
 
 ### Fixed

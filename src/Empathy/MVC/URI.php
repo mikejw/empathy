@@ -1,7 +1,9 @@
 <?php
 
 namespace Empathy\MVC;
+
 use Empathy\MVC\LogItem;
+use Empathy\MVC\SectionItemStandAlone;
 
 /**
  * Empathy URI
@@ -288,7 +290,7 @@ class URI
         // code still needed to assert correct section path - else throw 404
         $this->error = 0;
 
-        $section = Model::load('Empathy\\MVC\\SectionItemStandAlone');
+        $section = Model::load(SectionItemStandAlone::class);
 
         if (!isset($this->dynamicModule) || $this->dynamicModule == '') {
             throw new Exception("Failed to find name of dynamic module.");

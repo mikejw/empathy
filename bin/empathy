@@ -576,8 +576,8 @@ function option_get_elib_tables()
 
 function option_gen_password($password)
 {
-    $model = \Empathy\MVC\DI::getContainer()->get('UserModel') ?? 'UserItem';
-    $obj = \Empathy\ELib\Model::load($model);
+    $model = \Empathy\MVC\DI::getContainer()->get('UserModel') ?? 'Empathy\ELib\Stroage\UserItem';
+    $obj = \Empathy\MVC\Model::load($model);
     $obj->password = $password;
     $obj->validates();
     $errors = $obj->getValErrors();

@@ -646,4 +646,10 @@ class Entity
     {
         return $this->properties;
     }
+
+    public function getTable()
+    {
+        return $this::TABLE;
+    }
+
 }
