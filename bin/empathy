@@ -529,8 +529,10 @@ function option_clear_cache()
     }
     $matches = array();
     preg_match('/Cache cleared/', file_get_contents($proto . '://' . $route), $matches);
-    if ($matches[0]) {
+    if (count($matches) && $matches[0]) {
         echo "Cache cleared.\n";
+    } else {
+        echo "Error.\n";
     }
 }
 
@@ -583,7 +585,7 @@ function option_gen_password($password)
     $errors = $obj->getValErrors();
 
     if (isset($errors['password']) && $errors['password'] !== "") {
-        echo "\nError: ${errors['password']}\n\n";
+        echo "\nError: {$errors['password']}\n\n";
     } else {
         echo password_hash($password, PASSWORD_DEFAULT) . "\n";
     }
