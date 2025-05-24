@@ -34,7 +34,7 @@ class EntityManager implements PersisterInterface
             }
 
             Model::connectModel($object);
-            $object->id = $object->insert($object::TABLE, true, array(''), Entity::SANITIZE_NO_POST);
+            $object->id = $object->insert();
         }
     }
 
@@ -47,9 +47,7 @@ class EntityManager implements PersisterInterface
         $object = new $class;
         $object->init();
         Model::connectModel($object);
-
-        $object->id = $id;
-        $object->load();
+        $object->load($id);
         return $object;
     }
 
