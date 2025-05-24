@@ -17,10 +17,13 @@ class Entity
     const TABLE = '';
 
     private const GLOBALLY_IGNORED_PROPERTIES = ['id', 'table']; // leaving in table to support old models
+
     private $val;
     private $result;
     private $properties;
     private $dbh;
+
+    protected $id; // allow handling entities with no public ID value set
 
     /**
      * Older Empathy applications may rely on this property instead of class constants for table name definitions.
@@ -651,5 +654,4 @@ class Entity
     {
         return $this::TABLE;
     }
-
 }
