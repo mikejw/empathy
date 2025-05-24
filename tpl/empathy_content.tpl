@@ -25,7 +25,7 @@
         </h2>
         <p>You have successfully set up an empathy app.</p>
 
-    {elseif $status neq ''}
+    {elseif isset($status) && $status neq ''}
         <h1>Status is {$status}</h1>
 
     {elseif $cc}
