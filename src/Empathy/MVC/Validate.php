@@ -28,6 +28,8 @@ class Validate
     private $allowed_pattern_1;
     private $unix_username_pattern;
     private $twitter_style_username;
+    private $allowed_pw_pattern;
+    private $url_pattern;
 
     /**
      * Creates validation object
