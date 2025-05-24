@@ -271,6 +271,9 @@ class Empathy
                     $msg = "Notice: [$errno] $errstr";
                     break;
                 case E_DEPRECATED:
+                    if ($this->boot->getEnvironment() !== 'dev') {
+                        return;
+                    }
                     $msg = "Deprecated notice: [$errno] $errstr";
                     break;
                 default:
@@ -308,7 +311,7 @@ class Empathy
         }
         if (
             RequestException::class !== get_class($e) &&
-            $this->boot->getEnvironment() != 'dev'
+            $this->boot->getEnvironment() !== 'dev'
         ) {
             $message = '';
             $errors = $e->getMessage();
