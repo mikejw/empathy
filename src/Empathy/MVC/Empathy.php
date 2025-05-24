@@ -271,8 +271,7 @@ class Empathy
                     $msg = "Notice: [$errno] $errstr";
                     break;
                 case E_DEPRECATED:
-                case E_STRICT:
-                    $msg = "Strict/Deprecated notice: [$errno] $errstr";
+                    $msg = "Deprecated notice: [$errno] $errstr";
                     break;
                 default:
                     $msg = "Unknown error type: [$errno] $errstr";
