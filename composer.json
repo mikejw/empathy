@@ -10,15 +10,15 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Mike Whiting",
+            "name": "Michael J. Whiting",
             "email": "mikejw3@gmail.comk"
         }
     ],
     "require": {
-        "php": ">=8.1.0",
+        "php": "^8.1.0 <8.2",
         "wp-cli/php-cli-tools": "dev-master",
         "mustangostang/spyc": "0.6.3",
-        "mikejw/elibs": "dev-develop",
+        "mikejw/elibs": "^1.0",
         "php-di/php-di": "^6.0",
         "monolog/monolog": "^2.5.0"
     },

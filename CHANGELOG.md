@@ -1,6 +1,14 @@
 
 # Changelog
 
+
+## [3.1.1] - 2025-05-26
+
+### Fixed
+
+- Use fixed elibs version
+
+
 ## [3.1.0] - 2025-05-23
 
 ### Added
