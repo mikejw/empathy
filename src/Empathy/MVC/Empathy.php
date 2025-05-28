@@ -2,7 +2,7 @@
 
 namespace Empathy\MVC;
 
-define('MVC_VERSION', '3.1.0');
+define('MVC_VERSION', '4.0.0');
 
 
 /**
