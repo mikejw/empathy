@@ -28,6 +28,8 @@ class Validate
     private $allowed_pattern_1;
     private $unix_username_pattern;
     private $twitter_style_username;
+    private $allowed_pw_pattern;
+    private $url_pattern;
 
     /**
      * Creates validation object
@@ -40,8 +42,8 @@ class Validate
         $this->twitter_style_username = '/^[_a-zA-Z0-9]{1,15}$/';
         $this->allowed_pw_pattern = "/[\"\-\s:,\'\+&\|!\(\)\{\}\[\]\^~\*\?;@£\$]/";
 
-        // taken from http://bit.ly/AQFAn
-        $this->url_pattern = '|https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?|';
+        // taken from https://stackoverflow.com/a/3809435
+        $this->url_pattern = '|https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)|';
     }
 
     /**

@@ -95,13 +95,6 @@ class EntityTest extends ESuiteTest
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
         $fake = $objectManager->find('Esuite\FakeEntity', 1);
-        $this->assertEquals(10, sizeof($fake->getAllCustom($fake::TABLE, ' where foo like \'bar\'')));
+        $this->assertEquals(10, sizeof($fake->getAllCustom(' where foo like \'bar\'')));
     }
-
-
-
-
-
-
-
 }

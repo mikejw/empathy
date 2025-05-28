@@ -2,6 +2,19 @@
 # Changelog
 
 
+## [4.0.0] - 2025-05-28
+
+### Changed
+
+- Ignore deprecated errors when not `dev` environment (and handling errors)
+- Upgrades and fixes for PHP 8.4
+- Update URL validation regex
+
+### Fixed
+
+- Fix `EntityTest.php` `getAllCustom` call
+
+
 ## [3.1.1] - 2025-05-26
 
 ### Fixed

@@ -18,7 +18,7 @@ class SectionItemStandAlone extends Entity
     public $id;
     public $module;
     public $type;
-    public $parent_id;
+    public $section_id;
     public $position;
     public $label;
     public $friendly_url;
@@ -26,8 +26,12 @@ class SectionItemStandAlone extends Entity
     public $hidden;
     public $owns_inline;
     public $link;
+    public $stamp;
+    public $meta;
+    public $user_id;
 
     public static $table = "section_item";
+
 
     public function getURIData()
     {
@@ -56,13 +60,10 @@ class SectionItemStandAlone extends Entity
             foreach ($row as $index => $value) {
                 $this->$index = $value;
             }
-            $this->url_name = str_replace(" ", "", $this->label);
-            $this->url_name = strtolower($this->url_name);
         } else {
             //echo "Whoops!";
         }
     }
-
 
     public function findSection($rows, $slug, $parent_id)
     {
