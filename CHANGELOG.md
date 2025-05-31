@@ -2,6 +2,14 @@
 # Changelog
 
 
+## [4.0.1] - 2025-05-31
+
+### Fixed
+
+- Attempt to load default dynamic uri only when uri string is empty
+- Handle bad default dynamic uri error
+
+
 ## [4.0.0] - 2025-05-28
 
 ### Changed
