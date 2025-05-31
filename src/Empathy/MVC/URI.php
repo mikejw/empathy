@@ -310,7 +310,7 @@ class URI
             }
         }
 
-        if (!!$this->dynamicModuleDefaultURI) {
+        if ($this->uriString === '' && !!$this->dynamicModuleDefaultURI) {
             if (!$section->resolveURI($this->uri)) {
                 $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
             }

@@ -188,6 +188,8 @@ class Bootstrap
                     $error == URI::ERROR_404
                 ) {
                     throw new RequestException('Not found', RequestException::NOT_FOUND);
+                } elseif ($error == URI::INVALID_DYNAMIC_MODULE_DEFAULT_URI) {
+                    throw new RequestException('Bad default dynamic module default uri.', RequestException::BAD_REQUEST);
                 }
             } else {
                 throw new Exception('Dispatch error '.$error.' : '.$this->uri->getErrorMessage());
