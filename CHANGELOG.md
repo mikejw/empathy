@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.0.2] - 2025-06-02
+
+### Fixed
+
+- Load only found model properties
+
+
 ## [4.0.1] - 2025-05-31
 
 ### Fixed
