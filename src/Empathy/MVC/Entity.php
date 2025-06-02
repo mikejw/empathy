@@ -185,7 +185,9 @@ class Entity
             $row = $result->fetch();
             foreach ($row as $index => $value) {
                 if (!is_integer($index)) {
-                    $this->$index = $value;
+                    if (in_array($index, $this->properties, true)) {
+                        $this->$index = $value;
+                    }
                 }
             }
             return true;
