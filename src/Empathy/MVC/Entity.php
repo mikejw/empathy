@@ -503,9 +503,12 @@ class Entity
     {
         foreach ($this->properties as $property) {
             if (($force_id && $property == 'id') ||
-                (!in_array($property, self::GLOBALLY_IGNORED_PROPERTIES)
-                    && !in_array($property, $ignore))) {
-                $this->$property = $_POST[$property];
+                (
+                  !in_array($property, self::GLOBALLY_IGNORED_PROPERTIES) &&
+                  !in_array($property, $ignore)) &&
+                  isset($_POST[$property])
+                ) {
+                    $this->$property = $_POST[$property];
             }
         }
     }
