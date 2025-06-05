@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.0.3] - 2025-06-05
+
+### Fixed
+
+- Check for `POST` values before attempting to assign them
+
+
 ## [4.0.2] - 2025-06-02
 
 ### Fixed
