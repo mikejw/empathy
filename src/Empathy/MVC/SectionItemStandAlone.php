@@ -30,14 +30,15 @@ class SectionItemStandAlone extends Entity
     public $meta;
     public $user_id;
 
-    public static $table = "section_item";
+    public static $table = 'section_item';
 
 
     public function getURIData()
     {
         $uri_data = array();
 
-        $sql = "SELECT id, section_id, label, friendly_url FROM ".SectionItemStandAlone::$table;
+        $sql = 'SELECT id, section_id, label, friendly_url FROM ' . SectionItemStandAlone::$table
+            .' WHERE hidden != 1';
         $error = "Could not get URI data.";
         $result = $this->query($sql, $error);
         $i = 0;
