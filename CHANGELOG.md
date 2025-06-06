@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.0.4] - 2025-06-06
+
+### Fixed
+
+- Fail to load hidden sections
+
+
 ## [4.0.3] - 2025-06-05
 
 ### Fixed
