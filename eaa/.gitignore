@@ -6,4 +6,22 @@
 /tpl
 /config.yml
 /.idea
+/logs
 *~
+
+.DS_Store
+
+# React Router
+/react/node_modules/
+*.tsbuildinfo
+/react/.react-router/
+/react/build/
+
+# React Router Server
+/react/.env
+/react/server/.npm
+/react/server/build
+/react/server/public
+/react/server/node_modules
+/react/server/server.js
+/react/server/package-lock.json
