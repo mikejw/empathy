@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.0.5] - 2025-06-07
+
+### Fixed
+
+- Update `.gitignore` file
+
+
 ## [4.0.4] - 2025-06-06
 
 ### Fixed
