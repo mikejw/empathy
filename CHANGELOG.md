@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.1.0] - 2025-06-10
+
+### Added
+
+- Perform section URI caching
+
+
 ## [4.0.5] - 2025-06-07
 
 ### Fixed
