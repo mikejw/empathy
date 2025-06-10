@@ -291,6 +291,7 @@ class URI
         $this->error = 0;
 
         $section = Model::load(SectionItemStandAlone::class);
+        $sectionId = -1;
 
         if (!isset($this->dynamicModule) || $this->dynamicModule == '') {
             throw new Exception("Failed to find name of dynamic module.");
@@ -311,16 +312,17 @@ class URI
         }
 
         if ($this->uriString === '' && !!$this->dynamicModuleDefaultURI) {
-            if (!$section->resolveURI($this->uri)) {
+            if (($sectionId = $section->resolveURI($this->uri)) < 0) {
                 $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
             }
         }
 
-        if ($this->error === 0 && !$section->resolveURI($this->uri)) {
+        if ($this->error === 0 && (($sectionId = $section->resolveURI($this->uri)) < 0)) {
             $this->error = self::ERROR_404;
         }
-    
-        if (isset($_GET['section'])) {
+
+        if ($sectionId > -1) {
+            $_GET['section'] = $sectionId;
             $section->getItem($_GET['section']);
         }
 

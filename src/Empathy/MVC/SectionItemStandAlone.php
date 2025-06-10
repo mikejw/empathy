@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC;
+use Empathy\MVC\DI;
 
 /**
  * Empathy SectionItemStandAlone class
@@ -79,7 +80,7 @@ class SectionItemStandAlone extends Entity
         return $matched;
     }
 
-    public function resolveURI($uri)
+    public function doResolveURI($uri)
     {
         if (!isset($uri)) {
             return false;
@@ -89,6 +90,7 @@ class SectionItemStandAlone extends Entity
         $rows = $this->getURIData();
         $id = 0;
         $sections = array();
+        $sectionId = -1;
 
         foreach ($uri as $slug) {
             $section = $this->findSection($rows, $slug, $id);
@@ -102,8 +104,21 @@ class SectionItemStandAlone extends Entity
 
         if (isset($uri) && sizeof($sections) === sizeof($uri)) {
             $matched = true;
-            $_GET['section'] = $sections[sizeof($sections) - 1]['id'];
+            $sectionId = $sections[sizeof($sections) - 1]['id'];
         }
-        return $matched;
+        return $sectionId;
+    }
+
+    public function resolveURI($uri)
+    {
+        if (DI::getContainer()->get('CacheEnabled')) {
+            return DI::getContainer()->get('Cache')->cachedCallback(
+                'section_id_' . implode('_', $uri),
+                [$this, 'doResolveURI'],
+                [$uri]
+            );
+        } else {
+            return $this->doResolveURI($uri);
+        }
     }
 }
