@@ -254,29 +254,34 @@ class Entity
     {
         $this->toFilteredHTML($filter);
         $table = $this::TABLE;
-        $sql = "INSERT INTO $table VALUES(";
-        if ($id) {
-            $sql .= 'NULL, ';
-        }
-        $i = 0;
+        $placeholders = [];
+        $columns = [];
         $params = [];
-        foreach ($this->properties as $property) {
-            if ($this->$property == '') {
-                $sql .= 'NULL';
-            } elseif ($this->$property == 'DEFAULT') {
-                $sql .= 'DEFAULT';
-            } elseif ($this->$property == 'MYSQLTIME') {
-                $sql .= $this->MYSQLTime();
-            } else {
-                $sql .= '?';
-                $params[] = $this->$property;
-            }
-            if (($i + 1) < sizeof($this->properties)) {
-                $sql .= ', ';
-            }
-            $i++;
+
+        if ($id) {
+            $columns[] = 'id';
+            $placeholders[] = 'NULL';
         }
-        $sql .= ')';
+
+        foreach ($this->properties as $property) {
+            $value = $this->$property;
+            $columns[] = $property;
+
+            if ($value == '') {
+                $placeholders[] = 'NULL';
+            } elseif ($value == 'DEFAULT') {
+                $placeholders[] = 'DEFAULT';
+            } elseif ($value == 'MYSQLTIME') {
+                $placeholders[] = $this->MYSQLTime();
+            } else {
+                $placeholders[] = '?';
+                $params[] = $value;
+            }
+        }
+        $columnsSql = implode(', ', $columns);
+        $placeholdersSql = implode(', ', $placeholders);
+        $sql = "INSERT INTO $table ($columnsSql) VALUES ($placeholdersSql)";
+       
         $error = "Could not insert to table '$table'";
         $this->query($sql, $error, $params);
 
