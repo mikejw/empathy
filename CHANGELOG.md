@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [4.1.1] - 2025-08-03
+
+### Fixed
+
+- Build position insensitive insert SQL
+
 
 ## [4.1.0] - 2025-06-10
 
