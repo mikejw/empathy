@@ -1,6 +1,13 @@
 
 # Changelog
 
+## [4.1.2] - 2025-08-09
+
+### Fixed
+
+- Add Unprocessable Entity JSONView return code
+
+
 ## [4.1.1] - 2025-08-03
 
 ### Fixed

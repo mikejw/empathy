@@ -14,6 +14,7 @@ class ReturnCodes
     const Not_Found = 404;
     const Method_Not_Allowed = 405;
     const Conflict = 409;
+    const Unprocessable_Entity = 422;
     const Internal_Server_Error = 500;
 
     public static function getName($code)
