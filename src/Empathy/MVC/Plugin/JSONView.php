@@ -46,17 +46,23 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
     }
 
 
-    private function isResponseSubClass($object) {
-        return (
-            (
-                $this->errorResponse = (get_class($object) == $this->error_ob ||
-                is_subclass_of($object, $this->error_ob))
-            ) ||
-            (
-                get_class($object) == $this->return_ob ||
-                is_subclass_of($object, $this->return_ob)
-            )
-        );
+    private function isResponseSubClass($object): bool
+    {
+        if (!is_object($object)) {
+            $this->errorResponse = false;
+            return false;
+        }
+        $isError = is_string($this->error_ob) && (
+                $object instanceof $this->error_ob ||
+                $object instanceof JSONView\EROb
+            );
+        $isReturn = is_string($this->return_ob) && (
+                $object instanceof $this->return_ob ||
+                $object instanceof JSONView\ROb
+            );
+        $this->errorResponse = $isError;
+
+        return $isError || $isReturn;
     }
 
     public function display($template, $internal = false)

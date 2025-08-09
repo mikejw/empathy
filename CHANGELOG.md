@@ -1,6 +1,13 @@
 
 # Changelog
 
+## [4.1.3] - 2025-08-09
+
+### Fixed
+
+- Improved JSONView response object checks
+
+
 ## [4.1.2] - 2025-08-09
 
 ### Fixed
