@@ -63,6 +63,10 @@ class empathy extends BaseController
         } else {
             $success = FileContentsCache::clear();
 
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+
             // presume to clear memcache
             try {
                 $cache = DI::getContainer()->get('Cache')->clear();

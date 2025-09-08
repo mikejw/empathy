@@ -1,6 +1,14 @@
 
 # Changelog
 
+
+## [4.2.0] - 2025-09-08
+
+### Added
+
+- Clear cache route resets opcache
+
+
 ## [4.1.3] - 2025-08-09
 
 ### Fixed
