@@ -173,20 +173,20 @@ function option_mysql($action)
 
     switch ($action) {
         case 'setup':
-            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' < setup.sql');
-            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' < inserts.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' --ssl=false < setup.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' --ssl=false < inserts.sql');
             break;
         case 'dump':
             \cli\out_padded("Performing dump...");
             execute($config['mysql_dump'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass']
-                . ' --no-create-info --complete-insert ' . $app_config['db_name'] . ' > dump.sql');
+                . ' --no-create-info --complete-insert ' . $app_config['db_name'] . ' --ssl=false > dump.sql');
             break;
         case 'populate':
-            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' < setup.sql');
-            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' ' . $app_config['db_name'] . ' < dump.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' --ssl=false < setup.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' ' . $app_config['db_name'] . ' --ssl=false < dump.sql');
             break;
         case 'extra':
-            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' < extra.sql');
+            execute($config['mysql'] . ' -u ' . $app_config['db_user'] . ' -h ' . $app_config['db_server'] . ' --password=' . $app_config['db_pass'] . ' --ssl=false < extra.sql');
             break;
         default:
             invalid_action();

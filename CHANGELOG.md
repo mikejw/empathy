@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.2.1] - 2025-09-08
+
+### Fixed
+
+- Disable TLS for mysql commands
+
+
 ## [4.2.0] - 2025-09-08
 
 ### Added
