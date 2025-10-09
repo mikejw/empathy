@@ -1,6 +1,7 @@
 <?php
 
 namespace Empathy\MVC\Util;
+use Empathy\MVC\DI;
 
 /**
  * Empathy Misc util
@@ -15,10 +16,14 @@ namespace Empathy\MVC\Util;
  */
 class Misc
 {
-
     public static function isSecure()
     {
-        return ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                || (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443));
+        try {
+            DI::getContainer()->get('PluginManager')->find(['SmartySSL']);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 }

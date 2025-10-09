@@ -2,7 +2,14 @@
 # Changelog
 
 
-## [4.2.1] - 2025-09-08
+## [4.2.2] - 2025-10-09
+
+### Fixed
+
+- Use more reliable SSL detection method
+
+
+## [4.2.1] - 2025-09-29
 
 ### Fixed
 
