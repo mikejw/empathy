@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.2.3] - 2025-10-31
+
+### Fixed
+
+- Enable `ucfirst` in Smarty
+
+
 ## [4.2.2] - 2025-10-09
 
 ### Fixed
