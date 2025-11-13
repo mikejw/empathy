@@ -2,6 +2,14 @@
 # Changelog
 
 
+## [4.2.4] - 2025-11-13
+
+### Fixed
+
+- Correct syntax for Smarty plugins
+- Added `sizeof` and `preg_match`
+
+
 ## [4.2.3] - 2025-10-31
 
 ### Fixed
