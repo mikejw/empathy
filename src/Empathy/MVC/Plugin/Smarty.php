@@ -40,7 +40,7 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
             $this->smarty->registerResource('elib', new \Empathy\ELib\Plugin\SmartyResourceELib());
         }
 
-         $this->smarty->registerPlugin(
+        $this->smarty->registerPlugin(
             "modifier",
             "base64_encode",
             "base64_encode"
