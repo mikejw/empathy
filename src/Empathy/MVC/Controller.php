@@ -79,6 +79,7 @@ class Controller
      */
     public function __construct($boot, $useSession = true, $pluginOptions = [], $pluginWhitelist =[])
     {
+        DI::getContainer()->set('Controller', $this);
         $this->boot = $boot;
         $this->pluginManager = DI::getContainer()->get('PluginManager');
         $this->pluginManager->setController($this);

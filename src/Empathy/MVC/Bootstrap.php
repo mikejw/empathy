@@ -202,10 +202,8 @@ class Bootstrap
         } else {
             $this->controller = new $controller($this);
         }
-        
-        DI::getContainer()->set('Controller', $this->controller);
-        $this->controller->doPreEvent();
 
+        $this->controller->doPreEvent();
         if ($fake == false) {
             $event = $_GET['event'];
             $eventVal = $this->controller->$event();

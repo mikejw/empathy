@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.2.5] - 2025-11-14
+
+### Fixed
+
+- Set controller immediately in container
+
+
 ## [4.2.4] - 2025-11-13
 
 ### Fixed
