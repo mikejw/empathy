@@ -2,6 +2,14 @@
 # Changelog
 
 
+## [4.2.6] - 2025-11-20
+
+### Fixed
+
+- Use correct bootstrap theme vars
+- Add makefile depenencies
+
+
 ## [4.2.5] - 2025-11-14
 
 ### Fixed

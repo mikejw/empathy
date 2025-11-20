@@ -15,6 +15,11 @@ $fa-font-path: "../fonts" !default;
   margin-top: 1rem;
 }
 
+html, body {
+  background-color:  theme-color("light");
+  color:  theme-color("dark");
+}
+
 /* login page css */
 html.centerpage {
   &,
@@ -76,14 +81,14 @@ html.centerpage {
 
   h2, h1 {
     font-family: 'Pattaya', sans-serif;
-    color: $gray-600;
+    color: theme-color("primary");
   }
 }
 
 
 /* old styles */
 ul#tree {
-  background-color: $gray-200;
+  background-color: $white;
   border-radius: 10px;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;

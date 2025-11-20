@@ -1,22 +1,20 @@
 
 
-//$border-width:              0;
-//$input-border-radius:       2rem;
-//$border-radius-sm:          2rem;
-
-//$white:                     #222;
-//$black:                     #fff;
-//$gray-900:                  #f8f9fa;
-//$gray-800:                  #e9ecef;
-//$gray-700:                  #dee2e6;
-//$gray-600:                  #ced4da;
-//$gray-500:                  #adb5bd;
-//$gray-500:                  #6c757d;
-//$gray-300:                  #495057;
-//$gray-200:                  #343a40;
-//$gray-100:                  #212529;
-//$primary:                   #6610f2;
-//$input-bg:                  #eee;
-//$input-color:               #000;
-
 $font-size-base:              0.9rem;
+
+
+$white: #ffffff;
+
+$theme-colors: (
+        "light":      #e1d0cf,
+        "dark":       #080908,
+        "primary":    #543723,
+        "secondary":  #6c5b4c,
+        "info":       #a88b6a,
+        "accent1":    #6f3c1a,
+        "accent2":    #c14d2c,
+        "accent3":    #a9a496,
+        "success":    #549d20,
+        "warning":    #febe52,
+        "danger":     #ec1360,
+);
