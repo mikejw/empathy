@@ -1,8 +1,12 @@
 
-@import url("https://fonts.googleapis.com/css?family=Pattaya&display=swap");
 
+@import "../../../node_modules/bootstrap/scss/functions";
+
+// your overrides must be here
 @import "variables";
+
 @import "../../../node_modules/bootstrap/scss/bootstrap";
+
 
 $fa-font-path: "../fonts" !default;
 @import "../../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
@@ -16,8 +20,8 @@ $fa-font-path: "../fonts" !default;
 }
 
 html, body {
-  background-color:  theme-color("light");
-  color:  theme-color("dark");
+  background-color:  map-get($theme-colors, "light");
+  color: map-get($theme-colors, "dark");
 }
 
 /* login page css */
@@ -81,7 +85,7 @@ html.centerpage {
 
   h2, h1 {
     font-family: 'Pattaya', sans-serif;
-    color: theme-color("primary");
+    color: map-get($theme-colors, "accent1");
   }
 }
 
