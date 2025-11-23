@@ -1,22 +1,16 @@
 
-
 @import "../../../node_modules/bootstrap/scss/functions";
-
-// your overrides must be here
 @import "variables";
-
 @import "../../../node_modules/bootstrap/scss/bootstrap";
 
-
-$fa-font-path: "../fonts" !default;
 @import "../../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
 @import "../../../node_modules/@fortawesome/fontawesome-free/scss/regular";
 @import "../../../node_modules/@fortawesome/fontawesome-free/scss/solid";
 
 
-/* new styles */
-.navbar, .breadcrumb {
-  margin-top: 1rem;
+html, body.centerpage {
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 html, body {
@@ -24,14 +18,8 @@ html, body {
   color: map-get($theme-colors, "dark");
 }
 
-/* login page css */
-html.centerpage {
-  &,
-  body {
-    height: 100%;
-  }
-
-  body {
+body.centerpage {
+  & {
     text-align: center;
     display: -ms-flexbox;
     display: -webkit-box;
@@ -83,98 +71,103 @@ html.centerpage {
     width: 75%;
     margin: 0 auto;
   }
+}
 
-  h2, h1 {
+body.centerpage, body.adminpage {
+  h1, h2, h3, h4 {
     font-family: 'Pattaya', sans-serif;
     color: map-get($theme-colors, "accent1");
   }
 }
 
+body.adminpage {
 
-/* old styles */
-ul#tree {
-  background-color: $white;
-  border-radius: 10px;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  border: 0px solid #000000;
-  margin-bottom: 3rem;
-  padding: 1rem 0.3rem 1rem 1rem;
-
-  [class*="fa-folder"] {
-    color: red;
+  .navbar, .breadcrumb {
+    margin-top: 1rem;
   }
-  [class*="fa-file"] {
-    color: green;
+
+  ul#tree {
+    background-color: $white;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border: 0px solid #000000;
+    margin-bottom: 3rem;
+    padding: 1rem 0.3rem 1rem 1rem;
+
+    [class*="fa-folder"] {
+      color: red;
+    }
+
+    [class*="fa-file"] {
+      color: green;
+    }
   }
-}
 
-ul#tree ul {
-  padding: 0 0 0 22px;
-  margin: 0;
-  clear: both;
-}
-
-ul#tree li, ul#tree ul li {
-  list-style: none;
-  clear: both;
-  padding: 0;
-  margin: 0;
-  height: auto;
-  overflow-y: visible;
-  line-height: 1em;
-  a {
-    text-decoration: none;
+  ul#tree ul {
+    padding: 0 0 0 22px;
+    margin: 0;
+    clear: both;
   }
-}
 
+  ul#tree li, ul#tree ul li {
+    list-style: none;
+    clear: both;
+    padding: 0;
+    margin: 0;
+    height: auto;
+    overflow-y: visible;
+    line-height: 1em;
 
-ul#tree li span.toggle, ul#tree ul li span.toggle,
-ul#tree li a.toggle, ul#tree ul li a.toggle {
-  width: 16px;
-  float: left;
-  padding: 0.22em 0 0.5em 0;
-}
+    a {
+      text-decoration: none;
+    }
+  }
 
-ul#tree li i, ul#tree ul li i,
-ul#tree li img, ul#tree ul li img {
-  display: block;
-  float: left;
-}
+  ul#tree li span.toggle, ul#tree ul li span.toggle,
+  ul#tree li a.toggle, ul#tree ul li a.toggle {
+    width: 16px;
+    float: left;
+    padding: 0.22em 0 0.5em 0;
+  }
 
-ul#tree li i, ul#tree ul li i {
-  padding: 0.2rem;
-  font-size: 1.1rem;
-  min-width: 2rem;
-}
+  ul#tree li i, ul#tree ul li i,
+  ul#tree li img, ul#tree ul li img {
+    display: block;
+    float: left;
+  }
 
-ul#tree li span.label, ul#tree ul li span.label {
-  float: left;
-  margin: 0;
-  padding: 0.3rem 0 0 0;
-}
+  ul#tree li i, ul#tree ul li i {
+    padding: 0.2rem;
+    font-size: 1.1rem;
+    min-width: 2rem;
+  }
 
-ul#tree li.hidden {
-  opacity: 0.5;
-}
+  ul#tree li span.label, ul#tree ul li span.label {
+    float: left;
+    margin: 0;
+    padding: 0.3rem 0 0 0;
+  }
 
+  ul#tree li.hidden {
+    opacity: 0.5;
+  }
 
-.hidden_sections {
-  display: none;
-}
+  .hidden_sections {
+    display: none;
+  }
 
-.cms-actions {
-  line-height: 2.2rem;
-}
+  .cms-actions {
+    line-height: 2.2rem;
+  }
 
-.clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
-}
+  .clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
 
-
-
-fieldset input[type="radio"] {
-  margin-right: 0.7rem;
+  fieldset input[type="radio"] {
+    margin-right: 0.7rem;
+  }
 }
