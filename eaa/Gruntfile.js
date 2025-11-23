@@ -93,7 +93,8 @@ module.exports = function(grunt) {
             '<%= node %>/jquery-ui/ui/widgets/sortable.js',
             '<%= node %>/tinymce/tinymce.min.js',
             '<%= node %>/tinymce/jquery.tinymce.min.js',
-            '<%= elibdir %>/public/admin.js'
+            '<%= elibdir %>/public/admin.js',
+            '<%= elibdir %>/public/register.js'
           ]
         }
       }
