@@ -73,7 +73,7 @@ body.centerpage {
   }
 }
 
-body.centerpage, body.adminpage {
+body.centerpage, body.adminpage, body#user {
   h1, h2, h3, h4 {
     font-family: 'Pattaya', sans-serif;
     color: map-get($theme-colors, "accent1");
@@ -81,7 +81,6 @@ body.centerpage, body.adminpage {
 }
 
 body.adminpage {
-
   .navbar, .breadcrumb {
     margin-top: 1rem;
   }
@@ -171,3 +170,10 @@ body.adminpage {
     margin-right: 0.7rem;
   }
 }
+
+body#user {
+  #address_fields.hidden {
+    display: none;
+  }
+}
+
