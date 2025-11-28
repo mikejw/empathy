@@ -170,6 +170,10 @@ body.adminpage {
   fieldset input[type="radio"] {
     margin-right: 0.7rem;
   }
+
+  #containers.hidden {
+    display: none;
+  }
 }
 
 body#user {
