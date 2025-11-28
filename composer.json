@@ -1,7 +1,7 @@
 {
     "name": "mikejw/empathy",
     "type": "library",
-    "description": "Empathy PHP Framework",
+    "description": "Empathy MVC",
     "keywords": [
         "framework",
         "mvc"
