@@ -17,6 +17,8 @@ html, body.centerpage {
 html, body {
   background-color:  map-get($theme-colors, "light");
   color: map-get($theme-colors, "dark");
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 body.centerpage {
@@ -82,6 +84,22 @@ body.centerpage, body.adminpage, body#user {
 }
 
 body.adminpage {
+
+  & .body-inner {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: map-get($theme-colors, "light")
+  }
+
+  footer {
+    background-color: map-get($theme-colors, "dark");
+    color: map-get($theme-colors, "light");
+    font-size: 0.8rem;
+  }
+
   .navbar, .breadcrumb {
     margin-top: 1rem;
   }
