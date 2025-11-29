@@ -2,6 +2,18 @@
 # Changelog
 
 
+## [4.3.0] - 2025-11-29
+
+### Changed
+
+- Upgrade to Bootstrap 5
+
+### Fixed
+
+- Modernise grunt flow
+- Improve default styling
+
+
 ## [4.2.6] - 2025-11-20
 
 ### Fixed
