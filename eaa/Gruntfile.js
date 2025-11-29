@@ -1,22 +1,22 @@
-
 const yaml = require('js-yaml');
 const fs = require('fs');
-const touch = require("touch")
-
+const touch = require("touch");
+const path = require("path");
 
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-sass');
+  grunt.loadNpmTasks('grunt-terser');
+  grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
 
   grunt.registerTask('common', 'Generate common.js.', function() {
-    var config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
-    var file = './public_html/js/common.js';
+    const config = yaml.load(fs.readFileSync('config.yml', 'utf8'));
+
+    const file = './public_html/js/common.js';
     touch(file, function() {
-      var public_dir = config.public_dir || '';
-      var output = '\n' +
+      const public_dir = config.public_dir || '';
+      const output = '\n' +
         'var WEB_ROOT   = "' + config.web_root + "\";\n" +
         'var PUBLIC_DIR = "' + public_dir + "\";\n";
       fs.writeFileSync(file, output);
@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 
     node: './node_modules',
     dest: './public_html/vendor',
-    destfaf: './public_html/vendor/fonts',
+    destfaf: './public_html/vendor/webfonts',
     elibdir: './vendor/mikejw/elib-base',
 
     copy: {
@@ -79,6 +79,7 @@ module.exports = function(grunt) {
         ]
       }
     },
+
     concat: {
       js: {
         files: {
@@ -92,12 +93,20 @@ module.exports = function(grunt) {
             '<%= node %>/jquery-ui/ui/widgets/sortable.js',
             '<%= node %>/tinymce/tinymce.min.js',
             '<%= node %>/tinymce/jquery.tinymce.min.js',
-            '<%= elibdir %>/public/admin.js'
+            '<%= elibdir %>/public/admin.js',
+            '<%= elibdir %>/public/register.js'
           ]
         }
       }
     },
-    uglify: {
+
+    terser: {
+      options: {
+        // optional but handy:
+        // sourceMap: true,
+        // compress: true,
+        // mangle: true
+      },
       build: {
         files: {
           '<%= dest %>/js/main.min.js': [ '<%= dest %>/js/main.js' ]
@@ -106,14 +115,13 @@ module.exports = function(grunt) {
     },
 
     sass: {
+      options: {
+        implementation: require("sass")
+      },
       dist: {
-        files: [{
-          expand: true,
-          cwd: './public_html/css/scss/',
-          src: ['**/*.scss'],
-          dest: '<%= dest %>/css',
-          ext: '.css'
-        }]
+        files: {
+          "<%= dest %>/css/style.css": "./public_html/css/scss/style.scss"
+        }
       }
     },
 
@@ -134,7 +142,7 @@ module.exports = function(grunt) {
     'common',
     'concat:js',
     'copy',
-    'uglify',
+    'terser',
     'sass',
     'cssmin'
   ]);

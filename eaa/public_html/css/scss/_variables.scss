@@ -1,20 +1,29 @@
 
 
-$font-size-base:              0.9rem;
+$font-size-base: 0.9rem;
 
+$light:      #e1d0cf;
+$dark:       #080908;
+$primary:    #543723;
+$secondary:  #6c5b4c;
+$info:       #a88b6a;
+$success:    #549d20;
+$warning:    #febe52;
+$danger:     #ec1360;
 
-$white: #ffffff;
+$white: #fff;
 
 $theme-colors: (
-        "light":      #e1d0cf,
-        "dark":       #080908,
-        "primary":    #543723,
-        "secondary":  #6c5b4c,
-        "info":       #a88b6a,
-        "accent1":    #6f3c1a,
-        "accent2":    #c14d2c,
-        "accent3":    #a9a496,
-        "success":    #549d20,
-        "warning":    #febe52,
-        "danger":     #ec1360,
+  "light":     $light,
+  "dark":      $dark,
+  "primary":   $primary,
+  "secondary": $secondary,
+  "info":      $info,
+  "success":   $success,
+  "warning":   $warning,
+  "danger":    $danger,
+
+  "accent1":   #6f3c1a,
+  "accent2":   #c14d2c,
+  "accent3":   #a9a496
 );

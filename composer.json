@@ -1,7 +1,7 @@
 {
     "name": "mikejw/empathy",
     "type": "library",
-    "description": "Empathy PHP Framework",
+    "description": "Empathy MVC",
     "keywords": [
         "framework",
         "mvc"
@@ -42,5 +42,10 @@
     },
     "bin": [ "bin/empathy" ],
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+      "branch-alias": {
+        "dev-feature/bs5": "4.x-dev"
+      }
+    }
 }
