@@ -30,6 +30,27 @@ Empathy and officially released extension libraries are now distributed under an
 MIT license.  See [LICENSE](./LICENSE).
 
 
+Versioning & stability policy
+---
+
+Empathy follows semantic versioning. Early releases (v1.x → v4.x) reflect a fast-evolving design phase of the framework. Particularly
+the interplay beteen models and the ORM as it was security hardened. Plus the changes required for PHP 8.4 support.  As the API matured, each breaking change was given its own major release.
+
+With this history, major version bumps should not be seen as instability or sloppy development — but as honest signposts of sound, considered evolution.
+
+Going forward (from v5.0.0 onward):
+
+* Breaking changes will be batched into less-frequent major releases.
+
+* Where possible, functionality will first be deprecated in a release, and only removed in the next major.
+
+* Minor and patch versions will avoid breaking existing public APIs.
+
+* Each major release will include a clear upgrade guide (e.g. a file like UPGRADING-5.0.md) with before/after code examples for users.
+
+* Users who prefer stability over latest features can safely pin to a major version (e.g. "vendor/empathy": "^4.0") and skip new majors until explicitly ready.
+
+
 Testing the code itself
 ---
 

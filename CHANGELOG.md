@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.3.1] - 2025-12-12
+
+### Changed
+
+- Update readme regarding version history
+
+
 ## [4.3.0] - 2025-11-29
 
 ### Changed
