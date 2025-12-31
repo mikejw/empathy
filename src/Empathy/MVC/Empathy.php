@@ -2,7 +2,7 @@
 
 namespace Empathy\MVC;
 
-define('MVC_VERSION', '4.3.1');
+define('MVC_VERSION', '4.3.2');
 
 
 /**
@@ -271,6 +271,10 @@ class Empathy
                     $msg = "Notice: [$errno] $errstr";
                     break;
                 case E_DEPRECATED:
+                    if (str_contains($errstr, 'PDO::MYSQL_ATTR_INIT_COMMAND is deprecated')) {
+                        return true; // swallow redbean issue
+                    }
+
                     if ($this->boot->getEnvironment() !== 'dev') {
                         return;
                     }
