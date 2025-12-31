@@ -251,45 +251,54 @@ class Empathy
      */
     public function errorHandler($errno, $errstr, $errfile, $errline)
     {
-        if (error_reporting()) {
-            $msg = '';
-            switch ($errno) {
-                case E_ERROR:
-                case E_USER_ERROR:
-                    $msg = "Error: [$errno] $errstr";
-                    $msg .= "  Fatal error on line $errline in file $errfile";
-                    $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
-                    $msg .= " Aborting...";
-                    Testable::doDie($msg);
-                    break;
-                case E_WARNING:
-                case E_USER_WARNING:
-                    $msg = "Warning: [$errno] $errstr";
-                    break;
-                case E_NOTICE:
-                case E_USER_NOTICE:
-                    $msg = "Notice: [$errno] $errstr";
-                    break;
-                case E_DEPRECATED:
-                    if (str_contains($errstr, 'PDO::MYSQL_ATTR_INIT_COMMAND is deprecated')) {
-                        return true; // swallow redbean issue
-                    }
-
-                    if ($this->boot->getEnvironment() !== 'dev') {
-                        return;
-                    }
-                    $msg = "Deprecated notice: [$errno] $errstr";
-                    break;
-                default:
-                    $msg = "Unknown error type: [$errno] $errstr";
-                    break;
-            }
-            $msg .= " on line $errline in file $errfile";
-            //$msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
-            $this->errors[] = $msg;
+        // If this error level is not in current reporting, swallow it.
+        if (!(error_reporting() & $errno)) {
+            return true;
         }
 
-        return true;
+        $msg = '';
+        switch ($errno) {
+            case E_ERROR:
+            case E_USER_ERROR:
+                $msg = "Error: [$errno] $errstr";
+                $msg .= "  Fatal error on line $errline in file $errfile";
+                $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
+                $msg .= " Aborting...";
+                Testable::doDie($msg);
+                break;
+
+            case E_WARNING:
+            case E_USER_WARNING:
+                $msg = "Warning: [$errno] $errstr";
+                break;
+
+            case E_NOTICE:
+            case E_USER_NOTICE:
+                $msg = "Notice: [$errno] $errstr";
+                break;
+
+            case E_DEPRECATED:
+                // Swallow only this specific PHP 8.5 PDO deprecation (RedBean).
+                if (str_contains($errstr, 'MYSQL_ATTR_INIT_COMMAND')) {
+                    return true;
+                }
+
+                if ($this->boot->getEnvironment() !== 'dev') {
+                    return true; // IMPORTANT: swallow in non-dev
+                }
+
+                $msg = "Deprecated notice: [$errno] $errstr";
+                break;
+
+            default:
+                $msg = "Unknown error type: [$errno] $errstr";
+                break;
+        }
+
+        $msg .= " on line $errline in file $errfile";
+        $this->errors[] = $msg;
+
+        return true; // swallow everything handled here
     }
 
     /**
