@@ -22,7 +22,7 @@
   ],
   "require": {
     "php": ">=8.4.0",
-    "wp-cli/php-cli-tools": "dev-master",
+    "wp-cli/php-cli-tools": "dev-main",
     "mustangostang/spyc": "0.6.3",
     "mikejw/elibs": "^2",
     "php-di/php-di": "^7.0",

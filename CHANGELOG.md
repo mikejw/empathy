@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.3.3] - 2026-01-19
+
+### Fixed
+
+- Update `php-cli-tools` dependency
+
+
 ## [4.3.2] - 2025-12-31
 
 ### Fixed
