@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 /**
@@ -15,28 +17,21 @@ namespace Empathy\MVC;
  */
 class Plugin
 {
-    protected $bootstrap;
-    protected $config;
-    protected $manager;
-    
+    protected mixed $config = null;
 
-    public function __construct($manager, $bootstrap, $config = null)
+    public function __construct(protected PluginManager $manager, protected Bootstrap $bootstrap, ?string $config = null)
     {
-        $this->bootstrap = $bootstrap;
-        $this->manager = $manager;
         if ($config !== null) {
             $this->assignConfig($config);
         }
     }
 
-
-    public function assignConfig($config)
+    public function assignConfig(mixed $config): void
     {
-        $this->config = json_decode($config, true);
+        $this->config = is_string($config) ? json_decode($config, true) : $config;
     }
 
-
-    public function getConfig()
+    public function getConfig(): mixed
     {
         return $this->config;
     }

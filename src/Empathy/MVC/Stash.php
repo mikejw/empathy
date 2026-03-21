@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 /**
@@ -15,23 +17,19 @@ namespace Empathy\MVC;
  */
 class Stash
 {
-    private $items;
+    /** @var array<string, mixed> */
+    private array $items = [];
 
-    public function __construct()
-    {
-        $this->items = array();
-    }
-
-    public function get($key)
+    public function get(string $key): mixed
     {
         if (!isset($this->items[$key])) {
             return null;
-        } else {
-            return $this->items[$key];
         }
+
+        return $this->items[$key];
     }
 
-    public function store($key, $data)
+    public function store(string $key, mixed $data): void
     {
         $this->items[$key] = $data;
     }

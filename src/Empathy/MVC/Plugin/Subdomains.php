@@ -1,11 +1,12 @@
 <?php
 
-namespace Empathy\MVC\Plugin;
-use Empathy\MVC\DI;
+declare(strict_types=1);
 
-use Empathy\MVC\Testable;
-use Empathy\MVC\Plugin as Plugin;
+namespace Empathy\MVC\Plugin;
+
 use Empathy\MVC\Config;
+use Empathy\MVC\DI;
+use Empathy\MVC\Plugin as Plugin;
 use Empathy\MVC\RequestException;
 
 /**
@@ -24,24 +25,23 @@ use Empathy\MVC\RequestException;
  */
 class Subdomains extends Plugin implements PreDispatch
 {
-
     // regex from http://stackoverflow.com/a/10526727/6108127
-    public function onPreDispatch()
+    public function onPreDispatch(): void
     {
-        $validSubs = array();
-        if (isset($this->config)) {
+        $validSubs = [];
+        if ($this->config !== null) {
             $validSubs = array_keys($this->config);
         }
 
         $webRoot = Config::get('WEB_ROOT');
         Config::store('WEB_ROOT_DEFAULT', $webRoot);
-        $saneWebRoot = preg_replace('/^www\\./', '', $webRoot);
+        $saneWebRoot = preg_replace('/^www\\./', '', (string) $webRoot);
 
         if (isset($_SERVER['HTTP_HOST'])) {
             $matches = [];
             $pattern = '/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i';
-            if (preg_match($pattern, $_SERVER['HTTP_HOST'], $matches)) {
-                if (sizeof($validSubs) && !in_array($matches[1], $validSubs)) {
+            if (preg_match($pattern, (string) $_SERVER['HTTP_HOST'], $matches)) {
+                if (count($validSubs) && !in_array($matches[1], $validSubs, true)) {
                     throw new RequestException('Site not found', RequestException::NOT_FOUND);
                 } else {
                     Config::store('SUBDOMAIN', $matches[1]);

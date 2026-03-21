@@ -1,41 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
-use Empathy\MVC\DI;
 
 class LogItem
 {
-    private $msg;
-    private $context = array();
-    private $level;
-
-    public function __construct($msg, $context = array(),  $class = '', $level = 'debug',)
+    /**
+     * @param array<string, mixed> $context
+     */
+    public function __construct(private string $msg, private array $context = [], string $class = '', private string $level = 'debug')
     {
-        $this->msg = $msg;
-        $this->context = $context;
-        $this->level = $level;
-
-        if ($class === '') {
-            $this->context['app-origin'] = 'unspecified';
-        } else {
-            $this->context['app-origin'] = $class;
-        }
-        return $this;
+        $this->context['app-origin'] = $class === '' ? 'unspecified' : $class;
     }
 
-    public function append($key, $value) {
+    public function append(string $key, mixed $value): void
+    {
         $this->context[$key] = $value;
     }
 
-    public function setLevel($level) {
+    public function setLevel(string $level): void
+    {
         $this->level = $level;
     }
 
-    public function setMsg($msg) {
+    public function setMsg(string $msg): void
+    {
         $this->msg = $msg;
     }
 
-    public function fire() {
+    public function fire(): void
+    {
         $log = DI::getContainer()->get('LoggingOn') ? DI::getContainer()->get('Log') : false;
         $level = $this->level;
         if ($log !== false) {

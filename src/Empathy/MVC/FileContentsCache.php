@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 class FileContentsCache
 {
-    public static function cachedCallback($filename, $callback = null)
+    /**
+     * @param callable(string): mixed|null $callback
+     */
+    public static function cachedCallback(string $filename, ?callable $callback = null): mixed
     {
         $apcuAvailable = function_exists('apcu_enabled') && apcu_enabled();
 
@@ -14,18 +19,22 @@ class FileContentsCache
             if (!file_exists($filename)) {
                 throw new \Exception('Attempted to cache '.$filename.' but file was not found');
             }
-            $data = file_get_contents($filename);
+            $raw = file_get_contents($filename);
+            if ($raw === false) {
+                throw new \Exception('Could not read file: '.$filename);
+            }
+            $data = $raw;
             if (is_callable($callback)) {
                 $data = $callback($data);
             }
             if ($apcuAvailable) {
-                apcu_add($filename, $data); 
+                apcu_add($filename, $data);
             }
         }
         return $data;
     }
 
-    public static function clear()
+    public static function clear(): bool
     {
         return (
             function_exists('apcu_enabled') &&

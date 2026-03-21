@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Empathy\MVC\Plugin;
 
@@ -18,9 +19,10 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class TwitterOAuth
 {
-
     public function __construct()
     {
-        require 'twitteroauth/twitteroauth.php';
+        if (file_exists('twitteroauth/twitteroauth.php')) {
+            include __DIR__ . '/twitteroauth/twitteroauth.php';
+        }
     }
 }

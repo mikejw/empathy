@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Plugin;
 
-use Empathy\MVC\Plugin as Plugin;
 use Empathy\MVC\Config;
+use Empathy\MVC\Plugin as Plugin;
 
 /**
  * Empathy Smarty Plugin
@@ -18,7 +20,7 @@ use Empathy\MVC\Config;
  */
 class SmartySSL extends Smarty
 {
-    public function isSecure()
+    public function isSecure(): bool
     {
         return (
             isset($this->config['force']) && $this->config['force'] ||
@@ -26,7 +28,8 @@ class SmartySSL extends Smarty
         );
     }
 
-    public function display($template, $internal = false)
+    #[\Override]
+    public function display(string $template, bool $internal = false): void
     {
         if ($internal) {
             $this->switchInternal();

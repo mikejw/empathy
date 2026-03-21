@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Plugin;
 
 /**
@@ -15,5 +17,5 @@ namespace Empathy\MVC\Plugin;
  */
 interface PreEvent
 {
-    public function onPreEvent();
+    public function onPreEvent(): void;
 }

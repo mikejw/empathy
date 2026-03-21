@@ -1,9 +1,8 @@
 <?php
 
-namespace Empathy\MVC;
+declare(strict_types=1);
 
-use Empathy\MVC\LogItem;
-use Empathy\MVC\SectionItemStandAlone;
+namespace Empathy\MVC;
 
 /**
  * Empathy URI
@@ -21,49 +20,48 @@ class URI
     /**
      * Missing class definition constant
      */
-    const MISSING_CLASS_DEF = 1;
+    public const MISSING_CLASS_DEF = 1;
 
     /**
      * Missing event/action definition
      */
-    const MISSING_EVENT_DEF = 2;
+    public const MISSING_EVENT_DEF = 2;
 
     /**
      * 404 error contant
      */
-    const ERROR_404 = 3;
+    public const ERROR_404 = 3;
 
     /**
      * No template defined constant
      */
-    const NO_TEMPLATE = 4;
+    public const NO_TEMPLATE = 4;
 
     /**
      * Max comparisons contant
      */
-    const MAX_COMP = 4; // maxium relevant info stored in a URI
+    public const MAX_COMP = 4; // maxium relevant info stored in a URI
     // ie module, class, event, id
 
     /**
      * URI from config error
      */
-    const INVALID_DYNAMIC_MODULE_DEFAULT_URI = 5;
+    public const INVALID_DYNAMIC_MODULE_DEFAULT_URI = 5;
 
-    private $full;
-    private $uriString;
-    private $uri;
-    private $defaultModule;
-    private $dynamicModule;
-    private $dynamicModuleDefaultURI;
-    private $error = 0;
-    private $internal = false;
-    private $controllerName = '';
-    private $cli_mode_detected;
-    private $internal_controller = 'empathy';
+    private ?string $full = null;
+    private string $uriString = '';
+    /** @var array<int, string> */
+    private array $uri = [];
+    private ?string $defaultModule = null;
+    private int $error = 0;
+    private bool $internal = false;
+    private string $controllerName = '';
+    private bool $cli_mode_detected = false;
+    private string $internal_controller = 'empathy';
 
-    public function __construct($default_module, $dynamic_module, $dynamic_module_default_uri = '')
+    public function __construct(?string $default_module, private readonly ?string $dynamicModule, private readonly string $dynamicModuleDefaultURI = '')
     {
-        if (isset($_SERVER['HTTP_HOST']) && strpos(Config::get('WEB_ROOT'), $_SERVER['HTTP_HOST']) === false) {
+        if (isset($_SERVER['HTTP_HOST']) && !str_contains((string) Config::get('WEB_ROOT'), (string) $_SERVER['HTTP_HOST'])) {
             throw new SafeException('Host name mismatch.');
         }
 
@@ -71,17 +69,15 @@ class URI
         $this->sanity($default_module);
         $removeLength = strlen(Config::get('WEB_ROOT').Config::get('PUBLIC_DIR'));
         $this->defaultModule = $default_module;
-        $this->dynamicModule = $dynamic_module;
-        $this->dynamicModuleDefaultURI = $dynamic_module_default_uri;
         if (isset($_SERVER['HTTP_HOST'])) {
             $this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
             $this->uriString = substr($this->full, $removeLength + 1);
+        } elseif (isset($_SERVER['REQUEST_URI'])) {
+            // request has been faked
+            $this->uriString = $_SERVER['REQUEST_URI'];
         } else {
-            if (isset($_SERVER['REQUEST_URI'])) { // request has been faked
-                $this->uriString = $_SERVER['REQUEST_URI'];
-            } else {
-                $this->cli_mode_detected = true;
-            }
+            $this->cli_mode_detected = true;
+            $this->uriString = '';
         }
 
         $this->error = 0;
@@ -90,39 +86,43 @@ class URI
         $this->logRouting();
     }
 
-    public function getData()
+    /**
+     * @return array<int, string>
+     */
+    public function getData(): array
     {
         return $this->uri;
     }
 
-    public function getCliMode()
+    public function getCliMode(): bool
     {
         return $this->cli_mode_detected;
     }
 
-    public function getError()
+    public function getError(): int
     {
         return $this->error;
     }
 
-    public function getControllerName()
+    public function getControllerName(): string
     {
         return $this->controllerName;
     }
 
-    public function logRouting()
+    public function logRouting(): void
     {
-       $log = new LogItem(
-           'route loaded',
-           array(
-               'module' => $_GET['module'] ?? 'Undefined',
-               'class' => $_GET['class'] ?? 'Undefined',
-               'event' => $_GET['event'] ?? 'Undefined',
-               'controller name' => $this->controllerName,
-           ),
-           self::class
-       );
-        if ($error = $this->getErrorMessage()) {
+        $log = new LogItem(
+            'route loaded',
+            [
+                'module' => $_GET['module'] ?? 'Undefined',
+                'class' => $_GET['class'] ?? 'Undefined',
+                'event' => $_GET['event'] ?? 'Undefined',
+                'controller name' => $this->controllerName,
+            ],
+            self::class
+        );
+        $error = $this->getErrorMessage();
+        if ($error !== '' && $error !== '0') {
             $log->append('error', $error);
             $log->setMsg('route not loaded');
             $log->setLevel('error');
@@ -130,11 +130,11 @@ class URI
         $log->fire();
     }
 
-    public function processRequest()
+    public function processRequest(): void
     {
         if (isset($_GET['module'])) {
             $this->setModule($_GET['module']);
-        } elseif ($this->uriString == '') { // || strpos($this->uriString, '.')) {
+        } elseif ($this->uriString === '') { // || strpos($this->uriString, '.')) {
             if ($this->defaultModule === null) {
                 $this->setModule($this->internal_controller);
             } else {
@@ -146,12 +146,12 @@ class URI
         }
     }
 
-    public function formURI()
+    public function formURI(): void
     {
         $uri = explode('/', $this->uriString);
-        $size = sizeof($uri) - 1;
+        $size = count($uri) - 1;
         // remove empty element caused by trailing slash
-        if ($uri[$size] == '') {
+        if ($uri[$size] === '') {
             array_pop($uri);
             $size--;
         }
@@ -159,19 +159,20 @@ class URI
         $args = '';
 
         // ignore any args
-        if (preg_match('/\?/', $uri[$size])) {
-            $start_args = strpos($uri[$size], '?');
-            $args = substr($uri[$size], $start_args);
-            $uri[$size] = substr($uri[$size], 0, $start_args);
+        $lastSegment = $uri[$size] ?? '';
+        $queryPos = strpos($lastSegment, '?');
+        if ($queryPos !== false) {
+            $args = substr($lastSegment, $queryPos);
+            $uri[$size] = substr($lastSegment, 0, $queryPos);
 
-            if ($uri[$size] == '') {
+            if ($uri[$size] === '') {
                 array_pop($uri);
             }
         }
 
         // check for uppercase letters in main uri
         // and redirect if present
-        
+
         $temp_uri_string = implode('/', $uri);
         if (preg_match('/[A-Z]/', $temp_uri_string)) {
             header(
@@ -186,11 +187,11 @@ class URI
         $this->uri = $uri;
     }
 
-    public function analyzeURI()
+    public function analyzeURI(): void
     {
         $i = 0;
 
-        $length = sizeof($this->uri);
+        $length = count($this->uri);
         if ($length > self::MAX_COMP) {
             $length = self::MAX_COMP;
         }
@@ -223,24 +224,24 @@ class URI
         }
         if (!isset($_GET['module'])) {
             // only present url param is an id
-            $this->setModule($this->defaultModule);
+            $this->setModule($this->defaultModule ?? $this->internal_controller);
         }
     }
 
-    private function setModule($module)
+    private function setModule(string $module): void
     {
         $_GET['module'] = $module;
-        if ($_GET['module'] == $this->internal_controller) {
+        if ($_GET['module'] === $this->internal_controller) {
             $this->internal = true;
         }
     }
 
-    private function buildControllerName($controller)
+    private function buildControllerName(string $controller): string
     {
         return 'Empathy\\MVC\\Controller\\'.$controller;
     }
 
-    private function setController()
+    private function setController(): void
     {
         require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
 
@@ -259,33 +260,34 @@ class URI
             $_GET['class'] = $_GET['module'];
             $this->controllerName = $_GET['module'];
         }
-    
+
         $this->controllerName = $this->buildControllerName($this->controllerName);
 
-        if (!$this->error) {
-            if (!class_exists($this->controllerName)) {
-                $this->error = self::MISSING_CLASS_DEF;
-            }
+        if ($this->error === 0 && !class_exists($this->controllerName)) {
+            $this->error = self::MISSING_CLASS_DEF;
         }
 
         $this->assertEventIsSet();
-        if (!$this->error) {
-            $r = new \ReflectionClass($this->controllerName);
-            if (!$r->hasMethod($_GET['event'])) {
-                $this->error = self::MISSING_EVENT_DEF;
+        if ($this->error === 0) {
+            $controllerClass = $this->controllerName;
+            if (class_exists($controllerClass)) {
+                $r = new \ReflectionClass($controllerClass);
+                if (!$r->hasMethod($_GET['event'])) {
+                    $this->error = self::MISSING_EVENT_DEF;
+                }
             }
         }
     }
 
-    public function assertEventIsSet()
+    public function assertEventIsSet(): void
     {
-        if (!(isset($_GET['event'])) || $_GET['event'] == '') {
+        if (!(isset($_GET['event'])) || $_GET['event'] === '') {
             $_GET['event'] = 'default_event';
         }
     }
 
 
-    public function dynamicSection()
+    public function dynamicSection(): int
     {
         // code still needed to assert correct section path - else throw 404
         $this->error = 0;
@@ -293,31 +295,29 @@ class URI
         $section = Model::load(SectionItemStandAlone::class);
         $sectionId = -1;
 
-        if (!isset($this->dynamicModule) || $this->dynamicModule == '') {
-            throw new Exception("Failed to find name of dynamic module.");
+        if ($this->dynamicModule === null || $this->dynamicModule === '') {
+            throw new Exception('Failed to find name of dynamic module.');
         } else {
             $_GET['module'] = $this->dynamicModule;
         }
 
-        if (!isset($this->uri)) {
+        if ($this->uri === []) {
             $this->uri = explode('/', $this->dynamicModuleDefaultURI);
         }
 
-        if (isset($this->uri) && sizeof($this->uri) > 0) {
-            $section_index = (sizeof($this->uri) - 1);
-            if (is_numeric($this->uri[$section_index])) {
-                $_GET['id'] = $this->uri[$section_index];
-                array_pop($this->uri);
-            }
+        $lastIndex = count($this->uri) - 1;
+        if (array_key_exists($lastIndex, $this->uri) && is_numeric($this->uri[$lastIndex])) {
+            $_GET['id'] = $this->uri[$lastIndex];
+            array_pop($this->uri);
         }
 
-        if ($this->uriString === '' && !!$this->dynamicModuleDefaultURI) {
-            if (($sectionId = $section->resolveURI($this->uri)) < 0) {
-                $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
-            }
+        $uriForResolve = array_values($this->uri);
+
+        if ($this->uriString === '' && !!$this->dynamicModuleDefaultURI && ($sectionId = $section->resolveURI($uriForResolve)) < 0) {
+            $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
         }
 
-        if ($this->error === 0 && (($sectionId = $section->resolveURI($this->uri)) < 0)) {
+        if ($this->error === 0 && (($sectionId = $section->resolveURI($uriForResolve)) < 0)) {
             $this->error = self::ERROR_404;
         }
 
@@ -327,23 +327,22 @@ class URI
         }
 
         // section id is not set / found
-        if (!(is_numeric($section->id))) {
+        if ($section->id < 1) {
             $this->error = self::ERROR_404;
         }
 
-        if (isset($section->url_name)) {
+        if ($section->url_name !== null) {
             $_GET['section_uri'] = $section->url_name;
         }
 
         if ($this->error < 1) {
-            if ($section->template == "") {
+            if ($section->template === '') {
                 $this->error = self::NO_TEMPLATE;
+            } elseif ($section->template === '0') {
+                // section in 'specialised'
+                $controllerName = 'template'.$section->id;
             } else {
-                if ($section->template == '0') { // section in 'specialised'
-                    $controllerName = "template".$section->id;
-                } else {
-                    $controllerName = "template".$section->template;
-                }
+                $controllerName = 'template'.$section->template;
             }
         }
 
@@ -352,7 +351,7 @@ class URI
         }
 
         $_GET['event'] = 'default_event';
-        
+
         if ($this->error < 1) {
             $this->setController();
         }
@@ -360,7 +359,7 @@ class URI
         return $this->error;
     }
 
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         $message = '';
         switch ($this->error) {
@@ -385,7 +384,7 @@ class URI
         return $message;
     }
 
-    public function sanity($default_module)
+    public function sanity(?string $_default_module): void
     {
         if (Config::get('WEB_ROOT') === false) {
             throw new SafeException('Dispatch error: Web root is not defined');
@@ -398,7 +397,7 @@ class URI
         }
     }
 
-    public function getInternal()
+    public function getInternal(): bool
     {
         return $this->internal;
     }

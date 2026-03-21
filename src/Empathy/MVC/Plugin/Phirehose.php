@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Plugin as Plugin;
@@ -17,9 +19,10 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class Phirehose
 {
-
     public function __construct()
     {
-        require 'phirehose/Phirehose.php';
+        if (file_exists('phirehose/Phirehose.php')) {
+            include __DIR__ . '/phirehose/Phirehose.php';
+        }
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Empathy/MVC/Util/Lib.php
  *
@@ -11,6 +13,7 @@
  * @link      http://empathyphp.co.uk
  *
  */
+
 namespace Empathy\MVC\Util;
 
 class Lib
@@ -21,7 +24,7 @@ class Lib
      * @param string $path   The custom path
      *
      */
-    public static function addToIncludePath($path)
+    public static function addToIncludePath(string $path): void
     {
         $existing_include_path = get_include_path();
         ini_set(

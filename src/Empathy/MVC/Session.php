@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 /**
@@ -15,42 +17,42 @@ namespace Empathy\MVC;
  */
 class Session
 {
-    public static $app;
-    private static $up = false;
+    public static string $app = '';
 
-    public static function dump()
+    private static bool $up = false;
+
+    public static function dump(): void
     {
         if (isset($_SESSION)) {
             echo "<pre>\n";
             print_r($_SESSION);
-            echo "</pre>";
+            echo '</pre>';
         }
     }
 
-    public static function up()
+    public static function up(): void
     {
         if (empty($name = Config::get('NAME'))) {
             self::$app = 'unnamed';
         } else {
-            self::$app = $name;
+            self::$app = is_string($name) ? $name : 'unnamed';
         }
 
         if (self::$up === false) {
             Testable::session_start();
             if (!isset($_SESSION['app']) ||
                !isset($_SESSION['app'][self::$app])) {
-                $_SESSION['app'][self::$app] = array();
+                $_SESSION['app'][self::$app] = [];
             }
-            //self::dump();
             self::$up = true;
         }
     }
 
-    public static function getNewApp()
+    public static function getNewApp(): bool
     {
         $new_app = false;
         if (isset($_SESSION['app'][self::$app]) &&
-            sizeof($_SESSION['app'][self::$app]) > 0
+            count($_SESSION['app'][self::$app]) > 0
         ) {
             $new_app = true;
         }
@@ -58,64 +60,58 @@ class Session
         return $new_app;
     }
 
-    public static function setUISetting($ui, $setting, $value)
+    public static function setUISetting(string $ui, string $setting, mixed $value): void
     {
         $_SESSION['app'][self::$app][$ui][$setting] = $value;
     }
 
-    public static function getUISetting($ui, $setting)
+    public static function getUISetting(string $ui, string $setting): mixed
     {
-        if (isset($_SESSION['app'][self::$app][$ui][$setting])) {
-            return $_SESSION['app'][self::$app][$ui][$setting];
-        } else {
-            return false;
-        }
+        return $_SESSION['app'][self::$app][$ui][$setting] ?? false;
     }
 
-    public static function down()
+    public static function down(): void
     {
-        // backwards compatibility
         $new_app = self::getNewApp();
 
-        // main logic
         unset($_SESSION['app'][self::$app]);
-        if (sizeof($_SESSION['app']) == 0) {
+        if (count($_SESSION['app']) === 0) {
             Testable::session_unset();
             Testable::session_destroy();
         }
 
-        // backwards compatibility
         if (isset($_SESSION['user_id']) && !$new_app) {
-            foreach ($_SESSION as $index => $value) {
-                if ($index != 'app') {
+            foreach (array_keys($_SESSION) as $index) {
+                if ($index !== 'app') {
                     unset($_SESSION[$index]);
                 }
             }
         }
     }
 
-    public static function set($key, $value)
+    public static function set(string $key, mixed $value): void
     {
         $_SESSION['app'][self::$app][$key] = $value;
     }
 
-    public static function get($key)
+    public static function get(string $key): mixed
     {
         if (!isset($_SESSION['app'][self::$app][$key])) {
             return false;
-        } else {
-            return $_SESSION['app'][self::$app][$key];
         }
+
+        return $_SESSION['app'][self::$app][$key];
     }
 
-    public static function clear($key)
+    public static function clear(string $key): void
     {
         unset($_SESSION['app'][self::$app][$key]);
     }
 
-    
-    
-    public static function loadUIVars($ui, $ui_array)
+    /**
+     * @param list<string> $ui_array
+     */
+    public static function loadUIVars(string $ui, array $ui_array): void
     {
         $new_app = self::getNewApp();
         foreach ($ui_array as $setting) {
@@ -133,8 +129,7 @@ class Session
         }
     }
 
-
-    public static function write()
+    public static function write(): void
     {
         Testable::session_write_close();
     }

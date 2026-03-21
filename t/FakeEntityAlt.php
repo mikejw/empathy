@@ -1,8 +1,8 @@
 <?php
 
-namespace ESuite;
+declare(strict_types=1);
 
-use Empathy\MVC\Entity;
+namespace ESuite;
 
 class FakeEntityAlt extends FakeEntity
 {

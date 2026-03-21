@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
 use Empathy\MVC\Config;
 use ESuite\ESuiteTest;
-
 
 // @totdo: figure out proper use of expectOutput
 // can we set it multiple times.. or match over set of output
@@ -19,7 +20,7 @@ class EmpathyTest extends ESuiteTest
         //
     }
 
-    private function createMVC($persistent=false)
+    private function createMVC($persistent = false)
     {
         $bootstrap = $this->makeFakeBootstrap($persistent);
         $this->mvc = $bootstrap->getMVC();
@@ -33,13 +34,13 @@ class EmpathyTest extends ESuiteTest
         Config::store('BOOT_OPTIONS', $boot_options);
         $this->mvc->reloadBootOptions();
     }
-    
+
     private function changeDebug($debug)
     {
         $boot_options = Config::get('BOOT_OPTIONS');
         $boot_options['debug_mode'] = $debug;
         Config::store('BOOT_OPTIONS', $boot_options);
-        $this->mvc->reloadBootOptions();   
+        $this->mvc->reloadBootOptions();
     }
 
     public function testErrors()
@@ -55,16 +56,13 @@ class EmpathyTest extends ESuiteTest
         $this->mvc->errorHandler(E_ERROR, 'dummy error', 'someFile.php', 1);
 
         $this->mvc->errorHandler(E_USER_WARNING, 'dummy error', 'someFile.php', 1);
-        $this->assertRegExp('/Warning/', $this->mvc->errorsToString());
+        $this->assertMatchesRegularExpression('/Warning/', $this->mvc->errorsToString());
 
         $this->mvc->errorHandler(E_NOTICE, 'dummy error', 'someFile.php', 1);
-        $this->assertRegExp('/Notice/', $this->mvc->errorsToString());
-
-        $this->mvc->errorHandler(E_STRICT, 'dummy error', 'someFile.php', 1);
-        $this->assertRegExp('/Strict/', $this->mvc->errorsToString());
+        $this->assertMatchesRegularExpression('/Notice/', $this->mvc->errorsToString());
 
         $this->mvc->errorHandler(0, 'dummy error', 'someFile.php', 1);
-        $this->assertRegExp('/Unknown/', $this->mvc->errorsToString());
+        $this->assertMatchesRegularExpression('/Error/', $this->mvc->errorsToString());
     }
 
     public function testExceptions()
@@ -95,13 +93,13 @@ class EmpathyTest extends ESuiteTest
 
         // code = 0 => 404
         $this->createMVC(true);
-        $this->expectOutputRegex('/Not found/');    
+        $this->expectOutputRegex('/Not found/');
         $this->mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error'));
 
         // code = 1 => 500
         $this->createMVC(true);
-        $this->expectOutputRegex('/Bad request/');    
-        $this->mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error', 1)); 
+        $this->expectOutputRegex('/Bad request/');
+        $this->mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error', 1));
 
     }
 

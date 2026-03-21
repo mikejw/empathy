@@ -1,70 +1,108 @@
 <?php
 
-namespace Empathy\MVC;
+declare(strict_types=1);
 
-use Empathy\MVC\Config;
-use Empathy\MVC\LogItem;
+namespace Empathy\MVC;
+use PDOStatement;
+use PDO;
+use Exception;
 
 class Entity
 {
     public function __construct()
     {
         if (Config::get('LEGACY_MODEL')) {
-            ModelLegacy::load($this);
+            ModelLegacy::bootstrapEntity($this);
         }
     }
 
-    const TABLE = '';
+    public const TABLE = '';
 
-    private const GLOBALLY_IGNORED_PROPERTIES = ['id', 'table']; // leaving in table to support old models
+    private const array GLOBALLY_IGNORED_PROPERTIES = ['id', 'table']; // leaving in table to support old models
 
-    private $val;
-    private $result;
-    private $properties;
-    private $dbh;
+    private Validate $val;
+    private PDOStatement $result;
 
-    protected $id; // allow handling entities with no public ID value set
+    /** @var list<string> */
+    private array $properties;
+    private PDO | null $dbh = null;
+
+    public int $id; // allow handling entities with no public ID value set
+
+//    public function getId(): int
+//    {
+//        return $this->id;
+//    }
+
+    public function setPrimaryKeyAfterInsert(int $id): void
+    {
+        $this->id = $id;
+    }
 
     /**
      * Older Empathy applications may rely on this property instead of class constants for table name definitions.
      */
-    protected static $table = '';
+    protected static string $table = '';
 
-    public function MYSQLTime()
+    public function MYSQLTime(): string
     {
         return '\'' . date('Y:m:d H:i:s', time()) . '\'';
     }
 
-    public function init()
+    public function init(): void
     {
         $this->val = new Validate();
         $this->properties = [];
         $this->loadProperties();
     }
 
-    public function insertId()
+    public function insertId(): false | string
     {
-        return $this->dbh->lastInsertId();
+        return $this->requireDbh()->lastInsertId();
     }
 
-    private function loadProperties()
+    private function requireDbh(): PDO
     {
-        $super_class = 'Empathy\MVC\Entity';
+        if (!$this->dbh instanceof \PDO) {
+            throw new SafeException('No database connection');
+        }
 
-        $r = new \ReflectionClass(get_class($this));
+        return $this->dbh;
+    }
 
-        if ($r->getParentClass()->getName() != $super_class) {
+    private function pregReplaceToString(string $pattern, string $replacement, string $subject): string
+    {
+        $out = preg_replace($pattern, $replacement, $subject);
+        if (!is_string($out)) {
+            throw new Exception('preg_replace produced a non-string result');
+        }
+
+        return $out;
+    }
+
+    private function loadProperties(): void
+    {
+        $super_class = \Empathy\MVC\Entity::class;
+
+        $r = new \ReflectionClass(static::class);
+
+        $parent = $r->getParentClass();
+        if ($parent !== false && $parent->getName() !== $super_class) {
             $props = [];
-            while (($class = $r->getName()) != $super_class) {
+            while (($class = $r->getName()) !== $super_class) {
                 $props[] = $r->getProperties();
-                $r = $r->getParentClass();
+                $next = $r->getParentClass();
+                if ($next === false) {
+                    throw new Exception('Entity hierarchy walk failed before reaching '.$super_class);
+                }
+                $r = $next;
             }
             $props = array_reverse($props);
             $properties = [];
             foreach ($props as $p) {
                 foreach ($p as $rp) {
                     $name = $rp->name;
-                    if (!in_array($name, $properties) && $name != 'table') {
+                    if (!in_array($name, $properties, true) && $name !== 'table') {
                         $properties[] = $name;
                     }
                 }
@@ -75,97 +113,118 @@ class Entity
             // it's a straightforward single subclass
             foreach ($r->getProperties() as $item) {
                 if (!$item->isPrivate()) {
-                    array_push($this->properties, $item->name);
+                    $this->properties[] = $item->name;
                 }
             }
         }
-        $this->properties = array_diff($this->properties, self::GLOBALLY_IGNORED_PROPERTIES);
+        $this->properties = array_values(
+            array_diff($this->properties, self::GLOBALLY_IGNORED_PROPERTIES)
+        );
     }
 
     /**
-     * Used in old fashioned applications
+     * Used in old-fashioned applications
      * where Entities are not loaded through the Model class.
+     *
+     *
      */
-    public function dbConnect()
+    public function dbConnect(): void
     {
-        if (!defined('DB_SERVER') || DB_SERVER == '') {
+        if (!defined('DB_SERVER')) {
             throw new SafeException('DB Error: No database host given');
         }
-        if (!defined('DB_NAME') || DB_NAME == '') {
+
+        if (!defined('DB_NAME')) {
             throw new SafeException('DB Error: No database name');
         }
-        if (!defined('DB_USER') || DB_USER == '') {
+
+        if (!defined('DB_USER')) {
             throw new SafeException('DB Error: No database username');
         }
-        $dsn = 'mysql:host=' . DB_SERVER . ';dbname=' . DB_NAME . ';';
-        if (defined('DB_PORT') && is_numeric(DB_PORT)) {
-            $dsn .= 'port=' . DB_PORT . ';';
+
+        if (!defined('DB_PASS')) {
+            throw new SafeException('DB Error: No database password');
         }
-        $this->dbh = new \PDO($dsn, DB_USER, DB_PASS);
+
+        $dsn = 'mysql:host=' . constant('DB_SERVER') .
+            ';dbname=' . constant('DB_NAME') . ';';
+
+        if (defined('DB_PORT') && is_numeric(constant('DB_PORT'))) {
+            $dsn .= 'port=' . constant('DB_PORT') . ';';
+        }
+
+        $this->dbh = new \PDO(
+            $dsn,
+            constant('DB_USER'),
+            constant('DB_PASS')
+        );
     }
 
-    public function setDBH(&$dbh)
+    public function setDBH(PDO &$dbh): void
     {
         $this->dbh = $dbh;
     }
 
-    public function dbDisconnect()
+    public function dbDisconnect(): void
     {
         unset($this->result);
         $this->dbh = null;
     }
 
-    private function logQuery($sql, $error, $params, $level)
+    /**
+     * @param array<int|string, mixed> $params
+     */
+    private function logQuery(string $sql, string $error, array $params, string $level): void
     {
         $log = new LogItem(
             'sql query',
             [
-                'query' => $sql
+                'query' => $sql,
             ],
             self::class,
             $level
         );
 
-        if (sizeof($params) > 0) {
+        if (count($params) > 0) {
             $log->append('params', $params);
         }
 
-        if ($level != 'debug') {
+        if ($level !== 'debug') {
             $log->setMsg('sql query error');
             $log->append('error', $error);
         }
         $log->fire();
     }
 
-    public function query($sql, $error = '', $params = [])
+    /**
+     * @param array<int|string, mixed> $params
+     */
+    public function query(string $sql, string $error = '', array $params = []): PDOStatement
     {
-        $result = null;
+        $dbh = $this->requireDbh();
         $errors = ['', '', ''];
         try {
-            if (sizeof($params)) {
-                $sth = $this->dbh->prepare($sql, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+            if (count($params) !== 0) {
+                $sth = $dbh->prepare($sql, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
                 $sth->execute($params);
                 $result = $sth;
+            } elseif (($result = $dbh->query($sql)) === false) {
+                $errors = $dbh->errorInfo();
+                throw new Exception('[' . htmlentities($sql)
+                    . "]<br /><strong>MySQL</strong>: ($error): "
+                    . htmlentities((string) $errors[2]));
             } else {
-                if (($result = $this->dbh->query($sql)) == false) {
-                    $errors = $this->dbh->errorInfo();
-
-                    throw new \Exception("[" . htmlentities($sql)
-                        . "]<br /><strong>MySQL</strong>: ($error): "
-                        . htmlentities($errors[2]));
-                } else {
-                    $this->result = $result;
-                }
+                $this->result = $result;
             }
             $this->logQuery($sql, $error, $params, 'debug');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logQuery($sql, $error . $errors[2], $params, 'error');
             throw $e;
         }
         return $result;
     }
 
-    public function load($id = null)
+    public function load(mixed $id = null): bool
     {
         if (isset($id) && is_numeric($id)) {
             $this->id = intval($id);
@@ -184,10 +243,8 @@ class Entity
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             foreach ($row as $index => $value) {
-                if (!is_integer($index)) {
-                    if (in_array($index, $this->properties, true)) {
-                        $this->$index = $value;
-                    }
+                if (!is_int($index) && in_array($index, $this->properties, true)) {
+                    $this->$index = $value;
                 }
             }
             return true;
@@ -196,13 +253,16 @@ class Entity
         }
     }
 
-    public function loadAsOptions($field, $order = null)
+    /**
+     * @return array<int|string, string>
+     */
+    public function loadAsOptions(string $field, ?string $order = null): array
     {
         $data = [];
         $table = $this::TABLE;
         $params = [];
         $sql = "SELECT id, $field FROM $table";
-        if ($order !== null && $order != '') {
+        if ($order !== null && $order !== '') {
             $sql .= ' ORDER BY ?';
             $params[] = $order;
         } else {
@@ -219,7 +279,10 @@ class Entity
         return $data;
     }
 
-    public function save($filter = [])
+    /**
+     * @param list<string> $filter
+     */
+    public function save(array $filter = []): void
     {
         $this->toFilteredHTML($filter);
         $table = $this::TABLE;
@@ -230,17 +293,17 @@ class Entity
         foreach ($this->properties as $property) {
             $sql .= "$property = ";
 
-            if ($this->$property == '') {
+            if ($this->$property === '') {
                 $sql .= 'NULL';
-            } elseif ($this->$property == 'DEFAULT') {
+            } elseif ($this->$property === 'DEFAULT') {
                 $sql .= 'DEFAULT';
-            } elseif ($this->$property == 'MYSQLTIME') {
+            } elseif ($this->$property === 'MYSQLTIME') {
                 $sql .= $this->MYSQLTime();
             } else {
                 $sql .= '?';
                 $params[] = $this->$property;
             }
-            if ($i + 1 < sizeof($this->properties)) {
+            if ($i + 1 < count($this->properties)) {
                 $sql .= ', ';
             }
             $i++;
@@ -250,7 +313,10 @@ class Entity
         $this->query($sql, $error, $params);
     }
 
-    public function insert($filter = [], $id = true)
+    /**
+     * @param list<string> $filter
+     */
+    public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {
         $this->toFilteredHTML($filter);
         $table = $this::TABLE;
@@ -258,7 +324,7 @@ class Entity
         $columns = [];
         $params = [];
 
-        if ($id) {
+        if ($includeAutoIdColumn) {
             $columns[] = 'id';
             $placeholders[] = 'NULL';
         }
@@ -267,11 +333,11 @@ class Entity
             $value = $this->$property;
             $columns[] = $property;
 
-            if ($value == '') {
+            if ($value === '') {
                 $placeholders[] = 'NULL';
-            } elseif ($value == 'DEFAULT') {
+            } elseif ($value === 'DEFAULT') {
                 $placeholders[] = 'DEFAULT';
-            } elseif ($value == 'MYSQLTIME') {
+            } elseif ($value === 'MYSQLTIME') {
                 $placeholders[] = $this->MYSQLTime();
             } else {
                 $placeholders[] = '?';
@@ -281,14 +347,17 @@ class Entity
         $columnsSql = implode(', ', $columns);
         $placeholdersSql = implode(', ', $placeholders);
         $sql = "INSERT INTO $table ($columnsSql) VALUES ($placeholdersSql)";
-       
+
         $error = "Could not insert to table '$table'";
         $this->query($sql, $error, $params);
 
-        return $this->insertId();
+        return (int) $this->insertId();
     }
 
-    public function getAll()
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function getAll(): array
     {
         $table = $this::TABLE;
         $all = [];
@@ -302,10 +371,15 @@ class Entity
             $i++;
         }
 
-        return $all;
+        return array_values($all);
     }
 
-    public function getAllCustom($sqlString, $params = [])
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function getAllCustom(string $sqlString, array $params = []): array
     {
         $table = $this::TABLE;
         $all = [];
@@ -318,10 +392,15 @@ class Entity
             $all[$i] = $row;
             $i++;
         }
-        return $all;
+        return array_values($all);
     }
 
-    public function getPaginatePages($sqlString, $page, $perPage, $params = [])
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return array<int, int>
+     */
+    public function getPaginatePages(string $sqlString, int $page, int $perPage, array $params = []): array
     {
         $table = $this::TABLE;
         $nav = [];
@@ -333,17 +412,18 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i == $page) {
-                $nav[$i] = 1;
-            } else {
-                $nav[$i] = 0;
-            }
+            $nav[$i] = $i === $page ? 1 : 0;
             $i++;
         }
         return $nav;
     }
 
-    public function getPaginatePagesSimpleJoin($select, $table2, $sqlString, $page, $perPage, $leftJoins = '', $params = [])
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return array<int, int>
+     */
+    public function getPaginatePagesSimpleJoin(string $select, string $table2, string $sqlString, int $page, int $perPage, string $leftJoins = '', array $params = []): array
     {
         $nav = [];
         $table1 = $this::TABLE;
@@ -359,17 +439,18 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i == $page) {
-                $nav[$i] = 1;
-            } else {
-                $nav[$i] = 0;
-            }
+            $nav[$i] = $i === $page ? 1 : 0;
             $i++;
         }
         return $nav;
     }
 
-    public function getPaginatePagesMultiJoin($select, $table2, $table3, $sqlString, $page, $perPage, $params = [])
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return array<int, int>
+     */
+    public function getPaginatePagesMultiJoin(string $select, string $table2, string $table3, string $sqlString, int $page, int $perPage, array $params = []): array
     {
         $nav = [];
         $table1 = $this::TABLE;
@@ -380,27 +461,28 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i == $page) {
-                $nav[$i] = 1;
-            } else {
-                $nav[$i] = 0;
-            }
+            $nav[$i] = $i === $page ? 1 : 0;
             $i++;
         }
         return $nav;
     }
 
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return array<int, int>
+     */
     public function getPaginatePagesMultiJoinGroup(
-        $select,
-        $table2,
-        $table3,
-        $sqlString,
-        $page,
-        $perPage,
-        $group,
-        $order,
-        $params = []
-    ) {
+        string $select,
+        string $table2,
+        string $table3,
+        string $sqlString,
+        int $page,
+        int $perPage,
+        string $group,
+        string $order,
+        array $params = []
+    ): array {
         $nav = [];
         $table1 = $this::TABLE;
         $sql = "SELECT $select FROM $table1 t1, $table2 t2, $table3 t3 $sqlString";
@@ -411,17 +493,18 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i == $page) {
-                $nav[$i] = 1;
-            } else {
-                $nav[$i] = 0;
-            }
+            $nav[$i] = $i === $page ? 1 : 0;
             $i++;
         }
         return $nav;
     }
 
-    public function getAllCustomPaginate($sqlString, $page, $perPage, $params = [])
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function getAllCustomPaginate(string $sqlString, int $page, int $perPage, array $params = []): array
     {
         $all = [];
         $table = $this::TABLE;
@@ -434,10 +517,15 @@ class Entity
             $all[$i] = $row;
             $i++;
         }
-        return $all;
+        return array_values($all);
     }
 
-    public function getAllCustomPaginateSimpleJoin($select, $table2, $sqlString, $page, $perPage, $leftJoins = '', $params = [])
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function getAllCustomPaginateSimpleJoin(string $select, string $table2, string $sqlString, int $page, int $perPage, string $leftJoins = '', array $params = []): array
     {
         $all = [];
         $table1 = $this::TABLE;
@@ -456,10 +544,15 @@ class Entity
             $all[$i] = $row;
             $i++;
         }
-        return $all;
+        return array_values($all);
     }
 
-    public function getAllCustomPaginateMultiJoin($select, $table2, $table3, $sqlString, $page, $perPage, $params = [])
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function getAllCustomPaginateMultiJoin(string $select, string $table2, string $table3, string $sqlString, int $page, int $perPage, array $params = []): array
     {
         $all = [];
         $table1 = $this::TABLE;
@@ -473,21 +566,25 @@ class Entity
             $all[$i] = $row;
             $i++;
         }
-        return $all;
+        return array_values($all);
     }
 
+    /**
+     * @param array<int|string, mixed> $params
+     *
+     * @return list<array<string, mixed>>
+     */
     public function getAllCustomPaginateMultiJoinGroup(
-        $select,
-        $table2,
-        $table3,
-        $sqlString,
-        $page,
-        $perPage,
-        $group,
-        $order,
-        $params = []
-    )
-    {
+        string $select,
+        string $table2,
+        string $table3,
+        string $sqlString,
+        int $page,
+        int $perPage,
+        string $group,
+        string $order,
+        array $params = []
+    ): array {
         $all = [];
         $table1 = $this::TABLE;
         $start = ($page - 1) * $perPage;
@@ -501,32 +598,39 @@ class Entity
             $all[$i] = $row;
             $i++;
         }
-        return $all;
+        return array_values($all);
     }
 
-    public function assignFromPost($ignore, $force_id = false)
+    /**
+     * @param list<string> $ignore
+     */
+    public function assignFromPost(array $ignore, bool $force_id = false): void
     {
         foreach ($this->properties as $property) {
-            if (($force_id && $property == 'id') ||
+            if (($force_id && $property === 'id') ||
                 (
-                  !in_array($property, self::GLOBALLY_IGNORED_PROPERTIES) &&
-                  !in_array($property, $ignore)) &&
+                    !in_array($property, self::GLOBALLY_IGNORED_PROPERTIES, true) &&
+                  !in_array($property, $ignore, true)
+                ) &&
                   isset($_POST[$property])
-                ) {
-                    $this->$property = $_POST[$property];
+            ) {
+                $this->$property = $_POST[$property];
             }
         }
     }
 
-    public function prepareOptions($first, $label)
+    /**
+     * @return array<int|string, string>
+     */
+    public function prepareOptions(string $first, string $label): array
     {
         $option = [];
         $data = $this->getAll();
-        if ($first != '') {
+        if ($first !== '') {
             $option[0] = $first;
         }
 
-        foreach ($data as $index => $value) {
+        foreach ($data as $value) {
             $id = $value['id'];
             $option[$id] = $value[$label];
         }
@@ -534,7 +638,10 @@ class Entity
         return $option;
     }
 
-    public function toFilteredHTML($filtering)
+    /**
+     * @param list<string> $filtering
+     */
+    public function toFilteredHTML(array $filtering): void
     {
         $pTagPattern = '!&lt;p&gt;(.*?)&lt;/p&gt;!m';
         $aTagPattern = '!&lt;a +href=&quot;((?:ht|f)tps?://.*?)&quot;'
@@ -547,46 +654,29 @@ class Entity
         $preTagPattern2 = '!&lt;pre(?: +class=&quot;(.*?)&quot;)? *&gt;\n*(.*?)&lt;/pre&gt;!ms';
 
         foreach ($this->properties as $property) {
-            if (!is_numeric($property) && in_array($property, $filtering)) {
+            if (!is_numeric($property) && in_array($property, $filtering, true)) {
                 $markup = $this->$property;
+                if (!is_string($markup)) {
+                    continue;
+                }
                 $markup = str_replace("\r", "\n", $markup);
-                $markup = preg_replace("!\n\n+!", "\n", $markup);
+                $markup = $this->pregReplaceToString("!\n\n+!", "\n", $markup);
                 $markup = htmlentities($markup, ENT_QUOTES, 'UTF-8');
 
-                $markup = preg_replace(
-                    $pTagPattern,
-                    '<p>$1</p>',
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($pTagPattern, '<p>$1</p>', $markup);
 
-                $markup = preg_replace(
-                    $aTagPattern,
-                    '<a href="$1" title="$2" target="$3">$4</a>',
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($aTagPattern, '<a href="$1" title="$2" target="$3">$4</a>', $markup);
 
-                $markup = preg_replace(
-                    $imgTagPattern,
-                    '<img src="$1" id="$2" alt="$3" class="img-fluid">',
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($imgTagPattern, '<img src="$1" id="$2" alt="$3" class="img-fluid">', $markup);
 
-                $markup = preg_replace(
-                    $preTagPattern1,
-                    "<pre>$1</pre>",
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($preTagPattern1, '<pre>$1</pre>', $markup);
 
-                $markup = preg_replace(
-                    $preTagPattern2,
-                    "<pre><code class=\"lang-$1\">$2</code></pre>",
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($preTagPattern2, '<pre><code class="lang-$1">$2</code></pre>', $markup);
 
-                $markup = preg_replace('/&amp;nbsp;/', '&nbsp;', $markup);
-                $markup = preg_replace('/ +id=""/', '', $markup);
-                $markup = preg_replace('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup);
-                $markup = preg_replace('!&lt;em&gt;(.*?)&lt;/em&gt;!m', '<em>$1</em>', $markup);
+                $markup = $this->pregReplaceToString('/&amp;nbsp;/', '&nbsp;', $markup);
+                $markup = $this->pregReplaceToString('/ +id=""/', '', $markup);
+                $markup = $this->pregReplaceToString('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup);
+                $markup = $this->pregReplaceToString('!&lt;em&gt;(.*?)&lt;/em&gt;!m', '<em>$1</em>', $markup);
                 $hasPTags = preg_match('/<p>/', $markup);
 
                 if (!$hasPTags) {
@@ -610,57 +700,71 @@ class Entity
         }
     }
 
-    public function buildUnionString($ids)
+    /**
+     * @param list<int> $ids
+     *
+     * @return array{0: string, 1: list<int>}
+     */
+    public function buildUnionString(array $ids): array
     {
         array_unshift($ids, 0);
-        $ids = array_unique($ids);
+        $ids = array_values(array_unique($ids));
         $params = [];
         foreach ($ids as $id) {
             $params[] = '?';
         }
         return [
             '(' . implode(',', $params) . ')',
-            $ids
+            $ids,
         ];
     }
 
-    public function delete()
+    public function delete(): void
     {
         $table = $this::TABLE;
         $id = $this->id;
         $params = [];
         $sql = "DELETE FROM $table WHERE id = ?";
         $params[] = $id;
-        $error = "Could not delete row.";
+        $error = 'Could not delete row.';
         $this->query($sql, $error, $params);
     }
 
-    public function hasValErrors()
+    public function hasValErrors(): bool
     {
         return $this->val->hasErrors();
     }
 
-    public function getValErrors()
+    /**
+     * @return array<int|string, string>
+     */
+    public function getValErrors(): array
     {
         return $this->val->getErrors();
     }
 
-    public function addValError($error, $field = '')
+    public function addValError(string $error, string $field = ''): void
     {
         $this->val->addError($error, $field);
     }
 
-    public function doValType($type, $field, $data, $optional, $message = null)
+    /**
+     * @param array{0?: string, 1?: string}|string|null $message
+     */
+    public function doValType(int $type, string $field, mixed $data, bool $optional, string|array|null $message = null): bool
     {
-        return $this->val->valType($type, $field, $data, $optional, $message);
+        return $this->val->valType($type, $field, (string) $data, $optional, $message);
     }
 
-    public function getProperties()
+    /**
+     * @return list<string>
+     */
+    public function getProperties(): array
     {
         return $this->properties;
     }
 
-    public function getTable()
+    public function getTable(): string
     {
         return $this::TABLE;
     }

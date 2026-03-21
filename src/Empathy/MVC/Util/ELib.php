@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util;
 
-use Empathy\ELib\Util;
+use Empathy\MVC\SafeException;
 
 /**
  * Empathy ELib Plugin
@@ -17,8 +19,12 @@ use Empathy\ELib\Util;
  */
 class ELib
 {
-    public static function getLibLocation()
+    public static function getLibLocation(): string
     {
-        return Util::getLocation();
+        if (!class_exists(Empathy\ELib\Util::class)) {
+            throw new SafeException('ELib Base not found. Please install it and try again.');
+        }
+
+        return Empathy\ELib\Util::getLocation();
     }
 }

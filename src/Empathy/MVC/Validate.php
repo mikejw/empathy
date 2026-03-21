@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Empathy model validation
  * @file            Empathy/Validate.php
@@ -10,70 +12,61 @@
 
  * with this source code in the file licence.txt
  */
+
 namespace Empathy\MVC;
 
 class Validate
 {
-    const TEXT =  1;
-    const ALNUM = 2;
-    const NUM = 3;
-    const EMAIL = 4;
-    const TEL = 5;
-    const USERNAME = 6;
-    const URL = 7;
-    const PASSWORD = 8;
+    public const TEXT =  1;
+    public const ALNUM = 2;
+    public const NUM = 3;
+    public const EMAIL = 4;
+    public const TEL = 5;
+    public const USERNAME = 6;
+    public const URL = 7;
+    public const PASSWORD = 8;
 
-    public $error = array();
-    private $email_pattern;
-    private $allowed_pattern_1;
-    private $unix_username_pattern;
-    private $twitter_style_username;
-    private $allowed_pw_pattern;
-    private $url_pattern;
-
-    /**
-     * Creates validation object
-     */
-    public function __construct()
-    {
-        $this->email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
-        $this->allowed_pattern_1 = '/["\\/\\-\\s:,\\\']/';
-        $this->unix_username_pattern = '/^[a-z][_a-zA-Z0-9-]{3,7}$/';
-        $this->twitter_style_username = '/^[_a-zA-Z0-9]{1,15}$/';
-        $this->allowed_pw_pattern = "/[\"\-\s:,\'\+&\|!\(\)\{\}\[\]\^~\*\?;@£\$]/";
-
-        // taken from https://stackoverflow.com/a/3809435
-        $this->url_pattern = '|https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)|';
-    }
+    /** @var array<int|string, string> */
+    private array $error = [];
+    private string $email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
+    private string $allowed_pattern_1 = '/["\\/\\-\\s:,\\\']/';
+    private string $unix_username_pattern = '/^[a-z][_a-zA-Z0-9-]{3,7}$/';
+    private string $twitter_style_username = '/^[_a-zA-Z0-9]{1,15}$/';
+    private string $allowed_pw_pattern = "/[\"\-\s:,\'\+&\|!\(\)\{\}\[\]\^~\*\?;@£\$]/";
+    // taken from https://stackoverflow.com/a/3809435
+    private string $url_pattern = '|https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)|';
 
     /**
      * Perform validation of data based on type spcified
      *
      * @return boolean $valid
      */
-    public function valType($type, $field, $data, $optional, $message = null)
+    /**
+     * @param array{0?: string, 1?: string}|string|null $message
+     */
+    public function valType(int $type, string $field, string $data, bool $optional, string|array|null $message = null): bool
     {
         $valid = true;
-        if ($data != '') {
+        if ($data !== '') {
             switch ($type) {
                 case self::TEXT:
                     $filtered = preg_replace($this->allowed_pattern_1, '', $data);
                     $filtered = preg_replace($this->allowed_pw_pattern, '', $data);
-                    if (!ctype_alnum($filtered)) {
+                    if (!ctype_alnum((string) $filtered)) {
                         $valid = false;
                     }
                     break;
                 case self::PASSWORD:
-                    $matches = array();
+                    $matches = [];
                     $pattern = sprintf(
-                        "/^(?=.*[%s])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$/",
+                        '/^(?=.*[%s])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/',
                         substr($this->allowed_pw_pattern, 2, -2)
                     );
                     preg_match($pattern, $data, $matches, PREG_OFFSET_CAPTURE);
-                    if (!sizeof($matches)) {
+                    if (count($matches) === 0) {
                         $valid = false;
                     }
-                    break;    
+                    break;
                 case self::ALNUM:
                     if (!ctype_alnum($data)) {
                         $valid = false;
@@ -90,13 +83,13 @@ class Validate
                     }
                     break;
                 case self::TEL:
-                    if (!ctype_digit(preg_replace('/\s/', '', $data))) {
+                    if (!ctype_digit((string) preg_replace('/\s/', '', $data))) {
                         $valid = false;
                     }
                     break;
                 case self::USERNAME:
-                    //if(!preg_match($this->unix_username_pattern, $data))
-                    if (!preg_match($this->twitter_style_username, $data)) {
+                    if (!preg_match($this->twitter_style_username, $data)
+                        && !preg_match($this->unix_username_pattern, $data)) {
                         $valid = false;
                     }
                     break;
@@ -107,7 +100,6 @@ class Validate
                     break;
                 default:
                     throw new \Exception('No valid validation type specified.');
-                    break;
             }
 
             if (!$valid) {
@@ -119,7 +111,7 @@ class Validate
                     $this->addError('Invalid '.$field, $field);
                 }
             }
-        } elseif (!$optional && $data == '') {
+        } elseif (!$optional) {
             if (is_array($message) && isset($message[1])) {
                 $this->addError($message[1], $field);
             } else {
@@ -137,18 +129,17 @@ class Validate
      *
      * @param  string $message error message
      * @param  string $field   the field to apply the error message to
-     * @return void
      */
-    public function addError($message, $field)
+    public function addError(string $message, string $field): void
     {
-        if ($field != '') {
+        if ($field !== '') {
             if (isset($this->error['field'])) {
                 throw new \Exception('Attempted to overwrite error field value');
             } else {
                 $this->error[$field] = $message;
             }
         } else {
-            array_push($this->error, $message);
+            $this->error[] = $message;
         }
     }
 
@@ -157,16 +148,15 @@ class Validate
      * recorded errors.
      * @return boolean $errors whether the error data structure is empty or not.
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
-        return (sizeof($this->error) > 0);
+        return (count($this->error) > 0);
     }
 
     /**
-     * Returns the error data structure
-     * @return array $error the error data structure belonging to the validation object
+     * @return array<int|string, string>
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->error;
     }

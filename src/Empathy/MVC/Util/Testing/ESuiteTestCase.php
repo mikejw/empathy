@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util\Testing;
 
+use Empathy\MVC\Config as EmpConfig;
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
-use Empathy\MVC\Config as EmpConfig;
 
 /**
  * Empathy test suite base class
@@ -17,11 +19,11 @@ use Empathy\MVC\Config as EmpConfig;
 
  * with this source code in the file licence.txt
  */
-abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
+abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
 {
-    private $boot;
-    
-    protected function makeBootstrap()
+    private ?\Empathy\MVC\Empathy $boot = null;
+
+    protected function makeBootstrap(): void
     {
         global $base_dir;
 
@@ -32,9 +34,9 @@ abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function appRequest($uri, $mode = CLIMode::CAPTURED)
+    protected function appRequest(string $uri, int $mode = CLIMode::CAPTURED): mixed
     {
-        if (!isset($this->boot)) {
+        if (!$this->boot instanceof \Empathy\MVC\Empathy) {
             throw new \Exception('app not inited.');
         } else {
             CLI::setReqMode($mode);
@@ -43,35 +45,39 @@ abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function makeFakeBootstrap($testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY)
+    protected function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY): \Empathy\MVC\Bootstrap
     {
-
         // use eaa archive as root
-        $doc_root = realpath(
-            dirname(realpath(__FILE__)).'/../../../../../eaa/'
-        );
+        $selfPath = realpath(__FILE__);
+        if ($selfPath === false) {
+            throw new \RuntimeException('Could not resolve ESuiteTestCase path');
+        }
+        $doc_root = realpath(dirname($selfPath).'/../../../../../eaa/');
+        if ($doc_root === false) {
+            throw new \RuntimeException('eaa fixture root not found');
+        }
 
-        $dummyBootOptions = array(
+        $dummyBootOptions = [
             'default_module' => 'foo',
             'dynamic_module' => null,
             'debug_mode' => false,
             'environment' => 'dev',
-            'handle_errors' => false
-        );
-        $plugins = array(
-            array(
+            'handle_errors' => false,
+        ];
+        $plugins = [
+            [
                 'name' => 'ELibs',
                 'version' => '1.0',
-                'config' => '{ "testing": '.$testingMode.' }'
-            ),
-            array(
+                'config' => '{ "testing": '.$testingMode.' }',
+            ],
+            [
                 'name' => 'Smarty',
                 'version' => '1.0',
                 'class_path' => 'Smarty/Smarty.class.php',
                 'class_name' => '\Smarty',
-                'loader' => ''
-            )
-        );
+                'loader' => '',
+            ],
+        ];
 
         $container = \Empathy\MVC\DI::init($doc_root, true);
         $empathy = $container->get('Empathy');
@@ -87,14 +93,13 @@ abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
 
 
         $empathy->init();
-
-        $bootstrap = $container->get('Bootstrap');
-        return $bootstrap;
+        return $container->get('Bootstrap');
     }
 
 
-    protected function setConfig($key, $value)
+    protected function setConfig(string $key, mixed $value): void
     {
         EmpConfig::store($key, $value);
     }
 }
+

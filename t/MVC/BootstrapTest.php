@@ -1,34 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
 use ESuite\ESuiteTest;
 
-
 class BootstrapTest extends ESuiteTest
 {
     private $bootstrap;
-    
+
 
     protected function setUp(): void
     {
         parent::setUp();
 
         if ($this->bootstrap === null) {
-           $this->bootstrap = $this->makeFakeBootstrap();
+            $this->bootstrap = $this->makeFakeBootstrap();
         }
     }
 
 
     public function testNew()
     {
-        $this->assertInstanceOf('Empathy\MVC\Bootstrap', $this->bootstrap);
+        $this->assertInstanceOf(\Empathy\MVC\Bootstrap::class, $this->bootstrap);
     }
 
 
     public function testDispatch()
     {
-        $this->expectException('Empathy\MVC\RequestException', 'Not found');
+        $this->expectException(\Empathy\MVC\RequestException::class);
         $_SERVER['HTTP_HOST'] = 'www.dev.org';
         $_SERVER['REQUEST_URI'] = '/foo';
         $this->bootstrap->dispatch();
@@ -36,9 +37,9 @@ class BootstrapTest extends ESuiteTest
 
 
     public function testDispatchException()
-    {           
+    {
         $this->expectOutputRegex('/html/');
-        $this->bootstrap->dispatchException(new \Exception());    
+        $this->bootstrap->dispatchException(new \Exception());
     }
 
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This file is part of the Empathy package.
  *
@@ -11,6 +13,8 @@
 
 namespace Empathy\MVC;
 
+use Empathy\MVC\Plugin\Presentation;
+
 /**
  * Main parent controller class.
  *
@@ -18,111 +22,101 @@ namespace Empathy\MVC;
  */
 class Controller
 {
-
     /**
      * The module the controller instance belongs to. (Established using the URI object.)
      */
-    protected $module;
+    protected ?string $module = null;
 
     /**
      * The name of the class that the current controller instance belongs to as determined by the URI object.
      * The class will belong to an application module and may well be the same name as the current application module.
      * (A default controller class.)
      */
-    protected $class;
+    protected ?string $class = null;
 
     /**
      * The name of the current controller action/event. Often this is 'default_event'.
      */
-    protected $event;
+    protected ?string $event = null;
 
     /**
      * The template file the view will attempt to render.
      */
-    private $templateFile;
+    private ?string $templateFile = null;
 
     /**
      * The view/presentation object that will be used to render the page.
      */
-    public $presenter;
-   
+    public ?Presentation $presenter = null;
+
     /**
      * The plugin manager object created during booting.
      */
-    protected $pluginManager;
+    protected PluginManager $pluginManager;
 
     /**
      * Stash object used for storing arbitrary object.
      */
-    protected $stash;
-
-    /**
-     * The current bootstrap object.
-     */
-    protected $boot;
+    protected ?Stash $stash = null;
 
     /**
      * The applications current environment.
      */
-    protected $environment;
+    protected ?string $environment = null;
 
     /**
      * Use session flag
      */
-    protected $useSession;
+    protected ?bool $useSession = null;
 
     /**
      * Controller constructor.  Grabs certain properties from the boot object, establishes the view
      * from the plugin manager and assigns certain information to view making it available to templates.
      *
-     * @param Bootstrap $boot The current bootstrap object
+     * @param list<mixed> $pluginOptions
+     * @param list<string> $pluginWhitelist
      */
-    public function __construct($boot, $useSession = true, $pluginOptions = [], $pluginWhitelist =[])
+    public function __construct(/**
+     * The current bootstrap object.
+     */
+    protected Bootstrap $boot, bool $useSession = true, array $pluginOptions = [], array $pluginWhitelist = [])
     {
         DI::getContainer()->set('Controller', $this);
-        $this->boot = $boot;
         $this->pluginManager = DI::getContainer()->get('PluginManager');
         $this->pluginManager->setController($this);
         $this->pluginManager->setOptions($pluginOptions);
         $this->pluginManager->setWhitelist($pluginWhitelist);
 
-        if (!$this->boot->getMVC()->initPlugins()) {
-            return false;
-        }
+        if ($this->boot->getMVC()->initPlugins()) {
+            $this->presenter = $this->pluginManager->getView();
+            $this->useSession = $useSession;
+            $this->environment = $this->boot->getEnvironment();
+            $this->stash = DI::getContainer()->get('Stash');
+            $this->module = $_GET['module'] ?? null;
+            $this->class = $_GET['class'] ?? null;
+            $this->event = $_GET['event'] ?? null;
 
-        $this->presenter = $this->pluginManager->getView();
-    
-        $this->useSession = $useSession;
-        $this->environment = $boot->getEnvironment();
-        $this->stash =  DI::getContainer()->get('Stash');
-        $this->module = (isset($_GET['module']))? $_GET['module']: null;
-        $this->class = (isset($_GET['class']))? $_GET['class']: null;
-        $this->event = (isset($_GET['event']))? $_GET['event']: null;
-       
-        if (Config::get('TPL_BY_CLASS')) {
-            $this->templateFile = $this->class.'.tpl';
-        } else {
-            $this->templateFile = $this->module.'.tpl';
-        }
+            $this->templateFile = Config::get('TPL_BY_CLASS') ? $this->class . '.tpl' : $this->module . '.tpl';
 
-        if ($this->useSession) {
-            Session::up();    
+            if ($this->useSession) {
+                Session::up();
+            }
         }
     }
 
-    public function doPreEvent()
+    public function doPreEvent(): void
     {
         $this->pluginManager->preEvent();
         $this->setPresenter($this->pluginManager->getView());
         $this->controllerAssigns();
     }
 
-    private function controllerAssigns()
-    {    
+    private function controllerAssigns(): void
+    {
         $this->assignControllerInfo();
         $this->assignConstants();
         $this->assignEnvironment();
-    
+
         if (isset($_GET['section_uri'])) {
             $this->assign('section', $_GET['section_uri']);
         }
@@ -134,10 +128,8 @@ class Controller
 
     /**
      * Assigns the value of some of the main settings from the application config to the view.
-     *
-     * @return null
      */
-    private function assignConstants()
+    private function assignConstants(): void
     {
         if (Config::get('NAME') !== false) {
             $this->assign('NAME', Config::get('NAME'));
@@ -157,10 +149,9 @@ class Controller
     /**
      * Assign key controller attributes to the view
      *
-     * @return null
      *
      */
-    private function assignControllerInfo()
+    private function assignControllerInfo(): void
     {
         $this->assign('module', $this->module);
         $this->assign('class', $this->class);
@@ -171,10 +162,9 @@ class Controller
     /**
      * Assign environment value to the view
      *
-     * @return null
      *
      */
-    private function assignEnvironment()
+    private function assignEnvironment(): void
     {
         $this->assign('environment', $this->environment);
     }
@@ -184,9 +174,8 @@ class Controller
      * Set the name of the current view template
      *
      * @param string $tpl tempalte name (including file extension.)
-     * @return null
      */
-    public function setTemplate($tpl)
+    public function setTemplate(string $tpl): void
     {
         $this->templateFile = $tpl;
     }
@@ -195,10 +184,15 @@ class Controller
      * Initialise the view for rendering.
      *
      * @param boolean $internal Whether the template is internal.
-     * @return null
      */
-    public function initDisplay($internal)
+    public function initDisplay(bool $internal): void
     {
+        if (!$this->presenter instanceof \Empathy\MVC\Plugin\Presentation) {
+            throw new Exception('No presentation plugin is available');
+        }
+        if ($this->templateFile === null) {
+            throw new Exception('No template file has been set');
+        }
         $this->presenter->display($this->templateFile, $internal);
     }
 
@@ -206,18 +200,17 @@ class Controller
      * Redirect the user to another location within the application
      *
      * @param string $endString the new URI to redirect to.
-     * @return null
      */
-    public function redirect($endString = '')
+    public function redirect(string $endString = ''): void
     {
-        $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';
+        $proto = (\Empathy\MVC\Util\Misc::isSecure()) ? 'https' : 'http';
         if ($this->useSession) {
-            Session::write();    
+            Session::write();
         }
-        
+
         $location = 'Location: ';
         $location .= $proto.'://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
-        if ($endString != '') {
+        if ($endString !== '') {
             $location .= $endString;
         }
         Testable::header($location);
@@ -228,16 +221,15 @@ class Controller
      * Redirect to a local cgi script.
      *
      * @param string $endString path to the script.
-     * @return null
      */
-    public function redirect_cgi($endString = '')
+    public function redirect_cgi(string $endString = ''): void
     {
         if ($this->useSession) {
-            Session::write();    
-        }  
+            Session::write();
+        }
         $location = 'Location: ';
         $location .= 'http://'.Config::get('CGI').'/';
-        if ($endString != '') {
+        if ($endString !== '') {
             $location .= $endString;
         }
         Testable::header($location);
@@ -245,10 +237,8 @@ class Controller
 
     /**
      * End current user session
-     *
-     * @return null
      */
-    public function sessionDown()
+    public function sessionDown(): void
     {
         if ($this->useSession) {
             Session::down();
@@ -257,14 +247,12 @@ class Controller
 
     /**
      * Determines whether current request is an ajax request from the browser.
-     *
-     * @return null
      */
-    public function isXMLHttpRequest()
+    public function isXMLHttpRequest(): bool
     {
         $request = false;
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-           ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
+           ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest')) {
             $request = true;
         }
         return $request;
@@ -276,10 +264,12 @@ class Controller
      * @param string $name Key name.
      * @param mixed $data Data.
      * @param boolean $no_array Determine if data should be stored 'flat'
-     * @return null
      */
-    public function assign($name, $data, $no_array = false)
+    public function assign(string $name, mixed $data, bool $no_array = false): void
     {
+        if (!$this->presenter instanceof \Empathy\MVC\Plugin\Presentation) {
+            throw new Exception('No presentation plugin is available');
+        }
         $this->presenter->assign($name, $data, $no_array);
     }
 
@@ -288,7 +278,7 @@ class Controller
      *
      * @return string $module Module name.
      */
-    public function getModule()
+    public function getModule(): ?string
     {
         return $this->module;
     }
@@ -298,23 +288,22 @@ class Controller
      *
      * @return string $class Class name.
      */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
-    public function getEvent() 
+    public function getEvent(): ?string
     {
         return $this->event;
     }
 
     /**
      * Obtain user interface control values from request/session.
-     * @param string $ui Name of interface control set.
-     * @param array $ui_array Set of control settings.
-     * @return null
+     *
+     * @param list<string> $ui_array Set of control settings.
      */
-    public function loadUIVars($ui, $ui_array)
+    public function loadUIVars(string $ui, array $ui_array): void
     {
         if ($this->useSession) {
             $new_app = Session::getNewApp();
@@ -337,12 +326,12 @@ class Controller
 
     /**
      * When $def is 0, valid is true when id is 0
-     * @param int $id The ID.
+     * @param mixed $id The ID.
      * @param mixed $def The default value.
      * @param boolean $assertSet Assert ID is set.
      * @return boolean Init is valid.
      */
-    public function initID($id, $def, $assertSet = false)
+    public function initID(mixed $id, mixed $def, bool $assertSet = false): bool
     {
         $valid = true;
         $assign_def = false;
@@ -352,7 +341,7 @@ class Controller
             if ($assertSet) {
                 $valid = false;
             }
-        } elseif (!((string) $_GET[$id] === (string) (int) $_GET[$id]) || ($_GET[$id] == 0 && $def != 0)
+        } elseif ((string) $_GET[$id] !== (string) (int) $_GET[$id] || ($_GET[$id] === 0 && $def !== 0)
                || $_GET[$id] < 0) {
             $assign_def = true;
             $valid = false;
@@ -367,35 +356,36 @@ class Controller
 
     /**
      * Send exception to the view.
-     * @param boolean $debug Debug mode.
-     * @param Exception $exception The exception object.
-     * @param boolean $req_error Is request error. e.g. 404.
-     * @return null
+     * @param bool $debug Debug mode.
+     * @param bool $req_error Is request error. e.g. 404.
      */
-    public function viewException($debug, $exception, $req_error)
+    public function viewException(bool $debug, \Throwable $exception, bool $req_error): void
     {
+        if (!$this->presenter instanceof \Empathy\MVC\Plugin\Presentation) {
+            throw new Exception('No presentation plugin is available');
+        }
         $this->presenter->exception($debug, $exception, $req_error);
     }
 
     /**
      * Assign generated token.
-     * @return null
      */
-    protected function assignCSRFToken()
+    protected function assignCSRFToken(): void
     {
-        $token = md5(uniqid(rand(), true));
+        $token = md5(uniqid((string) random_int(0, mt_getrandmax()), true));
         $this->assign('csrf_token', $token);
         if ($this->useSession) {
-            Session::set('csrf_token', $token);    
+            Session::set('csrf_token', $token);
         }
     }
 
-    public function getUseSession()
+    public function getUseSession(): bool
     {
-        return $this->useSession;
+        return $this->useSession ?? true;
     }
 
-    private function setPresenter($view) {
+    private function setPresenter(?Presentation $view): void
+    {
         $this->presenter = $view;
     }
 

@@ -1,26 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
-use Monolog\Logger;
+
 use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 class Logging
 {
-    private $log;
+    private readonly Logger $log;
 
-    public function __construct($level = Logger::DEBUG)
+    public function __construct(int $level = Logger::DEBUG)
     {
-        try {
-            $logPath = Config::get('DOC_ROOT') . '/logs';
-            $logFile = $logPath . '/main.log';
-            $this->log = new Logger('default');
-            $this->log->pushHandler(new StreamHandler($logFile, $level));
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        $logPath = Config::get('DOC_ROOT') . '/logs';
+        $logFile = $logPath . '/main.log';
+        $this->log = new Logger('default');
+        $monologLevel = match ($level) {
+            Logger::DEBUG,
+            Logger::INFO,
+            Logger::NOTICE,
+            Logger::WARNING,
+            Logger::ERROR,
+            Logger::CRITICAL,
+            Logger::ALERT,
+            Logger::EMERGENCY => $level,
+            default => throw new \InvalidArgumentException('Invalid Monolog level: '.$level),
+        };
+        $this->log->pushHandler(new StreamHandler($logFile, $monologLevel));
     }
 
-    public function getLog()
+    public function getLog(): Logger
     {
         return $this->log;
     }

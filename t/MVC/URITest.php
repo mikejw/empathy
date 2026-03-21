@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
-use ESuite\ESuiteTest;
 use Empathy\MVC\DI;
+use ESuite\ESuiteTest;
 
 class URITest extends ESuiteTest
 {
@@ -46,4 +48,3 @@ class URITest extends ESuiteTest
         $this->assertEquals(21, $_GET['id']);
     }
 }
-

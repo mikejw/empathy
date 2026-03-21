@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite;
 
 use Empathy\MVC\Entity;
@@ -10,7 +12,7 @@ class FakeRelatedEntity extends Entity
     public $fake_id;
     public $name;
 
-    const TABLE = 'related';
+    public const TABLE = 'related';
 
 
 }

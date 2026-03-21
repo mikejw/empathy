@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util\Testing;
 
 /**
@@ -15,22 +17,21 @@ namespace Empathy\MVC\Util\Testing;
  */
 class Boot
 {
-    private static $base;
-    
-    public static function init($base)
+    private static string $base = '';
+
+    public static function init(string $base): void
     {
         self::$base = $base;
-        spl_autoload_register(array('\Empathy\MVC\Util\Testing\Boot', 'loadClass'));
+        spl_autoload_register(\Empathy\MVC\Util\Testing\Boot::loadClass(...));
     }
 
-
-    public static function loadClass($class)
+    public static function loadClass(string $class): void
     {
-        if (strpos($class, 'ESuite') === 0) {
+        if (str_starts_with($class, 'ESuite')) {
             $class = str_replace('ESuite\\', '', $class);
             $class = str_replace('\\', '/', $class);
             $class_file = self::$base."/t/$class.php";
-            
+
             if (!@include($class_file)) {
                 echo '[[['.$class_file.']]]';
                 throw new \Exception('Could not include class '.$class_file);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util;
 
 use Empathy\MVC\Config;
@@ -17,8 +19,7 @@ use Empathy\MVC\Config;
  */
 class ControllerGen
 {
-
-    const BLOB = <<<ENDBLOB
+    public const BLOB = <<<ENDBLOB
 <?php
 
 namespace Empathy\MVC\Controller;
@@ -30,21 +31,23 @@ class %s extends %s
 
 ENDBLOB;
 
-    protected $name;
-    protected $module;
-    protected $parent;
+    protected string $name = '';
+
+    protected string $module = '';
+
+    protected string $parent = '';
 
     public function __construct()
     {
         //
     }
-    
-    public function getModule()
+
+    public function getModule(): string
     {
         return $this->module;
     }
 
-    public function write()
+    public function write(): bool
     {
         $success = false;
         $module = Config::get('DOC_ROOT').'/application/'.$this->module;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 use Nelmio\Alice\Fixtures\Fixture;
@@ -22,16 +24,14 @@ use Nelmio\Alice\Instances\Populator\Methods\MethodInterface;
  */
 class EntityPopulator implements MethodInterface
 {
-    
-
-    public function canSet(Fixture $fixture, $object, $property, $value)
+    public function canSet(Fixture $fixture, mixed $object, mixed $property, mixed $value): bool
     {
         return true;
     }
 
-
-    public function set(Fixture $fixture, $object, $property, $value)
+    public function set(Fixture $fixture, mixed $object, mixed $property, mixed $value): void
     {
-        $object->$property = $value;
+        $prop = (string) $property;
+        $object->$prop = $value;
     }
 }

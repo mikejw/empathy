@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Plugin;
 
+use Empathy\MVC\Bootstrap;
 use Empathy\MVC\Config;
 use Empathy\MVC\Plugin as Plugin;
+use Empathy\MVC\Util\Lib;
+use Empathy\MVC\PluginManager;
 
 /**
  * Empathy ELibs Plugin
@@ -18,14 +23,14 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class ELibs extends Plugin
 {
-    const TESTING_EMPATHY = 1;
-    const TESTING_LIB = 2;
+    public const int TESTING_EMPATHY = 1;
+    public const int TESTING_LIB = 2;
 
 
-    public function __construct($manager, $bootstrap, $config)
+    public function __construct(PluginManager $manager, Bootstrap $bootstrap, ?string $config = null)
     {
         parent::__construct($manager, $bootstrap, $config);
-        
+        $path = '';
         if (isset($this->config['testing']) && $this->config['testing']) {
             switch ($this->config['testing']) {
                 case self::TESTING_EMPATHY:
@@ -36,11 +41,14 @@ class ELibs extends Plugin
                     break;
                 default:
                     break;
+
             }
         } else {
             $path = '/vendor/mikejw/elibs';
         }
 
-        \Empathy\MVC\Util\Lib::addToIncludePath(Config::get('DOC_ROOT').$path);
+        if ($path !== '') {
+            Lib::addToIncludePath(Config::get('DOC_ROOT').$path);
+        }
     }
 }

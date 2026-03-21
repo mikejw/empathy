@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
+use PDO;
 
 /**
  * Empathy Database Connection
@@ -15,62 +18,26 @@ namespace Empathy\MVC;
  */
 class DBC
 {
-
-    /**
-    * IP address of database server to connect to.
-    *
-    */
-    private $server;
-
-    /**
-    * Name of database.
-    */
-    private $name;
-
-    /**
-    * Username to use for connection.
-    */
-    private $user;
-
-    /**
-    * Password for connection.
-    */
-    private $pass;
-
-    /**
-    * Database port
-    */
-    private $port;
-
-
     /**
     * Handle for connection produced by PDO.
     */
-    private $handle;
+    private readonly \PDO $handle;
 
     /**
-    * Contrustor takes connection passed from parameters from
-    * DBPool object and creates connection.
-    * @param string $s server name.
-    *
-    * @param string $n database name.
-    *
-    * @param string $u database username.
-    *
-    * @param string $p database password.
-    *
-    * @param int $port database port.
-    *
-    * @return void.
-    */
-    public function __construct($s, $n, $u, $p, $port)
+     * Contrustor takes connection passed from parameters from
+     * DBPool object and creates connection.
+     * @param string $server server name.
+     *
+     * @param string $name database name.
+     *
+     * @param string $user database username.
+     *
+     * @param string $pass database password.
+     *
+     * @param int|null $port database port.
+     */
+    public function __construct(private readonly string $server, private readonly string $name, private readonly string $user, private readonly string $pass, private readonly int | null $port = null)
     {
-        $this->server = $s;
-        $this->name = $n;
-        $this->user = $u;
-        $this->pass = $p;
-        $this->port = $port;
-
         $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';charset=utf8mb4;';
         if ($this->port !== null) {
             $dsn .= 'port='.$this->port.';';
@@ -83,7 +50,7 @@ class DBC
     * Returns database connection handle produced by PDO
     * @return PDO handle
     */
-    public function getHandle()
+    public function getHandle(): PDO
     {
         return $this->handle;
     }

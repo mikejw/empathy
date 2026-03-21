@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util;
+use Empathy\MVC\SafeException;
 
 /**
  * Empathy Pear util
@@ -15,15 +18,17 @@ namespace Empathy\MVC\Util;
  */
 class Pear
 {
-
-    public static function getConfigDir()
+    public static function getConfigDir(): string
     {
-        $er = error_reporting();
-        error_reporting(0);
-        require_once 'PEAR/Config.php';
-        $global_config_dir = \PEAR_Config::singleton()->get('cfg_dir');
-        error_reporting($er);
+        $dir = '';
+        if (!file_exists('PEAR/Config.php')) {
+            throw new SafeException('PEAR not found. Please install it and try again.');
+        }
+        include(require_once __DIR__ . '/PEAR/Config.php');
 
-        return $global_config_dir;
+        if (class_exists(\PEAR_Config::class)) {
+            $dir = \PEAR_Config::singleton()->get('cfg_dir');
+        }
+        return $dir;
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
 use ESuite\ESuiteTest;
-use Empathy\MVC\Session;
-
 
 class ControllerTest extends ESuiteTest
 {
@@ -21,7 +21,7 @@ class ControllerTest extends ESuiteTest
 
     public function testNew()
     {
-        $this->assertInstanceOf('Empathy\MVC\Controller', $this->controller);
+        $this->assertInstanceOf(\Empathy\MVC\Controller::class, $this->controller);
     }
 
     public function testRedirect()

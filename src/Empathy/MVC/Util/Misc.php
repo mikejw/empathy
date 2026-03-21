@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util;
+
 use Empathy\MVC\DI;
 
 /**
@@ -16,11 +19,11 @@ use Empathy\MVC\DI;
  */
 class Misc
 {
-    public static function isSecure()
+    public static function isSecure(): bool
     {
         try {
             DI::getContainer()->get('PluginManager')->find(['SmartySSL']);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
 

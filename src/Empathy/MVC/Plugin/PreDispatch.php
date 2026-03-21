@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Plugin;
 
 /**
@@ -15,7 +17,5 @@ namespace Empathy\MVC\Plugin;
  */
 interface PreDispatch
 {
-    public function onPreDispatch();
-    
-    
+    public function onPreDispatch(): void;
 }

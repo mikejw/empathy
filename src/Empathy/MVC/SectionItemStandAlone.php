@@ -1,7 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
-use Empathy\MVC\DI;
 
 /**
  * Empathy SectionItemStandAlone class
@@ -16,48 +17,53 @@ use Empathy\MVC\DI;
  */
 class SectionItemStandAlone extends Entity
 {
-    public $id;
-    public $module;
-    public $type;
-    public $section_id;
-    public $position;
-    public $label;
-    public $friendly_url;
-    public $template;
-    public $hidden;
-    public $owns_inline;
-    public $link;
-    public $stamp;
-    public $meta;
-    public $user_id;
+    public int $id;
+    public string $module;
+    public string $type;
+    public int $section_id;
+    public int $position;
+    public string $label;
+    public string | null $friendly_url;
+    /** Populated from the row when present in the database. */
+    public ?string $url_name = null;
+    public string $template;
+    public string $hidden;
+    public bool $owns_inline;
+    public string $link;
+    public string $stamp;
+    public string | null $meta;
+    public int | null $user_id;
 
-    public static $table = 'section_item';
+    public static string $table = 'section_item';
 
 
-    public function getURIData()
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function getURIData(): array
     {
-        $uri_data = array();
+        $uri_data = [];
 
         $sql = 'SELECT id, section_id, label, friendly_url FROM ' . SectionItemStandAlone::$table
             .' WHERE hidden != 1';
-        $error = "Could not get URI data.";
+        $error = 'Could not get URI data.';
         $result = $this->query($sql, $error);
         $i = 0;
         foreach ($result as $row) {
             $uri_data[$i] = $row;
             $i++;
         }
-        return $uri_data;
+        return array_values($uri_data);
     }
 
-    public function getItem($id)
+    public function getItem(int|string $id): void
     {
         $params = [];
         $sql = 'SELECT * FROM ' . SectionItemStandAlone::$table . ' WHERE id = ?';
         $params[] = $id;
         $error = 'Could not load record.';
         $result = $this->query($sql, $error, $params);
-        if (1 == $result->rowCount()) {
+        if (1 === $result->rowCount()) {
             $row = $result->fetch();
             foreach ($row as $index => $value) {
                 $this->$index = $value;
@@ -67,12 +73,17 @@ class SectionItemStandAlone extends Entity
         }
     }
 
-    public function findSection($rows, $slug, $parent_id)
+    /**
+     * @param list<array<string, mixed>> $rows
+     *
+     * @return array<string, mixed>
+     */
+    public function findSection(array $rows, string $slug, int|string $parent_id): array
     {
-        $matched = array();
+        $matched = [];
         foreach ($rows as $row) {
-            $comp = str_replace(' ', '', strtolower($row['label']));
-            if ($comp == $slug && $parent_id == $row['section_id']) {
+            $comp = str_replace(' ', '', strtolower((string) $row['label']));
+            if ($comp === $slug && $parent_id === $row['section_id']) {
                 $matched = $row;
                 break;
             }
@@ -80,21 +91,23 @@ class SectionItemStandAlone extends Entity
         return $matched;
     }
 
-    public function doResolveURI($uri)
+    /**
+     * @param list<string>|null $uri
+     */
+    public function doResolveURI(?array $uri): int
     {
-        if (!isset($uri)) {
-            return false;
+        if ($uri === null) {
+            return 0;
         }
 
-        $matched = false;
         $rows = $this->getURIData();
         $id = 0;
-        $sections = array();
+        $sections = [];
         $sectionId = -1;
 
         foreach ($uri as $slug) {
             $section = $this->findSection($rows, $slug, $id);
-            if (sizeof($section)) {
+            if (count($section) !== 0) {
                 $id = $section['id'];
                 $sections[] = $section;
             } else {
@@ -102,23 +115,33 @@ class SectionItemStandAlone extends Entity
             }
         }
 
-        if (isset($uri) && sizeof($sections) === sizeof($uri)) {
-            $matched = true;
-            $sectionId = $sections[sizeof($sections) - 1]['id'];
+        if (count($sections) === count($uri)) {
+            $sectionId = $sections[count($sections) - 1]['id'];
         }
         return $sectionId;
     }
 
-    public function resolveURI($uri)
+    /**
+     * @param list<string>|null $uri
+     */
+    public function resolveURI(?array $uri): int
     {
-        if (DI::getContainer()->get('CacheEnabled')) {
-            return DI::getContainer()->get('Cache')->cachedCallback(
+        $cache = null;
+        $cacheEnabled = false;
+        try {
+            $cache = DI::getContainer()->get('Cache');
+            $cacheEnabled = DI::getContainer()->get('cacheEnabled');
+        } catch (\Exception) {
+            //
+        }
+        if ($cache && $cacheEnabled && $uri !== null) {
+            return $cache->cachedCallback(
                 'section_id_' . implode('_', $uri),
-                [$this, 'doResolveURI'],
+                $this->doResolveURI(...),
                 [$uri]
             );
-        } else {
-            return $this->doResolveURI($uri);
         }
+
+        return $this->doResolveURI($uri);
     }
 }

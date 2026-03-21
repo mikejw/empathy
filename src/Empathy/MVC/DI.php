@@ -1,27 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
+
 use DI\Container;
 use DI\ContainerBuilder;
+use Spyc;
 use Monolog\Logger;
 
 class DI
 {
-    private static $builder;
-    private static $container;
+    /**
+     * @var ContainerBuilder<Container>
+     */
+    private static ContainerBuilder $builder;
+    private static Container $container;
 
-    private static function loadConfig($configDir, $spyc = null)
+    private static function loadConfig(string $configDir, ?Spyc $spyc = null): mixed
     {
-        if ($spyc === null) {
+        if (!$spyc instanceof \Spyc) {
             $spyc = DI::getContainer()->get('Spyc');
         }
         $configFile = $configDir.'/config.yml';
-        return FileContentsCache::cachedCallback($configFile, function($data) use (&$spyc) {
+        return FileContentsCache::cachedCallback($configFile, function ($data) use (&$spyc) {
             return $spyc->YamlLoadString($data);
         });
     }
 
-    private static function loadAdditional($location, $docRoot = '')
+    private static function loadAdditional(string $location, string $docRoot = ''): void
     {
         if (file_exists($docRoot.$location)) {
             self::$builder->addDefinitions($docRoot.$location);
@@ -29,23 +36,20 @@ class DI
     }
 
     public static function init(
-        $configDir,
-        $persistentMode = false,
-        $systemMode = false
-    ) {
+        string $configDir,
+        bool $persistentMode = false,
+        bool $systemMode = false
+    ): Container {
         self::$builder = new ContainerBuilder();
         self::$builder->addDefinitions([
             'configDir' => $configDir,
             'persistentMode' => $persistentMode,
             'systemMode' => $systemMode,
-            'Spyc' => new \Spyc(),
-            'Empathy' => function (Container $c) {
-                return new Empathy(
-                    $c->get('configDir'),
-                    $c->get('persistentMode'),
-                    $c->get('systemMode')
-                );
-            },
+            'Spyc' => new Spyc(),
+            'Empathy' => fn(Container $c) => new Empathy(
+                $c->get('configDir'),
+                $c->get('persistentMode')
+            ),
             'Bootstrap' => function (Container $c) {
                 $empathy = $c->get('Empathy');
                 return new Bootstrap(
@@ -63,13 +67,16 @@ class DI
                 );
             },
             'PluginManager' => new PluginManager(),
-            'Stash' => function (Container $c) {
-                return new Stash();
-            },
+            'Stash' => fn(Container $c) => new Stash(),
             'Config' => function (Container $c) {
+                $diPath = realpath(__FILE__);
+                if ($diPath === false) {
+                    throw new Exception('Could not resolve path of DI.php');
+                }
+
                 return [
                     self::loadConfig($c->get('configDir')),
-                    self::loadConfig(dirname(realpath(__FILE__)).'/../../..')
+                    self::loadConfig(dirname($diPath).'/../../..'),
                 ];
             },
             'LoggingOn' => false,
@@ -80,18 +87,20 @@ class DI
                 }
                 $logging = new Logging($c->get('LoggingLevel'));
                 return $logging->getLog();
-            }
+            },
         ]);
 
-        $appConfig = self::loadConfig($configDir, new \Spyc());
+        $appConfig = self::loadConfig($configDir, new Spyc());
         if (
             isset($appConfig['boot_options']['use_elib']) &&
-            $appConfig['boot_options']['use_elib']
+            $appConfig['boot_options']['use_elib'] &&
+            class_exists(\Empathy\ELib\Util\Libs::class)
         ) {
             $elibDirs = \Empathy\ELib\Util\Libs::findAll($appConfig['doc_root']);
+
             foreach ($elibDirs as $lib) {
-                self::loadAdditional($lib.'/services.php', $appConfig['doc_root']);
-            }            
+                self::loadAdditional($lib . '/services.php', $appConfig['doc_root']);
+            }
         }
 
         self::loadAdditional($configDir.'/services.php');
@@ -99,7 +108,7 @@ class DI
         return self::$container;
     }
 
-    public static function getContainer()
+    public static function getContainer(): Container
     {
         return self::$container;
     }

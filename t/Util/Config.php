@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\Util;
 
 class Config
@@ -8,8 +10,8 @@ class Config
 
     public static function init()
     {
-        self::$items = array();
-        $base = realpath(dirname(__FILE__).'/../');
+        self::$items = [];
+        $base = realpath(__DIR__.'/../');
         $config = $base.'/config.yml';
         $config_arr = YAML::load($config);
         foreach ($config_arr as $index => $value) {

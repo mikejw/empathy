@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
-use ESuite\ESuiteTest;
 use Empathy\MVC\Session;
-use ESuite\Util\Config;
+use ESuite\ESuiteTest;
 
 class SessionTest extends ESuiteTest
 {
-
     protected function setUp(): void
     {
         //
     }
 
-    
+
     public function testLoadUIVars()
     {
         // set bar to dummy value

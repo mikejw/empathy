@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Empathy/MVC/Util/CLIMode.php
  *
@@ -17,8 +19,8 @@ namespace Empathy\MVC\Util;
 
 class CLIMode
 {
-    const TIMED = 0;
-    const CAPTURED = 1;
-    const FAKED = 2;
-    const STREAMED = 3;
+    public const int TIMED = 0;
+    public const int CAPTURED = 1;
+    public const int FAKED = 2;
+    public const int STREAMED = 3;
 }

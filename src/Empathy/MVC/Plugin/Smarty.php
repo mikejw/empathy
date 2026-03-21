@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Config;
@@ -18,9 +20,37 @@ use Empathy\MVC\DI;
  */
 class Smarty extends PresentationPlugin implements PreDispatch, Presentation
 {
-    protected $smarty;
+    /**
+     * @var bool
+     */
+    public $debugging;
+    /**
+     * @var int
+     */
+    public $caching;
+    /**
+     * @var bool|string
+     */
+    public $template_dir;
+    /**
+     * @var string
+     */
+    public $compile_dir;
+    /**
+     * @var string
+     */
+    public $cache_dir;
+    /**
+     * @var string
+     */
+    public $config_dir;
+    /**
+     * @var int
+     */
+    public $error_reporting;
+    protected \Smarty $smarty;
 
-    public function onPreDispatch()
+    public function onPreDispatch(): void
     {
         $this->smarty = new \Smarty();
 
@@ -30,10 +60,10 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         if (Config::get('SMARTY_CACHING')) {
             $this->smarty->caching = 1;
         }
-        $this->smarty->template_dir = Config::get('DOC_ROOT')."/presentation";
-        $this->smarty->compile_dir = Config::get('DOC_ROOT')."/tpl/templates_c";
-        $this->smarty->cache_dir = Config::get('DOC_ROOT')."/tpl/cache";
-        $this->smarty->config_dir = Config::get('DOC_ROOT')."/tpl/configs";
+        $this->smarty->template_dir = Config::get('DOC_ROOT').'/presentation';
+        $this->smarty->compile_dir = Config::get('DOC_ROOT').'/tpl/templates_c';
+        $this->smarty->cache_dir = Config::get('DOC_ROOT').'/tpl/cache';
+        $this->smarty->config_dir = Config::get('DOC_ROOT').'/tpl/configs';
         $this->smarty->error_reporting = E_ALL  & ~E_NOTICE & ~E_WARNING;
 
         if (class_exists('Empathy\ELib\Plugin\SmartyResourceELib')) {
@@ -41,38 +71,38 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         }
 
         $this->smarty->registerPlugin(
-            "modifier",
-            "base64_encode",
-            "base64_encode"
+            'modifier',
+            'base64_encode',
+            'base64_encode'
         );
         $this->smarty->registerPlugin(
-            "modifier",
-            "ucfirst",
-            "ucfirst"
+            'modifier',
+            'ucfirst',
+            'ucfirst'
         );
         $this->smarty->registerPlugin(
-            "modifier",
-            "sizeof",
-            "sizeof"
+            'modifier',
+            'sizeof',
+            'sizeof'
         );
         $this->smarty->registerPlugin(
-            "modifier",
-            "preg_match",
-            "preg_match"
+            'modifier',
+            'preg_match',
+            'preg_match'
         );
     }
 
-    public function assign($name, $data, $no_array = false)
+    public function assign(string $name, mixed $data, bool $no_array = false): void
     {
         $this->smarty->assign($name, $data);
     }
 
-    public function clear_assign($name)
+    public function clear_assign(string $name): void
     {
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template, $internal = false)
+    public function display(string $template, bool $internal = false): void
     {
         if ($internal) {
             $this->switchInternal();
@@ -82,7 +112,7 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
     }
 
 
-    public function assignEmpathyDir()
+    public function assignEmpathyDir(): void
     {
         // for default templates check test mode
         // derived from elibs plugin
@@ -95,17 +125,17 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
     }
 
 
-    public function loadFilter($type, $name)
+    public function loadFilter(string $type, string $name): void
     {
         $this->smarty->load_filter($type, $name);
     }
 
-    protected function switchInternal()
+    protected function switchInternal(): void
     {
-        $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
+        $this->smarty->template_dir = realpath(__DIR__.'/../../../../tpl/');
     }
 
-    public function exception($debug, $exception, $reqError)
+    public function exception(bool $debug, \Throwable $exception, bool $reqError): void
     {
         $this->assign('centerpage', true);
         $this->assign('error', $exception->getMessage());
@@ -117,19 +147,13 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         }
     }
 
-    public function getVars()
+    public function getVars(): mixed
     {
         return $this->smarty->getTemplateVars();
     }
 
-    public function clearVars()
+    public function clearVars(): void
     {
         $this->smarty->clear_all_assign();
     }
-
-    public function getSmarty()
-    {
-        return $this->smarty;
-    }
-
 }
