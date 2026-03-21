@@ -50,7 +50,7 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
         if ($no_array) {
             $this->output = $data;
         } else {
-            if (isset($this->output) && is_object($this->output)) {
+            if ($this->output !== null && is_object($this->output)) {
                 $this->clearVars();
             }
             if (!is_array($this->output)) {
@@ -77,7 +77,6 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
         Testable::header('Content-type: application/json');
 
         if (
-            is_object($this->output) &&
             $this->output instanceof JSONView\BaseROb &&
             $this->isResponseSubClass($this->output)
         ) {
@@ -120,26 +119,18 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
     {
         $module = DI::getContainer()->get('Controller')->getModule();
 
-        if (isset($this->config)) {
+        if ($this->config !== null) {
             if (count($this->config) === 1 && !isset($this->config[0])) {
                 $this->config[0] = $this->config;
             }
 
-            foreach ($this->config as $item => $value) {
+            foreach ($this->config as $value) {
                 if (in_array($module, array_keys($value), true)) {
                     $mod_conf = $value[$module];
-                    $this->error_ob = isset($mod_conf['error_ob'])
-                        ? $mod_conf['error_ob']
-                        : 'Empathy\MVC\Plugin\JSONView\EROb';
-                    $this->return_ob = isset($mod_conf['return_ob'])
-                        ? $mod_conf['return_ob']
-                        : 'Empathy\MVC\Plugin\JSONView\ROb';
-                    $this->return_codes = isset($mod_conf['return_codes'])
-                        ? $mod_conf['return_codes']
-                        : 'Empathy\MVC\Plugin\JSONView\ReturnCodes';
-                    $this->prettyPrint = isset($mod_conf['pretty_print'])
-                        ? $mod_conf['pretty_print']
-                        : false;
+                    $this->error_ob = $mod_conf['error_ob'] ?? \Empathy\MVC\Plugin\JSONView\EROb::class;
+                    $this->return_ob = $mod_conf['return_ob'] ?? \Empathy\MVC\Plugin\JSONView\ROb::class;
+                    $this->return_codes = $mod_conf['return_codes'] ?? \Empathy\MVC\Plugin\JSONView\ReturnCodes::class;
+                    $this->prettyPrint = $mod_conf['pretty_print'] ?? false;
 
                     DI::getContainer()->get('PluginManager')->setView($this);
                 }

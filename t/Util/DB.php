@@ -39,7 +39,7 @@ class DB
         }
 
         $sql = 'DROP DATABASE IF EXISTS '.$name.'; CREATE DATABASE '.$name.';';
-        $result = self::$dbh->query($sql);
+        self::$dbh->query($sql);
     }
 
     public static function reset($db_name = null)
@@ -66,16 +66,5 @@ class DB
             .'-h '.EmpConfig::get('DB_SERVER').' '
             .EmpConfig::get('DB_NAME').' < '.$file;
         exec($exec);
-    }
-
-    // not used as yet
-    private static function getCriteria()
-    {
-        self::$db_criteria = [
-            'host' => Config::get('db_host'),
-            'username' => Config::get('db_user'),
-            'password' => Config::get('db_pass'),
-            'database' => Config::get('db_name'),
-            ];
     }
 }

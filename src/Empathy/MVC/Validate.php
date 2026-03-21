@@ -28,27 +28,13 @@ class Validate
 
     /** @var array<int|string, string> */
     private array $error = [];
-    private string $email_pattern;
-    private string $allowed_pattern_1;
-    private string $unix_username_pattern;
-    private string $twitter_style_username;
-    private string $allowed_pw_pattern;
-    private string $url_pattern;
-
-    /**
-     * Creates validation object
-     */
-    public function __construct()
-    {
-        $this->email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
-        $this->allowed_pattern_1 = '/["\\/\\-\\s:,\\\']/';
-        $this->unix_username_pattern = '/^[a-z][_a-zA-Z0-9-]{3,7}$/';
-        $this->twitter_style_username = '/^[_a-zA-Z0-9]{1,15}$/';
-        $this->allowed_pw_pattern = "/[\"\-\s:,\'\+&\|!\(\)\{\}\[\]\^~\*\?;@£\$]/";
-
-        // taken from https://stackoverflow.com/a/3809435
-        $this->url_pattern = '|https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)|';
-    }
+    private string $email_pattern = '/^[^@\s<&>]+@([-a-z0-9]+\.)+[a-z]{2,}$/i';
+    private string $allowed_pattern_1 = '/["\\/\\-\\s:,\\\']/';
+    private string $unix_username_pattern = '/^[a-z][_a-zA-Z0-9-]{3,7}$/';
+    private string $twitter_style_username = '/^[_a-zA-Z0-9]{1,15}$/';
+    private string $allowed_pw_pattern = "/[\"\-\s:,\'\+&\|!\(\)\{\}\[\]\^~\*\?;@£\$]/";
+    // taken from https://stackoverflow.com/a/3809435
+    private string $url_pattern = '|https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)|';
 
     /**
      * Perform validation of data based on type spcified
@@ -66,18 +52,18 @@ class Validate
                 case self::TEXT:
                     $filtered = preg_replace($this->allowed_pattern_1, '', $data);
                     $filtered = preg_replace($this->allowed_pw_pattern, '', $data);
-                    if (!ctype_alnum($filtered)) {
+                    if (!ctype_alnum((string) $filtered)) {
                         $valid = false;
                     }
                     break;
                 case self::PASSWORD:
                     $matches = [];
                     $pattern = sprintf(
-                        '/^(?=.*[%s])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$/',
+                        '/^(?=.*[%s])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/',
                         substr($this->allowed_pw_pattern, 2, -2)
                     );
                     preg_match($pattern, $data, $matches, PREG_OFFSET_CAPTURE);
-                    if (!sizeof($matches)) {
+                    if (count($matches) === 0) {
                         $valid = false;
                     }
                     break;
@@ -97,7 +83,7 @@ class Validate
                     }
                     break;
                 case self::TEL:
-                    if (!ctype_digit(preg_replace('/\s/', '', $data))) {
+                    if (!ctype_digit((string) preg_replace('/\s/', '', $data))) {
                         $valid = false;
                     }
                     break;
@@ -143,7 +129,6 @@ class Validate
      *
      * @param  string $message error message
      * @param  string $field   the field to apply the error message to
-     * @return void
      */
     public function addError(string $message, string $field): void
     {
@@ -154,7 +139,7 @@ class Validate
                 $this->error[$field] = $message;
             }
         } else {
-            array_push($this->error, $message);
+            $this->error[] = $message;
         }
     }
 
@@ -165,7 +150,7 @@ class Validate
      */
     public function hasErrors(): bool
     {
-        return (sizeof($this->error) > 0);
+        return (count($this->error) > 0);
     }
 
     /**

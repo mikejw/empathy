@@ -19,58 +19,25 @@ use PDO;
 class DBC
 {
     /**
-    * IP address of database server to connect to.
-    *
-    */
-    private string $server;
-
-    /**
-    * Name of database.
-    */
-    private string $name;
-
-    /**
-    * Username to use for connection.
-    */
-    private string $user;
-
-    /**
-    * Password for connection.
-    */
-    private string $pass;
-
-    /**
-    * Database port
-    */
-    private int | null $port;
-
-
-    /**
     * Handle for connection produced by PDO.
     */
-    private \PDO $handle;
+    private readonly \PDO $handle;
 
     /**
-    * Contrustor takes connection passed from parameters from
-    * DBPool object and creates connection.
-    * @param string $s server name.
-    *
-    * @param string $n database name.
-    *
-    * @param string $u database username.
-    *
-    * @param string $p database password.
-    *
-    * @param int|null $port database port.
-    */
-    public function __construct(string $s, string $n, string $u, string $p, ?int $port = null)
+     * Contrustor takes connection passed from parameters from
+     * DBPool object and creates connection.
+     * @param string $server server name.
+     *
+     * @param string $name database name.
+     *
+     * @param string $user database username.
+     *
+     * @param string $pass database password.
+     *
+     * @param int|null $port database port.
+     */
+    public function __construct(private readonly string $server, private readonly string $name, private readonly string $user, private readonly string $pass, private readonly int | null $port = null)
     {
-        $this->server = $s;
-        $this->name = $n;
-        $this->user = $u;
-        $this->pass = $p;
-        $this->port = $port;
-
         $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';charset=utf8mb4;';
         echo $dsn;
         if ($this->port !== null) {

@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Plugin\JSONView;
 
-abstract class BaseROb
+abstract class BaseROb implements \Stringable
 {
     private ?string $jsonp_callback = null;
 
     private bool $pretty = false;
-
-    public function __construct()
-    {
-        $this->pretty = false;
-    }
 
     public function setPretty(bool $pretty): void
     {

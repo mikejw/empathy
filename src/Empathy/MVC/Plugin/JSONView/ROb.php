@@ -14,7 +14,6 @@ class ROb extends BaseROb
 
     public function __construct()
     {
-        parent::__construct();
         $this->meta = new \stdClass();
         $this->data = new \stdClass();
         $this->pagination = new \stdClass();

@@ -82,7 +82,7 @@ class SectionItemStandAlone extends Entity
     {
         $matched = [];
         foreach ($rows as $row) {
-            $comp = str_replace(' ', '', strtolower($row['label']));
+            $comp = str_replace(' ', '', strtolower((string) $row['label']));
             if ($comp === $slug && $parent_id === $row['section_id']) {
                 $matched = $row;
                 break;
@@ -107,7 +107,7 @@ class SectionItemStandAlone extends Entity
 
         foreach ($uri as $slug) {
             $section = $this->findSection($rows, $slug, $id);
-            if (sizeof($section)) {
+            if (count($section) !== 0) {
                 $id = $section['id'];
                 $sections[] = $section;
             } else {
@@ -115,8 +115,8 @@ class SectionItemStandAlone extends Entity
             }
         }
 
-        if (sizeof($sections) === sizeof($uri)) {
-            $sectionId = $sections[sizeof($sections) - 1]['id'];
+        if (count($sections) === count($uri)) {
+            $sectionId = $sections[count($sections) - 1]['id'];
         }
         return $sectionId;
     }
@@ -131,13 +131,13 @@ class SectionItemStandAlone extends Entity
         try {
             $cache = DI::getContainer()->get('Cache');
             $cacheEnabled = DI::getContainer()->get('cacheEnabled');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             //
         }
         if ($cache && $cacheEnabled && $uri !== null) {
             return $cache->cachedCallback(
                 'section_id_' . implode('_', $uri),
-                [$this, 'doResolveURI'],
+                $this->doResolveURI(...),
                 [$uri]
             );
         }

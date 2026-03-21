@@ -28,6 +28,7 @@ class SmartySSL extends Smarty
         );
     }
 
+    #[\Override]
     public function display(string $template, bool $internal = false): void
     {
         if ($internal) {

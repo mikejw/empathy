@@ -52,7 +52,7 @@ class Session
     {
         $new_app = false;
         if (isset($_SESSION['app'][self::$app]) &&
-            sizeof($_SESSION['app'][self::$app]) > 0
+            count($_SESSION['app'][self::$app]) > 0
         ) {
             $new_app = true;
         }
@@ -67,11 +67,7 @@ class Session
 
     public static function getUISetting(string $ui, string $setting): mixed
     {
-        if (isset($_SESSION['app'][self::$app][$ui][$setting])) {
-            return $_SESSION['app'][self::$app][$ui][$setting];
-        }
-
-        return false;
+        return $_SESSION['app'][self::$app][$ui][$setting] ?? false;
     }
 
     public static function down(): void
@@ -79,13 +75,13 @@ class Session
         $new_app = self::getNewApp();
 
         unset($_SESSION['app'][self::$app]);
-        if (sizeof($_SESSION['app']) === 0) {
+        if (count($_SESSION['app']) === 0) {
             Testable::session_unset();
             Testable::session_destroy();
         }
 
         if (isset($_SESSION['user_id']) && !$new_app) {
-            foreach ($_SESSION as $index => $value) {
+            foreach (array_keys($_SESSION) as $index) {
                 if ($index !== 'app') {
                     unset($_SESSION[$index]);
                 }

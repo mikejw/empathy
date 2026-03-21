@@ -40,8 +40,6 @@ class DBPool
      * @param string $p password for database.
      *
      * @param string $host name for connection. used as index in $pool array
-     * @param int|null $port
-     * @return void
      */
     public static function addHost(string $s, string $n, string $u, string $p, string $host, ?int $port = null): void
     {
@@ -81,7 +79,7 @@ class DBPool
     */
     public static function getDefCX(): PDO
     {
-        if (sizeof(self::$pool) < 1) {
+        if (count(self::$pool) < 1) {
             $db_port = Config::get('DB_PORT');
             if (is_numeric($db_port)) {
                 $port = (int) $db_port;

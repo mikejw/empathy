@@ -24,7 +24,7 @@ class Pear
         if (!file_exists('PEAR/Config.php')) {
             throw new SafeException('PEAR not found. Please install it and try again.');
         }
-        include(require_once 'PEAR/Config.php');
+        include(require_once __DIR__ . '/PEAR/Config.php');
 
         if (class_exists(\PEAR_Config::class)) {
             $dir = \PEAR_Config::singleton()->get('cfg_dir');

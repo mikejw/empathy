@@ -53,17 +53,15 @@ class URI
     /** @var array<int, string> */
     private array $uri = [];
     private ?string $defaultModule = null;
-    private ?string $dynamicModule = null;
-    private string $dynamicModuleDefaultURI = '';
     private int $error = 0;
     private bool $internal = false;
     private string $controllerName = '';
     private bool $cli_mode_detected = false;
     private string $internal_controller = 'empathy';
 
-    public function __construct(?string $default_module, ?string $dynamic_module, string $dynamic_module_default_uri = '')
+    public function __construct(?string $default_module, private readonly ?string $dynamicModule, private readonly string $dynamicModuleDefaultURI = '')
     {
-        if (isset($_SERVER['HTTP_HOST']) && strpos(Config::get('WEB_ROOT'), $_SERVER['HTTP_HOST']) === false) {
+        if (isset($_SERVER['HTTP_HOST']) && !str_contains((string) Config::get('WEB_ROOT'), (string) $_SERVER['HTTP_HOST'])) {
             throw new SafeException('Host name mismatch.');
         }
 
@@ -71,18 +69,15 @@ class URI
         $this->sanity($default_module);
         $removeLength = strlen(Config::get('WEB_ROOT').Config::get('PUBLIC_DIR'));
         $this->defaultModule = $default_module;
-        $this->dynamicModule = $dynamic_module;
-        $this->dynamicModuleDefaultURI = $dynamic_module_default_uri;
         if (isset($_SERVER['HTTP_HOST'])) {
             $this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
             $this->uriString = substr($this->full, $removeLength + 1);
+        } elseif (isset($_SERVER['REQUEST_URI'])) {
+            // request has been faked
+            $this->uriString = $_SERVER['REQUEST_URI'];
         } else {
-            if (isset($_SERVER['REQUEST_URI'])) { // request has been faked
-                $this->uriString = $_SERVER['REQUEST_URI'];
-            } else {
-                $this->cli_mode_detected = true;
-                $this->uriString = '';
-            }
+            $this->cli_mode_detected = true;
+            $this->uriString = '';
         }
 
         $this->error = 0;
@@ -126,7 +121,8 @@ class URI
             ],
             self::class
         );
-        if ($error = $this->getErrorMessage()) {
+        $error = $this->getErrorMessage();
+        if ($error !== '' && $error !== '0') {
             $log->append('error', $error);
             $log->setMsg('route not loaded');
             $log->setLevel('error');
@@ -153,7 +149,7 @@ class URI
     public function formURI(): void
     {
         $uri = explode('/', $this->uriString);
-        $size = sizeof($uri) - 1;
+        $size = count($uri) - 1;
         // remove empty element caused by trailing slash
         if ($uri[$size] === '') {
             array_pop($uri);
@@ -195,7 +191,7 @@ class URI
     {
         $i = 0;
 
-        $length = sizeof($this->uri);
+        $length = count($this->uri);
         if ($length > self::MAX_COMP) {
             $length = self::MAX_COMP;
         }
@@ -267,14 +263,12 @@ class URI
 
         $this->controllerName = $this->buildControllerName($this->controllerName);
 
-        if (!$this->error) {
-            if (!class_exists($this->controllerName)) {
-                $this->error = self::MISSING_CLASS_DEF;
-            }
+        if ($this->error === 0 && !class_exists($this->controllerName)) {
+            $this->error = self::MISSING_CLASS_DEF;
         }
 
         $this->assertEventIsSet();
-        if (!$this->error) {
+        if ($this->error === 0) {
             $controllerClass = $this->controllerName;
             if (class_exists($controllerClass)) {
                 $r = new \ReflectionClass($controllerClass);
@@ -301,7 +295,7 @@ class URI
         $section = Model::load(SectionItemStandAlone::class);
         $sectionId = -1;
 
-        if (!isset($this->dynamicModule) || $this->dynamicModule === '') {
+        if ($this->dynamicModule === null || $this->dynamicModule === '') {
             throw new Exception('Failed to find name of dynamic module.');
         } else {
             $_GET['module'] = $this->dynamicModule;
@@ -319,10 +313,8 @@ class URI
 
         $uriForResolve = array_values($this->uri);
 
-        if ($this->uriString === '' && !!$this->dynamicModuleDefaultURI) {
-            if (($sectionId = $section->resolveURI($uriForResolve)) < 0) {
-                $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
-            }
+        if ($this->uriString === '' && !!$this->dynamicModuleDefaultURI && ($sectionId = $section->resolveURI($uriForResolve)) < 0) {
+            $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
         }
 
         if ($this->error === 0 && (($sectionId = $section->resolveURI($uriForResolve)) < 0)) {
@@ -339,19 +331,18 @@ class URI
             $this->error = self::ERROR_404;
         }
 
-        if (isset($section->url_name)) {
+        if ($section->url_name !== null) {
             $_GET['section_uri'] = $section->url_name;
         }
 
         if ($this->error < 1) {
             if ($section->template === '') {
                 $this->error = self::NO_TEMPLATE;
+            } elseif ($section->template === '0') {
+                // section in 'specialised'
+                $controllerName = 'template'.$section->id;
             } else {
-                if ($section->template === '0') { // section in 'specialised'
-                    $controllerName = 'template'.$section->id;
-                } else {
-                    $controllerName = 'template'.$section->template;
-                }
+                $controllerName = 'template'.$section->template;
             }
         }
 

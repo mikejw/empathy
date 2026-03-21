@@ -48,7 +48,6 @@ class Config
      *
      * @param string $key The config key.
      * @param mixed $data The data to store against key.
-     * @return void
      */
     public static function store(string $key, mixed $data): void
     {
@@ -57,7 +56,6 @@ class Config
 
     /**
      * Simple dump of config.
-     * @return void
      */
     public static function dump(): void
     {

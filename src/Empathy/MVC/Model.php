@@ -12,7 +12,7 @@ class Model
 
     public static function connectModel(Entity $model, ?string $host = null): void
     {
-        if (self::$dbHandle !== null && $host === null) {
+        if (self::$dbHandle instanceof \PDO && $host === null) {
 
             $model->setDBH(self::$dbHandle);
 
@@ -42,7 +42,7 @@ class Model
         $reflect = new \ReflectionClass($model);
         $entity = $reflect->newInstanceArgs($params);
 
-        if (!in_array('Empathy\MVC\Entity', class_parents($entity), true)) {
+        if (!in_array(\Empathy\MVC\Entity::class, class_parents($entity), true)) {
             throw new \Exception('Class is not Entity model: ' . $model);
         }
 

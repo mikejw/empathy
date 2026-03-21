@@ -20,11 +20,6 @@ class Stash
     /** @var array<string, mixed> */
     private array $items = [];
 
-    public function __construct()
-    {
-        $this->items = [];
-    }
-
     public function get(string $key): mixed
     {
         if (!isset($this->items[$key])) {

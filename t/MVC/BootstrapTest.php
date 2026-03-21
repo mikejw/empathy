@@ -23,13 +23,13 @@ class BootstrapTest extends ESuiteTest
 
     public function testNew()
     {
-        $this->assertInstanceOf('Empathy\MVC\Bootstrap', $this->bootstrap);
+        $this->assertInstanceOf(\Empathy\MVC\Bootstrap::class, $this->bootstrap);
     }
 
 
     public function testDispatch()
     {
-        $this->expectException('Empathy\MVC\RequestException', 'Not found');
+        $this->expectException(\Empathy\MVC\RequestException::class);
         $_SERVER['HTTP_HOST'] = 'www.dev.org';
         $_SERVER['REQUEST_URI'] = '/foo';
         $this->bootstrap->dispatch();

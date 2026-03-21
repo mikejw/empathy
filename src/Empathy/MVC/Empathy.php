@@ -50,12 +50,6 @@ class Empathy
     private array $errors = [];
 
     /**
-     * Application persistent mode. Implies there could be multiple requests to handle
-     * following initialization. This flag is passed directly to the application.
-     */
-    private bool $persistentMode = false;
-
-    /**
      * This flag is read from the boot_options section of the application config.
      * If it is true then the main autoload function will attempt to load ELib components
      * when necessary. (There is now no difference in in loading elib components as the
@@ -79,11 +73,9 @@ class Empathy
     {
         foreach ($config as $index => &$item) {
             // auto fix of doc root
-            if (!is_array($item)) {
-                if ($index === 'doc_root') {
-                    if (!file_exists($item)) {
-                        $item = $configDir;
-                    }
+            if (!is_array($item) && $index === 'doc_root') {
+                if (!file_exists($item)) {
+                    $item = $configDir;
                 }
             }
 
@@ -109,14 +101,12 @@ class Empathy
      *
      * @param boolean $persistentMode Whether the application is running in persistent mode.
      * If true this means there could be many requests following initialization.
-     * @return void
      */
-    public function __construct(string $configDir, bool $persistentMode = false)
+    public function __construct(string $configDir, private readonly bool $persistentMode = false)
     {
-        $this->persistentMode = $persistentMode;
-        spl_autoload_register([$this, 'loadClass']);
+        spl_autoload_register($this->loadClass(...));
 
-        list($appConfig, $globalConfig) = DI::getContainer()->get('Config');
+        [$appConfig, $globalConfig] = DI::getContainer()->get('Config');
         $this->consumeConfig($appConfig, $configDir);
         $this->consumeConfig($globalConfig, $configDir, true);
 
@@ -131,14 +121,13 @@ class Empathy
             self::$useElib = false;
         }
         if ($this->getHandlingErrors()) {
-            set_error_handler([$this, 'errorHandler']);
+            set_error_handler($this->errorHandler(...));
         }
     }
 
 
     /**
      * Returns value of handle_errors setting from application config boot options.
-     * @return bool
      */
     private function getHandlingErrors(): bool
     {
@@ -150,8 +139,6 @@ class Empathy
      * Makes call to plugin initialization of boot object.
      * If application has been configured to handle errors
      * then calls are wrapped in try/catch blocks.
-     *
-     * @return bool
      */
     public function initPlugins(): bool
     {
@@ -180,7 +167,6 @@ class Empathy
      * which will (if true) not call the controller action. the
      * controller object is then returned.
      *
-     * @return null | Controller
      *
      */
     public function beginDispatch(bool $fake = false): null | Controller
@@ -224,11 +210,10 @@ class Empathy
 
     /**
      * Returns whether error handler has caught anything or not.
-     * @return boolean
      */
     public function hasErrors(): bool
     {
-        return (sizeof($this->errors) > 0);
+        return (count($this->errors) > 0);
     }
 
 
@@ -258,7 +243,7 @@ class Empathy
     public function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool
     {
         // If this error level is not in current reporting, swallow it.
-        if (!(error_reporting() & $errno)) {
+        if ((error_reporting() & $errno) === 0) {
             return true;
         }
 
@@ -310,9 +295,7 @@ class Empathy
     /**
      * The exception handler.  Deals with any exception.
      *
-     * @param Throwable $e
      *
-     * @return void
      *
      */
     public function exceptionHandler(Throwable $e): void
@@ -331,7 +314,7 @@ class Empathy
             $e = new ErrorException($errors);
         }
         if (
-            RequestException::class !== get_class($e) &&
+            RequestException::class !== $e::class &&
             $boot->getEnvironment() !== 'dev'
         ) {
             $message = '';
@@ -346,7 +329,7 @@ class Empathy
 
         $response500 = 'HTTP/1.1 500 Internal Server Error';
 
-        switch (get_class($e)) {
+        switch ($e::class) {
             case SafeException::class:
                 Testable::header($response500);
                 Testable::doDie('Safe exception: '.$e->getMessage());
@@ -410,16 +393,15 @@ class Empathy
     /**
      * the autoload function.
      * @param string $classPath the name of class that PHP is attempting to load
-     * @return void
      * @throws Exception
      */
     public static function loadClass(string $classPath): void
     {
         $classNameArr = explode('\\', $classPath);
-        $className = $classNameArr[ sizeof($classNameArr) - 1 ];
+        $className = $classNameArr[ count($classNameArr) - 1 ];
 
         $location = '';
-        if (strpos($classPath, 'Empathy\\MVC\\Controller\\') === 0) {
+        if (str_starts_with($classPath, 'Empathy\\MVC\\Controller\\')) {
             if (isset($_GET['module'])) {
                 if ($className !== 'CustomController') {
                     $location = Config::get('DOC_ROOT') . '/application/' . $_GET['module'] . '/';
@@ -427,10 +409,10 @@ class Empathy
             } else {
                 throw new Exception('Module not set.');
             }
-        } elseif (strpos($classPath, 'Empathy\\MVC\\Model\\') === 0) {
+        } elseif (str_starts_with($classPath, 'Empathy\\MVC\\Model\\')) {
             $location = Config::get('DOC_ROOT').'/storage/';
         }
-        if (!empty($location) && file_exists($location.$className.'.php')) {
+        if ($location !== '' && $location !== '0' && file_exists($location.$className.'.php')) {
             $file = $location.$className.'.php';
             include($file);
         }
@@ -444,7 +426,7 @@ class Empathy
     public function init(): void
     {
         $this->boot = DI::getContainer()->get('Bootstrap');
-        if ($this->persistentMode !== true) {
+        if (!$this->persistentMode) {
             $this->beginDispatch();
         }
     }

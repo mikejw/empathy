@@ -28,8 +28,6 @@ class CLI
      * Set request mode. Expects class constant value from CLIMode class.
      *
      * @param integer $mode request mode value
-     *
-     * @return void
      */
     public static function setReqMode(int $mode): void
     {
@@ -44,14 +42,12 @@ class CLI
      */
     private static function realMicrotime(): float
     {
-        list($micro, $seconds) = explode(' ', microtime());
+        [$micro, $seconds] = explode(' ', microtime());
         return ((float) $micro + (float) $seconds);
     }
 
     /**
      * End request by resetting super globals.
-     *
-     * @return void
      */
     private static function requestEnd(): void
     {
@@ -64,8 +60,6 @@ class CLI
      *
      * @param Empathy $e   MVC boot object
      * @param string  $uri URI of request
-     *
-     * @return null | float | string | Controller
      */
     public static function request(Empathy $e, string $uri): null | float | string | Controller
     {

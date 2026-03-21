@@ -45,11 +45,6 @@ class PluginManager
         'EDefault',
     ];
 
-    public function __construct()
-    {
-        $this->initialized = false;
-    }
-
     /**
      * @param list<mixed> $options
      */
@@ -87,7 +82,7 @@ class PluginManager
     public function register(object $p): void
     {
         $this->plugins[] = $p;
-        DI::getContainer()->set(get_class($p), $p);
+        DI::getContainer()->set($p::class, $p);
     }
 
     public function preDispatch(object $p): void
@@ -132,7 +127,7 @@ class PluginManager
     {
         $mode = false;
         foreach ($this->plugins as $p) {
-            if (get_class($p) === 'Empathy\MVC\Plugin\ELibs') {
+            if ($p::class === \Empathy\MVC\Plugin\ELibs::class) {
                 $c = $p->getConfig();
                 if (isset($c['testing']) && $c['testing']) {
                     $mode = true;
@@ -163,7 +158,7 @@ class PluginManager
             try {
                 return DI::getContainer()->get($name);
             } catch (\Exception $e) {
-                if (get_class($e) === 'DI\Definition\Exception\InvalidDefinition') {
+                if ($e::class === \DI\Definition\Exception\InvalidDefinition::class) {
                     continue;
                 } else {
                     throw $e;

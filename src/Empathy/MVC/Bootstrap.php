@@ -58,16 +58,7 @@ class Bootstrap
      * This property is used to contain a reference to
      * the current instance of the web application.
      */
-    private Empathy $mvc;
-
-    /**
-     * This property contains a data structure
-     * that contains the description of plugins to be initialized.
-     * Read from the application config.
-     *
-     * @var list<array<string, mixed>>
-     */
-    private array $plugins;
+    private readonly Empathy $mvc;
 
     /**
      * This property contains a reference to
@@ -82,7 +73,7 @@ class Bootstrap
      * is initialized but dispatchment to a
      * controller is prevented. Useful for testing etc.
      */
-    private bool $persistentMode;
+    private readonly bool $persistentMode;
 
     /**
      * New property as of 0.9.5.
@@ -108,11 +99,15 @@ class Bootstrap
      * @param array<string, mixed>       $bootOptions boot options config
      * @param list<array<string, mixed>> $plugins     active plugin definition
      */
-    public function __construct(array $bootOptions, array $plugins, Empathy $mvc)
+    public function __construct(array $bootOptions, /**
+     * This property contains a data structure
+     * that contains the description of plugins to be initialized.
+     * Read from the application config.
+     */
+    private readonly array $plugins, Empathy $mvc)
     {
         $this->persistentMode = $mvc->getPersistentMode();
         $this->mvc = $mvc;
-        $this->plugins = $plugins;
         $this->pluginManager = DI::getContainer()->get('PluginManager');
         $this->initBootOptions($bootOptions);
     }
@@ -146,10 +141,8 @@ class Bootstrap
         }
         $this->environment = 'dev';
         $validEnv = ['dev', 'uat', 'stag', 'prod'];
-        if (isset($bootOptions['environment'])) {
-            if (in_array($bootOptions['environment'], $validEnv, true)) {
-                $this->environment = $bootOptions['environment'];
-            }
+        if (isset($bootOptions['environment']) && in_array($bootOptions['environment'], $validEnv, true)) {
+            $this->environment = $bootOptions['environment'];
         }
     }
 
@@ -161,7 +154,6 @@ class Bootstrap
      * @param boolean $fake Can be used to prevent final action event call.
      * useful for testing.
      * @param string $controller Force controller name. Used in testing.
-     * @return void
      */
     public function dispatch($fake = false, $controller = null): void
     {
@@ -174,7 +166,7 @@ class Bootstrap
         $error = $uriService->getError();
 
         if ($error === URI::MISSING_CLASS_DEF
-           && isset($this->dynamicModule)
+           && $this->dynamicModule !== null
            && $this->dynamicModule) {
 
             // anticipate dispatched errors
@@ -187,9 +179,7 @@ class Bootstrap
 
         if ($error > 0 && $controller === null) {
             if ($this->environment !== 'dev' || $this->debugMode === false) {
-                if ($error === URI::MISSING_CLASS_DEF ||
-                    $error === URI::MISSING_EVENT_DEF ||
-                    $error === URI::ERROR_404
+                if (in_array($error, [URI::MISSING_CLASS_DEF, URI::MISSING_EVENT_DEF, URI::ERROR_404], true)
                 ) {
                     throw new RequestException('Not found', RequestException::NOT_FOUND);
                 } elseif ($error === URI::INVALID_DYNAMIC_MODULE_DEFAULT_URI) {
@@ -207,7 +197,7 @@ class Bootstrap
             $instance = new $controller($this);
         }
         if (!$instance instanceof Controller) {
-            throw new Exception('Resolved class is not a Controller: '.get_class($instance));
+            throw new Exception('Resolved class is not a Controller: '.$instance::class);
         }
         $this->controller = $instance;
 
@@ -232,12 +222,11 @@ class Bootstrap
     /**
      * If an exception is detected this is used to dispatch
      * to an internal controller and view.
-     * @return void
      */
     public function dispatchException(\Throwable $e): void
     {
-        $reqError = (get_class($e) === RequestException::class) ? true : false;
-        $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;
+        $reqError = $e::class === RequestException::class;
+        $useSession = $this->controller instanceof \Empathy\MVC\Controller ? $this->controller->getUseSession() : true;
 
         $this->controller = new Controller($this, $useSession);
         DI::getContainer()->set('Controller', $this->controller);
@@ -250,11 +239,10 @@ class Bootstrap
      * Invoke the view through the controller.
      * @param boolean $i Whether the current template is internal.
      * E.g. an exception has occurred.
-     * @return void
      */
     private function display($i = false): void
     {
-        if ($this->controller === null) {
+        if (!$this->controller instanceof \Empathy\MVC\Controller) {
             throw new Exception('Cannot display: controller was not initialised');
         }
         $this->controller->initDisplay($i);
@@ -267,8 +255,6 @@ class Bootstrap
      * This means error messages will be displayed
      * followed by the application dying silently with no attempt
      * to initialize the view.
-     *
-     * @return void
      */
     public function initPlugins(): void
     {
@@ -281,10 +267,8 @@ class Bootstrap
                 $pluginManager->init();
 
                 foreach ($plugins as $p) {
-                    if (count($whitelist)) {
-                        if (!in_array($p['name'], $whitelist, true)) {
-                            continue;
-                        }
+                    if (count($whitelist) && !in_array($p['name'], $whitelist, true)) {
+                        continue;
                     }
 
                     if (isset($p['class_path'])) {
@@ -298,7 +282,7 @@ class Bootstrap
                                 } catch (\ReflectionException) {
                                     $loaderMethod = null;
                                 }
-                                if ($loaderMethod !== null && $loaderMethod->isPublic() && $loaderMethod->isStatic()) {
+                                if ($loaderMethod instanceof \ReflectionMethod && $loaderMethod->isPublic() && $loaderMethod->isStatic()) {
                                     spl_autoload_register(
                                         static function (string $class) use ($loaderMethod): void {
                                             $loaderMethod->invoke(null, $class);
@@ -309,11 +293,7 @@ class Bootstrap
                         }
                     }
 
-                    if (count(explode('\\', $p['name'])) > 1) {
-                        $plugin = '\\'.$p['name'];
-                    } else {
-                        $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
-                    }
+                    $plugin = count(explode('\\', (string) $p['name'])) > 1 ? '\\'.$p['name'] : 'Empathy\\MVC\\Plugin\\'.$p['name'];
 
                     $n = (isset($p['config'])) ?
                         new $plugin($pluginManager, $this, $p['config']) :
@@ -324,10 +304,10 @@ class Bootstrap
                 }
 
             } catch (\Exception $e) {
-                if (RequestException::class === get_class($e)) {
+                if (RequestException::class === $e::class) {
                     throw $e;
                 } else {
-                    throw new \Empathy\MVC\SafeException($e->getMessage());
+                    throw new \Empathy\MVC\SafeException($e->getMessage(), $e->getCode(), $e);
                 }
             }
         }
@@ -355,7 +335,7 @@ class Bootstrap
      */
     public function getURIError(): mixed
     {
-        return $this->uri !== null ? $this->uri->getError() : null;
+        return $this->uri instanceof \Empathy\MVC\URI ? $this->uri->getError() : null;
     }
 
 
@@ -367,7 +347,7 @@ class Bootstrap
      */
     public function getURICliMode(): mixed
     {
-        return $this->uri !== null ? $this->uri->getCliMode() : null;
+        return $this->uri instanceof \Empathy\MVC\URI ? $this->uri->getCliMode() : null;
     }
 
     /**
@@ -377,7 +357,7 @@ class Bootstrap
      */
     public function getURIData(): ?array
     {
-        return $this->uri !== null ? $this->uri->getData() : null;
+        return $this->uri instanceof \Empathy\MVC\URI ? $this->uri->getData() : null;
     }
 
     /**

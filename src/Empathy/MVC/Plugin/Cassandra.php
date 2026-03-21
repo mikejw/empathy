@@ -24,19 +24,15 @@ class Cassandra extends Plugin
 {
     /**
      * Imports cassandra code.
-     *
-     * @return null
      */
     public function __construct()
     {
         if (file_exists('Cassandra/gen-php/cassandra/Cassandra.php')) {
-            /** @phpstan-ignore-next-line */
-            include 'Cassandra/gen-php/cassandra/Cassandra.php';
+            include __DIR__ . '/Cassandra/gen-php/cassandra/Cassandra.php';
         }
 
         if (file_exists('Cassandra/gen-php/cassandra/Types.php')) {
-            /** @phpstan-ignore-next-line */
-            include 'Cassandra/gen-php/cassandra/Types.php';
+            include __DIR__ . '/Cassandra/gen-php/cassandra/Types.php';
         }
     }
 }

@@ -29,19 +29,19 @@ class Subdomains extends Plugin implements PreDispatch
     public function onPreDispatch(): void
     {
         $validSubs = [];
-        if (isset($this->config)) {
+        if ($this->config !== null) {
             $validSubs = array_keys($this->config);
         }
 
         $webRoot = Config::get('WEB_ROOT');
         Config::store('WEB_ROOT_DEFAULT', $webRoot);
-        $saneWebRoot = preg_replace('/^www\\./', '', $webRoot);
+        $saneWebRoot = preg_replace('/^www\\./', '', (string) $webRoot);
 
         if (isset($_SERVER['HTTP_HOST'])) {
             $matches = [];
             $pattern = '/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i';
-            if (preg_match($pattern, $_SERVER['HTTP_HOST'], $matches)) {
-                if (sizeof($validSubs) && !in_array($matches[1], $validSubs, true)) {
+            if (preg_match($pattern, (string) $_SERVER['HTTP_HOST'], $matches)) {
+                if (count($validSubs) && !in_array($matches[1], $validSubs, true)) {
                     throw new RequestException('Site not found', RequestException::NOT_FOUND);
                 } else {
                     Config::store('SUBDOMAIN', $matches[1]);

@@ -47,7 +47,7 @@ class ELibs extends Plugin
             $path = '/vendor/mikejw/elibs';
         }
 
-        if ($path) {
+        if ($path !== '') {
             Lib::addToIncludePath(Config::get('DOC_ROOT').$path);
         }
     }

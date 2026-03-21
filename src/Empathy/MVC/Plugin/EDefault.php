@@ -34,7 +34,7 @@ class EDefault extends Plugin implements PreDispatch
         if (isset($_SERVER['HTTP_HOST'])) {
             $host = Config::get('WEB_ROOT');
             $reqHost = $_SERVER['HTTP_HOST'];
-            if (0 === strpos($host, 'www') && false === strPos($reqHost, 'www')) {
+            if (str_starts_with((string) $host, 'www') && !str_contains((string) $reqHost, 'www')) {
                 header('Location: //' . $host . $_SERVER['REQUEST_URI']);
                 exit();
             }

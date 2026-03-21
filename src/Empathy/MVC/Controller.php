@@ -60,11 +60,6 @@ class Controller
     protected ?Stash $stash = null;
 
     /**
-     * The current bootstrap object.
-     */
-    protected Bootstrap $boot;
-
-    /**
      * The applications current environment.
      */
     protected ?string $environment = null;
@@ -81,10 +76,12 @@ class Controller
      * @param list<mixed> $pluginOptions
      * @param list<string> $pluginWhitelist
      */
-    public function __construct(Bootstrap $boot, bool $useSession = true, array $pluginOptions = [], array $pluginWhitelist = [])
+    public function __construct(/**
+     * The current bootstrap object.
+     */
+    protected Bootstrap $boot, bool $useSession = true, array $pluginOptions = [], array $pluginWhitelist = [])
     {
         DI::getContainer()->set('Controller', $this);
-        $this->boot = $boot;
         $this->pluginManager = DI::getContainer()->get('PluginManager');
         $this->pluginManager->setController($this);
         $this->pluginManager->setOptions($pluginOptions);
@@ -93,17 +90,13 @@ class Controller
         if ($this->boot->getMVC()->initPlugins()) {
             $this->presenter = $this->pluginManager->getView();
             $this->useSession = $useSession;
-            $this->environment = $boot->getEnvironment();
+            $this->environment = $this->boot->getEnvironment();
             $this->stash = DI::getContainer()->get('Stash');
-            $this->module = (isset($_GET['module'])) ? $_GET['module'] : null;
-            $this->class = (isset($_GET['class'])) ? $_GET['class'] : null;
-            $this->event = (isset($_GET['event'])) ? $_GET['event'] : null;
+            $this->module = $_GET['module'] ?? null;
+            $this->class = $_GET['class'] ?? null;
+            $this->event = $_GET['event'] ?? null;
 
-            if (Config::get('TPL_BY_CLASS')) {
-                $this->templateFile = $this->class . '.tpl';
-            } else {
-                $this->templateFile = $this->module . '.tpl';
-            }
+            $this->templateFile = Config::get('TPL_BY_CLASS') ? $this->class . '.tpl' : $this->module . '.tpl';
 
             if ($this->useSession) {
                 Session::up();
@@ -135,8 +128,6 @@ class Controller
 
     /**
      * Assigns the value of some of the main settings from the application config to the view.
-     *
-     * @return void
      */
     private function assignConstants(): void
     {
@@ -158,7 +149,6 @@ class Controller
     /**
      * Assign key controller attributes to the view
      *
-     * @return void
      *
      */
     private function assignControllerInfo(): void
@@ -172,7 +162,6 @@ class Controller
     /**
      * Assign environment value to the view
      *
-     * @return void
      *
      */
     private function assignEnvironment(): void
@@ -185,7 +174,6 @@ class Controller
      * Set the name of the current view template
      *
      * @param string $tpl tempalte name (including file extension.)
-     * @return void
      */
     public function setTemplate(string $tpl): void
     {
@@ -196,11 +184,10 @@ class Controller
      * Initialise the view for rendering.
      *
      * @param boolean $internal Whether the template is internal.
-     * @return void
      */
     public function initDisplay(bool $internal): void
     {
-        if ($this->presenter === null) {
+        if (!$this->presenter instanceof \Empathy\MVC\Plugin\Presentation) {
             throw new Exception('No presentation plugin is available');
         }
         if ($this->templateFile === null) {
@@ -213,7 +200,6 @@ class Controller
      * Redirect the user to another location within the application
      *
      * @param string $endString the new URI to redirect to.
-     * @return void
      */
     public function redirect(string $endString = ''): void
     {
@@ -235,7 +221,6 @@ class Controller
      * Redirect to a local cgi script.
      *
      * @param string $endString path to the script.
-     * @return void
      */
     public function redirect_cgi(string $endString = ''): void
     {
@@ -252,8 +237,6 @@ class Controller
 
     /**
      * End current user session
-     *
-     * @return void
      */
     public function sessionDown(): void
     {
@@ -264,8 +247,6 @@ class Controller
 
     /**
      * Determines whether current request is an ajax request from the browser.
-     *
-     * @return bool
      */
     public function isXMLHttpRequest(): bool
     {
@@ -283,11 +264,10 @@ class Controller
      * @param string $name Key name.
      * @param mixed $data Data.
      * @param boolean $no_array Determine if data should be stored 'flat'
-     * @return void
      */
     public function assign(string $name, mixed $data, bool $no_array = false): void
     {
-        if ($this->presenter === null) {
+        if (!$this->presenter instanceof \Empathy\MVC\Plugin\Presentation) {
             throw new Exception('No presentation plugin is available');
         }
         $this->presenter->assign($name, $data, $no_array);
@@ -361,7 +341,7 @@ class Controller
             if ($assertSet) {
                 $valid = false;
             }
-        } elseif (!((string) $_GET[$id] === (string) (int) $_GET[$id]) || ($_GET[$id] === 0 && $def !== 0)
+        } elseif ((string) $_GET[$id] !== (string) (int) $_GET[$id] || ($_GET[$id] === 0 && $def !== 0)
                || $_GET[$id] < 0) {
             $assign_def = true;
             $valid = false;
@@ -381,7 +361,7 @@ class Controller
      */
     public function viewException(bool $debug, \Throwable $exception, bool $req_error): void
     {
-        if ($this->presenter === null) {
+        if (!$this->presenter instanceof \Empathy\MVC\Plugin\Presentation) {
             throw new Exception('No presentation plugin is available');
         }
         $this->presenter->exception($debug, $exception, $req_error);
@@ -389,11 +369,10 @@ class Controller
 
     /**
      * Assign generated token.
-     * @return void
      */
     protected function assignCSRFToken(): void
     {
-        $token = md5(uniqid((string) rand(), true));
+        $token = md5(uniqid((string) random_int(0, mt_getrandmax()), true));
         $this->assign('csrf_token', $token);
         if ($this->useSession) {
             Session::set('csrf_token', $token);

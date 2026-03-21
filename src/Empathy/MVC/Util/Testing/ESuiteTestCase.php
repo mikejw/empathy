@@ -36,7 +36,7 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
 
     protected function appRequest(string $uri, int $mode = CLIMode::CAPTURED): mixed
     {
-        if (!isset($this->boot)) {
+        if (!$this->boot instanceof \Empathy\MVC\Empathy) {
             throw new \Exception('app not inited.');
         } else {
             CLI::setReqMode($mode);
@@ -93,9 +93,7 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
 
 
         $empathy->init();
-
-        $bootstrap = $container->get('Bootstrap');
-        return $bootstrap;
+        return $container->get('Bootstrap');
     }
 
 

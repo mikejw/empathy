@@ -27,7 +27,6 @@ class empathy extends BaseController
 
     /**
      * Default controller event.
-     * @return void
      */
     public function default_event(): void
     {
@@ -36,7 +35,6 @@ class empathy extends BaseController
 
     /**
      * Default controller event.
-     * @return void
      */
     public function status(): void
     {
@@ -71,7 +69,7 @@ class empathy extends BaseController
             // presume to clear memcache
             try {
                 $cache = DI::getContainer()->get('Cache')->clear();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // do nothing
             }
         }

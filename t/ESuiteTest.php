@@ -15,7 +15,6 @@ abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
         $container = DI::init($doc_root, $persistentMode);
         $empathy = $container->get('Empathy');
         $empathy->init();
-        $bootstrap = $container->get('Bootstrap');
-        return $bootstrap;
+        return $container->get('Bootstrap');
     }
 }

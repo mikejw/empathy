@@ -23,7 +23,7 @@ class Misc
     {
         try {
             DI::getContainer()->get('PluginManager')->find(['SmartySSL']);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
 

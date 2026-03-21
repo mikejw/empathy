@@ -9,29 +9,25 @@ use Monolog\Logger;
 
 class Logging
 {
-    private Logger $log;
+    private readonly Logger $log;
 
     public function __construct(int $level = Logger::DEBUG)
     {
-        try {
-            $logPath = Config::get('DOC_ROOT') . '/logs';
-            $logFile = $logPath . '/main.log';
-            $this->log = new Logger('default');
-            $monologLevel = match ($level) {
-                Logger::DEBUG,
-                Logger::INFO,
-                Logger::NOTICE,
-                Logger::WARNING,
-                Logger::ERROR,
-                Logger::CRITICAL,
-                Logger::ALERT,
-                Logger::EMERGENCY => $level,
-                default => throw new \InvalidArgumentException('Invalid Monolog level: '.$level),
-            };
-            $this->log->pushHandler(new StreamHandler($logFile, $monologLevel));
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        $logPath = Config::get('DOC_ROOT') . '/logs';
+        $logFile = $logPath . '/main.log';
+        $this->log = new Logger('default');
+        $monologLevel = match ($level) {
+            Logger::DEBUG,
+            Logger::INFO,
+            Logger::NOTICE,
+            Logger::WARNING,
+            Logger::ERROR,
+            Logger::CRITICAL,
+            Logger::ALERT,
+            Logger::EMERGENCY => $level,
+            default => throw new \InvalidArgumentException('Invalid Monolog level: '.$level),
+        };
+        $this->log->pushHandler(new StreamHandler($logFile, $monologLevel));
     }
 
     public function getLog(): Logger

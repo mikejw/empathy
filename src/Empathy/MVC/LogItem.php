@@ -6,27 +6,12 @@ namespace Empathy\MVC;
 
 class LogItem
 {
-    private string $msg;
-
-    /** @var array<string, mixed> */
-    private array $context = [];
-
-    private string $level;
-
     /**
      * @param array<string, mixed> $context
      */
-    public function __construct(string $msg, array $context = [], string $class = '', string $level = 'debug')
+    public function __construct(private string $msg, private array $context = [], string $class = '', private string $level = 'debug')
     {
-        $this->msg = $msg;
-        $this->context = $context;
-        $this->level = $level;
-
-        if ($class === '') {
-            $this->context['app-origin'] = 'unspecified';
-        } else {
-            $this->context['app-origin'] = $class;
-        }
+        $this->context['app-origin'] = $class === '' ? 'unspecified' : $class;
     }
 
     public function append(string $key, mixed $value): void

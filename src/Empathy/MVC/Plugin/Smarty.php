@@ -20,6 +20,34 @@ use Empathy\MVC\DI;
  */
 class Smarty extends PresentationPlugin implements PreDispatch, Presentation
 {
+    /**
+     * @var bool
+     */
+    public $debugging;
+    /**
+     * @var int
+     */
+    public $caching;
+    /**
+     * @var bool|string
+     */
+    public $template_dir;
+    /**
+     * @var string
+     */
+    public $compile_dir;
+    /**
+     * @var string
+     */
+    public $cache_dir;
+    /**
+     * @var string
+     */
+    public $config_dir;
+    /**
+     * @var int
+     */
+    public $error_reporting;
     protected \Smarty $smarty;
 
     public function onPreDispatch(): void
@@ -104,7 +132,7 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
 
     protected function switchInternal(): void
     {
-        $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
+        $this->smarty->template_dir = realpath(__DIR__.'/../../../../tpl/');
     }
 
     public function exception(bool $debug, \Throwable $exception, bool $reqError): void

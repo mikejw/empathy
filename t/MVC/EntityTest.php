@@ -53,15 +53,15 @@ class EntityTest extends ESuiteTest
 
 
         $objectManager = new EntityManager();
-        $this->expectException(\Exception::class, 'Entity class does not exist');
-        $fake = $objectManager->find('Esuite\FakeEntityz', 1);
+        $this->expectException(\Exception::class);
+        $objectManager->find('Esuite\FakeEntityz', 1);
     }
 
     public function testFind()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $fake = $objectManager->find('Esuite\FakeEntity', 1);
+        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
         $this->assertEquals($fake->foo, 'bar');
     }
 
@@ -73,10 +73,10 @@ class EntityTest extends ESuiteTest
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $fake = $objectManager->find('Esuite\FakeEntity', 1);
+        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
         $fake->foo = 'new';
         $fake->save();
-        $fake = $objectManager->find('Esuite\FakeEntity', 1);
+        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
         $this->assertEquals($fake->foo, 'new');
     }
 
@@ -84,15 +84,15 @@ class EntityTest extends ESuiteTest
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $fake = $objectManager->find('Esuite\FakeEntity', 1);
-        $this->assertEquals(10, sizeof($fake->getAll()));
+        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
+        $this->assertEquals(10, count($fake->getAll()));
     }
 
     public function testGetAllCustom()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $fake = $objectManager->find('Esuite\FakeEntity', 1);
-        $this->assertEquals(10, sizeof($fake->getAllCustom(' where foo like \'bar\'')));
+        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
+        $this->assertEquals(10, count($fake->getAllCustom(' where foo like \'bar\'')));
     }
 }

@@ -22,8 +22,7 @@ class TwitterOAuth
     public function __construct()
     {
         if (file_exists('twitteroauth/twitteroauth.php')) {
-            /** @phpstan-ignore-next-line */
-            include 'twitteroauth/twitteroauth.php';
+            include __DIR__ . '/twitteroauth/twitteroauth.php';
         }
     }
 }

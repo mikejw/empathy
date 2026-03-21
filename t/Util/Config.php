@@ -11,7 +11,7 @@ class Config
     public static function init()
     {
         self::$items = [];
-        $base = realpath(dirname(__FILE__).'/../');
+        $base = realpath(__DIR__.'/../');
         $config = $base.'/config.yml';
         $config_arr = YAML::load($config);
         foreach ($config_arr as $index => $value) {

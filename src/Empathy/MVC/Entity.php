@@ -25,7 +25,7 @@ class Entity
 
     /** @var list<string> */
     private array $properties;
-    private PDO | null $dbh;
+    private PDO | null $dbh = null;
 
     protected int $id; // allow handling entities with no public ID value set
 
@@ -63,14 +63,14 @@ class Entity
 
     private function requireDbh(): PDO
     {
-        if ($this->dbh === null) {
+        if (!$this->dbh instanceof \PDO) {
             throw new SafeException('No database connection');
         }
 
         return $this->dbh;
     }
 
-    private static function pregReplaceToString(string $pattern, string $replacement, string $subject): string
+    private function pregReplaceToString(string $pattern, string $replacement, string $subject): string
     {
         $out = preg_replace($pattern, $replacement, $subject);
         if (!is_string($out)) {
@@ -82,9 +82,9 @@ class Entity
 
     private function loadProperties(): void
     {
-        $super_class = 'Empathy\MVC\Entity';
+        $super_class = \Empathy\MVC\Entity::class;
 
-        $r = new \ReflectionClass(get_class($this));
+        $r = new \ReflectionClass(static::class);
 
         $parent = $r->getParentClass();
         if ($parent !== false && $parent->getName() !== $super_class) {
@@ -113,7 +113,7 @@ class Entity
             // it's a straightforward single subclass
             foreach ($r->getProperties() as $item) {
                 if (!$item->isPrivate()) {
-                    array_push($this->properties, $item->name);
+                    $this->properties[] = $item->name;
                 }
             }
         }
@@ -185,7 +185,7 @@ class Entity
             $level
         );
 
-        if (sizeof($params) > 0) {
+        if (count($params) > 0) {
             $log->append('params', $params);
         }
 
@@ -204,20 +204,17 @@ class Entity
         $dbh = $this->requireDbh();
         $errors = ['', '', ''];
         try {
-            if (sizeof($params)) {
+            if (count($params) !== 0) {
                 $sth = $dbh->prepare($sql, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
                 $sth->execute($params);
                 $result = $sth;
+            } elseif (($result = $dbh->query($sql)) === false) {
+                $errors = $dbh->errorInfo();
+                throw new Exception('[' . htmlentities($sql)
+                    . "]<br /><strong>MySQL</strong>: ($error): "
+                    . htmlentities((string) $errors[2]));
             } else {
-                if (($result = $dbh->query($sql)) === false) {
-                    $errors = $dbh->errorInfo();
-
-                    throw new Exception('[' . htmlentities($sql)
-                        . "]<br /><strong>MySQL</strong>: ($error): "
-                        . htmlentities($errors[2]));
-                } else {
-                    $this->result = $result;
-                }
+                $this->result = $result;
             }
             $this->logQuery($sql, $error, $params, 'debug');
         } catch (Exception $e) {
@@ -246,10 +243,8 @@ class Entity
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             foreach ($row as $index => $value) {
-                if (!is_integer($index)) {
-                    if (in_array($index, $this->properties, true)) {
-                        $this->$index = $value;
-                    }
+                if (!is_int($index) && in_array($index, $this->properties, true)) {
+                    $this->$index = $value;
                 }
             }
             return true;
@@ -308,7 +303,7 @@ class Entity
                 $sql .= '?';
                 $params[] = $this->$property;
             }
-            if ($i + 1 < sizeof($this->properties)) {
+            if ($i + 1 < count($this->properties)) {
                 $sql .= ', ';
             }
             $i++;
@@ -417,11 +412,7 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i === $page) {
-                $nav[$i] = 1;
-            } else {
-                $nav[$i] = 0;
-            }
+            $nav[$i] = $i === $page ? 1 : 0;
             $i++;
         }
         return $nav;
@@ -448,11 +439,7 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i === $page) {
-                $nav[$i] = 1;
-            } else {
-                $nav[$i] = 0;
-            }
+            $nav[$i] = $i === $page ? 1 : 0;
             $i++;
         }
         return $nav;
@@ -474,11 +461,7 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i === $page) {
-                $nav[$i] = 1;
-            } else {
-                $nav[$i] = 0;
-            }
+            $nav[$i] = $i === $page ? 1 : 0;
             $i++;
         }
         return $nav;
@@ -510,11 +493,7 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i === $page) {
-                $nav[$i] = 1;
-            } else {
-                $nav[$i] = 0;
-            }
+            $nav[$i] = $i === $page ? 1 : 0;
             $i++;
         }
         return $nav;
@@ -681,43 +660,23 @@ class Entity
                     continue;
                 }
                 $markup = str_replace("\r", "\n", $markup);
-                $markup = self::pregReplaceToString("!\n\n+!", "\n", $markup);
+                $markup = $this->pregReplaceToString("!\n\n+!", "\n", $markup);
                 $markup = htmlentities($markup, ENT_QUOTES, 'UTF-8');
 
-                $markup = self::pregReplaceToString(
-                    $pTagPattern,
-                    '<p>$1</p>',
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($pTagPattern, '<p>$1</p>', $markup);
 
-                $markup = self::pregReplaceToString(
-                    $aTagPattern,
-                    '<a href="$1" title="$2" target="$3">$4</a>',
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($aTagPattern, '<a href="$1" title="$2" target="$3">$4</a>', $markup);
 
-                $markup = self::pregReplaceToString(
-                    $imgTagPattern,
-                    '<img src="$1" id="$2" alt="$3" class="img-fluid">',
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($imgTagPattern, '<img src="$1" id="$2" alt="$3" class="img-fluid">', $markup);
 
-                $markup = self::pregReplaceToString(
-                    $preTagPattern1,
-                    '<pre>$1</pre>',
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($preTagPattern1, '<pre>$1</pre>', $markup);
 
-                $markup = self::pregReplaceToString(
-                    $preTagPattern2,
-                    '<pre><code class="lang-$1">$2</code></pre>',
-                    $markup
-                );
+                $markup = $this->pregReplaceToString($preTagPattern2, '<pre><code class="lang-$1">$2</code></pre>', $markup);
 
-                $markup = self::pregReplaceToString('/&amp;nbsp;/', '&nbsp;', $markup);
-                $markup = self::pregReplaceToString('/ +id=""/', '', $markup);
-                $markup = self::pregReplaceToString('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup);
-                $markup = self::pregReplaceToString('!&lt;em&gt;(.*?)&lt;/em&gt;!m', '<em>$1</em>', $markup);
+                $markup = $this->pregReplaceToString('/&amp;nbsp;/', '&nbsp;', $markup);
+                $markup = $this->pregReplaceToString('/ +id=""/', '', $markup);
+                $markup = $this->pregReplaceToString('!&lt;strong&gt;(.*?)&lt;/strong&gt;!m', '<strong>$1</strong>', $markup);
+                $markup = $this->pregReplaceToString('!&lt;em&gt;(.*?)&lt;/em&gt;!m', '<em>$1</em>', $markup);
                 $hasPTags = preg_match('/<p>/', $markup);
 
                 if (!$hasPTags) {

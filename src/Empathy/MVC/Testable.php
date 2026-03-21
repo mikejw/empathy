@@ -48,11 +48,7 @@ class Testable
             $header_arr = explode(':', $header);
             $index = $header_arr[0];
             array_shift($header_arr);
-            if (count($header_arr) === 1) {
-                $content = $header_arr[0];
-            } else {
-                $content = implode(':', $header_arr);
-            }
+            $content = count($header_arr) === 1 ? $header_arr[0] : implode(':', $header_arr);
             self::$headers[$index] = trim($content);
         } else {
             header($header);
@@ -108,7 +104,7 @@ class Testable
         }
         $h = [];
         foreach ($_SERVER as $key => $value) {
-            if (is_string($key) && strpos($key, 'HTTP_') === 0) {
+            if (is_string($key) && str_starts_with($key, 'HTTP_')) {
                 $new_key = str_replace(' ', '-', ucwords(str_replace('_', ' ', substr(strtolower($key), 5))));
                 $h[$new_key] = is_scalar($value) ? (string) $value : '';
             }

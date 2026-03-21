@@ -8,7 +8,7 @@ class YAML
 {
     public static function save($data, $file, $append = false)
     {
-        $s = new \spyc();
+        new \spyc();
         $yaml = self::dump($data);
         $mode = 'w';
 
@@ -17,7 +17,7 @@ class YAML
         }
 
         $fh = fopen($file, $mode);
-        fwrite($fh, $yaml);
+        fwrite($fh, (string) $yaml);
         fclose($fh);
     }
 

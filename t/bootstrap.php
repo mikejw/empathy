@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 
-include(realpath(dirname(__FILE__).'/../vendor/autoload.php'));
+include(realpath(__DIR__.'/../vendor/autoload.php'));
 
 if (!function_exists('loadClass')) {
     function loadClass($class)
     {
-        if (strpos($class, 'ESuite') === 0) {
+        if (str_starts_with($class, 'ESuite')) {
             $base = dirname(realpath(__FILE__));
 
             $class = str_replace('ESuite\\', '', $class);
@@ -21,7 +21,7 @@ if (!function_exists('loadClass')) {
             }
         }
     }
-    spl_autoload_register('loadClass');
+    spl_autoload_register(loadClass(...));
 }
 
 

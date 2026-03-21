@@ -19,7 +19,7 @@ class DI
 
     private static function loadConfig(string $configDir, ?Spyc $spyc = null): mixed
     {
-        if ($spyc === null) {
+        if (!$spyc instanceof \Spyc) {
             $spyc = DI::getContainer()->get('Spyc');
         }
         $configFile = $configDir.'/config.yml';
@@ -46,12 +46,10 @@ class DI
             'persistentMode' => $persistentMode,
             'systemMode' => $systemMode,
             'Spyc' => new Spyc(),
-            'Empathy' => function (Container $c) {
-                return new Empathy(
-                    $c->get('configDir'),
-                    $c->get('persistentMode')
-                );
-            },
+            'Empathy' => fn(Container $c) => new Empathy(
+                $c->get('configDir'),
+                $c->get('persistentMode')
+            ),
             'Bootstrap' => function (Container $c) {
                 $empathy = $c->get('Empathy');
                 return new Bootstrap(
@@ -69,9 +67,7 @@ class DI
                 );
             },
             'PluginManager' => new PluginManager(),
-            'Stash' => function (Container $c) {
-                return new Stash();
-            },
+            'Stash' => fn(Container $c) => new Stash(),
             'Config' => function (Container $c) {
                 $diPath = realpath(__FILE__);
                 if ($diPath === false) {

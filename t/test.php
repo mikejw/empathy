@@ -21,18 +21,13 @@ declare(strict_types=1);
 // }
 
 
-if (false === @include('../vendor/autoload.php')) {
-
-} else {
-
-    require('bootstrap.php');
+if (false !== @include(__DIR__ . '/../vendor/autoload.php')) {
+    require(__DIR__ . '/bootstrap.php');
     \Empathy\MVC\Testable::header('Cache-Controlz: no-cache, must-revalidate');
     $m = new ESuite\Fake\Message();
-
     //header('foo: bar');
     echo '<pre>';
     print_r($m->getHeaders());
     //print_r(headers_list());
     echo '</pre>';
-
 }
