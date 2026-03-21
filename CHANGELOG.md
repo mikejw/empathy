@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.3.4] - 2026-03-21
+
+### Fixed
+
+- Code modernisation with pint, phpstan and rector
+
+
 ## [4.3.3] - 2026-01-19
 
 ### Fixed
