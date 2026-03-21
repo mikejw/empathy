@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
 use Empathy\MVC\Config;
 use ESuite\ESuiteTest;
-
 
 // @totdo: figure out proper use of expectOutput
 // can we set it multiple times.. or match over set of output
@@ -19,7 +20,7 @@ class EmpathyTest extends ESuiteTest
         //
     }
 
-    private function createMVC($persistent=false)
+    private function createMVC($persistent = false)
     {
         $bootstrap = $this->makeFakeBootstrap($persistent);
         $this->mvc = $bootstrap->getMVC();
@@ -33,13 +34,13 @@ class EmpathyTest extends ESuiteTest
         Config::store('BOOT_OPTIONS', $boot_options);
         $this->mvc->reloadBootOptions();
     }
-    
+
     private function changeDebug($debug)
     {
         $boot_options = Config::get('BOOT_OPTIONS');
         $boot_options['debug_mode'] = $debug;
         Config::store('BOOT_OPTIONS', $boot_options);
-        $this->mvc->reloadBootOptions();   
+        $this->mvc->reloadBootOptions();
     }
 
     public function testErrors()
@@ -92,13 +93,13 @@ class EmpathyTest extends ESuiteTest
 
         // code = 0 => 404
         $this->createMVC(true);
-        $this->expectOutputRegex('/Not found/');    
+        $this->expectOutputRegex('/Not found/');
         $this->mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error'));
 
         // code = 1 => 500
         $this->createMVC(true);
-        $this->expectOutputRegex('/Bad request/');    
-        $this->mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error', 1)); 
+        $this->expectOutputRegex('/Bad request/');
+        $this->mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error', 1));
 
     }
 

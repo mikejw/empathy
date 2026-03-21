@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Empathy model validation
  * @file            Empathy/Validate.php
@@ -10,20 +12,21 @@
 
  * with this source code in the file licence.txt
  */
+
 namespace Empathy\MVC;
 
 class Validate
 {
-    const TEXT =  1;
-    const ALNUM = 2;
-    const NUM = 3;
-    const EMAIL = 4;
-    const TEL = 5;
-    const USERNAME = 6;
-    const URL = 7;
-    const PASSWORD = 8;
+    public const TEXT =  1;
+    public const ALNUM = 2;
+    public const NUM = 3;
+    public const EMAIL = 4;
+    public const TEL = 5;
+    public const USERNAME = 6;
+    public const URL = 7;
+    public const PASSWORD = 8;
 
-    public $error = array();
+    public $error = [];
     private $email_pattern;
     private $allowed_pattern_1;
     private $unix_username_pattern;
@@ -54,7 +57,7 @@ class Validate
     public function valType($type, $field, $data, $optional, $message = null)
     {
         $valid = true;
-        if ($data != '') {
+        if ($data !== '') {
             switch ($type) {
                 case self::TEXT:
                     $filtered = preg_replace($this->allowed_pattern_1, '', $data);
@@ -64,16 +67,16 @@ class Validate
                     }
                     break;
                 case self::PASSWORD:
-                    $matches = array();
+                    $matches = [];
                     $pattern = sprintf(
-                        "/^(?=.*[%s])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$/",
+                        '/^(?=.*[%s])(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$/',
                         substr($this->allowed_pw_pattern, 2, -2)
                     );
                     preg_match($pattern, $data, $matches, PREG_OFFSET_CAPTURE);
                     if (!sizeof($matches)) {
                         $valid = false;
                     }
-                    break;    
+                    break;
                 case self::ALNUM:
                     if (!ctype_alnum($data)) {
                         $valid = false;
@@ -119,7 +122,7 @@ class Validate
                     $this->addError('Invalid '.$field, $field);
                 }
             }
-        } elseif (!$optional && $data == '') {
+        } elseif (!$optional && $data === '') {
             if (is_array($message) && isset($message[1])) {
                 $this->addError($message[1], $field);
             } else {
@@ -141,7 +144,7 @@ class Validate
      */
     public function addError($message, $field)
     {
-        if ($field != '') {
+        if ($field !== '') {
             if (isset($this->error['field'])) {
                 throw new \Exception('Attempted to overwrite error field value');
             } else {

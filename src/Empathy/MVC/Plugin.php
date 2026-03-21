@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 /**
@@ -18,7 +20,7 @@ class Plugin
     protected $bootstrap;
     protected $config;
     protected $manager;
-    
+
 
     public function __construct($manager, $bootstrap, $config = null)
     {

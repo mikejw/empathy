@@ -1,8 +1,8 @@
 <?php
 
-namespace Empathy\MVC;
+declare(strict_types=1);
 
-use Empathy\MVC\Config;
+namespace Empathy\MVC;
 
 /**
  * Empathy Database Pool
@@ -22,7 +22,7 @@ class DBPool
     /**
     * Data structure for storing connection objects.
     */
-    private static $pool = array();
+    private static $pool = [];
 
     /**
     * Add a new host/connection to the pool.
@@ -103,6 +103,6 @@ class DBPool
 
     public static function reset()
     {
-        self::$pool = array();
+        self::$pool = [];
     }
 }

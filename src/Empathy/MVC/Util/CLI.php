@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Empathy/MVC/Util/CLI.php
  *
@@ -11,11 +13,11 @@
  * @link      http://empathyphp.co.uk
  *
  */
+
 namespace Empathy\MVC\Util;
 
 class CLI
 {
-
     private static $reqMode = CLIMode::STREAMED;
 
 
@@ -50,8 +52,8 @@ class CLI
      */
     private static function requestEnd()
     {
-        $_GET = array();
-        $_POST = array();
+        $_GET = [];
+        $_POST = [];
     }
 
     /**
@@ -108,7 +110,7 @@ class CLI
                 $_SERVER['REQUEST_URI'] = $uri;
                 $e->beginDispatch();
                 break;
-                
+
             default:
                 break;
         }

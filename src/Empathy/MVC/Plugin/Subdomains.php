@@ -1,11 +1,12 @@
 <?php
 
-namespace Empathy\MVC\Plugin;
-use Empathy\MVC\DI;
+declare(strict_types=1);
 
-use Empathy\MVC\Testable;
-use Empathy\MVC\Plugin as Plugin;
+namespace Empathy\MVC\Plugin;
+
 use Empathy\MVC\Config;
+use Empathy\MVC\DI;
+use Empathy\MVC\Plugin as Plugin;
 use Empathy\MVC\RequestException;
 
 /**
@@ -24,11 +25,10 @@ use Empathy\MVC\RequestException;
  */
 class Subdomains extends Plugin implements PreDispatch
 {
-
     // regex from http://stackoverflow.com/a/10526727/6108127
     public function onPreDispatch()
     {
-        $validSubs = array();
+        $validSubs = [];
         if (isset($this->config)) {
             $validSubs = array_keys($this->config);
         }
@@ -41,7 +41,7 @@ class Subdomains extends Plugin implements PreDispatch
             $matches = [];
             $pattern = '/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i';
             if (preg_match($pattern, $_SERVER['HTTP_HOST'], $matches)) {
-                if (sizeof($validSubs) && !in_array($matches[1], $validSubs)) {
+                if (sizeof($validSubs) && !in_array($matches[1], $validSubs, true)) {
                     throw new RequestException('Site not found', RequestException::NOT_FOUND);
                 } else {
                     Config::store('SUBDOMAIN', $matches[1]);

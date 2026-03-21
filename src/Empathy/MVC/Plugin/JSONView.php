@@ -1,12 +1,14 @@
 <?php
 
-namespace Empathy\MVC\Plugin;
-use Empathy\MVC\Plugin as Plugin;
-use Empathy\MVC\Testable;
-use Empathy\MVC\Config;
-use Empathy\MVC\RequestException;
-use Empathy\MVC\DI;
+declare(strict_types=1);
 
+namespace Empathy\MVC\Plugin;
+
+use Empathy\MVC\Config;
+use Empathy\MVC\DI;
+use Empathy\MVC\Plugin as Plugin;
+use Empathy\MVC\RequestException;
+use Empathy\MVC\Testable;
 
 /**
  * Empathy JSONView Plugin
@@ -53,13 +55,13 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
             return false;
         }
         $isError = is_string($this->error_ob) && (
-                $object instanceof $this->error_ob ||
+            $object instanceof $this->error_ob ||
                 $object instanceof JSONView\EROb
-            );
+        );
         $isReturn = is_string($this->return_ob) && (
-                $object instanceof $this->return_ob ||
+            $object instanceof $this->return_ob ||
                 $object instanceof JSONView\ROb
-            );
+        );
         $this->errorResponse = $isError;
 
         return $isError || $isReturn;
@@ -118,7 +120,7 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
             }
 
             foreach ($this->config as $item => $value) {
-                if (in_array($module, array_keys($value))) {
+                if (in_array($module, array_keys($value), true)) {
                     $mod_conf = $value[$module];
                     $this->error_ob = isset($mod_conf['error_ob'])
                         ? $mod_conf['error_ob']
@@ -162,16 +164,16 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
                     break;
                 case RequestException::NOT_AUTHORIZED:
                     $code = $rc::Forbidden;
-                    break;  
+                    break;
                 case RequestException::METHOD_NOT_ALLOWED:
                     $code = $rc::Method_Not_Allowed;
-                    break;            
+                    break;
                 default:
                     break;
             }
         }
 
-        if ($debug || Config::get('BOOT_OPTIONS')['environment'] == 'dev') {
+        if ($debug || Config::get('BOOT_OPTIONS')['environment'] === 'dev') {
             $r = new $e_ob($code, 'Exception: ' .$exception->getMessage());
         } else {
             $r = new $e_ob($code, 'Server error.');
@@ -187,7 +189,7 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
         $this->display('');
     }
 
-   
+
     public function getVars()
     {
         return $this->output;

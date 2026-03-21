@@ -1,14 +1,15 @@
 <?php
 
-namespace Empathy\MVC\Plugin\JSONView;
+declare(strict_types=1);
 
+namespace Empathy\MVC\Plugin\JSONView;
 
 class ROb extends BaseROb
 {
     protected $meta;
     protected $data;
     protected $pagination;
-    
+
     public function __construct()
     {
         $this->meta = new \stdClass();
@@ -18,22 +19,22 @@ class ROb extends BaseROb
         $this->meta->code = ReturnCodes::OK;
     }
 
-    public function setData($data) 
+    public function setData($data)
     {
         $this->data = $data;
     }
 
-    public function setPagination($pagination) 
+    public function setPagination($pagination)
     {
         $this->pagination = $pagination;
     }
-    
+
     public function getCode()
     {
         return $this->meta->code;
     }
 
-    public function serialize() 
+    public function serialize()
     {
         $ob = new \stdClass();
         $ob->meta = $this->meta;

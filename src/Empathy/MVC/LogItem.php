@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
-use Empathy\MVC\DI;
 
 class LogItem
 {
     private $msg;
-    private $context = array();
+    private $context = [];
     private $level;
 
-    public function __construct($msg, $context = array(),  $class = '', $level = 'debug',)
+    public function __construct($msg, $context = [], $class = '', $level = 'debug')
     {
         $this->msg = $msg;
         $this->context = $context;
@@ -23,19 +24,23 @@ class LogItem
         return $this;
     }
 
-    public function append($key, $value) {
+    public function append($key, $value)
+    {
         $this->context[$key] = $value;
     }
 
-    public function setLevel($level) {
+    public function setLevel($level)
+    {
         $this->level = $level;
     }
 
-    public function setMsg($msg) {
+    public function setMsg($msg)
+    {
         $this->msg = $msg;
     }
 
-    public function fire() {
+    public function fire()
+    {
         $log = DI::getContainer()->get('LoggingOn') ? DI::getContainer()->get('Log') : false;
         $level = $this->level;
         if ($log !== false) {

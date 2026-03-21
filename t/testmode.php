@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 // TinoDidriksen: w is writable, w+ is read-write.
 
 
-$modes = array(
+$modes = [
     'r' => false,
     'r+' => true,
     'w' => true,
@@ -13,8 +15,8 @@ $modes = array(
     'x' => true,
     'x+' => true,
     'c' => true,
-    'c+' => true
-);
+    'c+' => true,
+];
 
 foreach ($modes as $m => $writing) {
 
@@ -22,4 +24,3 @@ foreach ($modes as $m => $writing) {
     $meta = stream_get_meta_data($mem);
     echo $m."\t".$writing."\t".$meta['mode']."\n";
 }
-

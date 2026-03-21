@@ -1,9 +1,8 @@
 <?php
 
-namespace Empathy\MVC;
+declare(strict_types=1);
 
-use Empathy\MVC\Config;
-use Empathy\MVC\LogItem;
+namespace Empathy\MVC;
 
 class Entity
 {
@@ -14,7 +13,7 @@ class Entity
         }
     }
 
-    const TABLE = '';
+    public const TABLE = '';
 
     private const GLOBALLY_IGNORED_PROPERTIES = ['id', 'table']; // leaving in table to support old models
 
@@ -53,9 +52,9 @@ class Entity
 
         $r = new \ReflectionClass(get_class($this));
 
-        if ($r->getParentClass()->getName() != $super_class) {
+        if ($r->getParentClass()->getName() !== $super_class) {
             $props = [];
-            while (($class = $r->getName()) != $super_class) {
+            while (($class = $r->getName()) !== $super_class) {
                 $props[] = $r->getProperties();
                 $r = $r->getParentClass();
             }
@@ -64,7 +63,7 @@ class Entity
             foreach ($props as $p) {
                 foreach ($p as $rp) {
                     $name = $rp->name;
-                    if (!in_array($name, $properties) && $name != 'table') {
+                    if (!in_array($name, $properties, true) && $name !== 'table') {
                         $properties[] = $name;
                     }
                 }
@@ -88,13 +87,13 @@ class Entity
      */
     public function dbConnect()
     {
-        if (!defined('DB_SERVER') || DB_SERVER == '') {
+        if (!defined('DB_SERVER') || DB_SERVER === '') {
             throw new SafeException('DB Error: No database host given');
         }
-        if (!defined('DB_NAME') || DB_NAME == '') {
+        if (!defined('DB_NAME') || DB_NAME === '') {
             throw new SafeException('DB Error: No database name');
         }
-        if (!defined('DB_USER') || DB_USER == '') {
+        if (!defined('DB_USER') || DB_USER === '') {
             throw new SafeException('DB Error: No database username');
         }
         $dsn = 'mysql:host=' . DB_SERVER . ';dbname=' . DB_NAME . ';';
@@ -120,7 +119,7 @@ class Entity
         $log = new LogItem(
             'sql query',
             [
-                'query' => $sql
+                'query' => $sql,
             ],
             self::class,
             $level
@@ -130,7 +129,7 @@ class Entity
             $log->append('params', $params);
         }
 
-        if ($level != 'debug') {
+        if ($level !== 'debug') {
             $log->setMsg('sql query error');
             $log->append('error', $error);
         }
@@ -147,10 +146,10 @@ class Entity
                 $sth->execute($params);
                 $result = $sth;
             } else {
-                if (($result = $this->dbh->query($sql)) == false) {
+                if (($result = $this->dbh->query($sql)) === false) {
                     $errors = $this->dbh->errorInfo();
 
-                    throw new \Exception("[" . htmlentities($sql)
+                    throw new \Exception('[' . htmlentities($sql)
                         . "]<br /><strong>MySQL</strong>: ($error): "
                         . htmlentities($errors[2]));
                 } else {
@@ -202,7 +201,7 @@ class Entity
         $table = $this::TABLE;
         $params = [];
         $sql = "SELECT id, $field FROM $table";
-        if ($order !== null && $order != '') {
+        if ($order !== null && $order !== '') {
             $sql .= ' ORDER BY ?';
             $params[] = $order;
         } else {
@@ -230,11 +229,11 @@ class Entity
         foreach ($this->properties as $property) {
             $sql .= "$property = ";
 
-            if ($this->$property == '') {
+            if ($this->$property === '') {
                 $sql .= 'NULL';
-            } elseif ($this->$property == 'DEFAULT') {
+            } elseif ($this->$property === 'DEFAULT') {
                 $sql .= 'DEFAULT';
-            } elseif ($this->$property == 'MYSQLTIME') {
+            } elseif ($this->$property === 'MYSQLTIME') {
                 $sql .= $this->MYSQLTime();
             } else {
                 $sql .= '?';
@@ -267,11 +266,11 @@ class Entity
             $value = $this->$property;
             $columns[] = $property;
 
-            if ($value == '') {
+            if ($value === '') {
                 $placeholders[] = 'NULL';
-            } elseif ($value == 'DEFAULT') {
+            } elseif ($value === 'DEFAULT') {
                 $placeholders[] = 'DEFAULT';
-            } elseif ($value == 'MYSQLTIME') {
+            } elseif ($value === 'MYSQLTIME') {
                 $placeholders[] = $this->MYSQLTime();
             } else {
                 $placeholders[] = '?';
@@ -281,7 +280,7 @@ class Entity
         $columnsSql = implode(', ', $columns);
         $placeholdersSql = implode(', ', $placeholders);
         $sql = "INSERT INTO $table ($columnsSql) VALUES ($placeholdersSql)";
-       
+
         $error = "Could not insert to table '$table'";
         $this->query($sql, $error, $params);
 
@@ -333,7 +332,7 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i == $page) {
+            if ($i === $page) {
                 $nav[$i] = 1;
             } else {
                 $nav[$i] = 0;
@@ -359,7 +358,7 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i == $page) {
+            if ($i === $page) {
                 $nav[$i] = 1;
             } else {
                 $nav[$i] = 0;
@@ -380,7 +379,7 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i == $page) {
+            if ($i === $page) {
                 $nav[$i] = 1;
             } else {
                 $nav[$i] = 0;
@@ -411,7 +410,7 @@ class Entity
         $pages = ceil($rows / $perPage);
         $i = 1;
         while ($i <= $pages) {
-            if ($i == $page) {
+            if ($i === $page) {
                 $nav[$i] = 1;
             } else {
                 $nav[$i] = 0;
@@ -486,8 +485,7 @@ class Entity
         $group,
         $order,
         $params = []
-    )
-    {
+    ) {
         $all = [];
         $table1 = $this::TABLE;
         $start = ($page - 1) * $perPage;
@@ -507,13 +505,14 @@ class Entity
     public function assignFromPost($ignore, $force_id = false)
     {
         foreach ($this->properties as $property) {
-            if (($force_id && $property == 'id') ||
+            if (($force_id && $property === 'id') ||
                 (
-                  !in_array($property, self::GLOBALLY_IGNORED_PROPERTIES) &&
-                  !in_array($property, $ignore)) &&
+                    !in_array($property, self::GLOBALLY_IGNORED_PROPERTIES, true) &&
+                  !in_array($property, $ignore, true)
+                ) &&
                   isset($_POST[$property])
-                ) {
-                    $this->$property = $_POST[$property];
+            ) {
+                $this->$property = $_POST[$property];
             }
         }
     }
@@ -522,7 +521,7 @@ class Entity
     {
         $option = [];
         $data = $this->getAll();
-        if ($first != '') {
+        if ($first !== '') {
             $option[0] = $first;
         }
 
@@ -547,7 +546,7 @@ class Entity
         $preTagPattern2 = '!&lt;pre(?: +class=&quot;(.*?)&quot;)? *&gt;\n*(.*?)&lt;/pre&gt;!ms';
 
         foreach ($this->properties as $property) {
-            if (!is_numeric($property) && in_array($property, $filtering)) {
+            if (!is_numeric($property) && in_array($property, $filtering, true)) {
                 $markup = $this->$property;
                 $markup = str_replace("\r", "\n", $markup);
                 $markup = preg_replace("!\n\n+!", "\n", $markup);
@@ -573,13 +572,13 @@ class Entity
 
                 $markup = preg_replace(
                     $preTagPattern1,
-                    "<pre>$1</pre>",
+                    '<pre>$1</pre>',
                     $markup
                 );
 
                 $markup = preg_replace(
                     $preTagPattern2,
-                    "<pre><code class=\"lang-$1\">$2</code></pre>",
+                    '<pre><code class="lang-$1">$2</code></pre>',
                     $markup
                 );
 
@@ -620,7 +619,7 @@ class Entity
         }
         return [
             '(' . implode(',', $params) . ')',
-            $ids
+            $ids,
         ];
     }
 
@@ -631,7 +630,7 @@ class Entity
         $params = [];
         $sql = "DELETE FROM $table WHERE id = ?";
         $params[] = $id;
-        $error = "Could not delete row.";
+        $error = 'Could not delete row.';
         $this->query($sql, $error, $params);
     }
 

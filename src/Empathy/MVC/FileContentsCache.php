@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 class FileContentsCache
@@ -19,7 +21,7 @@ class FileContentsCache
                 $data = $callback($data);
             }
             if ($apcuAvailable) {
-                apcu_add($filename, $data); 
+                apcu_add($filename, $data);
             }
         }
         return $data;

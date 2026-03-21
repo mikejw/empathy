@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 /**
@@ -23,7 +25,7 @@ class Session
         if (isset($_SESSION)) {
             echo "<pre>\n";
             print_r($_SESSION);
-            echo "</pre>";
+            echo '</pre>';
         }
     }
 
@@ -39,7 +41,7 @@ class Session
             Testable::session_start();
             if (!isset($_SESSION['app']) ||
                !isset($_SESSION['app'][self::$app])) {
-                $_SESSION['app'][self::$app] = array();
+                $_SESSION['app'][self::$app] = [];
             }
             //self::dump();
             self::$up = true;
@@ -79,7 +81,7 @@ class Session
 
         // main logic
         unset($_SESSION['app'][self::$app]);
-        if (sizeof($_SESSION['app']) == 0) {
+        if (sizeof($_SESSION['app']) === 0) {
             Testable::session_unset();
             Testable::session_destroy();
         }
@@ -87,7 +89,7 @@ class Session
         // backwards compatibility
         if (isset($_SESSION['user_id']) && !$new_app) {
             foreach ($_SESSION as $index => $value) {
-                if ($index != 'app') {
+                if ($index !== 'app') {
                     unset($_SESSION[$index]);
                 }
             }
@@ -113,8 +115,8 @@ class Session
         unset($_SESSION['app'][self::$app][$key]);
     }
 
-    
-    
+
+
     public static function loadUIVars($ui, $ui_array)
     {
         $new_app = self::getNewApp();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 define('MVC_VERSION', '4.3.3');
@@ -18,7 +20,6 @@ define('MVC_VERSION', '4.3.3');
  */
 class Empathy
 {
-
     /**
      * Boot object created before dispatch
      * @var Bootstrap
@@ -29,20 +30,20 @@ class Empathy
      * Boot options read from application config file.
      * @var array
      */
-    private $bootOptions = array();
+    private $bootOptions = [];
 
     /**
      * Plugin definition read from application config file.
      * @var array
      */
-    private $plugins = array();
+    private $plugins = [];
 
     /**
      * When application is set to handle errors
      * this array is used to collect the error messages.
      * @var array
      */
-    private $errors = array();
+    private $errors = [];
 
     /**
      * Application persistent mode. Implies there could be multiple requests to handle
@@ -70,11 +71,11 @@ class Empathy
 
     /**
      * Set config into memory.
-     * 
-     * @param $config Configuration data 
-     * 
-     * @param $hard   Set constants  
-     * 
+     *
+     * @param $config Configuration data
+     *
+     * @param $hard   Set constants
+     *
      * @return void
      */
     private function consumeConfig($config, $configDir, $hard = false)
@@ -116,7 +117,7 @@ class Empathy
     public function __construct($configDir, $persistentMode = false)
     {
         $this->persistentMode = $persistentMode;
-        spl_autoload_register(array($this, 'loadClass'));
+        spl_autoload_register([$this, 'loadClass']);
 
         list($appConfig, $globalConfig) = DI::getContainer()->get('Config');
         $this->consumeConfig($appConfig, $configDir);
@@ -130,7 +131,7 @@ class Empathy
             self::$useElib = false;
         }
         if ($this->getHandlingErrors()) {
-            set_error_handler(array($this, 'errorHandler'));
+            set_error_handler([$this, 'errorHandler']);
         }
     }
 
@@ -161,7 +162,7 @@ class Empathy
         } else {
             try {
                 $this->boot->initPlugins();
-            } catch (\Exception $e) {                
+            } catch (\Exception $e) {
                 $this->exceptionHandler($e);
                 $handleSuccess = false;
             }
@@ -262,8 +263,8 @@ class Empathy
             case E_USER_ERROR:
                 $msg = "Error: [$errno] $errstr";
                 $msg .= "  Fatal error on line $errline in file $errfile";
-                $msg .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")";
-                $msg .= " Aborting...";
+                $msg .= ', PHP ' . PHP_VERSION . ' (' . PHP_OS . ')';
+                $msg .= ' Aborting...';
                 Testable::doDie($msg);
                 break;
 
@@ -314,7 +315,7 @@ class Empathy
         if ($this->dispatchedException) {
             return false;
         }
-        
+
         $response = '';
         $errors = '';
 
@@ -359,29 +360,30 @@ class Empathy
                         break;
                     case RequestException::NOT_AUTHORIZED:
                         $response = 'HTTP/1.1 403 Forbidden';
-                        break;   
+                        break;
                     case RequestException::NOT_AUTHENTICATED:
                         $response = 'HTTP/1.1 401 Unauthorized';
                         break;
                     case RequestException::METHOD_NOT_ALLOWED:
                         $response = 'HTTP/1.1 401 Method Not Allowed';
-                        break;                              
+                        break;
                     default:
                         break;
                 }
+                // no break
             default:
-                if ($response == '') {
+                if ($response === '') {
                     $response = $response500;
                 }
 
                 $message = $e->getMessage();
                 $log = new LogItem(
                     'application error',
-                    array(),
+                    [],
                     self::class,
                     'error'
                 );
-                if ($message != '') {
+                if ($message !== '') {
                     $log->append('exception', $message);
                 }
                 if ($response) {
@@ -391,7 +393,7 @@ class Empathy
                     $log->append('error', $errors);
                 }
                 $log->fire();
-                
+
                 Testable::header($response);
                 $this->dispatchedException = true;
                 $this->boot->dispatchException($e);
@@ -408,12 +410,12 @@ class Empathy
     public static function loadClass($classPath)
     {
         $classNameArr = explode('\\', $classPath);
-        $className = $classNameArr[ sizeof($classNameArr) -1 ];
+        $className = $classNameArr[ sizeof($classNameArr) - 1 ];
 
         $location = '';
         if (strpos($classPath, 'Empathy\\MVC\\Controller\\') === 0) {
             if (isset($_GET['module'])) {
-                if ($className != 'CustomController') {
+                if ($className !== 'CustomController') {
                     $location = Config::get('DOC_ROOT') . '/application/' . $_GET['module'] . '/';
                 }
             } else {
@@ -435,7 +437,7 @@ class Empathy
 
     public function init()
     {
-        $this->boot = DI::getContainer()->get('Bootstrap');   
+        $this->boot = DI::getContainer()->get('Bootstrap');
         if ($this->persistentMode !== true) {
             $this->beginDispatch();
         }
@@ -455,7 +457,7 @@ class Empathy
     {
         $this->bootOptions = $options;
     }
-    
+
     public function setPlugins($plugins)
     {
         $this->plugins = $plugins;

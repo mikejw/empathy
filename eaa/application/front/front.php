@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Controller;
 
 class front extends CustomController

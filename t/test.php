@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 // if(false == @include('../vendor/autoload.php')) {
 
 // } else {
 //     require('bootstrap.php');
 
 //     \Empathy\MVC\Testable::header('Cache-Control: no-cache, must-revalidate');
-    
+
 //     $m = new ESuite\Fake\Message();
 //     //$new = $m->withHeader('Cache-Control', 'no-cache, must-revalidate');
 
@@ -19,7 +21,7 @@
 // }
 
 
-if(false == @include('../vendor/autoload.php')) {
+if (false === @include('../vendor/autoload.php')) {
 
 } else {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Copyright 2008-2015 Mike Whiting (mikejw3@gmail.com).
 // This file is part of the Empathy MVC framework.
 
@@ -16,11 +18,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Empathy.  If not, see <http://www.gnu.org/licenses/>.
 
-if(false == @include('../vendor/autoload.php')) {
-    
+if (false === @include('../vendor/autoload.php')) {
+
     include('./site_down.html');
 } else {
     $container = Empathy\MVC\DI::init(realpath(dirname(__FILE__).'/../'));
-	$empathy = $container->get('Empathy');
-	$empathy->init();
+    $empathy = $container->get('Empathy');
+    $empathy->init();
 }

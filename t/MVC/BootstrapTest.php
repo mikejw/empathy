@@ -1,21 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
 use ESuite\ESuiteTest;
 
-
 class BootstrapTest extends ESuiteTest
 {
     private $bootstrap;
-    
+
 
     protected function setUp(): void
     {
         parent::setUp();
 
         if ($this->bootstrap === null) {
-           $this->bootstrap = $this->makeFakeBootstrap();
+            $this->bootstrap = $this->makeFakeBootstrap();
         }
     }
 
@@ -36,9 +37,9 @@ class BootstrapTest extends ESuiteTest
 
 
     public function testDispatchException()
-    {           
+    {
         $this->expectOutputRegex('/html/');
-        $this->bootstrap->dispatchException(new \Exception());    
+        $this->bootstrap->dispatchException(new \Exception());
     }
 
 }

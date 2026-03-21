@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util;
 
 use Empathy\MVC\Config;
@@ -17,8 +19,7 @@ use Empathy\MVC\Config;
  */
 class ControllerGen
 {
-
-    const BLOB = <<<ENDBLOB
+    public const BLOB = <<<ENDBLOB
 <?php
 
 namespace Empathy\MVC\Controller;
@@ -38,7 +39,7 @@ ENDBLOB;
     {
         //
     }
-    
+
     public function getModule()
     {
         return $this->module;

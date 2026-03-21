@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util;
 
 /**
@@ -15,7 +17,6 @@ namespace Empathy\MVC\Util;
  */
 class Pear
 {
-
     public static function getConfigDir()
     {
         $er = error_reporting();

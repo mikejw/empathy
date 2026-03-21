@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 // simple mocking for certain native calls
@@ -47,7 +49,7 @@ class Testable
             if (sizeof($header_arr)) {
                 $index = $header_arr[0];
                 array_shift($header_arr);
-                if (sizeof($header_arr) == 1) {
+                if (sizeof($header_arr) === 1) {
                     $content = $header_arr[0];
                 } else {
                     $content = implode(':', $header_arr);
@@ -106,7 +108,7 @@ class Testable
             if (function_exists('apache_response_headers')) {
                 return apache_response_headers();
             } else {
-                $h = array();
+                $h = [];
                 foreach ($_SERVER as $key => $value) {
                     if (strpos($key, 'HTTP_') === 0) {
                         $new_key = str_replace(' ', '-', ucwords(str_replace('_', ' ', substr(strtolower($key), 5))));
@@ -120,6 +122,6 @@ class Testable
 
     public static function miscReset()
     {
-        self::$headers = array();
+        self::$headers = [];
     }
 }

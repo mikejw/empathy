@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This file is part of the Empathy package.
  *
@@ -10,8 +12,8 @@
  */
 
 namespace Empathy\MVC;
-use Empathy\MVC\PluginManager\Option as PMOption;
 
+use Empathy\MVC\PluginManager\Option as PMOption;
 
 /**
  * Main boot class that handles plugins and dispatches to controllers.
@@ -20,7 +22,6 @@ use Empathy\MVC\PluginManager\Option as PMOption;
  */
 class Bootstrap
 {
-
     /**
      * This is used to store a reference to the controller object
      * which is instatiated before an action can be dispatchted.
@@ -145,9 +146,9 @@ class Bootstrap
             $this->debugMode = ($bootOptions['debug_mode'] === true);
         }
         $this->environment = 'dev';
-        $validEnv = array('dev', 'uat', 'stag', 'prod');
+        $validEnv = ['dev', 'uat', 'stag', 'prod'];
         if (isset($bootOptions['environment'])) {
-            if (in_array($bootOptions['environment'], $validEnv)) {
+            if (in_array($bootOptions['environment'], $validEnv, true)) {
                 $this->environment = $bootOptions['environment'];
             }
         }
@@ -169,9 +170,9 @@ class Bootstrap
 
         $error = $this->uri->getError();
 
-        if ($error == URI::MISSING_CLASS_DEF
+        if ($error === URI::MISSING_CLASS_DEF
            && isset($this->dynamicModule)
-           && $this->dynamicModule != '') {
+           && $this->dynamicModule !== '') {
 
             // anticipate dispatched errors
             $this->pluginManager = DI::getContainer()->get('PluginManager');
@@ -182,13 +183,13 @@ class Bootstrap
         }
 
         if ($error > 0 && $controller === null) {
-            if ($this->environment != 'dev' || $this->debugMode == false) {
-                if ($error == URI::MISSING_CLASS_DEF ||
-                    $error == URI::MISSING_EVENT_DEF ||
-                    $error == URI::ERROR_404
+            if ($this->environment !== 'dev' || $this->debugMode === false) {
+                if ($error === URI::MISSING_CLASS_DEF ||
+                    $error === URI::MISSING_EVENT_DEF ||
+                    $error === URI::ERROR_404
                 ) {
                     throw new RequestException('Not found', RequestException::NOT_FOUND);
-                } elseif ($error == URI::INVALID_DYNAMIC_MODULE_DEFAULT_URI) {
+                } elseif ($error === URI::INVALID_DYNAMIC_MODULE_DEFAULT_URI) {
                     throw new RequestException('Bad default dynamic module default uri.', RequestException::BAD_REQUEST);
                 }
             } else {
@@ -204,7 +205,7 @@ class Bootstrap
         }
 
         $this->controller->doPreEvent();
-        if ($fake == false) {
+        if ($fake === false) {
             $event = $_GET['event'];
             $eventVal = $this->controller->$event();
             if ($this->mvc->hasErrors()) {
@@ -229,12 +230,12 @@ class Bootstrap
      */
     public function dispatchException($e)
     {
-        $reqError = (get_class($e) == RequestException::class) ? true : false;
-        $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;   
+        $reqError = (get_class($e) === RequestException::class) ? true : false;
+        $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;
 
         $this->controller = new Controller($this, $useSession);
-         DI::getContainer()->set('Controller', $this->controller);
-         $this->controller->doPreEvent();
+        DI::getContainer()->set('Controller', $this->controller);
+        $this->controller->doPreEvent();
 
         $this->controller->viewException($this->debugMode, $e, $reqError);
     }
@@ -267,12 +268,12 @@ class Bootstrap
         $whitelist = $this->pluginManager->getWhitelist();
 
         if (!$pluginManager->getInitialized()) {
-            try {       
+            try {
                 $pluginManager->init();
 
                 foreach ($plugins as $p) {
                     if (count($whitelist)) {
-                        if (!in_array($p['name'], $whitelist)) {
+                        if (!in_array($p['name'], $whitelist, true)) {
                             continue;
                         }
                     }
@@ -280,8 +281,8 @@ class Bootstrap
                     if (isset($p['class_path'])) {
                         if (!class_exists($p['class_name'])) {
                             require($p['class_path']);
-                            if (isset($p['loader']) && $p['loader'] != '') {
-                                spl_autoload_register(array($p['class_name'], $p['loader']));
+                            if (isset($p['loader']) && $p['loader'] !== '') {
+                                spl_autoload_register([$p['class_name'], $p['loader']]);
                             }
                         }
                     }
@@ -292,8 +293,8 @@ class Bootstrap
                         $plugin = 'Empathy\\MVC\\Plugin\\'.$p['name'];
                     }
 
-                    $n = (isset($p['config']))?
-                        new $plugin($pluginManager, $this, $p['config']):
+                    $n = (isset($p['config'])) ?
+                        new $plugin($pluginManager, $this, $p['config']) :
                         new $plugin($pluginManager, $this, null);
                     $pluginManager->register($n);
                     $pluginManager->attemptSetView($n);
@@ -334,7 +335,7 @@ class Bootstrap
      */
     public function getURIError()
     {
-        return (isset($this->uri))? $this->uri->getError(): null;
+        return (isset($this->uri)) ? $this->uri->getError() : null;
     }
 
 
@@ -348,7 +349,7 @@ class Bootstrap
      */
     public function getURICliMode()
     {
-        return (isset($this->uri))? $this->uri->getCliMode(): null;
+        return (isset($this->uri)) ? $this->uri->getCliMode() : null;
     }
 
     /**
@@ -357,7 +358,7 @@ class Bootstrap
      */
     public function getURIData()
     {
-        return (isset($this->uri))? $this->uri->getData(): null;
+        return (isset($this->uri)) ? $this->uri->getData() : null;
     }
 
     /**

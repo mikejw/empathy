@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
 use Empathy\MVC\DBC;
 use ESuite\ESuiteTest;
 use ESuite\Util\DB;
-
 
 class DBCTest extends ESuiteTest
 {
@@ -27,7 +28,7 @@ class DBCTest extends ESuiteTest
         );
     }
 
-    
+
     public function testConnection()
     {
         $this->assertInstanceOf('PDO', $this->dbc->getHandle());

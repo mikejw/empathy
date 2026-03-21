@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Plugin;
 
-use Empathy\MVC\Testable;
-use Empathy\MVC\Plugin as Plugin;
 use Empathy\MVC\Config;
+use Empathy\MVC\Plugin as Plugin;
+use Empathy\MVC\Testable;
 
 /**
  * Empathy EDefault Plugin
@@ -19,7 +21,6 @@ use Empathy\MVC\Config;
  */
 class EDefault extends Plugin implements PreDispatch
 {
-
     public function onPreDispatch()
     {
         date_default_timezone_set('Europe/London');
@@ -28,12 +29,13 @@ class EDefault extends Plugin implements PreDispatch
         $this->wwwRedirect();
     }
 
-    private function wwwRedirect() {
+    private function wwwRedirect()
+    {
         if (isset($_SERVER['HTTP_HOST'])) {
             $host = Config::get('WEB_ROOT');
             $reqHost = $_SERVER['HTTP_HOST'];
             if (0 === strpos($host, 'www') && false === strPos($reqHost, 'www')) {
-                header("Location: //" . $host . $_SERVER['REQUEST_URI']);
+                header('Location: //' . $host . $_SERVER['REQUEST_URI']);
                 exit();
             }
         }

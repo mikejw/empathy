@@ -1,7 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
-use Empathy\MVC\DI;
 
 /**
  * Empathy SectionItemStandAlone class
@@ -36,11 +37,11 @@ class SectionItemStandAlone extends Entity
 
     public function getURIData()
     {
-        $uri_data = array();
+        $uri_data = [];
 
         $sql = 'SELECT id, section_id, label, friendly_url FROM ' . SectionItemStandAlone::$table
             .' WHERE hidden != 1';
-        $error = "Could not get URI data.";
+        $error = 'Could not get URI data.';
         $result = $this->query($sql, $error);
         $i = 0;
         foreach ($result as $row) {
@@ -57,7 +58,7 @@ class SectionItemStandAlone extends Entity
         $params[] = $id;
         $error = 'Could not load record.';
         $result = $this->query($sql, $error, $params);
-        if (1 == $result->rowCount()) {
+        if (1 === $result->rowCount()) {
             $row = $result->fetch();
             foreach ($row as $index => $value) {
                 $this->$index = $value;
@@ -69,10 +70,10 @@ class SectionItemStandAlone extends Entity
 
     public function findSection($rows, $slug, $parent_id)
     {
-        $matched = array();
+        $matched = [];
         foreach ($rows as $row) {
             $comp = str_replace(' ', '', strtolower($row['label']));
-            if ($comp == $slug && $parent_id == $row['section_id']) {
+            if ($comp === $slug && $parent_id === $row['section_id']) {
                 $matched = $row;
                 break;
             }
@@ -89,7 +90,7 @@ class SectionItemStandAlone extends Entity
         $matched = false;
         $rows = $this->getURIData();
         $id = 0;
-        $sections = array();
+        $sections = [];
         $sectionId = -1;
 
         foreach ($uri as $slug) {

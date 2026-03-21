@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
+
 use DI\Container;
 use DI\ContainerBuilder;
 use Monolog\Logger;
@@ -16,7 +19,7 @@ class DI
             $spyc = DI::getContainer()->get('Spyc');
         }
         $configFile = $configDir.'/config.yml';
-        return FileContentsCache::cachedCallback($configFile, function($data) use (&$spyc) {
+        return FileContentsCache::cachedCallback($configFile, function ($data) use (&$spyc) {
             return $spyc->YamlLoadString($data);
         });
     }
@@ -69,7 +72,7 @@ class DI
             'Config' => function (Container $c) {
                 return [
                     self::loadConfig($c->get('configDir')),
-                    self::loadConfig(dirname(realpath(__FILE__)).'/../../..')
+                    self::loadConfig(dirname(realpath(__FILE__)).'/../../..'),
                 ];
             },
             'LoggingOn' => false,
@@ -80,7 +83,7 @@ class DI
                 }
                 $logging = new Logging($c->get('LoggingLevel'));
                 return $logging->getLog();
-            }
+            },
         ]);
 
         $appConfig = self::loadConfig($configDir, new \Spyc());
@@ -91,7 +94,7 @@ class DI
             $elibDirs = \Empathy\ELib\Util\Libs::findAll($appConfig['doc_root']);
             foreach ($elibDirs as $lib) {
                 self::loadAdditional($lib.'/services.php', $appConfig['doc_root']);
-            }            
+            }
         }
 
         self::loadAdditional($configDir.'/services.php');

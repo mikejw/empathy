@@ -1,7 +1,8 @@
 <?php
 
-namespace Empathy\MVC\Plugin\JSONView;
+declare(strict_types=1);
 
+namespace Empathy\MVC\Plugin\JSONView;
 
 abstract class BaseROb
 {
@@ -11,7 +12,7 @@ abstract class BaseROb
 
     public function __construct()
     {
-        $this->pretty = false;        
+        $this->pretty = false;
     }
 
     public function setPretty($pretty)
@@ -20,16 +21,16 @@ abstract class BaseROb
     }
 
     public function __toString()
-    {        
+    {
         return json_encode($this->serialize(), $this->pretty ? JSON_PRETTY_PRINT : 0);
     }
 
-    public function setJSONPCallback($callback) 
+    public function setJSONPCallback($callback)
     {
         $this->jsonp_callback = $callback;
     }
 
-    public function getJSONPCallback() 
+    public function getJSONPCallback()
     {
         $callback = false;
         if ($this->jsonp_callback !== null) {

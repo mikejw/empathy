@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\Util;
 
 use Empathy\MVC\Config as EmpConfig;
@@ -11,13 +13,13 @@ class DB
 
     public static function getDefDBCreds()
     {
-        return array(
+        return [
             'db_host' => '127.0.0.1',
             'db_name' => 'etest',
             'db_user' => 'root',
             'db_pass' => 'example',
-            'db_port' => 3306
-        );
+            'db_port' => 3306,
+        ];
     }
 
     public static function loadDefDBCreds()
@@ -32,17 +34,17 @@ class DB
 
     public static function create($name)
     {
-        if (self::$dbh === NULL) {
+        if (self::$dbh === null) {
             self::connect();
         }
 
-        $sql = 'DROP DATABASE IF EXISTS '.$name.'; CREATE DATABASE '.$name.';';      
+        $sql = 'DROP DATABASE IF EXISTS '.$name.'; CREATE DATABASE '.$name.';';
         $result = self::$dbh->query($sql);
     }
 
-    public static function reset($db_name = NULL)
+    public static function reset($db_name = null)
     {
-        if ($db_name === NULL) {
+        if ($db_name === null) {
             $db_name = EmpConfig::get('DB_NAME').'.sql';
         }
         self::create(EmpConfig::get('DB_NAME'));
@@ -51,10 +53,13 @@ class DB
 
     private static function connect()
     {
-        self::$dbh = new \PDO('mysql:host='.EmpConfig::get('DB_SERVER'),
-            EmpConfig::get('DB_USER'), EmpConfig::get('DB_PASS'));
+        self::$dbh = new \PDO(
+            'mysql:host='.EmpConfig::get('DB_SERVER'),
+            EmpConfig::get('DB_USER'),
+            EmpConfig::get('DB_PASS')
+        );
     }
-    
+
     private static function load($file)
     {
         $exec = Config::get('mysql').' -u '.EmpConfig::get('DB_USER').' --password=\''.EmpConfig::get('DB_PASS').'\' '
@@ -66,11 +71,11 @@ class DB
     // not used as yet
     private static function getCriteria()
     {
-        self::$db_criteria = array(
+        self::$db_criteria = [
             'host' => Config::get('db_host'),
             'username' => Config::get('db_user'),
             'password' => Config::get('db_pass'),
-            'database' => Config::get('db_name')
-            );
+            'database' => Config::get('db_name'),
+            ];
     }
 }

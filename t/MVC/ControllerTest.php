@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
 use ESuite\ESuiteTest;
-use Empathy\MVC\Session;
-
 
 class ControllerTest extends ESuiteTest
 {

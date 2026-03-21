@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util;
 
 use Empathy\ELib\Util\Libs;
@@ -18,12 +20,11 @@ use Empathy\MVC\Config;
  */
 class ModuleGen
 {
-    
     public static function generate($module, $lib = null)
     {
         Libs::detect();
         $installed = Libs::getInstalled();
-        $class_list = array();
+        $class_list = [];
         $generated = 0;
 
         foreach ($installed as $i) {
@@ -31,7 +32,7 @@ class ModuleGen
             if (file_exists($gen_root)) {
                 $files = glob($gen_root.'/*.php');
                 foreach ($files as $f) {
-                    $matches = array();
+                    $matches = [];
                     preg_match('/Gen\/(.+)\.php$/', $f, $matches);
                     $class_list[] = 'Empathy\\ELib\\Gen\\'.$matches[1];
                 }
@@ -39,7 +40,7 @@ class ModuleGen
         }
         foreach ($class_list as $c) {
             $tmp = new $c();
-            if ($tmp->getModule() == $module) {
+            if ($tmp->getModule() === $module) {
                 if ($tmp->write()) {
                     $generated++;
                 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This file is part of the Empathy package.
  *
@@ -18,7 +20,6 @@ namespace Empathy\MVC;
  */
 class Controller
 {
-
     /**
      * The module the controller instance belongs to. (Established using the URI object.)
      */
@@ -45,7 +46,7 @@ class Controller
      * The view/presentation object that will be used to render the page.
      */
     public $presenter;
-   
+
     /**
      * The plugin manager object created during booting.
      */
@@ -77,7 +78,7 @@ class Controller
      *
      * @param Bootstrap $boot The current bootstrap object
      */
-    public function __construct($boot, $useSession = true, $pluginOptions = [], $pluginWhitelist =[])
+    public function __construct($boot, $useSession = true, $pluginOptions = [], $pluginWhitelist = [])
     {
         DI::getContainer()->set('Controller', $this);
         $this->boot = $boot;
@@ -91,14 +92,14 @@ class Controller
         }
 
         $this->presenter = $this->pluginManager->getView();
-    
+
         $this->useSession = $useSession;
         $this->environment = $boot->getEnvironment();
         $this->stash =  DI::getContainer()->get('Stash');
-        $this->module = (isset($_GET['module']))? $_GET['module']: null;
-        $this->class = (isset($_GET['class']))? $_GET['class']: null;
-        $this->event = (isset($_GET['event']))? $_GET['event']: null;
-       
+        $this->module = (isset($_GET['module'])) ? $_GET['module'] : null;
+        $this->class = (isset($_GET['class'])) ? $_GET['class'] : null;
+        $this->event = (isset($_GET['event'])) ? $_GET['event'] : null;
+
         if (Config::get('TPL_BY_CLASS')) {
             $this->templateFile = $this->class.'.tpl';
         } else {
@@ -106,7 +107,7 @@ class Controller
         }
 
         if ($this->useSession) {
-            Session::up();    
+            Session::up();
         }
     }
 
@@ -118,11 +119,11 @@ class Controller
     }
 
     private function controllerAssigns()
-    {    
+    {
         $this->assignControllerInfo();
         $this->assignConstants();
         $this->assignEnvironment();
-    
+
         if (isset($_GET['section_uri'])) {
             $this->assign('section', $_GET['section_uri']);
         }
@@ -210,14 +211,14 @@ class Controller
      */
     public function redirect($endString = '')
     {
-        $proto = (\Empathy\MVC\Util\Misc::isSecure())? 'https': 'http';
+        $proto = (\Empathy\MVC\Util\Misc::isSecure()) ? 'https' : 'http';
         if ($this->useSession) {
-            Session::write();    
+            Session::write();
         }
-        
+
         $location = 'Location: ';
         $location .= $proto.'://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
-        if ($endString != '') {
+        if ($endString !== '') {
             $location .= $endString;
         }
         Testable::header($location);
@@ -233,11 +234,11 @@ class Controller
     public function redirect_cgi($endString = '')
     {
         if ($this->useSession) {
-            Session::write();    
-        }  
+            Session::write();
+        }
         $location = 'Location: ';
         $location .= 'http://'.Config::get('CGI').'/';
-        if ($endString != '') {
+        if ($endString !== '') {
             $location .= $endString;
         }
         Testable::header($location);
@@ -264,7 +265,7 @@ class Controller
     {
         $request = false;
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-           ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
+           ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest')) {
             $request = true;
         }
         return $request;
@@ -303,7 +304,7 @@ class Controller
         return $this->class;
     }
 
-    public function getEvent() 
+    public function getEvent()
     {
         return $this->event;
     }
@@ -352,7 +353,7 @@ class Controller
             if ($assertSet) {
                 $valid = false;
             }
-        } elseif (!((string) $_GET[$id] === (string) (int) $_GET[$id]) || ($_GET[$id] == 0 && $def != 0)
+        } elseif (!((string) $_GET[$id] === (string) (int) $_GET[$id]) || ($_GET[$id] === 0 && $def !== 0)
                || $_GET[$id] < 0) {
             $assign_def = true;
             $valid = false;
@@ -386,7 +387,7 @@ class Controller
         $token = md5(uniqid(rand(), true));
         $this->assign('csrf_token', $token);
         if ($this->useSession) {
-            Session::set('csrf_token', $token);    
+            Session::set('csrf_token', $token);
         }
     }
 
@@ -395,7 +396,8 @@ class Controller
         return $this->useSession;
     }
 
-    private function setPresenter($view) {
+    private function setPresenter($view)
+    {
         $this->presenter = $view;
     }
 

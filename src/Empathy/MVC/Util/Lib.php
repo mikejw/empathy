@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Empathy/MVC/Util/Lib.php
  *
@@ -11,6 +13,7 @@
  * @link      http://empathyphp.co.uk
  *
  */
+
 namespace Empathy\MVC\Util;
 
 class Lib

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Util\Testing;
 
+use Empathy\MVC\Config as EmpConfig;
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
-use Empathy\MVC\Config as EmpConfig;
 
 /**
  * Empathy test suite base class
@@ -20,7 +22,7 @@ use Empathy\MVC\Config as EmpConfig;
 abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
 {
     private $boot;
-    
+
     protected function makeBootstrap()
     {
         global $base_dir;
@@ -51,27 +53,27 @@ abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
             dirname(realpath(__FILE__)).'/../../../../../eaa/'
         );
 
-        $dummyBootOptions = array(
+        $dummyBootOptions = [
             'default_module' => 'foo',
             'dynamic_module' => null,
             'debug_mode' => false,
             'environment' => 'dev',
-            'handle_errors' => false
-        );
-        $plugins = array(
-            array(
+            'handle_errors' => false,
+        ];
+        $plugins = [
+            [
                 'name' => 'ELibs',
                 'version' => '1.0',
-                'config' => '{ "testing": '.$testingMode.' }'
-            ),
-            array(
+                'config' => '{ "testing": '.$testingMode.' }',
+            ],
+            [
                 'name' => 'Smarty',
                 'version' => '1.0',
                 'class_path' => 'Smarty/Smarty.class.php',
                 'class_name' => '\Smarty',
-                'loader' => ''
-            )
-        );
+                'loader' => '',
+            ],
+        ];
 
         $container = \Empathy\MVC\DI::init($doc_root, true);
         $empathy = $container->get('Empathy');

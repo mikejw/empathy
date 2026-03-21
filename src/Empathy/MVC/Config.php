@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This file is part of the Empathy package.
  *
@@ -22,7 +24,7 @@ class Config
     /**
      * Initialise empty config;
      */
-    private static $items = array();
+    private static $items = [];
 
     /**
      * Return a piece of config.

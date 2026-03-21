@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite\MVC;
 
 use Empathy\MVC\EntityManager;
 use Empathy\MVC\EntityPopulator;
-use Empathy\MVC\Config as EmpConfig;
 use ESuite\ESuiteTest;
-
 use Nelmio\Alice\Fixtures;
 use Nelmio\Alice\Fixtures\Loader;
-
 
 // also testing new EntityManager class
 
@@ -17,7 +16,6 @@ use Nelmio\Alice\Fixtures\Loader;
 
 class EntityTest extends ESuiteTest
 {
-    
     protected function setUp(): void
     {
         \ESuite\Util\DB::loadDefDBCreds();
@@ -31,7 +29,7 @@ class EntityTest extends ESuiteTest
         $objectManager = new EntityManager();
 
         $file = \ESuite\Util\Config::get('base').$file;
-        $loader = new Loader();        
+        $loader = new Loader();
         $loader->addPopulator($populator);
 
         $objects = $loader->load($file);
@@ -39,15 +37,15 @@ class EntityTest extends ESuiteTest
     }
 
 
-   /*
-    * Commented out - no tests to run
-    public function testAlice()
-    {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
-        $this->loadFixtures('fixtures/dd2.sql', '/fixtures/fixtures2.yml');
-        $this->loadFixtures('fixtures/dd3.sql', '/fixtures/fixtures3.yml');
-    }
-    */
+    /*
+     * Commented out - no tests to run
+     public function testAlice()
+     {
+         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+         $this->loadFixtures('fixtures/dd2.sql', '/fixtures/fixtures2.yml');
+         $this->loadFixtures('fixtures/dd3.sql', '/fixtures/fixtures3.yml');
+     }
+     */
 
     public function testFindBadClass()
     {
@@ -80,7 +78,7 @@ class EntityTest extends ESuiteTest
         $fake->save();
         $fake = $objectManager->find('Esuite\FakeEntity', 1);
         $this->assertEquals($fake->foo, 'new');
-    }    
+    }
 
     public function testGetAll()
     {

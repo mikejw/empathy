@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This file is part of the Empathy package.
  *
@@ -20,7 +22,6 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class Cassandra extends Plugin
 {
-
     /**
      * Imports cassandra code.
      *

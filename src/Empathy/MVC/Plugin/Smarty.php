@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Config;
@@ -30,10 +32,10 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         if (Config::get('SMARTY_CACHING')) {
             $this->smarty->caching = 1;
         }
-        $this->smarty->template_dir = Config::get('DOC_ROOT')."/presentation";
-        $this->smarty->compile_dir = Config::get('DOC_ROOT')."/tpl/templates_c";
-        $this->smarty->cache_dir = Config::get('DOC_ROOT')."/tpl/cache";
-        $this->smarty->config_dir = Config::get('DOC_ROOT')."/tpl/configs";
+        $this->smarty->template_dir = Config::get('DOC_ROOT').'/presentation';
+        $this->smarty->compile_dir = Config::get('DOC_ROOT').'/tpl/templates_c';
+        $this->smarty->cache_dir = Config::get('DOC_ROOT').'/tpl/cache';
+        $this->smarty->config_dir = Config::get('DOC_ROOT').'/tpl/configs';
         $this->smarty->error_reporting = E_ALL  & ~E_NOTICE & ~E_WARNING;
 
         if (class_exists('Empathy\ELib\Plugin\SmartyResourceELib')) {
@@ -41,24 +43,24 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         }
 
         $this->smarty->registerPlugin(
-            "modifier",
-            "base64_encode",
-            "base64_encode"
+            'modifier',
+            'base64_encode',
+            'base64_encode'
         );
         $this->smarty->registerPlugin(
-            "modifier",
-            "ucfirst",
-            "ucfirst"
+            'modifier',
+            'ucfirst',
+            'ucfirst'
         );
         $this->smarty->registerPlugin(
-            "modifier",
-            "sizeof",
-            "sizeof"
+            'modifier',
+            'sizeof',
+            'sizeof'
         );
         $this->smarty->registerPlugin(
-            "modifier",
-            "preg_match",
-            "preg_match"
+            'modifier',
+            'preg_match',
+            'preg_match'
         );
     }
 

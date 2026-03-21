@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ESuite;
 
 use Empathy\MVC\Entity;
@@ -13,7 +15,7 @@ class FakeEntity extends Entity
     public $nonempty;
     public $foo;
 
-    const TABLE = 'fake';
+    public const TABLE = 'fake';
 
 
 }

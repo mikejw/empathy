@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
+
 use Empathy\MVC\PluginManager\Option;
-use Empathy\MVC\DI;
 
 /**
  * Empathy PluginManager
@@ -24,12 +26,12 @@ class PluginManager
     private $plugins = [];
     private $view;
 
-    const DEF_WHITELIST_LIST = [
+    public const DEF_WHITELIST_LIST = [
         'ELibs',
         'Smarty',
         'SmartySSL',
         'JSONView',
-        'EDefault'
+        'EDefault',
     ];
 
     public function __construct()
@@ -44,7 +46,7 @@ class PluginManager
 
     public function setWhitelist($whitelist)
     {
-        if (in_array(Option::DefaultWhitelist, $this->options)) {
+        if (in_array(Option::DefaultWhitelist, $this->options, true)) {
             $whitelist = array_merge($whitelist, self::DEF_WHITELIST_LIST);
         }
         $this->whitelist = $whitelist;
@@ -70,7 +72,7 @@ class PluginManager
     public function preDispatch($p)
     {
         $r = new \ReflectionClass(get_class($p));
-        if (in_array('Empathy\MVC\Plugin\PreDispatch', $r->getInterfaceNames())) {
+        if (in_array('Empathy\MVC\Plugin\PreDispatch', $r->getInterfaceNames(), true)) {
             $p->onPreDispatch();
         }
     }
@@ -79,7 +81,7 @@ class PluginManager
     {
         foreach ($this->plugins as $p) {
             $r = new \ReflectionClass(get_class($p));
-            if (in_array('Empathy\MVC\Plugin\PreEvent', $r->getInterfaceNames())) {
+            if (in_array('Empathy\MVC\Plugin\PreEvent', $r->getInterfaceNames(), true)) {
                 $p->onPreEvent();
             }
         }
@@ -88,7 +90,7 @@ class PluginManager
     public function attemptSetView($p)
     {
         $r = new \ReflectionClass(get_class($p));
-        if (in_array('Empathy\MVC\Plugin\Presentation', $r->getInterfaceNames())) {
+        if (in_array('Empathy\MVC\Plugin\Presentation', $r->getInterfaceNames(), true)) {
             if ($p->getGlobal()) {
                 $this->setView($p);
             }
@@ -114,7 +116,7 @@ class PluginManager
     {
         $mode = false;
         foreach ($this->plugins as $p) {
-            if (get_class($p) == 'Empathy\MVC\Plugin\ELibs') {
+            if (get_class($p) === 'Empathy\MVC\Plugin\ELibs') {
                 $c = $p->getConfig();
                 if (isset($c['testing']) && $c['testing']) {
                     $mode = true;
@@ -130,7 +132,8 @@ class PluginManager
         return $this->whitelist;
     }
 
-    public function find($names = []) {
+    public function find($names = [])
+    {
         foreach ($names as $name) {
             if (count(explode('\\', $name)) === 1) {
                 $name = 'Empathy\\MVC\\Plugin\\' . $name;
@@ -138,7 +141,7 @@ class PluginManager
             try {
                 return DI::getContainer()->get($name);
             } catch (\Exception $e) {
-                if (get_class($e) == 'DI\Definition\Exception\InvalidDefinition') {
+                if (get_class($e) === 'DI\Definition\Exception\InvalidDefinition') {
                     continue;
                 } else {
                     throw $e;

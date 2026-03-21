@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 use Nelmio\Alice\PersisterInterface;
@@ -21,8 +23,6 @@ use Nelmio\Alice\PersisterInterface;
  */
 class EntityManager implements PersisterInterface
 {
-    
-    
     public function persist(array $objects)
     {
         foreach ($objects as $object) {
@@ -44,7 +44,7 @@ class EntityManager implements PersisterInterface
         if (!class_exists($class)) {
             throw new \Exception('Entity class does not exist.');
         }
-        $object = new $class;
+        $object = new $class();
         $object->init();
         Model::connectModel($object);
         $object->load($id);

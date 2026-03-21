@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 /**
@@ -15,7 +17,6 @@ namespace Empathy\MVC;
  */
 class DBC
 {
-
     /**
     * IP address of database server to connect to.
     *

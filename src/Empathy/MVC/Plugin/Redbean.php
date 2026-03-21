@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace {
 
@@ -25,7 +26,6 @@ namespace Empathy\MVC\Plugin {
      */
     class Redbean extends \Empathy\MVC\Plugin implements PreDispatch
     {
-        
         private function isIP($server)
         {
             $ip = false;
@@ -38,12 +38,12 @@ namespace Empathy\MVC\Plugin {
             }
             return $ip;
         }
-        
+
         public function onPreDispatch()
         {
-            $dbms = (isset($this->config['dbms']))? $this->config['dbms']: 'mysql';
+            $dbms = (isset($this->config['dbms'])) ? $this->config['dbms'] : 'mysql';
 
-            if ($dbms == 'sqlite') {
+            if ($dbms === 'sqlite') {
                 if (!isset($this->config['database'])) {
                     throw new \Empathy\MVC\Exception('sqlite database file not supplied.');
                 }

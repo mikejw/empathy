@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC\Controller;
+
 use Empathy\MVC\Controller as Controller;
 
 /**
@@ -14,7 +17,6 @@ use Empathy\MVC\Controller as Controller;
  */
 class CustomController extends Controller
 {
-
     /**
      * Calls to custom routines can go in here.
      *

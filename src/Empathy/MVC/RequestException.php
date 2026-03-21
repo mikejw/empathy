@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 /**
@@ -15,12 +17,12 @@ namespace Empathy\MVC;
  */
 class RequestException extends Exception
 {
-    const NOT_FOUND = 0;
-    const BAD_REQUEST = 1;
-    const INTERNAL_ERROR = 2;
-    const NOT_AUTHORIZED = 3;
-    const NOT_AUTHENTICATED = 4;
-    const METHOD_NOT_ALLOWED = 5;
+    public const NOT_FOUND = 0;
+    public const BAD_REQUEST = 1;
+    public const INTERNAL_ERROR = 2;
+    public const NOT_AUTHORIZED = 3;
+    public const NOT_AUTHENTICATED = 4;
+    public const METHOD_NOT_ALLOWED = 5;
 
     public function __construct($message, $code = 0, ?\Exception $previous = null)
     {

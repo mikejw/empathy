@@ -1,8 +1,8 @@
 <?php
 
-namespace Empathy\MVC;
+declare(strict_types=1);
 
-use Empathy\MVC\Config;
+namespace Empathy\MVC;
 
 class Model
 {
@@ -19,7 +19,7 @@ class Model
             $dbh = DBPool::getConnection($host);
             $model->setDBH($dbh);
 
-        } elseif (self::$dbHandle == null && $host == null) {
+        } elseif (self::$dbHandle === null && $host === null) {
 
             $handle = DBPool::getDefCX();
             $model->setDBH($handle);
@@ -32,7 +32,7 @@ class Model
         $reflect = new \ReflectionClass($model);
         $modelObject = $reflect->newInstanceArgs($params);
 
-        if (!in_array('Empathy\MVC\Entity', class_parents($modelObject))) {
+        if (!in_array('Empathy\MVC\Entity', class_parents($modelObject), true)) {
             throw new \Exception('Class is not Entity model: ' . $model);
         } else {
             $entity = new $model($params);

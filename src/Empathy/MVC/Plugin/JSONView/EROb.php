@@ -1,11 +1,11 @@
 <?php
 
-namespace Empathy\MVC\Plugin\JSONView;
+declare(strict_types=1);
 
+namespace Empathy\MVC\Plugin\JSONView;
 
 class EROb extends ROb
 {
-
     public function __construct($code, $message)
     {
         parent::__construct();
@@ -15,7 +15,7 @@ class EROb extends ROb
     }
 
     public static function getObject($code)
-    {    
+    {
         return new EROb($code, ReturnCodes::getName($code));
     }
 }

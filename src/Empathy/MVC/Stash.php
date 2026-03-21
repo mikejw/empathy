@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\MVC;
 
 /**
@@ -19,7 +21,7 @@ class Stash
 
     public function __construct()
     {
-        $this->items = array();
+        $this->items = [];
     }
 
     public function get($key)
