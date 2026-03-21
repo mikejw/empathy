@@ -21,9 +21,9 @@ use Empathy\MVC\Util\CLIMode;
  */
 abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
 {
-    private $boot;
+    private ?\Empathy\MVC\Empathy $boot = null;
 
-    protected function makeBootstrap()
+    protected function makeBootstrap(): void
     {
         global $base_dir;
 
@@ -34,7 +34,7 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
     }
 
 
-    protected function appRequest($uri, $mode = CLIMode::CAPTURED)
+    protected function appRequest(string $uri, int $mode = CLIMode::CAPTURED): mixed
     {
         if (!isset($this->boot)) {
             throw new \Exception('app not inited.');
@@ -45,13 +45,17 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
     }
 
 
-    protected function makeFakeBootstrap($testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY)
+    protected function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY): \Empathy\MVC\Bootstrap
     {
-
         // use eaa archive as root
-        $doc_root = realpath(
-            dirname(realpath(__FILE__)).'/../../../../../eaa/'
-        );
+        $selfPath = realpath(__FILE__);
+        if ($selfPath === false) {
+            throw new \RuntimeException('Could not resolve ESuiteTestCase path');
+        }
+        $doc_root = realpath(dirname($selfPath).'/../../../../../eaa/');
+        if ($doc_root === false) {
+            throw new \RuntimeException('eaa fixture root not found');
+        }
 
         $dummyBootOptions = [
             'default_module' => 'foo',
@@ -95,8 +99,9 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
     }
 
 
-    protected function setConfig($key, $value)
+    protected function setConfig(string $key, mixed $value): void
     {
         EmpConfig::store($key, $value);
     }
 }
+

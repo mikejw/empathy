@@ -21,7 +21,7 @@ use Empathy\MVC\Testable;
  */
 class EDefault extends Plugin implements PreDispatch
 {
-    public function onPreDispatch()
+    public function onPreDispatch(): void
     {
         date_default_timezone_set('Europe/London');
         Testable::header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
@@ -29,7 +29,7 @@ class EDefault extends Plugin implements PreDispatch
         $this->wwwRedirect();
     }
 
-    private function wwwRedirect()
+    private function wwwRedirect(): void
     {
         if (isset($_SERVER['HTTP_HOST'])) {
             $host = Config::get('WEB_ROOT');

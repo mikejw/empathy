@@ -24,6 +24,8 @@ class SectionItemStandAlone extends Entity
     public int $position;
     public string $label;
     public string $friendly_url;
+    /** Populated from the row when present in the database. */
+    public ?string $url_name = null;
     public string $template;
     public bool $hidden;
     public bool $owns_inline;
@@ -35,6 +37,9 @@ class SectionItemStandAlone extends Entity
     public static string $table = 'section_item';
 
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function getURIData(): array
     {
         $uri_data = [];
@@ -48,10 +53,10 @@ class SectionItemStandAlone extends Entity
             $uri_data[$i] = $row;
             $i++;
         }
-        return $uri_data;
+        return array_values($uri_data);
     }
 
-    public function getItem($id): void
+    public function getItem(int|string $id): void
     {
         $params = [];
         $sql = 'SELECT * FROM ' . SectionItemStandAlone::$table . ' WHERE id = ?';
@@ -68,7 +73,12 @@ class SectionItemStandAlone extends Entity
         }
     }
 
-    public function findSection($rows, $slug, $parent_id): array
+    /**
+     * @param list<array<string, mixed>> $rows
+     *
+     * @return array<string, mixed>
+     */
+    public function findSection(array $rows, string $slug, int|string $parent_id): array
     {
         $matched = [];
         foreach ($rows as $row) {
@@ -81,6 +91,9 @@ class SectionItemStandAlone extends Entity
         return $matched;
     }
 
+    /**
+     * @param list<string>|null $uri
+     */
     public function doResolveURI(?array $uri): int
     {
         if ($uri === null) {
@@ -108,7 +121,10 @@ class SectionItemStandAlone extends Entity
         return $sectionId;
     }
 
-    public function resolveURI($uri): int
+    /**
+     * @param list<string>|null $uri
+     */
+    public function resolveURI(?array $uri): int
     {
         $cache = null;
         $cacheEnabled = false;
@@ -118,14 +134,14 @@ class SectionItemStandAlone extends Entity
         } catch (\Exception $e) {
             //
         }
-        if ($cache && $cacheEnabled) {
+        if ($cache && $cacheEnabled && $uri !== null) {
             return $cache->cachedCallback(
                 'section_id_' . implode('_', $uri),
                 [$this, 'doResolveURI'],
                 [$uri]
             );
-        } else {
-            return $this->doResolveURI($uri);
         }
+
+        return $this->doResolveURI($uri);
     }
 }

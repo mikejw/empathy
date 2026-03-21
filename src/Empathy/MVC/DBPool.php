@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Empathy\MVC;
+
 use PDO;
 
 /**
@@ -21,8 +22,10 @@ use PDO;
 class DBPool
 {
     /**
-    * Data structure for storing connection objects.
-    */
+     * Data structure for storing connection objects.
+     *
+     * @var array<string, DBC>
+     */
     private static array $pool = [];
 
     /**
@@ -81,13 +84,14 @@ class DBPool
         if (sizeof(self::$pool) < 1) {
             $db_port = Config::get('DB_PORT');
             if (is_numeric($db_port)) {
+                $port = (int) $db_port;
                 self::addHost(
                     Config::get('DB_SERVER'),
                     Config::get('DB_NAME'),
                     Config::get('DB_USER'),
                     Config::get('DB_PASS'),
                     'default',
-                    $db_port
+                    $port
                 );
             } else {
                 self::addHost(

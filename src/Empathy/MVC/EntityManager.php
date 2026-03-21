@@ -23,28 +23,38 @@ use Nelmio\Alice\PersisterInterface;
  */
 class EntityManager implements PersisterInterface
 {
-    public function persist(array $objects)
+    /**
+     * @param list<object> $objects
+     */
+    public function persist(array $objects): void
     {
         foreach ($objects as $object) {
+            if (!$object instanceof Entity) {
+                throw new \Exception('persist() only accepts Entity instances');
+            }
             $object->init();
             foreach ($object->getProperties() as $property) {
-                if (is_object($object->$property)) {
-                    $object->$property = $object->$property->id;
+                $value = $object->$property;
+                if ($value instanceof Entity) {
+                    $object->$property = $value->getId();
                 }
             }
 
             Model::connectModel($object);
-            $object->id = $object->insert();
+            $object->setPrimaryKeyAfterInsert($object->insert());
         }
     }
 
 
-    public function find($class, $id)
+    public function find(mixed $class, mixed $id): ?object
     {
         if (!class_exists($class)) {
             throw new \Exception('Entity class does not exist.');
         }
         $object = new $class();
+        if (!$object instanceof Entity) {
+            throw new \Exception('Class is not an Entity: '.$class);
+        }
         $object->init();
         Model::connectModel($object);
         $object->load($id);
@@ -53,8 +63,9 @@ class EntityManager implements PersisterInterface
 
 
     // probably not needed
-    public function flush()
+    public function flush(): void
     {
         throw new \Exception('not yet implemented.');
     }
 }
+

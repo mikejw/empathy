@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Controller;
 
+use Empathy\MVC\Bootstrap;
 use Empathy\MVC\Config;
 use Empathy\MVC\Controller as BaseController;
 use Empathy\MVC\DI;
@@ -19,7 +20,7 @@ use Empathy\MVC\PluginManager\Option as PMOption;
  */
 class empathy extends BaseController
 {
-    public function __construct($boot)
+    public function __construct(Bootstrap $boot)
     {
         parent::__construct($boot, false, [PMOption::DefaultWhitelist]);
     }

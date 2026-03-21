@@ -64,17 +64,17 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         );
     }
 
-    public function assign($name, $data, $no_array = false): void
+    public function assign(string $name, mixed $data, bool $no_array = false): void
     {
         $this->smarty->assign($name, $data);
     }
 
-    public function clear_assign($name): void
+    public function clear_assign(string $name): void
     {
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template, $internal = false): void
+    public function display(string $template, bool $internal = false): void
     {
         if ($internal) {
             $this->switchInternal();
@@ -107,7 +107,7 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
     }
 
-    public function exception($debug, $exception, $reqError): void
+    public function exception(bool $debug, \Throwable $exception, bool $reqError): void
     {
         $this->assign('centerpage', true);
         $this->assign('error', $exception->getMessage());
@@ -119,7 +119,7 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         }
     }
 
-    public function getVars(): array
+    public function getVars(): mixed
     {
         return $this->smarty->getTemplateVars();
     }

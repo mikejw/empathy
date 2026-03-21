@@ -17,16 +17,15 @@ namespace Empathy\MVC\Util\Testing;
  */
 class Boot
 {
-    private static $base;
+    private static string $base = '';
 
-    public static function init($base)
+    public static function init(string $base): void
     {
         self::$base = $base;
         spl_autoload_register(['\Empathy\MVC\Util\Testing\Boot', 'loadClass']);
     }
 
-
-    public static function loadClass($class)
+    public static function loadClass(string $class): void
     {
         if (strpos($class, 'ESuite') === 0) {
             $class = str_replace('ESuite\\', '', $class);

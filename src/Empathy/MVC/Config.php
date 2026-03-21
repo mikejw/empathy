@@ -23,8 +23,10 @@ class Config
 {
     /**
      * Initialise empty config;
+     *
+     * @var array<string, mixed>
      */
-    private static $items = [];
+    private static array $items = [];
 
     /**
      * Return a piece of config.

@@ -28,7 +28,7 @@ class SmartySSL extends Smarty
         );
     }
 
-    public function display($template, $internal = false): void
+    public function display(string $template, bool $internal = false): void
     {
         if ($internal) {
             $this->switchInternal();

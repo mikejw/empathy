@@ -26,7 +26,7 @@ use Empathy\MVC\RequestException;
 class Subdomains extends Plugin implements PreDispatch
 {
     // regex from http://stackoverflow.com/a/10526727/6108127
-    public function onPreDispatch()
+    public function onPreDispatch(): void
     {
         $validSubs = [];
         if (isset($this->config)) {

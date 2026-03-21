@@ -88,7 +88,7 @@ class CLI
                 $response = ob_get_contents();
                 ob_end_clean();
                 self::requestEnd();
-                return $response;
+                return is_string($response) ? $response : '';
             case CLIMode::FAKED:
                 ob_start();
                 $_SERVER['REQUEST_URI'] = $uri;

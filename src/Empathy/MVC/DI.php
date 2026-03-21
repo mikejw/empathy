@@ -11,6 +11,9 @@ use Monolog\Logger;
 
 class DI
 {
+    /**
+     * @var ContainerBuilder<Container>
+     */
     private static ContainerBuilder $builder;
     private static Container $container;
 
@@ -25,7 +28,7 @@ class DI
         });
     }
 
-    private static function loadAdditional($location, $docRoot = ''): void
+    private static function loadAdditional(string $location, string $docRoot = ''): void
     {
         if (file_exists($docRoot.$location)) {
             self::$builder->addDefinitions($docRoot.$location);
@@ -33,9 +36,9 @@ class DI
     }
 
     public static function init(
-        $configDir,
-        $persistentMode = false,
-        $systemMode = false
+        string $configDir,
+        bool $persistentMode = false,
+        bool $systemMode = false
     ): Container {
         self::$builder = new ContainerBuilder();
         self::$builder->addDefinitions([
@@ -70,9 +73,14 @@ class DI
                 return new Stash();
             },
             'Config' => function (Container $c) {
+                $diPath = realpath(__FILE__);
+                if ($diPath === false) {
+                    throw new Exception('Could not resolve path of DI.php');
+                }
+
                 return [
                     self::loadConfig($c->get('configDir')),
-                    self::loadConfig(dirname(realpath(__FILE__)).'/../../..'),
+                    self::loadConfig(dirname($diPath).'/../../..'),
                 ];
             },
             'LoggingOn' => false,

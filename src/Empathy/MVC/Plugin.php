@@ -17,12 +17,11 @@ namespace Empathy\MVC;
  */
 class Plugin
 {
-    protected $bootstrap;
-    protected $config;
-    protected $manager;
+    protected Bootstrap $bootstrap;
+    protected mixed $config = null;
+    protected PluginManager $manager;
 
-
-    public function __construct($manager, $bootstrap, $config = null)
+    public function __construct(PluginManager $manager, Bootstrap $bootstrap, mixed $config = null)
     {
         $this->bootstrap = $bootstrap;
         $this->manager = $manager;
@@ -31,14 +30,12 @@ class Plugin
         }
     }
 
-
-    public function assignConfig($config)
+    public function assignConfig(mixed $config): void
     {
-        $this->config = json_decode($config, true);
+        $this->config = is_string($config) ? json_decode($config, true) : $config;
     }
 
-
-    public function getConfig()
+    public function getConfig(): mixed
     {
         return $this->config;
     }

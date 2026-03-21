@@ -24,7 +24,7 @@ class Lib
      * @param string $path   The custom path
      *
      */
-    public static function addToIncludePath($path)
+    public static function addToIncludePath(string $path): void
     {
         $existing_include_path = get_include_path();
         ini_set(

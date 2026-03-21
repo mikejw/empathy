@@ -6,38 +6,43 @@ namespace Empathy\MVC\Plugin\JSONView;
 
 abstract class BaseROb
 {
-    private $jsonp_callback;
-    private $pretty;
+    private ?string $jsonp_callback = null;
 
+    private bool $pretty = false;
 
     public function __construct()
     {
         $this->pretty = false;
     }
 
-    public function setPretty($pretty)
+    public function setPretty(bool $pretty): void
     {
         $this->pretty = $pretty;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return json_encode($this->serialize(), $this->pretty ? JSON_PRETTY_PRINT : 0);
+        $encoded = json_encode($this->serialize(), $this->pretty ? JSON_PRETTY_PRINT : 0);
+
+        return $encoded === false ? '{}' : $encoded;
     }
 
-    public function setJSONPCallback($callback)
+    public function setJSONPCallback(?string $callback): void
     {
         $this->jsonp_callback = $callback;
     }
 
-    public function getJSONPCallback()
+    public function getJSONPCallback(): string|false
     {
-        $callback = false;
         if ($this->jsonp_callback !== null) {
-            $callback = $this->jsonp_callback;
+            return $this->jsonp_callback;
         }
-        return $callback;
+
+        return false;
     }
 
-    abstract public function serialize();
+    /**
+     * @return array<string, mixed>|\stdClass
+     */
+    abstract public function serialize(): array|\stdClass;
 }

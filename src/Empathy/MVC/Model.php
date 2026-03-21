@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Empathy\MVC;
 
+use PDO;
+
 class Model
 {
-    private static $dbHandle = null;
+    private static ?PDO $dbHandle = null;
 
-    public static function connectModel($model, $host = null)
+    public static function connectModel(Entity $model, ?string $host = null): void
     {
         if (self::$dbHandle !== null && $host === null) {
 
@@ -19,7 +21,7 @@ class Model
             $dbh = DBPool::getConnection($host);
             $model->setDBH($dbh);
 
-        } elseif (self::$dbHandle === null && $host === null) {
+        } else {
 
             $handle = DBPool::getDefCX();
             $model->setDBH($handle);
@@ -27,30 +29,44 @@ class Model
         }
     }
 
-    public static function load($model, $id = null, $params = [], $host = null)
+    /**
+     * @template T of Entity
+     *
+     * @param class-string<T> $model
+     * @param list<mixed>     $params
+     *
+     * @return T
+     */
+    public static function load(string $model, mixed $id = null, array $params = [], ?string $host = null): Entity
     {
         $reflect = new \ReflectionClass($model);
-        $modelObject = $reflect->newInstanceArgs($params);
+        $entity = $reflect->newInstanceArgs($params);
 
-        if (!in_array('Empathy\MVC\Entity', class_parents($modelObject), true)) {
+        if (!in_array('Empathy\MVC\Entity', class_parents($entity), true)) {
             throw new \Exception('Class is not Entity model: ' . $model);
-        } else {
-            $entity = new $model($params);
-            self::connectModel($entity, $host);
-            $entity->init();
-            $entity->load($id);
-            return $entity;
         }
+
+        self::connectModel($entity, $host);
+        $entity->init();
+        $entity->load($id);
+
+        return $entity;
     }
 
-    public static function disconnect(array $models)
+    /**
+     * @param list<Entity> $models
+     */
+    public static function disconnect(array $models): void
     {
         foreach ($models as $m) {
             $m->dbDisconnect();
         }
     }
 
-    public static function getTable($model)
+    /**
+     * @param class-string<Entity> $model
+     */
+    public static function getTable(string $model): string
     {
         $entity = new $model();
         return $entity->getTable();

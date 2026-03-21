@@ -26,13 +26,14 @@ class Validate
     public const URL = 7;
     public const PASSWORD = 8;
 
-    public $error = [];
-    private $email_pattern;
-    private $allowed_pattern_1;
-    private $unix_username_pattern;
-    private $twitter_style_username;
-    private $allowed_pw_pattern;
-    private $url_pattern;
+    /** @var array<int|string, string> */
+    private array $error = [];
+    private string $email_pattern;
+    private string $allowed_pattern_1;
+    private string $unix_username_pattern;
+    private string $twitter_style_username;
+    private string $allowed_pw_pattern;
+    private string $url_pattern;
 
     /**
      * Creates validation object
@@ -54,7 +55,10 @@ class Validate
      *
      * @return boolean $valid
      */
-    public function valType($type, $field, $data, $optional, $message = null)
+    /**
+     * @param array{0?: string, 1?: string}|string|null $message
+     */
+    public function valType(int $type, string $field, string $data, bool $optional, string|array|null $message = null): bool
     {
         $valid = true;
         if ($data !== '') {
@@ -98,8 +102,8 @@ class Validate
                     }
                     break;
                 case self::USERNAME:
-                    //if(!preg_match($this->unix_username_pattern, $data))
-                    if (!preg_match($this->twitter_style_username, $data)) {
+                    if (!preg_match($this->twitter_style_username, $data)
+                        && !preg_match($this->unix_username_pattern, $data)) {
                         $valid = false;
                     }
                     break;
@@ -121,7 +125,7 @@ class Validate
                     $this->addError('Invalid '.$field, $field);
                 }
             }
-        } elseif (!$optional && $data === '') {
+        } elseif (!$optional) {
             if (is_array($message) && isset($message[1])) {
                 $this->addError($message[1], $field);
             } else {
@@ -141,7 +145,7 @@ class Validate
      * @param  string $field   the field to apply the error message to
      * @return void
      */
-    public function addError($message, $field)
+    public function addError(string $message, string $field): void
     {
         if ($field !== '') {
             if (isset($this->error['field'])) {
@@ -159,16 +163,15 @@ class Validate
      * recorded errors.
      * @return boolean $errors whether the error data structure is empty or not.
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return (sizeof($this->error) > 0);
     }
 
     /**
-     * Returns the error data structure
-     * @return array $error the error data structure belonging to the validation object
+     * @return array<int|string, string>
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->error;
     }

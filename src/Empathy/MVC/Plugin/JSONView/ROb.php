@@ -6,35 +6,37 @@ namespace Empathy\MVC\Plugin\JSONView;
 
 class ROb extends BaseROb
 {
-    protected $meta;
-    protected $data;
-    protected $pagination;
+    protected \stdClass $meta;
+
+    protected mixed $data;
+
+    protected mixed $pagination;
 
     public function __construct()
     {
+        parent::__construct();
         $this->meta = new \stdClass();
         $this->data = new \stdClass();
         $this->pagination = new \stdClass();
-        $this->meta = new \stdClass();
         $this->meta->code = ReturnCodes::OK;
     }
 
-    public function setData($data)
+    public function setData(mixed $data): void
     {
         $this->data = $data;
     }
 
-    public function setPagination($pagination)
+    public function setPagination(mixed $pagination): void
     {
         $this->pagination = $pagination;
     }
 
-    public function getCode()
+    public function getCode(): int
     {
-        return $this->meta->code;
+        return (int) $this->meta->code;
     }
 
-    public function serialize()
+    public function serialize(): \stdClass
     {
         $ob = new \stdClass();
         $ob->meta = $this->meta;

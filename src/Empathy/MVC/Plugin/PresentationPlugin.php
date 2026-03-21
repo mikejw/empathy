@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Plugin;
 
+use Empathy\MVC\Bootstrap;
 use Empathy\MVC\Plugin as Plugin;
+use Empathy\MVC\PluginManager;
 
 class PresentationPlugin extends Plugin
 {
-    private $global;
+    private bool $global;
 
-    public function __construct($manager, $bootstrap, $config = null, $global = true)
+    public function __construct(PluginManager $manager, Bootstrap $bootstrap, mixed $config = null, bool $global = true)
     {
         parent::__construct($manager, $bootstrap, $config);
         $this->global = $global;
     }
 
-    public function getGlobal()
+    public function getGlobal(): bool
     {
         return $this->global;
     }

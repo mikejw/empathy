@@ -6,7 +6,7 @@ namespace Empathy\MVC;
 
 class ModelLegacy extends Model
 {
-    public static function load($model, $id = null, $params = [], $host = null): void
+    public static function bootstrapEntity(Entity $model): void
     {
         self::connectModel($model);
         $model->init();

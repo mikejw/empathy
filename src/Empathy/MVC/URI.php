@@ -48,19 +48,20 @@ class URI
      */
     public const INVALID_DYNAMIC_MODULE_DEFAULT_URI = 5;
 
-    private $full;
-    private $uriString;
-    private $uri;
-    private $defaultModule;
-    private $dynamicModule;
-    private $dynamicModuleDefaultURI;
-    private $error = 0;
-    private $internal = false;
-    private $controllerName = '';
-    private $cli_mode_detected;
-    private $internal_controller = 'empathy';
+    private ?string $full = null;
+    private string $uriString = '';
+    /** @var array<int, string> */
+    private array $uri = [];
+    private ?string $defaultModule = null;
+    private ?string $dynamicModule = null;
+    private string $dynamicModuleDefaultURI = '';
+    private int $error = 0;
+    private bool $internal = false;
+    private string $controllerName = '';
+    private bool $cli_mode_detected = false;
+    private string $internal_controller = 'empathy';
 
-    public function __construct($default_module, $dynamic_module, $dynamic_module_default_uri = '')
+    public function __construct(?string $default_module, ?string $dynamic_module, string $dynamic_module_default_uri = '')
     {
         if (isset($_SERVER['HTTP_HOST']) && strpos(Config::get('WEB_ROOT'), $_SERVER['HTTP_HOST']) === false) {
             throw new SafeException('Host name mismatch.');
@@ -80,6 +81,7 @@ class URI
                 $this->uriString = $_SERVER['REQUEST_URI'];
             } else {
                 $this->cli_mode_detected = true;
+                $this->uriString = '';
             }
         }
 
@@ -89,27 +91,30 @@ class URI
         $this->logRouting();
     }
 
-    public function getData()
+    /**
+     * @return array<int, string>
+     */
+    public function getData(): array
     {
         return $this->uri;
     }
 
-    public function getCliMode()
+    public function getCliMode(): bool
     {
         return $this->cli_mode_detected;
     }
 
-    public function getError()
+    public function getError(): int
     {
         return $this->error;
     }
 
-    public function getControllerName()
+    public function getControllerName(): string
     {
         return $this->controllerName;
     }
 
-    public function logRouting()
+    public function logRouting(): void
     {
         $log = new LogItem(
             'route loaded',
@@ -129,7 +134,7 @@ class URI
         $log->fire();
     }
 
-    public function processRequest()
+    public function processRequest(): void
     {
         if (isset($_GET['module'])) {
             $this->setModule($_GET['module']);
@@ -145,7 +150,7 @@ class URI
         }
     }
 
-    public function formURI()
+    public function formURI(): void
     {
         $uri = explode('/', $this->uriString);
         $size = sizeof($uri) - 1;
@@ -158,10 +163,11 @@ class URI
         $args = '';
 
         // ignore any args
-        if (preg_match('/\?/', $uri[$size])) {
-            $start_args = strpos($uri[$size], '?');
-            $args = substr($uri[$size], $start_args);
-            $uri[$size] = substr($uri[$size], 0, $start_args);
+        $lastSegment = $uri[$size] ?? '';
+        $queryPos = strpos($lastSegment, '?');
+        if ($queryPos !== false) {
+            $args = substr($lastSegment, $queryPos);
+            $uri[$size] = substr($lastSegment, 0, $queryPos);
 
             if ($uri[$size] === '') {
                 array_pop($uri);
@@ -185,7 +191,7 @@ class URI
         $this->uri = $uri;
     }
 
-    public function analyzeURI()
+    public function analyzeURI(): void
     {
         $i = 0;
 
@@ -222,11 +228,11 @@ class URI
         }
         if (!isset($_GET['module'])) {
             // only present url param is an id
-            $this->setModule($this->defaultModule);
+            $this->setModule($this->defaultModule ?? $this->internal_controller);
         }
     }
 
-    private function setModule($module)
+    private function setModule(string $module): void
     {
         $_GET['module'] = $module;
         if ($_GET['module'] === $this->internal_controller) {
@@ -234,12 +240,12 @@ class URI
         }
     }
 
-    private function buildControllerName($controller)
+    private function buildControllerName(string $controller): string
     {
         return 'Empathy\\MVC\\Controller\\'.$controller;
     }
 
-    private function setController()
+    private function setController(): void
     {
         require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
 
@@ -269,14 +275,17 @@ class URI
 
         $this->assertEventIsSet();
         if (!$this->error) {
-            $r = new \ReflectionClass($this->controllerName);
-            if (!$r->hasMethod($_GET['event'])) {
-                $this->error = self::MISSING_EVENT_DEF;
+            $controllerClass = $this->controllerName;
+            if (class_exists($controllerClass)) {
+                $r = new \ReflectionClass($controllerClass);
+                if (!$r->hasMethod($_GET['event'])) {
+                    $this->error = self::MISSING_EVENT_DEF;
+                }
             }
         }
     }
 
-    public function assertEventIsSet()
+    public function assertEventIsSet(): void
     {
         if (!(isset($_GET['event'])) || $_GET['event'] === '') {
             $_GET['event'] = 'default_event';
@@ -284,7 +293,7 @@ class URI
     }
 
 
-    public function dynamicSection()
+    public function dynamicSection(): int
     {
         // code still needed to assert correct section path - else throw 404
         $this->error = 0;
@@ -298,25 +307,25 @@ class URI
             $_GET['module'] = $this->dynamicModule;
         }
 
-        if (!isset($this->uri)) {
+        if ($this->uri === []) {
             $this->uri = explode('/', $this->dynamicModuleDefaultURI);
         }
 
-        if (isset($this->uri) && sizeof($this->uri) > 0) {
-            $section_index = (sizeof($this->uri) - 1);
-            if (is_numeric($this->uri[$section_index])) {
-                $_GET['id'] = $this->uri[$section_index];
-                array_pop($this->uri);
-            }
+        $lastIndex = count($this->uri) - 1;
+        if (array_key_exists($lastIndex, $this->uri) && is_numeric($this->uri[$lastIndex])) {
+            $_GET['id'] = $this->uri[$lastIndex];
+            array_pop($this->uri);
         }
 
+        $uriForResolve = array_values($this->uri);
+
         if ($this->uriString === '' && !!$this->dynamicModuleDefaultURI) {
-            if (($sectionId = $section->resolveURI($this->uri)) < 0) {
+            if (($sectionId = $section->resolveURI($uriForResolve)) < 0) {
                 $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
             }
         }
 
-        if ($this->error === 0 && (($sectionId = $section->resolveURI($this->uri)) < 0)) {
+        if ($this->error === 0 && (($sectionId = $section->resolveURI($uriForResolve)) < 0)) {
             $this->error = self::ERROR_404;
         }
 
@@ -326,7 +335,7 @@ class URI
         }
 
         // section id is not set / found
-        if (!(is_numeric($section->id))) {
+        if ($section->id < 1) {
             $this->error = self::ERROR_404;
         }
 
@@ -359,7 +368,7 @@ class URI
         return $this->error;
     }
 
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         $message = '';
         switch ($this->error) {
@@ -384,7 +393,7 @@ class URI
         return $message;
     }
 
-    public function sanity($default_module)
+    public function sanity(?string $_default_module): void
     {
         if (Config::get('WEB_ROOT') === false) {
             throw new SafeException('Dispatch error: Web root is not defined');
@@ -397,7 +406,7 @@ class URI
         }
     }
 
-    public function getInternal()
+    public function getInternal(): bool
     {
         return $this->internal;
     }

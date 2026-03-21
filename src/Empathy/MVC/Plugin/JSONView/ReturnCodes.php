@@ -19,7 +19,7 @@ class ReturnCodes
     public const Unprocessable_Entity = 422;
     public const Internal_Server_Error = 500;
 
-    public static function getName($code)
+    public static function getName(int $code): string
     {
         $name = '';
         foreach (self::getAll() as $index => $value) {
@@ -31,7 +31,10 @@ class ReturnCodes
         return $name;
     }
 
-    public static function getAll()
+    /**
+     * @return array<string, int>
+     */
+    public static function getAll(): array
     {
         $r = new \ReflectionClass(self::class);
         return $r->getConstants();

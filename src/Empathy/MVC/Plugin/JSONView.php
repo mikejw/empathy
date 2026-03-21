@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Plugin;
 
+use Empathy\MVC\Bootstrap;
 use Empathy\MVC\Config;
 use Empathy\MVC\DI;
-use Empathy\MVC\Plugin as Plugin;
+use Empathy\MVC\PluginManager;
 use Empathy\MVC\RequestException;
 use Empathy\MVC\Testable;
 
@@ -23,19 +24,28 @@ use Empathy\MVC\Testable;
  */
 class JSONView extends PresentationPlugin implements PreEvent, Presentation
 {
-    private $output;
-    private $error_ob;
-    private $return_ob;
-    private $return_codes;
-    private $prettyPrint;
-    private $errorResponse = false;
+    /** @var array<string, mixed>|object|null */
+    private mixed $output = null;
 
-    public function __construct($manager, $bootstrap, $config)
+    /** @var class-string */
+    private string $error_ob = JSONView\EROb::class;
+
+    /** @var class-string */
+    private string $return_ob = JSONView\ROb::class;
+
+    /** @var class-string */
+    private string $return_codes = JSONView\ReturnCodes::class;
+
+    private bool $prettyPrint = false;
+
+    private bool $errorResponse = false;
+
+    public function __construct(PluginManager $manager, Bootstrap $bootstrap, mixed $config)
     {
         parent::__construct($manager, $bootstrap, $config, false);
     }
 
-    public function assign($name, $data, $no_array = false)
+    public function assign(string $name, mixed $data, bool $no_array = false): void
     {
         if ($no_array) {
             $this->output = $data;
@@ -43,42 +53,38 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
             if (isset($this->output) && is_object($this->output)) {
                 $this->clearVars();
             }
+            if (!is_array($this->output)) {
+                $this->output = [];
+            }
             $this->output[$name] = $data;
         }
     }
 
 
-    private function isResponseSubClass($object): bool
+    private function isResponseSubClass(object $object): bool
     {
-        if (!is_object($object)) {
-            $this->errorResponse = false;
-            return false;
-        }
-        $isError = is_string($this->error_ob) && (
-            $object instanceof $this->error_ob ||
-                $object instanceof JSONView\EROb
-        );
-        $isReturn = is_string($this->return_ob) && (
-            $object instanceof $this->return_ob ||
-                $object instanceof JSONView\ROb
-        );
+        $isError = $object instanceof $this->error_ob
+            || $object instanceof JSONView\EROb;
+        $isReturn = $object instanceof $this->return_ob
+            || $object instanceof JSONView\ROb;
         $this->errorResponse = $isError;
 
         return $isError || $isReturn;
     }
 
-    public function display($template, $internal = false)
+    public function display(string $template, bool $internal = false): void
     {
         Testable::header('Content-type: application/json');
 
         if (
             is_object($this->output) &&
+            $this->output instanceof JSONView\BaseROb &&
             $this->isResponseSubClass($this->output)
         ) {
             $this->output->setPretty($this->prettyPrint);
             $output = (string) $this->output;
 
-            if ($this->errorResponse) {
+            if ($this->errorResponse && $this->output instanceof JSONView\ROb) {
                 $header = 'HTTP/1.1 '
                     .$this->output->getCode()
                     .' '
@@ -95,7 +101,7 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
         } else {
             if (is_array($this->output)) {
                 foreach ($this->output as &$item) {
-                    if (is_object($item) && $this->isResponseSubClass($item)) {
+                    if ($item instanceof JSONView\BaseROb && $this->isResponseSubClass($item)) {
                         $item = json_decode((string) $item);
                     }
                 }
@@ -110,7 +116,7 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
     }
 
 
-    public function onPreEvent()
+    public function onPreEvent(): void
     {
         $module = DI::getContainer()->get('Controller')->getModule();
 
@@ -141,7 +147,7 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
         }
     }
 
-    public function exception($debug, $exception, $req_error)
+    public function exception(bool $debug, \Throwable $exception, bool $req_error): void
     {
         $rc = $this->return_codes;
         $e_ob = $this->error_ob;
@@ -190,13 +196,13 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
     }
 
 
-    public function getVars()
+    public function getVars(): mixed
     {
         return $this->output;
     }
 
-    public function clearVars()
+    public function clearVars(): void
     {
-        unset($this->output);
+        $this->output = null;
     }
 }

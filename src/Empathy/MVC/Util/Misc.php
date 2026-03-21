@@ -19,7 +19,7 @@ use Empathy\MVC\DI;
  */
 class Misc
 {
-    public static function isSecure()
+    public static function isSecure(): bool
     {
         try {
             DI::getContainer()->get('PluginManager')->find(['SmartySSL']);

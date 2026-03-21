@@ -19,7 +19,7 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class EForceEndSlash extends Plugin implements PreDispatch
 {
-    public function onPreDispatch()
+    public function onPreDispatch(): void
     {
         // check if target looks life a file first
         $uri_arr = explode('/', $_SERVER['REQUEST_URI']);

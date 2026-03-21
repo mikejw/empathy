@@ -24,35 +24,36 @@ class Empathy
 {
     /**
      * Boot object created before dispatch
-     * @var Bootstrap
      */
-    private $boot;
+    private ?Bootstrap $boot = null;
 
     /**
      * Boot options read from application config file.
-     * @var array
+     *
+     * @var array<string, mixed>
      */
-    private $bootOptions = [];
+    private array $bootOptions = [];
 
     /**
      * Plugin definition read from application config file.
-     * @var array
+     *
+     * @var list<array<string, mixed>>
      */
-    private $plugins = [];
+    private array $plugins = [];
 
     /**
      * When application is set to handle errors
      * this array is used to collect the error messages.
-     * @var array
+     *
+     * @var list<string>
      */
-    private $errors = [];
+    private array $errors = [];
 
     /**
      * Application persistent mode. Implies there could be multiple requests to handle
      * following initialization. This flag is passed directly to the application.
-     * @var boolean
      */
-    private $persistentMode = false;
+    private bool $persistentMode = false;
 
     /**
      * This flag is read from the boot_options section of the application config.
@@ -60,27 +61,21 @@ class Empathy
      * when necessary. (There is now no difference in in loading elib components as the
      * common namespace 'vendor'
      * is always the same.)
-     *
-     * @var boolean
      */
-    private static bool$useElib = false;
+    private static bool $useElib = false;
 
     /**
-     * @var bool Prevent multiple dispatch.
+     * Prevent multiple dispatch.
      */
-    private $dispatchedException = false;
+    private bool $dispatchedException = false;
 
 
     /**
      * Set config into memory.
      *
-     * @param $config Configuration data
-     *
-     * @param $hard   Set constants
-     *
-     * @return void
+     * @param array<string, mixed> $config Configuration data
      */
-    private function consumeConfig($config, $configDir, $hard = false)
+    private function consumeConfig(array $config, string $configDir, bool $hard = false): void
     {
         foreach ($config as $index => &$item) {
             // auto fix of doc root
@@ -116,7 +111,7 @@ class Empathy
      * If true this means there could be many requests following initialization.
      * @return void
      */
-    public function __construct($configDir, $persistentMode = false)
+    public function __construct(string $configDir, bool $persistentMode = false)
     {
         $this->persistentMode = $persistentMode;
         spl_autoload_register([$this, 'loadClass']);
@@ -161,12 +156,13 @@ class Empathy
     public function initPlugins(): bool
     {
         $handleSuccess = true;
+        $boot = $this->boot ?? throw new \LogicException('Empathy::init() must be called first.');
 
         if (!$this->getHandlingErrors()) {
-            $this->boot->initPlugins();
+            $boot->initPlugins();
         } else {
             try {
-                $this->boot->initPlugins();
+                $boot->initPlugins();
             } catch (Exception $e) {
                 $this->exceptionHandler($e);
                 $handleSuccess = false;
@@ -189,11 +185,13 @@ class Empathy
      */
     public function beginDispatch(bool $fake = false): null | Controller
     {
+        $boot = $this->boot ?? throw new \LogicException('Empathy::init() must be called first.');
+
         if (!$this->getHandlingErrors()) {
-            $this->boot->dispatch($fake);
+            $boot->dispatch($fake);
         } else {
             try {
-                $this->boot->dispatch($fake);
+                $boot->dispatch($fake);
             } catch (Throwable $e) {
                 $this->exceptionHandler($e);
             }
@@ -215,7 +213,8 @@ class Empathy
 
     /**
      * Returns errors caught by error handler.
-     * @return array $errors
+     *
+     * @return list<string>
      */
     public function getErrors(): array
     {
@@ -290,7 +289,7 @@ class Empathy
                     return true;
                 }
 
-                if ($this->boot->getEnvironment() !== 'dev') {
+                if (($this->boot?->getEnvironment() ?? 'prod') !== 'dev') {
                     return true; // IMPORTANT: swallow in non-dev
                 }
 
@@ -322,6 +321,8 @@ class Empathy
             return;
         }
 
+        $boot = $this->boot ?? throw new \LogicException('Empathy::init() must be called before handling exceptions.');
+
         $response = '';
         $errors = '';
 
@@ -331,11 +332,11 @@ class Empathy
         }
         if (
             RequestException::class !== get_class($e) &&
-            $this->boot->getEnvironment() !== 'dev'
+            $boot->getEnvironment() !== 'dev'
         ) {
             $message = '';
             $errors = $e->getMessage();
-            if ($this->boot->getDebugMode()) {
+            if ($boot->getDebugMode()) {
                 $message = $e->getMessage();
             }
             // the default is now BAD_REQUEST as we assume the user
@@ -392,17 +393,15 @@ class Empathy
                 if ($message !== '') {
                     $log->append('exception', $message);
                 }
-                if ($response) {
-                    $log->append('response', $response);
-                }
-                if ($errors) {
+                $log->append('response', $response);
+                if ($errors !== '') {
                     $log->append('error', $errors);
                 }
                 $log->fire();
 
                 Testable::header($response);
                 $this->dispatchedException = true;
-                $this->boot->dispatchException($e);
+                $boot->dispatchException($e);
                 break;
         }
     }
@@ -439,7 +438,7 @@ class Empathy
 
     public function reloadBootOptions(): void
     {
-        $this->boot->initBootOptions();
+        ($this->boot ?? throw new \LogicException('Empathy::init() must be called first.'))->initBootOptions();
     }
 
     public function init(): void
@@ -450,23 +449,40 @@ class Empathy
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getBootOptions(): array
     {
         return $this->bootOptions;
     }
 
-    public function getPlugins()
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function getPlugins(): array
     {
         return $this->plugins;
     }
 
-    public function setBootOptions($options)
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function setBootOptions(array $options): void
     {
         $this->bootOptions = $options;
     }
 
-    public function setPlugins($plugins)
+    /**
+     * @param list<array<string, mixed>> $plugins
+     */
+    public function setPlugins(array $plugins): void
     {
         $this->plugins = $plugins;
+    }
+
+    public static function usesElib(): bool
+    {
+        return self::$useElib;
     }
 }

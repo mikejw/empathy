@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Empathy\MVC;
 
+use Empathy\MVC\Plugin\Presentation;
+
 /**
  * Main parent controller class.
  *
@@ -23,62 +25,63 @@ class Controller
     /**
      * The module the controller instance belongs to. (Established using the URI object.)
      */
-    protected $module;
+    protected ?string $module = null;
 
     /**
      * The name of the class that the current controller instance belongs to as determined by the URI object.
      * The class will belong to an application module and may well be the same name as the current application module.
      * (A default controller class.)
      */
-    protected $class;
+    protected ?string $class = null;
 
     /**
      * The name of the current controller action/event. Often this is 'default_event'.
      */
-    protected $event;
+    protected ?string $event = null;
 
     /**
      * The template file the view will attempt to render.
      */
-    private $templateFile;
+    private ?string $templateFile = null;
 
     /**
      * The view/presentation object that will be used to render the page.
      */
-    public $presenter;
+    public ?Presentation $presenter = null;
 
     /**
      * The plugin manager object created during booting.
      */
-    protected $pluginManager;
+    protected PluginManager $pluginManager;
 
     /**
      * Stash object used for storing arbitrary object.
      */
-    protected $stash;
+    protected ?Stash $stash = null;
 
     /**
      * The current bootstrap object.
      */
-    protected $boot;
+    protected Bootstrap $boot;
 
     /**
      * The applications current environment.
      */
-    protected $environment;
+    protected ?string $environment = null;
 
     /**
      * Use session flag
      */
-    protected $useSession;
+    protected ?bool $useSession = null;
 
     /**
      * Controller constructor.  Grabs certain properties from the boot object, establishes the view
      * from the plugin manager and assigns certain information to view making it available to templates.
      *
-     * @param Bootstrap $boot The current bootstrap object
+     * @param list<mixed> $pluginOptions
+     * @param list<string> $pluginWhitelist
      */
-    public function __construct($boot, $useSession = true, $pluginOptions = [], $pluginWhitelist = [])
+    public function __construct(Bootstrap $boot, bool $useSession = true, array $pluginOptions = [], array $pluginWhitelist = [])
     {
         DI::getContainer()->set('Controller', $this);
         $this->boot = $boot;
@@ -197,6 +200,12 @@ class Controller
      */
     public function initDisplay(bool $internal): void
     {
+        if ($this->presenter === null) {
+            throw new Exception('No presentation plugin is available');
+        }
+        if ($this->templateFile === null) {
+            throw new Exception('No template file has been set');
+        }
         $this->presenter->display($this->templateFile, $internal);
     }
 
@@ -278,6 +287,9 @@ class Controller
      */
     public function assign(string $name, mixed $data, bool $no_array = false): void
     {
+        if ($this->presenter === null) {
+            throw new Exception('No presentation plugin is available');
+        }
         $this->presenter->assign($name, $data, $no_array);
     }
 
@@ -286,7 +298,7 @@ class Controller
      *
      * @return string $module Module name.
      */
-    public function getModule(): string
+    public function getModule(): ?string
     {
         return $this->module;
     }
@@ -296,21 +308,20 @@ class Controller
      *
      * @return string $class Class name.
      */
-    public function getClass(): string
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
-    public function getEvent(): string
+    public function getEvent(): ?string
     {
         return $this->event;
     }
 
     /**
      * Obtain user interface control values from request/session.
-     * @param string $ui Name of interface control set.
-     * @param array $ui_array Set of control settings.
-     * @return void
+     *
+     * @param list<string> $ui_array Set of control settings.
      */
     public function loadUIVars(string $ui, array $ui_array): void
     {
@@ -365,13 +376,14 @@ class Controller
 
     /**
      * Send exception to the view.
-     * @param boolean $debug Debug mode.
-     * @param Exception $exception The exception object.
-     * @param boolean $req_error Is request error. e.g. 404.
-     * @return void
+     * @param bool $debug Debug mode.
+     * @param bool $req_error Is request error. e.g. 404.
      */
-    public function viewException($debug, $exception, $req_error): void
+    public function viewException(bool $debug, \Throwable $exception, bool $req_error): void
     {
+        if ($this->presenter === null) {
+            throw new Exception('No presentation plugin is available');
+        }
         $this->presenter->exception($debug, $exception, $req_error);
     }
 
@@ -390,10 +402,10 @@ class Controller
 
     public function getUseSession(): bool
     {
-        return $this->useSession;
+        return $this->useSession ?? true;
     }
 
-    private function setPresenter($view): void
+    private function setPresenter(?Presentation $view): void
     {
         $this->presenter = $view;
     }
