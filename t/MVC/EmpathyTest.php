@@ -55,13 +55,13 @@ class EmpathyTest extends ESuiteTest
         $this->mvc->errorHandler(E_ERROR, 'dummy error', 'someFile.php', 1);
 
         $this->mvc->errorHandler(E_USER_WARNING, 'dummy error', 'someFile.php', 1);
-        $this->assertRegExp('/Warning/', $this->mvc->errorsToString());
+        $this->assertMatchesRegularExpression('/Warning/', $this->mvc->errorsToString());
 
         $this->mvc->errorHandler(E_NOTICE, 'dummy error', 'someFile.php', 1);
-        $this->assertRegExp('/Notice/', $this->mvc->errorsToString());
+        $this->assertMatchesRegularExpression('/Notice/', $this->mvc->errorsToString());
 
         $this->mvc->errorHandler(0, 'dummy error', 'someFile.php', 1);
-        $this->assertRegExp('/Error/', $this->mvc->errorsToString());
+        $this->assertMatchesRegularExpression('/Error/', $this->mvc->errorsToString());
     }
 
     public function testExceptions()
