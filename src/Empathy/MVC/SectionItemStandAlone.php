@@ -23,16 +23,16 @@ class SectionItemStandAlone extends Entity
     public int $section_id;
     public int $position;
     public string $label;
-    public string $friendly_url;
+    public string | null $friendly_url;
     /** Populated from the row when present in the database. */
     public ?string $url_name = null;
     public string $template;
-    public bool $hidden;
+    public string $hidden;
     public bool $owns_inline;
     public string $link;
     public string $stamp;
-    public string $meta;
-    public int $user_id;
+    public string | null $meta;
+    public int | null $user_id;
 
     public static string $table = 'section_item';
 

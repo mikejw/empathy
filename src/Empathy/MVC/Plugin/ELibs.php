@@ -27,7 +27,7 @@ class ELibs extends Plugin
     public const int TESTING_LIB = 2;
 
 
-    public function __construct(PluginManager $manager, Bootstrap $bootstrap, string $config)
+    public function __construct(PluginManager $manager, Bootstrap $bootstrap, ?string $config = null)
     {
         parent::__construct($manager, $bootstrap, $config);
         $path = '';

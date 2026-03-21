@@ -19,7 +19,7 @@ class Plugin
 {
     protected mixed $config = null;
 
-    public function __construct(protected PluginManager $manager, protected Bootstrap $bootstrap, mixed $config = null)
+    public function __construct(protected PluginManager $manager, protected Bootstrap $bootstrap, ?string $config = null)
     {
         if ($config !== null) {
             $this->assignConfig($config);

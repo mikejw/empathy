@@ -39,7 +39,6 @@ class DBC
     public function __construct(private readonly string $server, private readonly string $name, private readonly string $user, private readonly string $pass, private readonly int | null $port = null)
     {
         $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';charset=utf8mb4;';
-        echo $dsn;
         if ($this->port !== null) {
             $dsn .= 'port='.$this->port.';';
         }

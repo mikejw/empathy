@@ -27,12 +27,12 @@ class Entity
     private array $properties;
     private PDO | null $dbh = null;
 
-    protected int $id; // allow handling entities with no public ID value set
+    public int $id; // allow handling entities with no public ID value set
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
+//    public function getId(): int
+//    {
+//        return $this->id;
+//    }
 
     public function setPrimaryKeyAfterInsert(int $id): void
     {
