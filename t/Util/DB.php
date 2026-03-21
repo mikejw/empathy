@@ -12,7 +12,7 @@ class DB
     public static function getDefDBCreds()
     {
         return array(
-            'db_host' => 'db',
+            'db_host' => '127.0.0.1',
             'db_name' => 'etest',
             'db_user' => 'root',
             'db_pass' => 'example',
