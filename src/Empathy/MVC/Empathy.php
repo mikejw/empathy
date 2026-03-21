@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace Empathy\MVC;
+use Throwable;
+use Exception;
 
 define('MVC_VERSION', '4.3.3');
 
@@ -61,7 +63,7 @@ class Empathy
      *
      * @var boolean
      */
-    private static $useElib = false;
+    private static bool$useElib = false;
 
     /**
      * @var bool Prevent multiple dispatch.
@@ -123,8 +125,11 @@ class Empathy
         $this->consumeConfig($appConfig, $configDir);
         $this->consumeConfig($globalConfig, $configDir, true);
 
-        if (isset($this->bootOptions['use_elib']) &&
-           $this->bootOptions['use_elib']) {
+        if (
+            isset($this->bootOptions['use_elib']) &&
+            $this->bootOptions['use_elib'] &&
+            class_exists(\Empathy\ELib\Config::class)
+        ) {
             self::$useElib = true;
             \Empathy\ELib\Config::load($configDir);
         } else {
@@ -138,9 +143,9 @@ class Empathy
 
     /**
      * Returns value of handle_errors setting from application config boot options.
-     * @return void
+     * @return bool
      */
-    private function getHandlingErrors()
+    private function getHandlingErrors(): bool
     {
         return (isset($this->bootOptions['handle_errors']) &&
                 $this->bootOptions['handle_errors']);
@@ -151,9 +156,9 @@ class Empathy
      * If application has been configured to handle errors
      * then calls are wrapped in try/catch blocks.
      *
-     * @return void
+     * @return bool
      */
-    public function initPlugins()
+    public function initPlugins(): bool
     {
         $handleSuccess = true;
 
@@ -162,7 +167,7 @@ class Empathy
         } else {
             try {
                 $this->boot->initPlugins();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->exceptionHandler($e);
                 $handleSuccess = false;
             }
@@ -179,30 +184,31 @@ class Empathy
      * which will (if true) not call the controller action. the
      * controller object is then returned.
      *
-     * @return void/Controller
+     * @return null | Controller
      *
      */
-    public function beginDispatch($fake = false)
+    public function beginDispatch(bool $fake = false): null | Controller
     {
         if (!$this->getHandlingErrors()) {
             $this->boot->dispatch($fake);
         } else {
             try {
                 $this->boot->dispatch($fake);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->exceptionHandler($e);
             }
         }
         if ($fake) {
             return DI::getContainer()->get('Controller');
         }
+        return null;
     }
 
     /**
      * Returns the $persistentMode setting.
      * @return boolean $persistentMode
      */
-    public function getPersistentMode()
+    public function getPersistentMode(): bool
     {
         return $this->persistentMode;
     }
@@ -211,7 +217,7 @@ class Empathy
      * Returns errors caught by error handler.
      * @return array $errors
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -221,7 +227,7 @@ class Empathy
      * Returns whether error handler has caught anything or not.
      * @return boolean
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return (sizeof($this->errors) > 0);
     }
@@ -231,7 +237,7 @@ class Empathy
      * Return a concatenated string of all caught error messages.
      * @return string $errors
      */
-    public function errorsToString()
+    public function errorsToString(): string
     {
         return implode('</h2><h2>&nbsp;</h2><h2>', $this->getErrors());
     }
@@ -250,7 +256,7 @@ class Empathy
      * @return boolean returns true to indicate the error has been handled.
      *
      */
-    public function errorHandler($errno, $errstr, $errfile, $errline)
+    public function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool
     {
         // If this error level is not in current reporting, swallow it.
         if (!(error_reporting() & $errno)) {
@@ -305,15 +311,15 @@ class Empathy
     /**
      * The exception handler.  Deals with any exception.
      *
-     * @param Exception $e
+     * @param Throwable $e
      *
      * @return void
      *
      */
-    public function exceptionHandler($e)
+    public function exceptionHandler(Throwable $e): void
     {
         if ($this->dispatchedException) {
-            return false;
+            return;
         }
 
         $response = '';
@@ -404,10 +410,11 @@ class Empathy
 
     /**
      * the autoload function.
-     * @param  string $class the name of class that PHP is attempting to load
+     * @param string $classPath the name of class that PHP is attempting to load
      * @return void
+     * @throws Exception
      */
-    public static function loadClass($classPath)
+    public static function loadClass(string $classPath): void
     {
         $classNameArr = explode('\\', $classPath);
         $className = $classNameArr[ sizeof($classNameArr) - 1 ];
@@ -419,7 +426,7 @@ class Empathy
                     $location = Config::get('DOC_ROOT') . '/application/' . $_GET['module'] . '/';
                 }
             } else {
-                throw new \Exception('Module not set.');
+                throw new Exception('Module not set.');
             }
         } elseif (strpos($classPath, 'Empathy\\MVC\\Model\\') === 0) {
             $location = Config::get('DOC_ROOT').'/storage/';
@@ -430,12 +437,12 @@ class Empathy
         }
     }
 
-    public function reloadBootOptions()
+    public function reloadBootOptions(): void
     {
         $this->boot->initBootOptions();
     }
 
-    public function init()
+    public function init(): void
     {
         $this->boot = DI::getContainer()->get('Bootstrap');
         if ($this->persistentMode !== true) {
@@ -443,7 +450,7 @@ class Empathy
         }
     }
 
-    public function getBootOptions()
+    public function getBootOptions(): array
     {
         return $this->bootOptions;
     }

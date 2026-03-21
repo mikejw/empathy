@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Util;
 
-use Empathy\ELib\Util\Libs;
 use Empathy\MVC\Config;
+use Empathy\MVC\SafeException;
 
 /**
  * Empathy module code generation
@@ -20,10 +20,13 @@ use Empathy\MVC\Config;
  */
 class ModuleGen
 {
-    public static function generate($module, $lib = null)
+    public static function generate(string $module, ?string $lib = null): int
     {
-        Libs::detect();
-        $installed = Libs::getInstalled();
+        if (!class_exists(Empathy\ELib\Util\Libs::class)) {
+            throw new SafeException('ELib Base not found. Please install it and try again.');
+        }
+        Empathy\ELib\Util\Libs::detect();
+        $installed = Empathy\ELib\Util\Libs::getInstalled();
         $class_list = [];
         $generated = 0;
 

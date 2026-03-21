@@ -20,9 +20,9 @@ use Empathy\MVC\DI;
  */
 class Smarty extends PresentationPlugin implements PreDispatch, Presentation
 {
-    protected $smarty;
+    protected \Smarty $smarty;
 
-    public function onPreDispatch()
+    public function onPreDispatch(): void
     {
         $this->smarty = new \Smarty();
 
@@ -64,17 +64,17 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         );
     }
 
-    public function assign($name, $data, $no_array = false)
+    public function assign($name, $data, $no_array = false): void
     {
         $this->smarty->assign($name, $data);
     }
 
-    public function clear_assign($name)
+    public function clear_assign($name): void
     {
         $this->smarty->clear_assign($name);
     }
 
-    public function display($template, $internal = false)
+    public function display($template, $internal = false): void
     {
         if ($internal) {
             $this->switchInternal();
@@ -84,7 +84,7 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
     }
 
 
-    public function assignEmpathyDir()
+    public function assignEmpathyDir(): void
     {
         // for default templates check test mode
         // derived from elibs plugin
@@ -97,17 +97,17 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
     }
 
 
-    public function loadFilter($type, $name)
+    public function loadFilter(string $type, string $name): void
     {
         $this->smarty->load_filter($type, $name);
     }
 
-    protected function switchInternal()
+    protected function switchInternal(): void
     {
         $this->smarty->template_dir = realpath(dirname(__FILE__).'/../../../../tpl/');
     }
 
-    public function exception($debug, $exception, $reqError)
+    public function exception($debug, $exception, $reqError): void
     {
         $this->assign('centerpage', true);
         $this->assign('error', $exception->getMessage());
@@ -119,19 +119,13 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         }
     }
 
-    public function getVars()
+    public function getVars(): array
     {
         return $this->smarty->getTemplateVars();
     }
 
-    public function clearVars()
+    public function clearVars(): void
     {
         $this->smarty->clear_all_assign();
     }
-
-    public function getSmarty()
-    {
-        return $this->smarty;
-    }
-
 }

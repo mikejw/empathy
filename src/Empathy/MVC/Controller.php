@@ -87,38 +87,35 @@ class Controller
         $this->pluginManager->setOptions($pluginOptions);
         $this->pluginManager->setWhitelist($pluginWhitelist);
 
-        if (!$this->boot->getMVC()->initPlugins()) {
-            return false;
-        }
+        if ($this->boot->getMVC()->initPlugins()) {
+            $this->presenter = $this->pluginManager->getView();
+            $this->useSession = $useSession;
+            $this->environment = $boot->getEnvironment();
+            $this->stash = DI::getContainer()->get('Stash');
+            $this->module = (isset($_GET['module'])) ? $_GET['module'] : null;
+            $this->class = (isset($_GET['class'])) ? $_GET['class'] : null;
+            $this->event = (isset($_GET['event'])) ? $_GET['event'] : null;
 
-        $this->presenter = $this->pluginManager->getView();
+            if (Config::get('TPL_BY_CLASS')) {
+                $this->templateFile = $this->class . '.tpl';
+            } else {
+                $this->templateFile = $this->module . '.tpl';
+            }
 
-        $this->useSession = $useSession;
-        $this->environment = $boot->getEnvironment();
-        $this->stash =  DI::getContainer()->get('Stash');
-        $this->module = (isset($_GET['module'])) ? $_GET['module'] : null;
-        $this->class = (isset($_GET['class'])) ? $_GET['class'] : null;
-        $this->event = (isset($_GET['event'])) ? $_GET['event'] : null;
-
-        if (Config::get('TPL_BY_CLASS')) {
-            $this->templateFile = $this->class.'.tpl';
-        } else {
-            $this->templateFile = $this->module.'.tpl';
-        }
-
-        if ($this->useSession) {
-            Session::up();
+            if ($this->useSession) {
+                Session::up();
+            }
         }
     }
 
-    public function doPreEvent()
+    public function doPreEvent(): void
     {
         $this->pluginManager->preEvent();
         $this->setPresenter($this->pluginManager->getView());
         $this->controllerAssigns();
     }
 
-    private function controllerAssigns()
+    private function controllerAssigns(): void
     {
         $this->assignControllerInfo();
         $this->assignConstants();
@@ -136,9 +133,9 @@ class Controller
     /**
      * Assigns the value of some of the main settings from the application config to the view.
      *
-     * @return null
+     * @return void
      */
-    private function assignConstants()
+    private function assignConstants(): void
     {
         if (Config::get('NAME') !== false) {
             $this->assign('NAME', Config::get('NAME'));
@@ -158,10 +155,10 @@ class Controller
     /**
      * Assign key controller attributes to the view
      *
-     * @return null
+     * @return void
      *
      */
-    private function assignControllerInfo()
+    private function assignControllerInfo(): void
     {
         $this->assign('module', $this->module);
         $this->assign('class', $this->class);
@@ -172,10 +169,10 @@ class Controller
     /**
      * Assign environment value to the view
      *
-     * @return null
+     * @return void
      *
      */
-    private function assignEnvironment()
+    private function assignEnvironment(): void
     {
         $this->assign('environment', $this->environment);
     }
@@ -185,9 +182,9 @@ class Controller
      * Set the name of the current view template
      *
      * @param string $tpl tempalte name (including file extension.)
-     * @return null
+     * @return void
      */
-    public function setTemplate($tpl)
+    public function setTemplate(string $tpl): void
     {
         $this->templateFile = $tpl;
     }
@@ -196,9 +193,9 @@ class Controller
      * Initialise the view for rendering.
      *
      * @param boolean $internal Whether the template is internal.
-     * @return null
+     * @return void
      */
-    public function initDisplay($internal)
+    public function initDisplay(bool $internal): void
     {
         $this->presenter->display($this->templateFile, $internal);
     }
@@ -207,9 +204,9 @@ class Controller
      * Redirect the user to another location within the application
      *
      * @param string $endString the new URI to redirect to.
-     * @return null
+     * @return void
      */
-    public function redirect($endString = '')
+    public function redirect(string $endString = ''): void
     {
         $proto = (\Empathy\MVC\Util\Misc::isSecure()) ? 'https' : 'http';
         if ($this->useSession) {
@@ -229,9 +226,9 @@ class Controller
      * Redirect to a local cgi script.
      *
      * @param string $endString path to the script.
-     * @return null
+     * @return void
      */
-    public function redirect_cgi($endString = '')
+    public function redirect_cgi(string $endString = ''): void
     {
         if ($this->useSession) {
             Session::write();
@@ -247,9 +244,9 @@ class Controller
     /**
      * End current user session
      *
-     * @return null
+     * @return void
      */
-    public function sessionDown()
+    public function sessionDown(): void
     {
         if ($this->useSession) {
             Session::down();
@@ -259,9 +256,9 @@ class Controller
     /**
      * Determines whether current request is an ajax request from the browser.
      *
-     * @return null
+     * @return bool
      */
-    public function isXMLHttpRequest()
+    public function isXMLHttpRequest(): bool
     {
         $request = false;
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
@@ -277,9 +274,9 @@ class Controller
      * @param string $name Key name.
      * @param mixed $data Data.
      * @param boolean $no_array Determine if data should be stored 'flat'
-     * @return null
+     * @return void
      */
-    public function assign($name, $data, $no_array = false)
+    public function assign(string $name, mixed $data, bool $no_array = false): void
     {
         $this->presenter->assign($name, $data, $no_array);
     }
@@ -289,7 +286,7 @@ class Controller
      *
      * @return string $module Module name.
      */
-    public function getModule()
+    public function getModule(): string
     {
         return $this->module;
     }
@@ -299,12 +296,12 @@ class Controller
      *
      * @return string $class Class name.
      */
-    public function getClass()
+    public function getClass(): string
     {
         return $this->class;
     }
 
-    public function getEvent()
+    public function getEvent(): string
     {
         return $this->event;
     }
@@ -313,9 +310,9 @@ class Controller
      * Obtain user interface control values from request/session.
      * @param string $ui Name of interface control set.
      * @param array $ui_array Set of control settings.
-     * @return null
+     * @return void
      */
-    public function loadUIVars($ui, $ui_array)
+    public function loadUIVars(string $ui, array $ui_array): void
     {
         if ($this->useSession) {
             $new_app = Session::getNewApp();
@@ -338,12 +335,12 @@ class Controller
 
     /**
      * When $def is 0, valid is true when id is 0
-     * @param int $id The ID.
+     * @param mixed $id The ID.
      * @param mixed $def The default value.
      * @param boolean $assertSet Assert ID is set.
      * @return boolean Init is valid.
      */
-    public function initID($id, $def, $assertSet = false)
+    public function initID(mixed $id, mixed $def, bool $assertSet = false): bool
     {
         $valid = true;
         $assign_def = false;
@@ -371,32 +368,32 @@ class Controller
      * @param boolean $debug Debug mode.
      * @param Exception $exception The exception object.
      * @param boolean $req_error Is request error. e.g. 404.
-     * @return null
+     * @return void
      */
-    public function viewException($debug, $exception, $req_error)
+    public function viewException($debug, $exception, $req_error): void
     {
         $this->presenter->exception($debug, $exception, $req_error);
     }
 
     /**
      * Assign generated token.
-     * @return null
+     * @return void
      */
-    protected function assignCSRFToken()
+    protected function assignCSRFToken(): void
     {
-        $token = md5(uniqid(rand(), true));
+        $token = md5(uniqid((string) rand(), true));
         $this->assign('csrf_token', $token);
         if ($this->useSession) {
             Session::set('csrf_token', $token);
         }
     }
 
-    public function getUseSession()
+    public function getUseSession(): bool
     {
         return $this->useSession;
     }
 
-    private function setPresenter($view)
+    private function setPresenter($view): void
     {
         $this->presenter = $view;
     }

@@ -30,9 +30,9 @@ class Config
      * Return a piece of config.
      *
      * @param string $key The config key.
-     * @return string Config.
+     * @return mixed Config.
      */
-    public static function get($key)
+    public static function get(string $key): mixed
     {
         if (!isset(self::$items[$key])) {
             return false;
@@ -45,19 +45,19 @@ class Config
      * Store some config.
      *
      * @param string $key The config key.
-     * @param mixed Data to store against key.
-     * @return null
+     * @param mixed $data The data to store against key.
+     * @return void
      */
-    public static function store($key, $data)
+    public static function store(string $key, mixed $data): void
     {
         self::$items[$key] = $data;
     }
 
     /**
      * Simple dump of config.
-     * @return null
+     * @return void
      */
-    public static function dump()
+    public static function dump(): void
     {
         print_r(self::$items);
     }

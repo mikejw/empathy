@@ -2,16 +2,11 @@
 
 declare(strict_types=1);
 
-namespace {
-
-    class R extends RedBeanPHP\Facade
-    {
-    }
-}
-
 namespace Empathy\MVC\Plugin {
 
     use Empathy\MVC\Config;
+    use Empathy\MVC\Plugin;
+    use Empathy\MVC\Exception;
 
     /**
      * Empathy Redbean Plugin
@@ -24,8 +19,13 @@ namespace Empathy\MVC\Plugin {
 
      * with this source code in the file licence.txt
      */
-    class Redbean extends \Empathy\MVC\Plugin implements PreDispatch
+    class Redbean extends Plugin implements PreDispatch
     {
+        private function usingRedbean(): bool
+        {
+            return class_exists(\R::class);
+        }
+
         private function isIP($server)
         {
             $ip = false;
@@ -45,13 +45,15 @@ namespace Empathy\MVC\Plugin {
 
             if ($dbms === 'sqlite') {
                 if (!isset($this->config['database'])) {
-                    throw new \Empathy\MVC\Exception('sqlite database file not supplied.');
+                    throw new Exception('sqlite database file not supplied.');
                 }
-                $db = DOC_ROOT.'/'.$this->config['database'];
+                $db = Config::get('DOC_ROOT') . '/' . $this->config['database'];
                 if (!file_exists($db)) {
-                    throw new \Empathy\MVC\Exception('sqlite database file not found.');
+                    throw new Exception('sqlite database file not found.');
                 }
-                \R::setup('sqlite:'.$db);
+                if ($this->usingRedbean()) {
+                    \R::setup('sqlite:'.$db);
+                }
             } else {
                 if (Config::get('DB_SERVER') === false) {
                     throw new \Empathy\MVC\Exception('Database server is not defined in config.');
@@ -66,7 +68,9 @@ namespace Empathy\MVC\Plugin {
                 if (is_numeric($db_port)) {
                     $dsn .= 'port='.$db_port.';';
                 }
-                \R::setup($dsn, Config::get('DB_USER'), Config::get('DB_PASS'));
+                if ($this->usingRedbean()) {
+                    \R::setup($dsn, Config::get('DB_USER'), Config::get('DB_PASS'));
+                }
             }
         }
     }

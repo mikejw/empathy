@@ -21,6 +21,9 @@ class Phirehose
 {
     public function __construct()
     {
-        require 'phirehose/Phirehose.php';
+        if (file_exists('phirehose/Phirehose.php')) {
+            /** @phpstan-ignore-next-line */
+            include 'phirehose/Phirehose.php';
+        }
     }
 }

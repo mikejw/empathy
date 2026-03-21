@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Empathy\MVC;
+use PDO;
 
 /**
  * Empathy Database Connection
@@ -21,33 +22,33 @@ class DBC
     * IP address of database server to connect to.
     *
     */
-    private $server;
+    private string $server;
 
     /**
     * Name of database.
     */
-    private $name;
+    private string $name;
 
     /**
     * Username to use for connection.
     */
-    private $user;
+    private string $user;
 
     /**
     * Password for connection.
     */
-    private $pass;
+    private string $pass;
 
     /**
     * Database port
     */
-    private $port;
+    private int | null $port;
 
 
     /**
     * Handle for connection produced by PDO.
     */
-    private $handle;
+    private \PDO $handle;
 
     /**
     * Contrustor takes connection passed from parameters from
@@ -60,11 +61,9 @@ class DBC
     *
     * @param string $p database password.
     *
-    * @param int $port database port.
-    *
-    * @return void.
+    * @param int|null $port database port.
     */
-    public function __construct($s, $n, $u, $p, $port)
+    public function __construct(string $s, string $n, string $u, string $p, ?int $port = null)
     {
         $this->server = $s;
         $this->name = $n;
@@ -73,6 +72,7 @@ class DBC
         $this->port = $port;
 
         $dsn = 'mysql:host='.$this->server.';dbname='.$this->name.';charset=utf8mb4;';
+        echo $dsn;
         if ($this->port !== null) {
             $dsn .= 'port='.$this->port.';';
         }
@@ -84,7 +84,7 @@ class DBC
     * Returns database connection handle produced by PDO
     * @return PDO handle
     */
-    public function getHandle()
+    public function getHandle(): PDO
     {
         return $this->handle;
     }

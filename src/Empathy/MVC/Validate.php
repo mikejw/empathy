@@ -110,7 +110,6 @@ class Validate
                     break;
                 default:
                     throw new \Exception('No valid validation type specified.');
-                    break;
             }
 
             if (!$valid) {

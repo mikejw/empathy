@@ -26,27 +26,25 @@ class empathy extends BaseController
 
     /**
      * Default controller event.
-     * @return null
+     * @return void
      */
-    public function default_event()
+    public function default_event(): void
     {
         $this->assign('about', true);
     }
 
     /**
      * Default controller event.
-     * @return null
+     * @return void
      */
-    public function status()
+    public function status(): void
     {
         $status = 'Unknown';
         if (Config::get('DB_NAME') !== false) {
             $e = new Entity();
-            $model = Model::connectModel($e);
-            $status = 'OK';
-        } else {
-            $status = 'OK';
+            Model::connectModel($e);
         }
+        $status = 'OK';
         $this->assign('status', $status);
     }
 
@@ -54,7 +52,7 @@ class empathy extends BaseController
     /**
      * Clear APCu cache.
      */
-    public function cc()
+    public function cc(): void
     {
         $success = false;
 

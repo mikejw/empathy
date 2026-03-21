@@ -19,7 +19,7 @@ use Empathy\MVC\Util\CLIMode;
 
  * with this source code in the file licence.txt
  */
-abstract class ESuiteTestCase extends \PHPUnit_Framework_TestCase
+abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
 {
     private $boot;
 

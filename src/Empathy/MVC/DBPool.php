@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Empathy\MVC;
+use PDO;
 
 /**
  * Empathy Database Pool
@@ -22,24 +23,24 @@ class DBPool
     /**
     * Data structure for storing connection objects.
     */
-    private static $pool = [];
+    private static array $pool = [];
 
     /**
-    * Add a new host/connection to the pool.
-    *
-    * @param string $s host/server address.
-    *
-    * @param string $n name of database.
-    *
-    * @param string $u username for database.
-    *
-    * @param string $p password for database.
-    *
-    * @param string $host name for connection. used as index in $pool array
-    *
-    * @return void
-    */
-    public static function addHost($s, $n, $u, $p, $host, $port = null)
+     * Add a new host/connection to the pool.
+     *
+     * @param string $s host/server address.
+     *
+     * @param string $n name of database.
+     *
+     * @param string $u username for database.
+     *
+     * @param string $p password for database.
+     *
+     * @param string $host name for connection. used as index in $pool array
+     * @param int|null $port
+     * @return void
+     */
+    public static function addHost(string $s, string $n, string $u, string $p, string $host, ?int $port = null): void
     {
         self::$pool[$host] = new DBC($s, $n, $u, $p, $port);
     }
@@ -49,9 +50,9 @@ class DBPool
     *
     * @param string $host connection name
     *
-    * return DBC $host Empathy Database Connection Object
+    * @return DBC Empathy Database Connection Object
     */
-    private static function getHost($host)
+    private static function getHost(string $host): DBC
     {
         return self::$pool[$host];
     }
@@ -63,7 +64,7 @@ class DBPool
     *
     * @return PDO Handle
     */
-    public static function getConnection($host)
+    public static function getConnection(string $host): PDO
     {
         $cx = self::getHost($host);
         return $cx->getHandle();
@@ -75,7 +76,7 @@ class DBPool
     *
     * @return PDO Handle
     */
-    public static function getDefCX()
+    public static function getDefCX(): PDO
     {
         if (sizeof(self::$pool) < 1) {
             $db_port = Config::get('DB_PORT');
@@ -101,7 +102,7 @@ class DBPool
         return self::getConnection('default');
     }
 
-    public static function reset()
+    public static function reset(): void
     {
         self::$pool = [];
     }

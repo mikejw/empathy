@@ -6,10 +6,9 @@ namespace Empathy\MVC;
 
 class ModelLegacy extends Model
 {
-    public static function load($model)
+    public static function load($model, $id = null, $params = [], $host = null): void
     {
-        $storageObject = $model;
-        self::connectModel($storageObject);
-        $storageObject->init();
+        self::connectModel($model);
+        $model->init();
     }
 }

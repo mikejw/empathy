@@ -6,14 +6,15 @@ namespace Empathy\MVC;
 
 use DI\Container;
 use DI\ContainerBuilder;
+use Spyc;
 use Monolog\Logger;
 
 class DI
 {
-    private static $builder;
-    private static $container;
+    private static ContainerBuilder $builder;
+    private static Container $container;
 
-    private static function loadConfig($configDir, $spyc = null)
+    private static function loadConfig(string $configDir, ?Spyc $spyc = null): mixed
     {
         if ($spyc === null) {
             $spyc = DI::getContainer()->get('Spyc');
@@ -24,7 +25,7 @@ class DI
         });
     }
 
-    private static function loadAdditional($location, $docRoot = '')
+    private static function loadAdditional($location, $docRoot = ''): void
     {
         if (file_exists($docRoot.$location)) {
             self::$builder->addDefinitions($docRoot.$location);
@@ -35,18 +36,17 @@ class DI
         $configDir,
         $persistentMode = false,
         $systemMode = false
-    ) {
+    ): Container {
         self::$builder = new ContainerBuilder();
         self::$builder->addDefinitions([
             'configDir' => $configDir,
             'persistentMode' => $persistentMode,
             'systemMode' => $systemMode,
-            'Spyc' => new \Spyc(),
+            'Spyc' => new Spyc(),
             'Empathy' => function (Container $c) {
                 return new Empathy(
                     $c->get('configDir'),
-                    $c->get('persistentMode'),
-                    $c->get('systemMode')
+                    $c->get('persistentMode')
                 );
             },
             'Bootstrap' => function (Container $c) {
@@ -86,14 +86,16 @@ class DI
             },
         ]);
 
-        $appConfig = self::loadConfig($configDir, new \Spyc());
+        $appConfig = self::loadConfig($configDir, new Spyc());
         if (
             isset($appConfig['boot_options']['use_elib']) &&
-            $appConfig['boot_options']['use_elib']
+            $appConfig['boot_options']['use_elib'] &&
+            class_exists(\Empathy\ELib\Util\Libs::class)
         ) {
             $elibDirs = \Empathy\ELib\Util\Libs::findAll($appConfig['doc_root']);
+
             foreach ($elibDirs as $lib) {
-                self::loadAdditional($lib.'/services.php', $appConfig['doc_root']);
+                self::loadAdditional($lib . '/services.php', $appConfig['doc_root']);
             }
         }
 
@@ -102,7 +104,7 @@ class DI
         return self::$container;
     }
 
-    public static function getContainer()
+    public static function getContainer(): Container
     {
         return self::$container;
     }

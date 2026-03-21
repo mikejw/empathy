@@ -20,7 +20,7 @@ use Empathy\MVC\Plugin as Plugin;
  */
 class SmartySSL extends Smarty
 {
-    public function isSecure()
+    public function isSecure(): bool
     {
         return (
             isset($this->config['force']) && $this->config['force'] ||
@@ -28,7 +28,7 @@ class SmartySSL extends Smarty
         );
     }
 
-    public function display($template, $internal = false)
+    public function display($template, $internal = false): void
     {
         if ($internal) {
             $this->switchInternal();

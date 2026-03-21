@@ -17,25 +17,25 @@ namespace Empathy\MVC;
  */
 class SectionItemStandAlone extends Entity
 {
-    public $id;
-    public $module;
-    public $type;
-    public $section_id;
-    public $position;
-    public $label;
-    public $friendly_url;
-    public $template;
-    public $hidden;
-    public $owns_inline;
-    public $link;
-    public $stamp;
-    public $meta;
-    public $user_id;
+    public int $id;
+    public string $module;
+    public string $type;
+    public int $section_id;
+    public int $position;
+    public string $label;
+    public string $friendly_url;
+    public string $template;
+    public bool $hidden;
+    public bool $owns_inline;
+    public string $link;
+    public string $stamp;
+    public string $meta;
+    public int $user_id;
 
-    public static $table = 'section_item';
+    public static string $table = 'section_item';
 
 
-    public function getURIData()
+    public function getURIData(): array
     {
         $uri_data = [];
 
@@ -51,7 +51,7 @@ class SectionItemStandAlone extends Entity
         return $uri_data;
     }
 
-    public function getItem($id)
+    public function getItem($id): void
     {
         $params = [];
         $sql = 'SELECT * FROM ' . SectionItemStandAlone::$table . ' WHERE id = ?';
@@ -68,7 +68,7 @@ class SectionItemStandAlone extends Entity
         }
     }
 
-    public function findSection($rows, $slug, $parent_id)
+    public function findSection($rows, $slug, $parent_id): array
     {
         $matched = [];
         foreach ($rows as $row) {
@@ -81,13 +81,12 @@ class SectionItemStandAlone extends Entity
         return $matched;
     }
 
-    public function doResolveURI($uri)
+    public function doResolveURI(?array $uri): int
     {
-        if (!isset($uri)) {
-            return false;
+        if ($uri === null) {
+            return 0;
         }
 
-        $matched = false;
         $rows = $this->getURIData();
         $id = 0;
         $sections = [];
@@ -103,17 +102,24 @@ class SectionItemStandAlone extends Entity
             }
         }
 
-        if (isset($uri) && sizeof($sections) === sizeof($uri)) {
-            $matched = true;
+        if (sizeof($sections) === sizeof($uri)) {
             $sectionId = $sections[sizeof($sections) - 1]['id'];
         }
         return $sectionId;
     }
 
-    public function resolveURI($uri)
+    public function resolveURI($uri): int
     {
-        if (DI::getContainer()->get('CacheEnabled')) {
-            return DI::getContainer()->get('Cache')->cachedCallback(
+        $cache = null;
+        $cacheEnabled = false;
+        try {
+            $cache = DI::getContainer()->get('Cache');
+            $cacheEnabled = DI::getContainer()->get('cacheEnabled');
+        } catch (\Exception $e) {
+            //
+        }
+        if ($cache && $cacheEnabled) {
+            return $cache->cachedCallback(
                 'section_id_' . implode('_', $uri),
                 [$this, 'doResolveURI'],
                 [$uri]

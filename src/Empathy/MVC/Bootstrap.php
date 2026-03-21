@@ -44,9 +44,9 @@ class Bootstrap
     private $dynamicModule;
 
     /**
-     * @var Dynamic module (ELib CMS) URI string as fallback
+     * @var string Dynamic module (ELib CMS) URI string as fallback
      */
-    private $dynamicModuleDefaultURI;
+    private string | false $dynamicModuleDefaultURI;
 
     /**
      * The URI object is used for determining
@@ -125,9 +125,9 @@ class Bootstrap
      * Sets local boot options including environment.
      *
      * @param array $bootOptions boot options config
-     * @return null
+     * @return void
      */
-    public function initBootOptions($bootOptions = null)
+    public function initBootOptions($bootOptions = null): void
     {
         if ($bootOptions === null) {
             $bootOptions = Config::get('BOOT_OPTIONS');
@@ -162,9 +162,9 @@ class Bootstrap
      * @param boolean $fake Can be used to prevent final action event call.
      * useful for testing.
      * @param string $controller Force controller name. Used in testing.
-     * @return null
+     * @return void
      */
-    public function dispatch($fake = false, $controller = null)
+    public function dispatch($fake = false, $controller = null): void
     {
         $this->uri = DI::getContainer()->get('URI');
 
@@ -172,7 +172,7 @@ class Bootstrap
 
         if ($error === URI::MISSING_CLASS_DEF
            && isset($this->dynamicModule)
-           && $this->dynamicModule !== '') {
+           && $this->dynamicModule) {
 
             // anticipate dispatched errors
             $this->pluginManager = DI::getContainer()->get('PluginManager');
@@ -226,9 +226,9 @@ class Bootstrap
      * If an exception is detected this is used to dispatch
      * to an internal controller and view.
      * @param Exception $e The exception object.
-     * @return null
+     * @return void
      */
-    public function dispatchException($e)
+    public function dispatchException($e): void
     {
         $reqError = (get_class($e) === RequestException::class) ? true : false;
         $useSession = $this->controller !== null ? $this->controller->getUseSession() : true;
@@ -244,9 +244,9 @@ class Bootstrap
      * Invoke the view through the controller.
      * @param boolean $i Whether the current template is internal.
      * E.g. an exception has occurred.
-     * @return null
+     * @return void
      */
-    private function display($i = false)
+    private function display($i = false): void
     {
         $this->controller->initDisplay($i);
     }
@@ -259,9 +259,9 @@ class Bootstrap
      * followed by the application dying silently with no attempt
      * to initialize the view.
      *
-     * @return null
+     * @return void
      */
-    public function initPlugins()
+    public function initPlugins(): void
     {
         $pluginManager = $this->pluginManager;
         $plugins = $this->plugins;

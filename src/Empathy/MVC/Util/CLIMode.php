@@ -19,8 +19,8 @@ namespace Empathy\MVC\Util;
 
 class CLIMode
 {
-    public const TIMED = 0;
-    public const CAPTURED = 1;
-    public const FAKED = 2;
-    public const STREAMED = 3;
+    public const int TIMED = 0;
+    public const int CAPTURED = 1;
+    public const int FAKED = 2;
+    public const int STREAMED = 3;
 }
