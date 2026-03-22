@@ -6,7 +6,7 @@ namespace Empathy\MVC;
 use Throwable;
 use Exception;
 
-define('MVC_VERSION', '4.3.3');
+define('MVC_VERSION', '4.3.5');
 
 
 /**
