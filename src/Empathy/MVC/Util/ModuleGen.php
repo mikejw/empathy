@@ -20,7 +20,7 @@ use Empathy\MVC\SafeException;
  */
 class ModuleGen
 {
-    public static function generate(string $module, ?string $lib = null): int
+    public static function generate(string $module): int
     {
         if (!class_exists(\Empathy\ELib\Util\Libs::class)) {
             throw new SafeException('ELib Base not found. Please install it and try again.');
