@@ -14,7 +14,7 @@ class ControllerTest extends ESuiteTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->bootstrap = $this->makeFakeBootstrapSimple();
+        $this->bootstrap = $this->makeFakeBootstrap();
         $this->controller = new \Empathy\MVC\Controller($this->bootstrap);
     }
 

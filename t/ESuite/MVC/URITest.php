@@ -16,7 +16,7 @@ class URITest extends ESuiteTestCase
     protected function setUp(): void
     {
         if (!$this->boot) {
-            $this->boot = $this->makeFakeBootstrapSimple(true);
+            $this->boot = $this->makeFakeBootstrap();
         }
     }
 

@@ -59,18 +59,10 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
         return $doc_root;
     }
 
-    protected function makeFakeBootstrapSimple($persistentMode = true)
-    {
-        $container = DI::init($this->getDocRoot(), $persistentMode);
-        $empathy = $container->get('Empathy');
-        $empathy->init();
-        return $container->get('Bootstrap');
-    }
-
-    protected function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY): \Empathy\MVC\Bootstrap
+    protected function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY, bool $persistentMode = true): \Empathy\MVC\Bootstrap
     {
         $dummyBootOptions = [
-            'default_module' => 'foo',
+            'default_module' => 'front',
             'dynamic_module' => null,
             'debug_mode' => false,
             'environment' => 'dev',
@@ -91,7 +83,8 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $container = \Empathy\MVC\DI::init($this->getDocRoot(), true);
+        $doc_root = $this->getDocRoot();
+        $container = \Empathy\MVC\DI::init($doc_root, true);
         $empathy = $container->get('Empathy');
         $empathy->setBootOptions($dummyBootOptions);
         $empathy->setPlugins($plugins);
@@ -100,8 +93,8 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
         $this->setConfig('NAME', 'empathytest');
         $this->setConfig('TITLE', 'empathy testing');
         $this->setConfig('DOC_ROOT', $doc_root);
-        $this->setConfig('WEB_ROOT', 'localhost/empathytest');
-        $this->setConfig('PUBLIC_DIR', '/public_html');
+        $this->setConfig('WEB_ROOT', 'www.dev.org');
+        $this->setConfig('PUBLIC_DIR', '');
 
 
         $empathy->init();

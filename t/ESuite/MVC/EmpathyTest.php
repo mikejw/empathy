@@ -20,9 +20,9 @@ class EmpathyTest extends ESuiteTestCase
         //
     }
 
-    private function createMVC($persistent = false)
+    private function createMVC()
     {
-        $bootstrap = $this->makeFakeBootstrapSimple($persistent);
+        $bootstrap = $this->makeFakeBootstrap();
         $this->mvc = $bootstrap->getMVC();
     }
 
@@ -45,7 +45,7 @@ class EmpathyTest extends ESuiteTestCase
 
     public function testErrors()
     {
-        $this->createMVC(true);
+        $this->createMVC();
         $errors = $this->mvc->getErrors();
 
         $this->assertEmpty($errors);
@@ -68,39 +68,34 @@ class EmpathyTest extends ESuiteTestCase
     public function testExceptions()
     {
         // what happens when there is just an error
-        $this->createMVC(true);
+        $this->createMVC();
         $this->changeDebug(true);
         $this->mvc->errorHandler(E_NOTICE, 'dummy error', 'someFile.php', 1);
         $this->expectOutputRegex('/dummy error/');
         $this->mvc->exceptionHandler(new \Exception(''));
 
-
-        $this->createMVC(true);
+        $this->createMVC();
         $this->expectOutputRegex('/Bad request/');
         $this->mvc->exceptionHandler(new \Empathy\MVC\SafeException('some error'));
 
-
-
-        $this->createMVC(true);
+        $this->createMVC();
         $this->changeEnv('dev');
         $this->expectOutputRegex('/die: Safe exception: some error/');
         $this->mvc->exceptionHandler(new \Empathy\MVC\SafeException('some error'));
 
 
-        $this->createMVC(true);
+        $this->createMVC();
         $this->expectOutputRegex('/<h2>some error<\/h2>/');
         $this->mvc->exceptionHandler(new \Exception('some error'));
 
         // code = 0 => 404
-        $this->createMVC(true);
+        $this->createMVC();
         $this->expectOutputRegex('/Not found/');
         $this->mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error'));
 
         // code = 1 => 500
-        $this->createMVC(true);
+        $this->createMVC();
         $this->expectOutputRegex('/Bad request/');
         $this->mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error', 1));
-
     }
-
 }

@@ -16,7 +16,7 @@ class BootstrapTest extends ESuiteTestCase
         parent::setUp();
 
         if ($this->bootstrap === null) {
-            $this->bootstrap = $this->makeFakeBootstrapSimple();
+            $this->bootstrap = $this->makeFakeBootstrap();
         }
     }
 
