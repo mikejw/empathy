@@ -28,7 +28,7 @@ class Config
             self::$items[$index] = $value;
         }
         self::set('base', $base);
-        self::set('util_dir', $utilDir );
+        self::set('util_dir', $utilDir);
     }
 
     public static function get(string $key): mixed

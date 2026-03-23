@@ -41,7 +41,7 @@
   "autoload": {
     "psr-0": {
       "Empathy": "src/",
-      "Psr": "src/"
+      "Esuite": "t/"
     },
     "classmap": [
       "src/R.php"

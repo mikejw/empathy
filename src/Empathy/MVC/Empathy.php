@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 namespace Empathy\MVC;
-use Throwable;
+
 use Exception;
+use Throwable;
 
 define('MVC_VERSION', '4.3.5');
 

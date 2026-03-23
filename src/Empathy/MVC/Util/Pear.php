@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Empathy\MVC\Util;
+
 use Empathy\MVC\SafeException;
 
 /**

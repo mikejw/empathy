@@ -104,7 +104,7 @@ class Bootstrap
      * that contains the description of plugins to be initialized.
      * Read from the application config.
      */
-    private readonly array $plugins, Empathy $mvc)
+        private readonly array $plugins, Empathy $mvc)
     {
         $this->persistentMode = $mvc->getPersistentMode();
         $this->mvc = $mvc;

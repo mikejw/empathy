@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Empathy\MVC\Plugin {
 
     use Empathy\MVC\Config;
-    use Empathy\MVC\Plugin;
     use Empathy\MVC\Exception;
+    use Empathy\MVC\Plugin;
 
     /**
      * Empathy Redbean Plugin

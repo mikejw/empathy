@@ -21,13 +21,10 @@
         <log type="coverage-html" target="../build/coverage" lowUpperBound="35" highLowerBound="70"/>
     </logging>
 
-
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">../src/</directory>
-            <directory suffix=".php">./Fake/</directory>
             <directory suffix=".php">../eaa/</directory>
         </whitelist>
     </filter>
-
 </phpunit>

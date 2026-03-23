@@ -114,4 +114,3 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
         EmpConfig::store($key, $value);
     }
 }
-

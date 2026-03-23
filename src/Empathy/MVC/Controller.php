@@ -79,8 +79,11 @@ class Controller
     public function __construct(/**
      * The current bootstrap object.
      */
-    protected Bootstrap $boot, bool $useSession = true, array $pluginOptions = [], array $pluginWhitelist = [])
-    {
+        protected Bootstrap $boot,
+        bool $useSession = true,
+        array $pluginOptions = [],
+        array $pluginWhitelist = []
+    ) {
         DI::getContainer()->set('Controller', $this);
         $this->pluginManager = DI::getContainer()->get('PluginManager');
         $this->pluginManager->setController($this);

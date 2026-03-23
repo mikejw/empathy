@@ -6,12 +6,12 @@ namespace ESuite\MVC;
 
 use Empathy\MVC\EntityManager;
 use Empathy\MVC\EntityPopulator;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
+use Empathy\MVC\Util\Testing\Util\Config;
+use Empathy\MVC\Util\Testing\Util\DB;
+use Empathy\MVC\Util\Testing\Util\FakeEntity;
 use Nelmio\Alice\Fixtures;
 use Nelmio\Alice\Fixtures\Loader;
-use Empathy\MVC\Util\Testing\ESuiteTestCase;
-use Empathy\MVC\Util\Testing\Util\DB;
-use Empathy\MVC\Util\Testing\Util\Config;
-use Empathy\MVC\Util\Testing\Util\FakeEntity;
 
 // also testing new EntityManager class
 

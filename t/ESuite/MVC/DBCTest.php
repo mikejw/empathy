@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ESuite\MVC;
 
 use Empathy\MVC\DBC;
-use Empathy\MVC\Util\Testing\Util\DB;
 use Empathy\MVC\Util\Testing\ESuiteTestCase;
+use Empathy\MVC\Util\Testing\Util\DB;
 
 class DBCTest extends ESuiteTestCase
 {
