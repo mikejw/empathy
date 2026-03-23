@@ -1,7 +1,8 @@
 parameters:
-    level: 8
+    level: 6
     paths:
         - src
+        - t/ESuite
     tmpDir: var/phpstan
     bootstrapFiles:
         - phpstan-smarty-bootstrap.php

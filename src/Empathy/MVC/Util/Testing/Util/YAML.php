@@ -8,7 +8,6 @@ class YAML
 {
     public static function save($data, $file, $append = false)
     {
-        new \spyc();
         $yaml = self::dump($data);
         $mode = 'w';
 
@@ -24,7 +23,7 @@ class YAML
     public static function load($file)
     {
         if (file_exists($file)) {
-            $s = new \spyc();
+            $s = new \Spyc();
             return $s->YAMLLoad($file);
         }
     }
@@ -32,14 +31,14 @@ class YAML
 
     public static function dump($data)
     {
-        $s = new \spyc();
+        $s = new \Spyc();
         return $s->YAMLDump($data, 4, 60);
     }
 
 
     public static function loadString($data)
     {
-        $s = new \spyc();
+        $s = new \Spyc();
         return $s->YAMLLoadString($data);
     }
 }

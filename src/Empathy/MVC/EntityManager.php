@@ -36,7 +36,7 @@ class EntityManager implements PersisterInterface
             foreach ($object->getProperties() as $property) {
                 $value = $object->$property;
                 if ($value instanceof Entity) {
-                    $object->$property = $value->getId();
+                    $object->$property = $value->id;
                 }
             }
 

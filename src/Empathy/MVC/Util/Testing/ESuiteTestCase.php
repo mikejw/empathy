@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Empathy\MVC\Util\Testing;
 
 use Empathy\MVC\Config as EmpConfig;
-use Empathy\MVC\DI;
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
 
