@@ -6,15 +6,14 @@ namespace ESuite\MVC;
 
 use Empathy\MVC\EntityManager;
 use Empathy\MVC\EntityPopulator;
-use ESuite\ESuiteTest;
 use Nelmio\Alice\Fixtures;
 use Nelmio\Alice\Fixtures\Loader;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
 // also testing new EntityManager class
 
 
-
-class EntityTest extends ESuiteTest
+class EntityTest extends ESuiteTestCase
 {
     protected function setUp(): void
     {

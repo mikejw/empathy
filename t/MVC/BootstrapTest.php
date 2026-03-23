@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ESuite\MVC;
 
-use ESuite\ESuiteTest;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
-class BootstrapTest extends ESuiteTest
+class BootstrapTest extends ESuiteTestCase
 {
     private $bootstrap;
 
@@ -16,7 +16,7 @@ class BootstrapTest extends ESuiteTest
         parent::setUp();
 
         if ($this->bootstrap === null) {
-            $this->bootstrap = $this->makeFakeBootstrap();
+            $this->bootstrap = $this->makeFakeBootstrapSimple();
         }
     }
 

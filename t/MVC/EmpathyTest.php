@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace ESuite\MVC;
 
 use Empathy\MVC\Config;
-use ESuite\ESuiteTest;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
 // @totdo: figure out proper use of expectOutput
 // can we set it multiple times.. or match over set of output
 // is it supposed to default to one test case?
 
-class EmpathyTest extends ESuiteTest
+class EmpathyTest extends ESuiteTestCase
 {
     private $mvc;
 
@@ -22,7 +22,7 @@ class EmpathyTest extends ESuiteTest
 
     private function createMVC($persistent = false)
     {
-        $bootstrap = $this->makeFakeBootstrap($persistent);
+        $bootstrap = $this->makeFakeBootstrapSimple($persistent);
         $this->mvc = $bootstrap->getMVC();
     }
 

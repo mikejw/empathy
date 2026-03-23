@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace ESuite\MVC;
 
 use Empathy\MVC\DBC;
-use ESuite\ESuiteTest;
 use ESuite\Util\DB;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
-class DBCTest extends ESuiteTest
+class DBCTest extends ESuiteTestCase
 {
     private $dbc;
 

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ESuite\MVC;
 
 use Empathy\MVC\DI;
-use ESuite\ESuiteTest;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
-class URITest extends ESuiteTest
+class URITest extends ESuiteTestCase
 {
     private $boot;
     private $host = 'www.dev.org';
@@ -16,7 +16,7 @@ class URITest extends ESuiteTest
     protected function setUp(): void
     {
         if (!$this->boot) {
-            $this->boot = $this->makeFakeBootstrap(true);
+            $this->boot = $this->makeFakeBootstrapSimple(true);
         }
     }
 

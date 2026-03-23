@@ -6,9 +6,9 @@ namespace ESuite\MVC;
 
 use Empathy\MVC\Config;
 use Empathy\MVC\DBPool;
-use ESuite\ESuiteTest;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
-class DBPoolTest extends ESuiteTest
+class DBPoolTest extends ESuiteTestCase
 {
     protected function setUp(): void
     {

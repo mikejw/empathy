@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ESuite\MVC;
 
 use Empathy\MVC\Session;
-use ESuite\ESuiteTest;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
-class SessionTest extends ESuiteTest
+class SessionTest extends ESuiteTestCase
 {
     protected function setUp(): void
     {

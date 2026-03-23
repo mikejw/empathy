@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ESuite\MVC;
 
-use ESuite\ESuiteTest;
+use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
-class ControllerTest extends ESuiteTest
+class ControllerTest extends ESuiteTestCase
 {
     private $bootstrap;
     private $controller;
@@ -14,7 +14,7 @@ class ControllerTest extends ESuiteTest
     protected function setUp(): void
     {
         parent::setUp();
-        $this->bootstrap = $this->makeFakeBootstrap();
+        $this->bootstrap = $this->makeFakeBootstrapSimple();
         $this->controller = new \Empathy\MVC\Controller($this->bootstrap);
     }
 

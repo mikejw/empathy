@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Empathy\MVC\Util\Testing;
 
 use Empathy\MVC\Config as EmpConfig;
+use Empathy\MVC\DI;
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
 
@@ -44,8 +45,7 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-
-    protected function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY): \Empathy\MVC\Bootstrap
+    private function getDocRoot(): string
     {
         // use eaa archive as root
         $selfPath = realpath(__FILE__);
@@ -56,7 +56,19 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
         if ($doc_root === false) {
             throw new \RuntimeException('eaa fixture root not found');
         }
+        return $doc_root;
+    }
 
+    protected function makeFakeBootstrapSimple($persistentMode = true)
+    {
+        $container = DI::init($this->getDocRoot(), $persistentMode);
+        $empathy = $container->get('Empathy');
+        $empathy->init();
+        return $container->get('Bootstrap');
+    }
+
+    protected function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY): \Empathy\MVC\Bootstrap
+    {
         $dummyBootOptions = [
             'default_module' => 'foo',
             'dynamic_module' => null,
@@ -79,7 +91,7 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $container = \Empathy\MVC\DI::init($doc_root, true);
+        $container = \Empathy\MVC\DI::init($this->getDocRoot(), true);
         $empathy = $container->get('Empathy');
         $empathy->setBootOptions($dummyBootOptions);
         $empathy->setPlugins($plugins);
