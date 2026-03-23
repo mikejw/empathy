@@ -73,7 +73,7 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
             [
                 'name' => 'Smarty',
                 'version' => '1.0',
-                'class_path' => 'Smarty/Smarty.class.php',
+                'class_path' => 'Smarty/libs/Smarty.class.php',
                 'class_name' => '\Smarty',
                 'loader' => '',
             ],
