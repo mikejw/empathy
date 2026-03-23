@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Empathy\MVC\Util\Testing;
 
 use Empathy\MVC\Config as EmpConfig;
+use Empathy\MVC\DI;
 use Empathy\MVC\Util\CLI;
 use Empathy\MVC\Util\CLIMode;
+use Empathy\MVC\Util\Testing\Util\DB;
 
 /**
  * Empathy test suite base class
@@ -95,8 +97,18 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
         $this->setConfig('WEB_ROOT', 'www.dev.org');
         $this->setConfig('PUBLIC_DIR', '');
 
+        DB::loadDefDBCreds();
 
         $empathy->init();
+
+        if (
+            class_exists(\Empathy\ELib\User\CurrentUser::class) &&
+            class_exists(\Empathy\ELib\Storage\UserItem::class)
+        ) {
+            DI::getContainer()->set('UserModel', \Empathy\ELib\Storage\UserItem::class);
+            DI::getContainer()->set('CurrentUser', new \Empathy\ELib\User\CurrentUser());
+        }
+
         return $container->get('Bootstrap');
     }
 
