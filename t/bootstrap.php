@@ -26,10 +26,10 @@ if (!function_exists('loadClass')) {
 
 
 
-ESuite\Util\Config::init();
-if (ESuite\Util\Config::get('set_test_mode')) {
-    define('MVC_TEST_MODE', ESuite\Util\Config::get('set_test_mode'));
+Empathy\MVC\Util\Testing\Util\Config::init();
+if (Empathy\MVC\Util\Testing\Util\Config::get('set_test_mode')) {
+    define('MVC_TEST_MODE', Empathy\MVC\Util\Testing\Util\Config::get('set_test_mode'));
 }
-if (ESuite\Util\Config::get('set_test_mode_output')) {
-    define('MVC_TEST_OUTPUT_ON', ESuite\Util\Config::get('set_test_mode_output'));
+if (Empathy\MVC\Util\Testing\Util\Config::get('set_test_mode_output')) {
+    define('MVC_TEST_OUTPUT_ON', Empathy\MVC\Util\Testing\Util\Config::get('set_test_mode_output'));
 }

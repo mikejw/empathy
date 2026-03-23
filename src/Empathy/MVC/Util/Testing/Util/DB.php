@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ESuite\Util;
+namespace Empathy\MVC\Util\Testing\Util;
 
 use Empathy\MVC\Config as EmpConfig;
+use Empathy\MVC\SafeException;
 
 class DB
 {
@@ -42,13 +43,18 @@ class DB
         self::$dbh->query($sql);
     }
 
-    public static function reset($db_name = null)
+    public static function reset($file = null)
     {
-        if ($db_name === null) {
-            $db_name = EmpConfig::get('DB_NAME').'.sql';
+        if ($file === null) {
+            $file = 'fixtures/' . EmpConfig::get('DB_NAME').'.sql';
         }
         self::create(EmpConfig::get('DB_NAME'));
-        self::load($db_name);
+        $reset = Config::get('util_dir') . '/' . $file;
+
+        if (!file_exists($reset)) {
+            throw new SafeException('Reset file ' . $reset . ' does not exist.');
+        }
+        self::load($reset);
     }
 
     private static function connect()

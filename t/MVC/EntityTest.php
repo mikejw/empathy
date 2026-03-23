@@ -9,6 +9,9 @@ use Empathy\MVC\EntityPopulator;
 use Nelmio\Alice\Fixtures;
 use Nelmio\Alice\Fixtures\Loader;
 use Empathy\MVC\Util\Testing\ESuiteTestCase;
+use Empathy\MVC\Util\Testing\Util\DB;
+use Empathy\MVC\Util\Testing\Util\Config;
+use Empathy\MVC\Util\Testing\Util\FakeEntity;
 
 // also testing new EntityManager class
 
@@ -17,17 +20,17 @@ class EntityTest extends ESuiteTestCase
 {
     protected function setUp(): void
     {
-        \ESuite\Util\DB::loadDefDBCreds();
+        DB::loadDefDBCreds();
     }
 
 
     private function loadFixtures($reset, $file)
     {
         $populator = new EntityPopulator();
-        \ESuite\Util\DB::reset($reset);
+        DB::reset($reset);
         $objectManager = new EntityManager();
 
-        $file = \ESuite\Util\Config::get('base').$file;
+        $file = Config::get('util_dir') . '/' . $file;
         $loader = new Loader();
         $loader->addPopulator($populator);
 
@@ -48,7 +51,7 @@ class EntityTest extends ESuiteTestCase
 
     public function testFindBadClass()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
 
 
         $objectManager = new EntityManager();
@@ -58,9 +61,9 @@ class EntityTest extends ESuiteTestCase
 
     public function testFind()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
+        $fake = $objectManager->find(FakeEntity::class, 1);
         $this->assertEquals($fake->foo, 'bar');
     }
 
@@ -70,28 +73,28 @@ class EntityTest extends ESuiteTestCase
 
     public function testSave()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
+        $fake = $objectManager->find(FakeEntity::class, 1);
         $fake->foo = 'new';
         $fake->save();
-        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
+        $fake = $objectManager->find(FakeEntity::class, 1);
         $this->assertEquals($fake->foo, 'new');
     }
 
     public function testGetAll()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
+        $fake = $objectManager->find(FakeEntity::class, 1);
         $this->assertEquals(10, count($fake->getAll()));
     }
 
     public function testGetAllCustom()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
-        $fake = $objectManager->find(\Esuite\FakeEntity::class, 1);
+        $fake = $objectManager->find(FakeEntity::class, 1);
         $this->assertEquals(10, count($fake->getAllCustom(' where foo like \'bar\'')));
     }
 }

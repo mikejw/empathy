@@ -1,11 +1,12 @@
 
 
-ESuite\FakeEntity:
+Empathy\MVC\Util\Testing\Util\FakeEntityAlt:
   detail{1..10}:
     name: <firstName()>
     age: <randomDigit()>
     stamp: 'MYSQLTIME'
     nonempty: <randomDigit()>
     foo: 'DEFAULT'
+    anotherfield: 'some val'
 
 

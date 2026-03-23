@@ -7,14 +7,14 @@ namespace ESuite\MVC;
 use Empathy\MVC\Config;
 use Empathy\MVC\DBPool;
 use Empathy\MVC\Util\Testing\ESuiteTestCase;
+use Empathy\MVC\Util\Testing\Util\DB;
 
 class DBPoolTest extends ESuiteTestCase
 {
     protected function setUp(): void
     {
-        \ESuite\Util\DB::loadDefDBCreds();
+        DB::loadDefDBCreds();
     }
-
 
     public function testPool()
     {

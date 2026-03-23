@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ESuite\Util;
+namespace Empathy\MVC\Util\Testing\Util;
 
 class YAML
 {
