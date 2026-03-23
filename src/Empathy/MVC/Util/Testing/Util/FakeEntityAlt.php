@@ -6,7 +6,7 @@ namespace Empathy\MVC\Util\Testing\Util;
 
 class FakeEntityAlt extends FakeEntity
 {
-    public $anotherfield;
+    public mixed $anotherfield;
     //const TABLE = 'fake';
 
 }

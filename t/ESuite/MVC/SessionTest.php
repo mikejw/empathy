@@ -15,7 +15,7 @@ class SessionTest extends ESuiteTestCase
     }
 
 
-    public function testLoadUIVars()
+    public function testLoadUIVars(): void
     {
         // set bar to dummy value
         $_GET['bar'] = 'baz';

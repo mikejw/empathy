@@ -24,7 +24,7 @@ class EntityTest extends ESuiteTestCase
     }
 
 
-    private function loadFixtures($reset, $file)
+    private function loadFixtures(string $reset, string $file): void
     {
         $populator = new EntityPopulator();
         DB::reset($reset);
@@ -34,7 +34,8 @@ class EntityTest extends ESuiteTestCase
         $loader = new Loader();
         $loader->addPopulator($populator);
 
-        $objects = $loader->load($file);
+        /** @var list<object> $objects */
+        $objects = array_values($loader->load($file));
         $objectManager->persist($objects);
     }
 
@@ -49,7 +50,7 @@ class EntityTest extends ESuiteTestCase
      }
      */
 
-    public function testFindBadClass()
+    public function testFindBadClass(): void
     {
         $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
 
@@ -59,11 +60,12 @@ class EntityTest extends ESuiteTestCase
         $objectManager->find('Esuite\FakeEntityz', 1);
     }
 
-    public function testFind()
+    public function testFind(): void
     {
         $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
         $fake = $objectManager->find(FakeEntity::class, 1);
+        $this->assertInstanceOf(FakeEntity::class, $fake);
         $this->assertEquals($fake->foo, 'bar');
     }
 
@@ -71,30 +73,34 @@ class EntityTest extends ESuiteTestCase
     /* Actual entity tests */
 
 
-    public function testSave()
+    public function testSave(): void
     {
         $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
         $fake = $objectManager->find(FakeEntity::class, 1);
+        $this->assertInstanceOf(FakeEntity::class, $fake);
         $fake->foo = 'new';
         $fake->save();
         $fake = $objectManager->find(FakeEntity::class, 1);
+        $this->assertInstanceOf(FakeEntity::class, $fake);
         $this->assertEquals($fake->foo, 'new');
     }
 
-    public function testGetAll()
+    public function testGetAll(): void
     {
         $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
         $fake = $objectManager->find(FakeEntity::class, 1);
+        $this->assertInstanceOf(FakeEntity::class, $fake);
         $this->assertEquals(10, count($fake->getAll()));
     }
 
-    public function testGetAllCustom()
+    public function testGetAllCustom(): void
     {
         $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures1.yml');
         $objectManager = new EntityManager();
         $fake = $objectManager->find(FakeEntity::class, 1);
+        $this->assertInstanceOf(FakeEntity::class, $fake);
         $this->assertEquals(10, count($fake->getAllCustom(' where foo like \'bar\'')));
     }
 }

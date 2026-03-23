@@ -10,7 +10,7 @@ use Empathy\MVC\Util\Testing\Util\DB;
 
 class DBCTest extends ESuiteTestCase
 {
-    private $dbc;
+    private DBC $dbc;
 
     protected function setUp(): void
     {
@@ -29,7 +29,7 @@ class DBCTest extends ESuiteTestCase
     }
 
 
-    public function testConnection()
+    public function testConnection(): void
     {
         $this->assertInstanceOf('PDO', $this->dbc->getHandle());
     }

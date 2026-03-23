@@ -8,7 +8,7 @@ use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
 class BootstrapTest extends ESuiteTestCase
 {
-    private $bootstrap;
+    private mixed $bootstrap = null;
 
 
     protected function setUp(): void
@@ -21,13 +21,13 @@ class BootstrapTest extends ESuiteTestCase
     }
 
 
-    public function testNew()
+    public function testNew(): void
     {
         $this->assertInstanceOf(\Empathy\MVC\Bootstrap::class, $this->bootstrap);
     }
 
 
-    public function testDispatch()
+    public function testDispatch(): void
     {
         $this->expectException(\Empathy\MVC\RequestException::class);
         $_SERVER['HTTP_HOST'] = 'www.dev.org';
@@ -36,7 +36,7 @@ class BootstrapTest extends ESuiteTestCase
     }
 
 
-    public function testDispatchException()
+    public function testDispatchException(): void
     {
         $this->expectOutputRegex('/html/');
         $this->bootstrap->dispatchException(new \Exception());

@@ -9,9 +9,9 @@ use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
 class URITest extends ESuiteTestCase
 {
-    private $boot;
-    private $host = 'www.dev.org';
-    private $uri = '';
+    private mixed $boot = null;
+    private string $host = 'www.dev.org';
+    private string $uri = '';
 
     protected function setUp(): void
     {
@@ -20,7 +20,7 @@ class URITest extends ESuiteTestCase
         }
     }
 
-    private function initURI($hostString)
+    private function initURI(string $hostString): void
     {
         unset($_GET['module']);
         unset($_GET['class']);
@@ -31,7 +31,7 @@ class URITest extends ESuiteTestCase
         DI::getContainer()->get('URI');
     }
 
-    public function testURI1()
+    public function testURI1(): void
     {
         $this->initURI('/');
         $this->assertEquals('front', $_GET['module']);
@@ -39,7 +39,7 @@ class URITest extends ESuiteTestCase
         $this->assertEquals('default_event', $_GET['event']);
     }
 
-    public function testURI2()
+    public function testURI2(): void
     {
         $this->initURI('/blog/item/21');
         $this->assertEquals('blog', $_GET['module']);

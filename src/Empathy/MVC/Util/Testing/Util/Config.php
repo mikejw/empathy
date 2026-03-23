@@ -6,7 +6,8 @@ namespace Empathy\MVC\Util\Testing\Util;
 
 class Config
 {
-    private static $items;
+    /** @var array<string, mixed> */
+    private static array $items = [];
 
     public static function init(): void
     {

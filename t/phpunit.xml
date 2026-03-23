@@ -8,11 +8,8 @@
         colors="true">
 
     <testsuites>
-        <testsuite name="Experimental">
-            <directory suffix="Test.php">./Experimental</directory>
-        </testsuite>
         <testsuite name="MVC">
-            <directory suffix="Test.php">./MVC</directory>
+            <directory suffix="Test.php">./ESuite/MVC</directory>
         </testsuite>
     </testsuites>
 

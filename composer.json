@@ -54,6 +54,13 @@
   "prefer-stable": true,
   "scripts": {
     "format": "pint ./src ./t",
-    "analyze": "phpstan --memory-limit=1G"
+    "format-check": "pint --test ./src ./t",
+    "analyse": "phpstan --memory-limit=1G",
+    "test": "phpunit -c ./t/phpunit.xml",
+    "check": [
+      "@format-check",
+      "@analyse",
+      "@test"
+    ]
   }
 }

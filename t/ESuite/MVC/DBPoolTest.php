@@ -16,7 +16,7 @@ class DBPoolTest extends ESuiteTestCase
         DB::loadDefDBCreds();
     }
 
-    public function testPool()
+    public function testPool(): void
     {
         $this->assertInstanceOf('PDO', DBPool::getDefCX());
         DBPool::reset();

@@ -9,10 +9,12 @@ use Empathy\MVC\SafeException;
 
 class DB
 {
-    private static $dbh;
-    private static $db_criteria;
+    private static ?\PDO $dbh = null;
 
-    public static function getDefDBCreds()
+    /**
+     * @return array{db_host: string, db_name: string, db_user: string, db_pass: string, db_port: int}
+     */
+    public static function getDefDBCreds(): array
     {
         return [
             'db_host' => '127.0.0.1',
@@ -23,7 +25,7 @@ class DB
         ];
     }
 
-    public static function loadDefDBCreds()
+    public static function loadDefDBCreds(): void
     {
         $creds = self::getDefDBCreds();
         EmpConfig::store('DB_SERVER', $creds['db_host']);
@@ -33,17 +35,20 @@ class DB
         EmpConfig::store('DB_PORT', $creds['db_port']);
     }
 
-    public static function create($name)
+    public static function create(string $name): void
     {
         if (self::$dbh === null) {
             self::connect();
+        }
+        if (self::$dbh === null) {
+            throw new \RuntimeException('Database connection not initialized');
         }
 
         $sql = 'DROP DATABASE IF EXISTS '.$name.'; CREATE DATABASE '.$name.';';
         self::$dbh->query($sql);
     }
 
-    public static function reset($file = null)
+    public static function reset(?string $file = null): void
     {
         if ($file === null) {
             $file = 'fixtures/' . EmpConfig::get('DB_NAME').'.sql';
@@ -57,7 +62,7 @@ class DB
         self::load($reset);
     }
 
-    private static function connect()
+    private static function connect(): void
     {
         self::$dbh = new \PDO(
             'mysql:host='.EmpConfig::get('DB_SERVER'),
@@ -66,7 +71,7 @@ class DB
         );
     }
 
-    private static function load($file)
+    private static function load(string $file): void
     {
         $exec = Config::get('mysql').' -u '.EmpConfig::get('DB_USER').' --password=\''.EmpConfig::get('DB_PASS').'\' '
             .'-h '.EmpConfig::get('DB_SERVER').' '

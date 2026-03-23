@@ -13,21 +13,21 @@ use Empathy\MVC\Util\Testing\ESuiteTestCase;
 
 class EmpathyTest extends ESuiteTestCase
 {
-    private $mvc;
+    private mixed $mvc = null;
 
     protected function setUp(): void
     {
         //
     }
 
-    private function createMVC()
+    private function createMVC(): void
     {
         $bootstrap = $this->makeFakeBootstrap();
         $this->mvc = $bootstrap->getMVC();
     }
 
 
-    private function changeEnv($env)
+    private function changeEnv(string $env): void
     {
         $boot_options = Config::get('BOOT_OPTIONS');
         $boot_options['environment'] = $env;
@@ -35,7 +35,7 @@ class EmpathyTest extends ESuiteTestCase
         $this->mvc->reloadBootOptions();
     }
 
-    private function changeDebug($debug)
+    private function changeDebug(bool $debug): void
     {
         $boot_options = Config::get('BOOT_OPTIONS');
         $boot_options['debug_mode'] = $debug;
@@ -43,7 +43,7 @@ class EmpathyTest extends ESuiteTestCase
         $this->mvc->reloadBootOptions();
     }
 
-    public function testErrors()
+    public function testErrors(): void
     {
         $this->createMVC();
         $errors = $this->mvc->getErrors();
@@ -65,7 +65,7 @@ class EmpathyTest extends ESuiteTestCase
         $this->assertMatchesRegularExpression('/Error/', $this->mvc->errorsToString());
     }
 
-    public function testExceptions()
+    public function testExceptions(): void
     {
         // what happens when there is just an error
         $this->createMVC();
