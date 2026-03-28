@@ -36,16 +36,24 @@
     "nelmio/alice": "dev-2.x-dev",
     "laravel/pint": "^1.29",
     "phpstan/phpstan": "^2.1",
-    "rector/rector": "^2.3"
+    "rector/rector": "^2.3",
+    "pestphp/pest": "^4.4"
   },
   "autoload": {
     "psr-0": {
-      "Empathy": "src/",
-      "Esuite": "t/"
+      "Empathy\\": "src/"
     },
     "classmap": [
       "src/R.php"
     ]
+  },
+  "autoload-dev": {
+    "psr-0": {
+      "Esuite\\": "t/"
+    },
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
   },
   "bin": [
     "bin/empathy"
@@ -53,15 +61,21 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "scripts": {
-    "format": "pint ./src ./t",
-    "format-check": "pint --test ./src ./t",
+    "format": "pint ./src ./t ./tests",
+    "format-check": "pint --test ./src ./t ./tests",
     "analyse": "phpstan --memory-limit=1G",
-    "test": "phpunit -c ./t/phpunit.xml",
-    "test:coverage": "XDEBUG_MODE=coverage phpunit -c ./t/phpunit.xml --coverage-html ./build/coverage",
+    "test": "pest",
+    "test:phpunit": "phpunit -c ./t/phpunit.xml",
+    "test:coverage": "XDEBUG_MODE=coverage pest --coverage-html ./build/coverage",
     "check": [
       "@format-check",
       "@analyse",
       "@test"
     ]
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   }
 }

@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-
-include(realpath(__DIR__.'/../vendor/autoload.php'));
+require dirname(__DIR__).'/vendor/autoload.php';
 
 Empathy\MVC\Util\Testing\Util\Config::init();
 if (Empathy\MVC\Util\Testing\Util\Config::get('set_test_mode')) {

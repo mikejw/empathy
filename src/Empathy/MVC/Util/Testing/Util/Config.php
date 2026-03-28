@@ -16,7 +16,7 @@ class Config
         if ($selfPath === false) {
             throw new \RuntimeException('Could not resolve Config path');
         }
-        $base = realpath(dirname($selfPath).'/../../../../../../t');
+        $base = realpath(dirname($selfPath).'/../../../../../../tests');
         if ($base === false) {
             throw new \RuntimeException('tests directory not found');
         }

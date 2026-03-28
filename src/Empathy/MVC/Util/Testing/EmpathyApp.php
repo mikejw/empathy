@@ -11,56 +11,34 @@ use Empathy\MVC\Util\CLIMode;
 use Empathy\MVC\Util\Testing\Util\DB;
 
 /**
- * Empathy test suite base class
- * @file            Empathy/MVC/Util/Testing/ESuite.php
- * @description
- * @author          Mike Whiting
- * @license         See LICENCE
- *
- * (c) copyright Mike Whiting
-
- * with this source code in the file licence.txt
+ * Shared helpers for bootstrapping Empathy in tests (PHPUnit or Pest).
  */
-abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
+final class EmpathyApp
 {
-    private ?\Empathy\MVC\Empathy $boot = null;
+    private ?\Empathy\MVC\Empathy $empathy = null;
 
-    protected function makeBootstrap(): void
+    public function makeBootstrap(): void
     {
         global $base_dir;
 
-        $container = \Empathy\MVC\DI::init($base_dir, true);
-        $empathy = $container->get('Empathy');
-        $empathy->init();
-        $this->boot = $empathy;
+        $container = DI::init($base_dir, true);
+        $instance = $container->get('Empathy');
+        $instance->init();
+        $this->empathy = $instance;
     }
 
-
-    protected function appRequest(string $uri, int $mode = CLIMode::CAPTURED): mixed
+    public function appRequest(string $uri, int $mode = CLIMode::CAPTURED): mixed
     {
-        if (!$this->boot instanceof \Empathy\MVC\Empathy) {
+        if (!$this->empathy instanceof \Empathy\MVC\Empathy) {
             throw new \Exception('app not inited.');
-        } else {
-            CLI::setReqMode($mode);
-            return CLI::request($this->boot, $uri);
         }
+
+        CLI::setReqMode($mode);
+
+        return CLI::request($this->empathy, $uri);
     }
 
-    private function getDocRoot(): string
-    {
-        // use eaa archive as root
-        $selfPath = realpath(__FILE__);
-        if ($selfPath === false) {
-            throw new \RuntimeException('Could not resolve ESuiteTestCase path');
-        }
-        $doc_root = realpath(dirname($selfPath).'/../../../../../eaa/');
-        if ($doc_root === false) {
-            throw new \RuntimeException('eaa fixture root not found');
-        }
-        return $doc_root;
-    }
-
-    protected function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY, bool $persistentMode = true): \Empathy\MVC\Bootstrap
+    public function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY, bool $persistentMode = true): \Empathy\MVC\Bootstrap
     {
         $dummyBootOptions = [
             'default_module' => 'front',
@@ -85,12 +63,11 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
         ];
 
         $doc_root = $this->getDocRoot();
-        $container = \Empathy\MVC\DI::init($doc_root, true);
+        $container = DI::init($doc_root, true);
         $empathy = $container->get('Empathy');
         $empathy->setBootOptions($dummyBootOptions);
         $empathy->setPlugins($plugins);
 
-        // override config
         $this->setConfig('NAME', 'empathytest');
         $this->setConfig('TITLE', 'empathy testing');
         $this->setConfig('DOC_ROOT', $doc_root);
@@ -112,9 +89,22 @@ abstract class ESuiteTestCase extends \PHPUnit\Framework\TestCase
         return $container->get('Bootstrap');
     }
 
-
-    protected function setConfig(string $key, mixed $value): void
+    public function setConfig(string $key, mixed $value): void
     {
         EmpConfig::store($key, $value);
+    }
+
+    private function getDocRoot(): string
+    {
+        $selfPath = realpath(__FILE__);
+        if ($selfPath === false) {
+            throw new \RuntimeException('Could not resolve EmpathyApp path');
+        }
+        $doc_root = realpath(dirname($selfPath).'/../../../../../eaa/');
+        if ($doc_root === false) {
+            throw new \RuntimeException('eaa fixture root not found');
+        }
+
+        return $doc_root;
     }
 }
