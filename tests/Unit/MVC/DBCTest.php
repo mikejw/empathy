@@ -20,5 +20,7 @@ beforeEach(function () {
 });
 
 test('DBC exposes a PDO handle', function () {
-    expect($this->dbc->getHandle())->toBeInstanceOf(\PDO::class);
+    $dbc = $this->dbc;
+    assert($dbc instanceof \Empathy\MVC\DBC);
+    expect($dbc->getHandle())->toBeInstanceOf(\PDO::class);
 });

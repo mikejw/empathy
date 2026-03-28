@@ -61,11 +61,10 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "scripts": {
-    "format": "pint ./src ./t ./tests",
-    "format-check": "pint --test ./src ./t ./tests",
+    "format": "pint ./src ./tests",
+    "format-check": "pint --test ./src ./tests",
     "analyse": "phpstan --memory-limit=1G",
     "test": "pest",
-    "test:phpunit": "phpunit -c ./t/phpunit.xml",
     "test:coverage": "XDEBUG_MODE=coverage pest --coverage-html ./build/coverage",
     "check": [
       "@format-check",

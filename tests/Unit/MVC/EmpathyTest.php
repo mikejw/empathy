@@ -35,8 +35,9 @@ test('errorHandler collects warnings notices and unknown types', function () {
     expect($mvc->hasErrors())->toBeFalse();
     expect($mvc->errorsToString())->toBeEmpty();
 
-    $this->expectOutputRegex('/Fatal error/');
+    ob_start();
     $mvc->errorHandler(E_ERROR, 'dummy error', 'someFile.php', 1);
+    expect((string) ob_get_clean())->toMatch('/Fatal error/');
 
     $mvc->errorHandler(E_USER_WARNING, 'dummy error', 'someFile.php', 1);
     expect($mvc->errorsToString())->toMatch('/Warning/');
@@ -52,38 +53,44 @@ test('exceptionHandler outputs dummy error when debug and prior notice', functio
     $mvc = empathyTestCreateMvc($this->empathy);
     empathyTestChangeDebug($mvc, true);
     $mvc->errorHandler(E_NOTICE, 'dummy error', 'someFile.php', 1);
-    $this->expectOutputRegex('/dummy error/');
+    ob_start();
     $mvc->exceptionHandler(new \Exception(''));
+    expect((string) ob_get_clean())->toMatch('/dummy error/');
 });
 
 test('exceptionHandler handles SafeException as bad request when not in dev', function () {
     $mvc = empathyTestCreateMvc($this->empathy);
     empathyTestChangeEnv($mvc, 'prod');
-    $this->expectOutputRegex('/Bad request/');
+    ob_start();
     $mvc->exceptionHandler(new \Empathy\MVC\SafeException('some error'));
+    expect((string) ob_get_clean())->toMatch('/Bad request/');
 });
 
 test('exceptionHandler SafeException in dev dies with message', function () {
     $mvc = empathyTestCreateMvc($this->empathy);
     empathyTestChangeEnv($mvc, 'dev');
-    $this->expectOutputRegex('/die: Safe exception: some error/');
+    ob_start();
     $mvc->exceptionHandler(new \Empathy\MVC\SafeException('some error'));
+    expect((string) ob_get_clean())->toMatch('/die: Safe exception: some error/');
 });
 
 test('exceptionHandler renders generic exception message in error page', function () {
     $mvc = empathyTestCreateMvc($this->empathy);
-    $this->expectOutputRegex('/some error/');
+    ob_start();
     $mvc->exceptionHandler(new \Exception('some error'));
+    expect((string) ob_get_clean())->toMatch('/some error/');
 });
 
 test('exceptionHandler RequestException code 0 is not found', function () {
     $mvc = empathyTestCreateMvc($this->empathy);
-    $this->expectOutputRegex('/Not found/');
+    ob_start();
     $mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error'));
+    expect((string) ob_get_clean())->toMatch('/Not found/');
 });
 
 test('exceptionHandler RequestException code 1 is bad request', function () {
     $mvc = empathyTestCreateMvc($this->empathy);
-    $this->expectOutputRegex('/Bad request/');
+    ob_start();
     $mvc->exceptionHandler(new \Empathy\MVC\RequestException('some error', 1));
+    expect((string) ob_get_clean())->toMatch('/Bad request/');
 });

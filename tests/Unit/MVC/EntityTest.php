@@ -40,6 +40,7 @@ test('find loads entity from fixtures', function () {
 
     $objectManager = new EntityManager();
     $fake = $objectManager->find(FakeEntity::class, 1);
+    assert($fake instanceof FakeEntity);
     expect($fake)->toBeInstanceOf(FakeEntity::class);
     expect($fake->foo)->toBe('bar');
 });
@@ -49,11 +50,11 @@ test('save persists entity changes', function () {
 
     $objectManager = new EntityManager();
     $fake = $objectManager->find(FakeEntity::class, 1);
-    expect($fake)->toBeInstanceOf(FakeEntity::class);
+    assert($fake instanceof FakeEntity);
     $fake->foo = 'new';
     $fake->save();
     $fake = $objectManager->find(FakeEntity::class, 1);
-    expect($fake)->toBeInstanceOf(FakeEntity::class);
+    assert($fake instanceof FakeEntity);
     expect($fake->foo)->toBe('new');
 });
 
@@ -62,7 +63,7 @@ test('getAll returns expected row count', function () {
 
     $objectManager = new EntityManager();
     $fake = $objectManager->find(FakeEntity::class, 1);
-    expect($fake)->toBeInstanceOf(FakeEntity::class);
+    assert($fake instanceof FakeEntity);
     expect(count($fake->getAll()))->toBe(10);
 });
 
@@ -71,6 +72,6 @@ test('getAllCustom returns expected row count', function () {
 
     $objectManager = new EntityManager();
     $fake = $objectManager->find(FakeEntity::class, 1);
-    expect($fake)->toBeInstanceOf(FakeEntity::class);
+    assert($fake instanceof FakeEntity);
     expect(count($fake->getAllCustom(' where foo like \'bar\'')))->toBe(10);
 });

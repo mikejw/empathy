@@ -7,17 +7,29 @@ beforeEach(function () {
 });
 
 test('bootstrap is a Bootstrap instance', function () {
-    expect($this->bootstrap)->toBeInstanceOf(\Empathy\MVC\Bootstrap::class);
+    $bootstrap = $this->bootstrap;
+    assert($bootstrap instanceof \Empathy\MVC\Bootstrap);
+    expect($bootstrap)->toBeInstanceOf(\Empathy\MVC\Bootstrap::class);
 });
 
 test('dispatch throws RequestException for unknown route', function () {
-    $this->expectException(\Empathy\MVC\RequestException::class);
-    $_SERVER['HTTP_HOST'] = 'www.dev.org';
-    $_SERVER['REQUEST_URI'] = '/foo';
-    $this->bootstrap->dispatch();
+    $bootstrap = $this->bootstrap;
+    assert($bootstrap instanceof \Empathy\MVC\Bootstrap);
+
+    expect(function () use ($bootstrap): void {
+        $_SERVER['HTTP_HOST'] = 'www.dev.org';
+        $_SERVER['REQUEST_URI'] = '/foo';
+        $bootstrap->dispatch();
+    })->toThrow(\Empathy\MVC\RequestException::class);
 });
 
 test('dispatchException renders html for generic exception', function () {
-    $this->expectOutputRegex('/html/');
-    $this->bootstrap->dispatchException(new \Exception());
+    $bootstrap = $this->bootstrap;
+    assert($bootstrap instanceof \Empathy\MVC\Bootstrap);
+
+    ob_start();
+    $bootstrap->dispatchException(new \Exception());
+    $output = (string) ob_get_clean();
+
+    expect($output)->toMatch('/html/');
 });
