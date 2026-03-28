@@ -243,8 +243,10 @@ class Empathy
      */
     public function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool
     {
-        // If this error level is not in current reporting, swallow it.
-        if ((error_reporting() & $errno) === 0) {
+        // Only swallow @-suppressed errors: PHP sets error_reporting() to 0 for the duration
+        // of the evaluated expression. Bitmask checks against error_reporting() are unreliable
+        // inside handlers (e.g. PHPUnit) and break direct calls to this method in tests.
+        if (error_reporting() === 0) {
             return true;
         }
 
@@ -453,7 +455,11 @@ class Empathy
      */
     public function setBootOptions(array $options): void
     {
+        $wasHandling = $this->getHandlingErrors();
         $this->bootOptions = $options;
+        if ($wasHandling && !$this->getHandlingErrors()) {
+            restore_error_handler();
+        }
     }
 
     /**
