@@ -19,7 +19,7 @@ class YAML
         if ($fh === false) {
             throw new \RuntimeException('Could not open YAML file: ' . $file);
         }
-        fwrite($fh, (string) $yaml);
+        fwrite($fh, $yaml);
         fclose($fh);
     }
 

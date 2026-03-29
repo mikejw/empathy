@@ -313,7 +313,7 @@ class URI
 
         $uriForResolve = array_values($this->uri);
 
-        if ($this->uriString === '' && !!$this->dynamicModuleDefaultURI && ($sectionId = $section->resolveURI($uriForResolve)) < 0) {
+        if ($this->uriString === '' && (bool) $this->dynamicModuleDefaultURI && ($sectionId = $section->resolveURI($uriForResolve)) < 0) {
             $this->error = self::INVALID_DYNAMIC_MODULE_DEFAULT_URI;
         }
 

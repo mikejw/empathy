@@ -38,7 +38,7 @@ final class EmpathyApp
         return CLI::request($this->empathy, $uri);
     }
 
-    public function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY, bool $persistentMode = true): \Empathy\MVC\Bootstrap
+    public function makeFakeBootstrap(int $testingMode = \Empathy\MVC\Plugin\ELibs::TESTING_EMPATHY): \Empathy\MVC\Bootstrap
     {
         $dummyBootOptions = [
             'default_module' => 'front',

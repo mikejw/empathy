@@ -37,15 +37,9 @@ class DB
 
     public static function create(string $name): void
     {
-        if (self::$dbh === null) {
-            self::connect();
-        }
-        if (self::$dbh === null) {
-            throw new \RuntimeException('Database connection not initialized');
-        }
-
-        $sql = 'DROP DATABASE IF EXISTS '.$name.'; CREATE DATABASE '.$name.';';
-        self::$dbh->query($sql);
+        $dbh = self::connect();
+        $sql = 'DROP DATABASE IF EXISTS ' . $name . '; CREATE DATABASE ' . $name . ';';
+        $dbh->query($sql);
     }
 
     public static function reset(?string $file = null): void
@@ -62,13 +56,18 @@ class DB
         self::load($reset);
     }
 
-    private static function connect(): void
+    private static function connect(): \PDO
     {
+        if (self::$dbh instanceof \PDO) {
+            return self::$dbh;
+        }
+
         self::$dbh = new \PDO(
             'mysql:host='.EmpConfig::get('DB_SERVER'),
             EmpConfig::get('DB_USER'),
             EmpConfig::get('DB_PASS')
         );
+        return self::$dbh;
     }
 
     private static function load(string $file): void

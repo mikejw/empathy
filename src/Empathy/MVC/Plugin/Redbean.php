@@ -39,7 +39,7 @@ namespace Empathy\MVC\Plugin {
                     throw new Exception('sqlite database file not found.');
                 }
                 if ($this->usingRedbean()) {
-                    (new \R())->setup('sqlite:'.$db);
+                    new \R()->setup('sqlite:'.$db);
                 }
             } else {
                 if (Config::get('DB_SERVER') === false) {
@@ -53,7 +53,7 @@ namespace Empathy\MVC\Plugin {
                     $dsn .= 'port='.$db_port.';';
                 }
                 if ($this->usingRedbean()) {
-                    (new \R())->setup($dsn, Config::get('DB_USER'), Config::get('DB_PASS'));
+                    new \R()->setup($dsn, Config::get('DB_USER'), Config::get('DB_PASS'));
                 }
             }
         }

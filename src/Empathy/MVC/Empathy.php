@@ -74,10 +74,8 @@ class Empathy
     {
         foreach ($config as $index => &$item) {
             // auto fix of doc root
-            if (!is_array($item) && $index === 'doc_root') {
-                if (!file_exists($item)) {
-                    $item = $configDir;
-                }
+            if (!is_array($item) && $index === 'doc_root' && !file_exists($item)) {
+                $item = $configDir;
             }
 
             if ($hard) {
