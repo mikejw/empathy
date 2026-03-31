@@ -6,8 +6,8 @@ namespace Empathy\MVC;
 
 use DI\Container;
 use DI\ContainerBuilder;
-use Spyc;
 use Monolog\Logger;
+use Spyc;
 
 class DI
 {
@@ -46,7 +46,7 @@ class DI
             'persistentMode' => $persistentMode,
             'systemMode' => $systemMode,
             'Spyc' => new Spyc(),
-            'Empathy' => fn(Container $c) => new Empathy(
+            'Empathy' => fn (Container $c) => new Empathy(
                 $c->get('configDir'),
                 $c->get('persistentMode')
             ),
@@ -67,7 +67,7 @@ class DI
                 );
             },
             'PluginManager' => new PluginManager(),
-            'Stash' => fn(Container $c) => new Stash(),
+            'Stash' => fn (Container $c) => new Stash(),
             'Config' => function (Container $c) {
                 $diPath = realpath(__FILE__);
                 if ($diPath === false) {

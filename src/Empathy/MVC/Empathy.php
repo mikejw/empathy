@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 namespace Empathy\MVC;
-use Throwable;
+
 use Exception;
+use Throwable;
 
 define('MVC_VERSION', '4.3.5');
 
@@ -73,10 +74,8 @@ class Empathy
     {
         foreach ($config as $index => &$item) {
             // auto fix of doc root
-            if (!is_array($item) && $index === 'doc_root') {
-                if (!file_exists($item)) {
-                    $item = $configDir;
-                }
+            if (!is_array($item) && $index === 'doc_root' && !file_exists($item)) {
+                $item = $configDir;
             }
 
             if ($hard) {
@@ -242,8 +241,10 @@ class Empathy
      */
     public function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool
     {
-        // If this error level is not in current reporting, swallow it.
-        if ((error_reporting() & $errno) === 0) {
+        // Only swallow @-suppressed errors: PHP sets error_reporting() to 0 for the duration
+        // of the evaluated expression. Bitmask checks against error_reporting() are unreliable
+        // inside handlers (e.g. PHPUnit) and break direct calls to this method in tests.
+        if (error_reporting() === 0) {
             return true;
         }
 
@@ -452,7 +453,11 @@ class Empathy
      */
     public function setBootOptions(array $options): void
     {
+        $wasHandling = $this->getHandlingErrors();
         $this->bootOptions = $options;
+        if ($wasHandling && !$this->getHandlingErrors()) {
+            restore_error_handler();
+        }
     }
 
     /**

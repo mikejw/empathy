@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ESuite;
+namespace Empathy\MVC\Util\Testing\Util;
 
 use Empathy\MVC\Entity;
 

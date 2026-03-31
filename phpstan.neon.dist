@@ -2,6 +2,10 @@ parameters:
     level: 8
     paths:
         - src
+        - tests
     tmpDir: var/phpstan
     bootstrapFiles:
         - phpstan-smarty-bootstrap.php
+    # Pest: $this in test()/beforeEach() is PHPUnit\TestCase per vendor stubs; allow dynamic props + subclass helpers.
+    universalObjectCratesClasses:
+        - PHPUnit\Framework\TestCase

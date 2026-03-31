@@ -74,7 +74,7 @@ use Empathy\MVC\Plugin\JSONView\ROb;
 
 class api extends CustomController
 {
-    public function default_event()
+    public function default_event(): void
     {
         $rob = new ROb();
         $data = new \stdClass();
@@ -103,7 +103,7 @@ use Empathy\MVC\Plugin\JSONView\ReturnCodes;
 
 class api2 extends CustomController
 {
-    public function default_event()
+    public function default_event(): void
     { 
         $response = EROb::getObject(ReturnCodes::Not_Found);
         $this->assign('default', $response, true);

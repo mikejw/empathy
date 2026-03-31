@@ -18,7 +18,7 @@
             </div>
         {/if}
 
-    {elseif $about}
+    {elseif isset($about) and $about}
         <h2 class="h3 mb-3 font-weight-normal">
             Thank you for choosing Empathy<br />
             Congratulations!
@@ -28,7 +28,7 @@
     {elseif isset($status) && $status neq ''}
         <h1>Status is {$status}</h1>
 
-    {elseif $cc}
+    {elseif isset($cc) and $cc}
         <h1>Cache cleared.</h1>    
 
     {else}

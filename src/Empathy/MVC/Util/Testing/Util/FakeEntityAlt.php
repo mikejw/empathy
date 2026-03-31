@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ESuite;
+namespace Empathy\MVC\Util\Testing\Util;
 
 class FakeEntityAlt extends FakeEntity
 {
-    public $anotherfield;
+    public mixed $anotherfield;
     //const TABLE = 'fake';
-
-
 
 }

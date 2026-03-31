@@ -2,16 +2,19 @@
 
 declare(strict_types=1);
 
-namespace ESuite\Util;
+namespace Empathy\MVC\Util\Testing\Util;
 
 use Empathy\MVC\Config as EmpConfig;
+use Empathy\MVC\SafeException;
 
 class DB
 {
-    private static $dbh;
-    private static $db_criteria;
+    private static ?\PDO $dbh = null;
 
-    public static function getDefDBCreds()
+    /**
+     * @return array{db_host: string, db_name: string, db_user: string, db_pass: string, db_port: int}
+     */
+    public static function getDefDBCreds(): array
     {
         return [
             'db_host' => '127.0.0.1',
@@ -22,7 +25,7 @@ class DB
         ];
     }
 
-    public static function loadDefDBCreds()
+    public static function loadDefDBCreds(): void
     {
         $creds = self::getDefDBCreds();
         EmpConfig::store('DB_SERVER', $creds['db_host']);
@@ -32,35 +35,42 @@ class DB
         EmpConfig::store('DB_PORT', $creds['db_port']);
     }
 
-    public static function create($name)
+    public static function create(string $name): void
     {
-        if (self::$dbh === null) {
-            self::connect();
-        }
-
-        $sql = 'DROP DATABASE IF EXISTS '.$name.'; CREATE DATABASE '.$name.';';
-        self::$dbh->query($sql);
+        $dbh = self::connect();
+        $sql = 'DROP DATABASE IF EXISTS ' . $name . '; CREATE DATABASE ' . $name . ';';
+        $dbh->query($sql);
     }
 
-    public static function reset($db_name = null)
+    public static function reset(?string $file = null, bool $useBase = false): void
     {
-        if ($db_name === null) {
-            $db_name = EmpConfig::get('DB_NAME').'.sql';
+        if ($file === null) {
+            $file = 'fixtures/' . EmpConfig::get('DB_NAME').'.sql';
         }
         self::create(EmpConfig::get('DB_NAME'));
-        self::load($db_name);
+        $reset = Config::get($useBase ? 'base' : 'util_dir') . '/' . $file;
+
+        if (!file_exists($reset)) {
+            throw new SafeException('Reset file ' . $reset . ' does not exist.');
+        }
+        self::load($reset);
     }
 
-    private static function connect()
+    private static function connect(): \PDO
     {
+        if (self::$dbh instanceof \PDO) {
+            return self::$dbh;
+        }
+
         self::$dbh = new \PDO(
             'mysql:host='.EmpConfig::get('DB_SERVER'),
             EmpConfig::get('DB_USER'),
             EmpConfig::get('DB_PASS')
         );
+        return self::$dbh;
     }
 
-    private static function load($file)
+    private static function load(string $file): void
     {
         $exec = Config::get('mysql').' -u '.EmpConfig::get('DB_USER').' --password=\''.EmpConfig::get('DB_PASS').'\' '
             .'-h '.EmpConfig::get('DB_SERVER').' '

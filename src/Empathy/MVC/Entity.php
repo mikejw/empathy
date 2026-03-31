@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 namespace Empathy\MVC;
-use PDOStatement;
-use PDO;
+
 use Exception;
+use PDO;
+use PDOStatement;
 
 class Entity
 {
@@ -29,10 +30,10 @@ class Entity
 
     public int $id; // allow handling entities with no public ID value set
 
-//    public function getId(): int
-//    {
-//        return $this->id;
-//    }
+    //    public function getId(): int
+    //    {
+    //        return $this->id;
+    //    }
 
     public function setPrimaryKeyAfterInsert(int $id): void
     {

@@ -1,6 +1,6 @@
 
 
-ESuite\FakeEntity:
+Empathy\MVC\Util\Testing\Util\FakeEntity:
   fakeentity{1..10}:
     name: <firstName()>
     age: <randomDigit()>
@@ -9,7 +9,7 @@ ESuite\FakeEntity:
     foo: 'DEFAULT'
 
 
-ESuite\FakeRelatedEntity:
+Empathy\MVC\Util\Testing\Util\FakeRelatedEntity:
   fakerelated{1..10}:
     fake_id: "@fakeentity<current()>"
     name: <firstName()>
