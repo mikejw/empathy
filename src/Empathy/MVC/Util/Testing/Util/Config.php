@@ -9,19 +9,9 @@ class Config
     /** @var array<string, mixed> */
     private static array $items = [];
 
-    public static function init(): void
+    public static function init(string $base): void
     {
-        // use eaa archive as root
-        $selfPath = realpath(__FILE__);
-        if ($selfPath === false) {
-            throw new \RuntimeException('Could not resolve Config path');
-        }
-        $base = realpath(dirname($selfPath).'/../../../../../../tests');
-        if ($base === false) {
-            throw new \RuntimeException('tests directory not found');
-        }
-        $utilDir = realpath(dirname($selfPath));
-
+        $utilDir = realpath(dirname(__FILE__));
         self::$items = [];
         $config = $base.'/config.yml';
         $config_arr = YAML::load($config);

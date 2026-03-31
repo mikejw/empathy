@@ -42,13 +42,13 @@ class DB
         $dbh->query($sql);
     }
 
-    public static function reset(?string $file = null): void
+    public static function reset(?string $file = null, bool $useBase = false): void
     {
         if ($file === null) {
             $file = 'fixtures/' . EmpConfig::get('DB_NAME').'.sql';
         }
         self::create(EmpConfig::get('DB_NAME'));
-        $reset = Config::get('util_dir') . '/' . $file;
+        $reset = Config::get($useBase ? 'base' : 'util_dir') . '/' . $file;
 
         if (!file_exists($reset)) {
             throw new SafeException('Reset file ' . $reset . ' does not exist.');
