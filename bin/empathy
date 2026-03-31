@@ -598,8 +598,11 @@ $no_motd = ['get_elibs', 'get_elib_tables', 'gen_password'];
 
 if ($app_config !== false) {
     $boot = boot();
+    main();
+} else {
+    echo "No application config found.\n";
 }
-main();
+
 
 //\Empathy\MVC\Util\CLI::setReqMode(\Empathy\MVC\Util\CLIMode::CAPTURED);
 //echo \Empathy\MVC\Util\CLI::request($boot, '');
