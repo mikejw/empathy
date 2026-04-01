@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Bootstrap;
-use Empathy\MVC\Plugin as Plugin;
+use Empathy\MVC\Plugin;
 use Empathy\MVC\PluginManager;
 use Empathy\MVC\Util\Lib;
 
