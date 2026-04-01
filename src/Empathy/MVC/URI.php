@@ -61,18 +61,19 @@ class URI
 
     public function __construct(
         ?string $default_module,
+        private readonly ApplicationPaths $applicationPaths,
         private readonly ?string $dynamicModule,
         private readonly string $dynamicModuleDefaultURI = '',
         private readonly mixed $sectionResolveCache = null,
         private readonly bool $sectionResolveCacheEnabled = false,
     ) {
-        if (isset($_SERVER['HTTP_HOST']) && !str_contains((string) Config::get('WEB_ROOT'), (string) $_SERVER['HTTP_HOST'])) {
+        if (isset($_SERVER['HTTP_HOST']) && !str_contains((string) ($this->applicationPaths->webRoot ?? ''), (string) $_SERVER['HTTP_HOST'])) {
             throw new SafeException('Host name mismatch.');
         }
 
         $this->cli_mode_detected = false;
         $this->sanity($default_module);
-        $removeLength = strlen(Config::get('WEB_ROOT').Config::get('PUBLIC_DIR'));
+        $removeLength = strlen(($this->applicationPaths->webRoot ?? '').($this->applicationPaths->publicDir ?? ''));
         $this->defaultModule = $default_module;
         if (isset($_SERVER['HTTP_HOST'])) {
             $this->full = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
@@ -181,8 +182,8 @@ class URI
         $temp_uri_string = implode('/', $uri);
         if (preg_match('/[A-Z]/', $temp_uri_string)) {
             header(
-                'Location: http://'.Config::get('WEB_ROOT')
-                    .Config::get('PUBLIC_DIR')
+                'Location: http://'.($this->applicationPaths->webRoot ?? '')
+                    .($this->applicationPaths->publicDir ?? '')
                     .'/'.strtolower($temp_uri_string).$args,
                 true,
                 301
@@ -248,7 +249,7 @@ class URI
 
     private function setController(): void
     {
-        require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
+        require_once(($this->applicationPaths->docRoot ?? '').'/application/CustomController.php');
 
         if (!(isset($_GET['class'])) && isset($_GET['module'])) {
             $_GET['class'] = $_GET['module'];
@@ -395,13 +396,13 @@ class URI
 
     public function sanity(?string $_default_module): void
     {
-        if (Config::get('WEB_ROOT') === false) {
+        if ($this->applicationPaths->webRoot === null) {
             throw new SafeException('Dispatch error: Web root is not defined');
         }
-        if (Config::get('PUBLIC_DIR') === false) {
+        if ($this->applicationPaths->publicDir === null) {
             throw new SafeException('Dispatch error: Public dir is not defined');
         }
-        if (Config::get('DOC_ROOT') === false) {
+        if ($this->applicationPaths->docRoot === null) {
             throw new SafeException('Dispatch error: Doc root is not defined');
         }
     }

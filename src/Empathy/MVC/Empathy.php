@@ -105,7 +105,7 @@ class Empathy
      * @param array{0: array<string, mixed>, 1: array<string, mixed>} $loadedConfig
      */
     public function __construct(
-        string $configDir,
+        private readonly string $configDir,
         private readonly bool $persistentMode,
         private readonly array $loadedConfig,
         private readonly bool $loggingOn = false,
@@ -114,8 +114,8 @@ class Empathy
         spl_autoload_register($this->loadClass(...));
 
         [$appConfig, $globalConfig] = $this->loadedConfig;
-        $this->consumeConfig($appConfig, $configDir);
-        $this->consumeConfig($globalConfig, $configDir, true);
+        $this->consumeConfig($appConfig, $this->configDir);
+        $this->consumeConfig($globalConfig, $this->configDir, true);
 
         LogBridge::configure($this->loggingOn, $this->logger);
 
@@ -125,7 +125,7 @@ class Empathy
             class_exists(\Empathy\ELib\Config::class)
         ) {
             self::$useElib = true;
-            \Empathy\ELib\Config::load($configDir);
+            \Empathy\ELib\Config::load($this->configDir);
         } else {
             self::$useElib = false;
         }
@@ -214,6 +214,14 @@ class Empathy
     public function getPersistentMode(): bool
     {
         return $this->persistentMode;
+    }
+
+    /**
+     * Paths for routing and the application document root (from config at call time).
+     */
+    public function getApplicationPaths(): ApplicationPaths
+    {
+        return ApplicationPaths::fromConfig($this->configDir);
     }
 
     /**

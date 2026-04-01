@@ -173,6 +173,7 @@ class Bootstrap
     {
         return new URI(
             $this->getDefaultModule(),
+            $this->mvc->getApplicationPaths(),
             $this->getDynamicModule(),
             $this->getDynamicModuleDefaultURI(),
             $this->cacheService,
