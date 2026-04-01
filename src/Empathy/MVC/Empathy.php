@@ -67,11 +67,14 @@ class Empathy
 
 
     /**
-     * Set config into memory.
+     * Merge YAML config into {@see Config} (single source of truth).
+     *
+     * Legacy apps sometimes relied on {@see define()} for the bundled framework `config.yml`;
+     * that path is removed—use {@see Config::get} with the uppercased key instead.
      *
      * @param array<string, mixed> $config Configuration data
      */
-    private function consumeConfig(array $config, string $configDir, bool $hard = false): void
+    private function consumeConfig(array $config, string $configDir): void
     {
         foreach ($config as $index => &$item) {
             // auto fix of doc root
@@ -79,13 +82,7 @@ class Empathy
                 $item = $configDir;
             }
 
-            if ($hard) {
-                if (!defined(strtoupper($index))) {
-                    define(strtoupper($index), $item);
-                }
-            } else {
-                Config::store(strtoupper($index), $item);
-            }
+            Config::store(strtoupper((string) $index), $item);
         }
         if (isset($config['boot_options'])) {
             $this->bootOptions = $config['boot_options'];
@@ -115,7 +112,7 @@ class Empathy
 
         [$appConfig, $globalConfig] = $this->loadedConfig;
         $this->consumeConfig($appConfig, $this->configDir);
-        $this->consumeConfig($globalConfig, $this->configDir, true);
+        $this->consumeConfig($globalConfig, $this->configDir);
 
         LogBridge::configure($this->loggingOn, $this->logger);
 

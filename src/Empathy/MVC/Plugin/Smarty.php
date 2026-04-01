@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Plugin;
 
+use Empathy\MVC\ApplicationPaths;
 use Empathy\MVC\Config;
+use Empathy\MVC\SafeException;
 
 /**
  * Empathy Smarty Plugin
@@ -59,10 +61,14 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
         if (Config::get('SMARTY_CACHING')) {
             $this->smarty->caching = 1;
         }
-        $this->smarty->template_dir = Config::get('DOC_ROOT').'/presentation';
-        $this->smarty->compile_dir = Config::get('DOC_ROOT').'/tpl/templates_c';
-        $this->smarty->cache_dir = Config::get('DOC_ROOT').'/tpl/cache';
-        $this->smarty->config_dir = Config::get('DOC_ROOT').'/tpl/configs';
+        $docRoot = $this->applicationPaths()->docRoot;
+        if ($docRoot === null || $docRoot === '') {
+            throw new SafeException('Smarty requires doc_root (DOC_ROOT) to be set in application config.');
+        }
+        $this->smarty->template_dir = $docRoot.'/presentation';
+        $this->smarty->compile_dir = $docRoot.'/tpl/templates_c';
+        $this->smarty->cache_dir = $docRoot.'/tpl/cache';
+        $this->smarty->config_dir = $docRoot.'/tpl/configs';
         $this->smarty->error_reporting = E_ALL  & ~E_NOTICE & ~E_WARNING;
 
         if (class_exists('Empathy\ELib\Plugin\SmartyResourceELib')) {
@@ -115,12 +121,21 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
     {
         // for default templates check test mode
         // derived from elibs plugin
+        $docRoot = $this->applicationPaths()->docRoot;
+        if ($docRoot === null || $docRoot === '') {
+            throw new SafeException('Cannot resolve EMPATHY_DIR: doc_root is not set.');
+        }
         if ($this->manager->eLibsTestMode()) {
-            $empathy_dir = realpath(Config::get('DOC_ROOT').'/../');
+            $empathy_dir = realpath($docRoot.'/../');
         } else {
-            $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';
+            $empathy_dir = $docRoot.'/vendor/mikejw/empathy';
         }
         $this->assign('EMPATHY_DIR', $empathy_dir);
+    }
+
+    private function applicationPaths(): ApplicationPaths
+    {
+        return $this->bootstrap->getMVC()->getApplicationPaths();
     }
 
 

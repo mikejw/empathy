@@ -141,12 +141,15 @@ class Controller
         if (Config::get('TITLE') !== false) {
             $this->assign('TITLE', Config::get('TITLE'));
         }
-        $this->assign('DOC_ROOT', Config::get('DOC_ROOT'));
-        $this->assign('WEB_ROOT', Config::get('WEB_ROOT'));
+
+        $paths = $this->boot->getMVC()->getApplicationPaths();
+        $this->assign('DOC_ROOT', $paths->docRoot !== null ? $paths->docRoot : false);
+        $this->assign('WEB_ROOT', $paths->webRoot !== null ? $paths->webRoot : false);
+        $this->assign('PUBLIC_DIR', $paths->publicDir !== null ? $paths->publicDir : false);
+
         $this->assign('WEB_ROOT_DEFAULT', Config::get('WEB_ROOT_DEFAULT'));
         $this->assign('SUBDOMAIN', Config::get('SUBDOMAIN'));
 
-        $this->assign('PUBLIC_DIR', Config::get('PUBLIC_DIR'));
         $this->assign('MVC_VERSION', MVC_VERSION);
     }
 
@@ -212,8 +215,9 @@ class Controller
             Session::write();
         }
 
+        $paths = $this->boot->getMVC()->getApplicationPaths();
         $location = 'Location: ';
-        $location .= $proto.'://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR').'/';
+        $location .= $proto.'://'.($paths->webRoot ?? '').($paths->publicDir ?? '').'/';
         if ($endString !== '') {
             $location .= $endString;
         }

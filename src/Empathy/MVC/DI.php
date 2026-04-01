@@ -112,7 +112,7 @@ class DI
                 if (!$c->get('LoggingOn')) {
                     throw new Exception('Logging disabled');
                 }
-                $logging = new Logging($c->get('LoggingLevel'));
+                $logging = new Logging($c->get('LoggingLevel'), $c->get('configDir'));
                 return $logging->getLog();
             },
         ]);

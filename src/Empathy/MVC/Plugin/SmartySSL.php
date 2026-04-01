@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Plugin;
 
-use Empathy\MVC\Config;
 use Empathy\MVC\Plugin as Plugin;
 
 /**
@@ -40,9 +39,10 @@ class SmartySSL extends Smarty
         if (
             $this->isSecure()
         ) {
+            $webRoot = $this->bootstrap->getMVC()->getApplicationPaths()->webRoot ?? '';
             echo str_replace(
-                'http://'.Config::get('WEB_ROOT'),
-                'https://'.Config::get('WEB_ROOT'),
+                'http://'.$webRoot,
+                'https://'.$webRoot,
                 $this->smarty->fetch($template)
             );
         } else {
