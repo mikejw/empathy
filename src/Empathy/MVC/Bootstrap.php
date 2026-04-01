@@ -23,12 +23,6 @@ use Empathy\MVC\PluginManager\Option as PMOption;
 class Bootstrap
 {
     /**
-     * This is used to store a reference to the controller object
-     * which is instatiated before an action can be dispatchted.
-     */
-    private ?Controller $controller = null;
-
-    /**
      * Default module read from application config file.
      * Used for resolving routes e.g. when URI is empty.
      */
@@ -47,12 +41,6 @@ class Bootstrap
      * Dynamic module (ELib CMS) URI string as fallback (empty when unset).
      */
     private string $dynamicModuleDefaultURI = '';
-
-    /**
-     * The URI object is used for determining
-     * the correct application controller to dispatch to.
-     */
-    private ?URI $uri = null;
 
     /**
      * This property contains a reference to
@@ -110,6 +98,7 @@ class Bootstrap
         private readonly Empathy $mvc,
         PluginManager $pluginManager,
         Stash $stash,
+        private readonly DispatchContext $dispatchContext,
         mixed $cacheService = null,
         bool $sectionUriCacheEnabled = false,
         bool $apcuDebug = false,
@@ -133,9 +122,14 @@ class Bootstrap
         return $this->stash;
     }
 
+    public function getDispatchContext(): DispatchContext
+    {
+        return $this->dispatchContext;
+    }
+
     public function getController(): ?Controller
     {
-        return $this->controller;
+        return $this->dispatchContext->getController();
     }
 
     public function isApcuDebugEnabled(): bool
@@ -207,8 +201,10 @@ class Bootstrap
      */
     public function dispatch($fake = false, $controller = null): void
     {
+        $this->dispatchContext->reset();
+
         $uriService = $this->createUri();
-        $this->uri = $uriService;
+        $this->dispatchContext->setUri($uriService);
 
         $error = $uriService->getError();
 
@@ -245,18 +241,17 @@ class Bootstrap
         if (!$instance instanceof Controller) {
             throw new Exception('Resolved class is not a Controller: '.$instance::class);
         }
-        $this->controller = $instance;
 
-        $this->controller->doPreEvent();
+        $instance->doPreEvent();
         if ($fake === false) {
             $event = $_GET['event'];
-            $eventVal = $this->controller->$event();
+            $eventVal = $instance->$event();
             if ($this->mvc->hasErrors()) {
                 throw new ErrorException($this->mvc->errorsToString());
             } elseif ($eventVal !== false) {
                 if ($uriService->getInternal()) {
-                    $this->controller->assign('centerpage', true);
-                    $this->controller->setTemplate('empathy.tpl');
+                    $instance->assign('centerpage', true);
+                    $instance->setTemplate('empathy.tpl');
                     $this->display(true);
                 } else {
                     $this->display(false);
@@ -272,13 +267,12 @@ class Bootstrap
     public function dispatchException(\Throwable $e): void
     {
         $reqError = $e::class === RequestException::class;
-        $useSession = $this->controller instanceof \Empathy\MVC\Controller ? $this->controller->getUseSession() : true;
+        $previous = $this->dispatchContext->getController();
+        $useSession = $previous instanceof Controller ? $previous->getUseSession() : true;
 
-        $this->controller = new Controller($this, $useSession);
-        DI::getContainer()->set('Controller', $this->controller);
-        $this->controller->doPreEvent();
-
-        $this->controller->viewException($this->debugMode, $e, $reqError);
+        $controller = new Controller($this, $useSession);
+        $controller->doPreEvent();
+        $controller->viewException($this->debugMode, $e, $reqError);
     }
 
     /**
@@ -288,10 +282,11 @@ class Bootstrap
      */
     private function display($i = false): void
     {
-        if (!$this->controller instanceof \Empathy\MVC\Controller) {
+        $controller = $this->dispatchContext->getController();
+        if (!$controller instanceof Controller) {
             throw new Exception('Cannot display: controller was not initialised');
         }
-        $this->controller->initDisplay($i);
+        $controller->initDisplay($i);
     }
 
     /**
@@ -381,7 +376,9 @@ class Bootstrap
      */
     public function getURIError(): mixed
     {
-        return $this->uri instanceof \Empathy\MVC\URI ? $this->uri->getError() : null;
+        $uri = $this->dispatchContext->getUri();
+
+        return $uri instanceof URI ? $uri->getError() : null;
     }
 
 
@@ -393,7 +390,9 @@ class Bootstrap
      */
     public function getURICliMode(): mixed
     {
-        return $this->uri instanceof \Empathy\MVC\URI ? $this->uri->getCliMode() : null;
+        $uri = $this->dispatchContext->getUri();
+
+        return $uri instanceof URI ? $uri->getCliMode() : null;
     }
 
     /**
@@ -403,7 +402,9 @@ class Bootstrap
      */
     public function getURIData(): ?array
     {
-        return $this->uri instanceof \Empathy\MVC\URI ? $this->uri->getData() : null;
+        $uri = $this->dispatchContext->getUri();
+
+        return $uri instanceof URI ? $uri->getData() : null;
     }
 
     /**

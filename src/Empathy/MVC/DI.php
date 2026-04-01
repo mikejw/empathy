@@ -72,6 +72,7 @@ class DI
                     $empathy,
                     $c->get('PluginManager'),
                     $c->get('Stash'),
+                    new DispatchContext(),
                     $cache,
                     $cacheEnabled,
                     (bool) $c->get('ApcuDebug'),
