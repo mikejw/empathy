@@ -9,6 +9,17 @@ use DI\ContainerBuilder;
 use Monolog\Logger;
 use Spyc;
 
+/**
+ * Application service container (PHP-DI).
+ *
+ * The active controller is not registered as a typical factory entry: it is
+ * synchronised to entry name {@see Bootstrap::LEGACY_CONTAINER_CONTROLLER_ID} from
+ * {@see Controller::__construct} so repeated dispatches in the same process stay correct
+ * (PHP-DI caches the result of {@see Container::get}).
+ *
+ * Preferred APIs for the current controller (may be null before dispatch):
+ * {@see Bootstrap::getController}, {@see DispatchContext::getController}, {@see Empathy::getController}.
+ */
 class DI
 {
     /**

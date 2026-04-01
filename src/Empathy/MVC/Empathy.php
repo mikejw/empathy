@@ -198,6 +198,16 @@ class Empathy
     }
 
     /**
+     * The active controller after {@see init()} and dispatch, or null before / between dispatches.
+     *
+     * Equivalent to {@see Bootstrap::getController()} when the application has been initialised.
+     */
+    public function getController(): ?Controller
+    {
+        return $this->boot?->getController();
+    }
+
+    /**
      * Returns the $persistentMode setting.
      * @return boolean $persistentMode
      */

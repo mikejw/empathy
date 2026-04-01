@@ -18,10 +18,20 @@ use Empathy\MVC\PluginManager\Option as PMOption;
 /**
  * Main boot class that handles plugins and dispatches to controllers.
  *
+ * The active controller for the current dispatch lives in {@see DispatchContext}.
+ * For backward compatibility with code that uses the DI container, the same
+ * instance is also written to {@see Bootstrap::LEGACY_CONTAINER_CONTROLLER_ID}
+ * from {@see Controller::__construct}.
+ *
  * @author Mike Whiting mike@ai-em.net
  */
 class Bootstrap
 {
+    /**
+     * Legacy container entry for the active controller (synchronised from {@see Controller}).
+     */
+    public const string LEGACY_CONTAINER_CONTROLLER_ID = 'Controller';
+
     /**
      * Default module read from application config file.
      * Used for resolving routes e.g. when URI is empty.
@@ -127,9 +137,23 @@ class Bootstrap
         return $this->dispatchContext;
     }
 
+    /**
+     * The controller for the current dispatch, or null before one is constructed.
+     *
+     * Prefer this (or DispatchContext::getController) over DI::getContainer()->get('Controller'):
+     * the container entry exists for backward compatibility only.
+     */
     public function getController(): ?Controller
     {
         return $this->dispatchContext->getController();
+    }
+
+    /**
+     * Keeps the PHP-DI entry in sync with DispatchContext (backward compatibility).
+     */
+    public function syncLegacyContainerController(Controller $controller): void
+    {
+        DI::getContainer()->set(self::LEGACY_CONTAINER_CONTROLLER_ID, $controller);
     }
 
     public function isApcuDebugEnabled(): bool

@@ -84,10 +84,10 @@ class Controller
         array $pluginOptions = [],
         array $pluginWhitelist = []
     ) {
-        DI::getContainer()->set('Controller', $this);
         $this->pluginManager = $this->boot->getPluginManager();
         $this->pluginManager->setController($this);
         $this->boot->getDispatchContext()->setController($this);
+        $this->boot->syncLegacyContainerController($this);
         $this->pluginManager->setOptions($pluginOptions);
         $this->pluginManager->setWhitelist($pluginWhitelist);
 

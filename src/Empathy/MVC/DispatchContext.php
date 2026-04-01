@@ -8,9 +8,11 @@ namespace Empathy\MVC;
  * Per-dispatch (request-scoped) state: current URI instance and controller.
  *
  * Reset at the start of each {@see Bootstrap::dispatch()} so persistent / CLI reuse
- * does not leak the previous request’s objects. The DI container may still register
- * the active controller for backward compatibility; this object is the framework’s
- * explicit source of truth for “what is being dispatched now”.
+ * does not leak the previous request’s objects.
+ *
+ * The PHP-DI entry {@see Bootstrap::LEGACY_CONTAINER_CONTROLLER_ID} is updated from
+ * {@see Controller::__construct} for legacy callers; this object is the authoritative
+ * source for “what is being dispatched now”.
  */
 final class DispatchContext
 {
