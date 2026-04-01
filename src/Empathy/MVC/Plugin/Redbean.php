@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Plugin {
 
-    use Empathy\MVC\Config;
+    use Empathy\MVC\DatabasePoolDefaults;
     use Empathy\MVC\Exception;
     use Empathy\MVC\Plugin;
 
@@ -34,7 +34,11 @@ namespace Empathy\MVC\Plugin {
                 if (!isset($this->config['database'])) {
                     throw new Exception('sqlite database file not supplied.');
                 }
-                $db = Config::get('DOC_ROOT') . '/' . $this->config['database'];
+                $docRoot = $this->bootstrap->getMVC()->getApplicationPaths()->docRoot;
+                if ($docRoot === null || $docRoot === '') {
+                    throw new Exception('DOC_ROOT is not set; cannot open sqlite database.');
+                }
+                $db = $docRoot.'/'.$this->config['database'];
                 if (!file_exists($db)) {
                     throw new Exception('sqlite database file not found.');
                 }
@@ -42,18 +46,18 @@ namespace Empathy\MVC\Plugin {
                     new \R()->setup('sqlite:'.$db);
                 }
             } else {
-                if (Config::get('DB_SERVER') === false) {
-                    throw new \Empathy\MVC\Exception('Database server is not defined in config.');
+                $defaults = DatabasePoolDefaults::tryFromConfig();
+                if ($defaults === null) {
+                    throw new Exception('Database server is not defined in config.');
                 }
                 // IP check disabled (previously optional strict validation).
-                $dsn = $dbms.':host='.Config::get('DB_SERVER').';dbname='.Config::get('DB_NAME').';';
+                $dsn = $dbms.':host='.$defaults->server.';dbname='.$defaults->databaseName.';';
 
-                $db_port = Config::get('DB_PORT');
-                if (is_numeric($db_port)) {
-                    $dsn .= 'port='.$db_port.';';
+                if ($defaults->port !== null) {
+                    $dsn .= 'port='.$defaults->port.';';
                 }
                 if ($this->usingRedbean()) {
-                    new \R()->setup($dsn, Config::get('DB_USER'), Config::get('DB_PASS'));
+                    new \R()->setup($dsn, $defaults->user, $defaults->password);
                 }
             }
         }

@@ -67,6 +67,10 @@ class Empathy
      */
     private bool $dispatchedException = false;
 
+    /**
+     * Used by {@see loadClass} with {@see ApplicationPaths::fromConfig} (reads current {@see Config}).
+     */
+    private static string $autoloadConfigDir = '';
 
     /**
      * Create application object.
@@ -85,6 +89,7 @@ class Empathy
         $this->bootOptions = $bootOptions;
         $this->plugins = $plugins;
 
+        self::$autoloadConfigDir = $this->configDir;
         spl_autoload_register($this->loadClass(...));
 
         LogBridge::configure($this->loggingOn, $this->logger);
@@ -399,17 +404,28 @@ class Empathy
         $classNameArr = explode('\\', $classPath);
         $className = $classNameArr[ count($classNameArr) - 1 ];
 
+        $docRootRaw = self::$autoloadConfigDir !== ''
+            ? ApplicationPaths::fromConfig(self::$autoloadConfigDir)->docRoot
+            : null;
+        $docRoot = ($docRootRaw !== null && $docRootRaw !== '') ? $docRootRaw : null;
+
         $location = '';
         if (str_starts_with($classPath, 'Empathy\\MVC\\Controller\\')) {
             if (isset($_GET['module'])) {
                 if ($className !== 'CustomController') {
-                    $location = Config::get('DOC_ROOT') . '/application/' . $_GET['module'] . '/';
+                    if ($docRoot === null) {
+                        throw new Exception('DOC_ROOT is not set; cannot autoload controller.');
+                    }
+                    $location = $docRoot . '/application/' . $_GET['module'] . '/';
                 }
             } else {
                 throw new Exception('Module not set.');
             }
         } elseif (str_starts_with($classPath, 'Empathy\\MVC\\Model\\')) {
-            $location = Config::get('DOC_ROOT').'/storage/';
+            if ($docRoot === null) {
+                throw new Exception('DOC_ROOT is not set; cannot autoload model.');
+            }
+            $location = $docRoot.'/storage/';
         }
         if ($location !== '' && $location !== '0' && file_exists($location.$className.'.php')) {
             $file = $location.$className.'.php';

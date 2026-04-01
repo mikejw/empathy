@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Bootstrap;
-use Empathy\MVC\Config;
 use Empathy\MVC\Plugin as Plugin;
 use Empathy\MVC\PluginManager;
 use Empathy\MVC\Util\Lib;
@@ -48,7 +47,10 @@ class ELibs extends Plugin
         }
 
         if ($path !== '') {
-            Lib::addToIncludePath(Config::get('DOC_ROOT').$path);
+            $docRoot = $bootstrap->getMVC()->getApplicationPaths()->docRoot;
+            if ($docRoot !== null && $docRoot !== '') {
+                Lib::addToIncludePath($docRoot.$path);
+            }
         }
     }
 }

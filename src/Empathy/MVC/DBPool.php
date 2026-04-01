@@ -80,26 +80,18 @@ class DBPool
     public static function getDefCX(): PDO
     {
         if (count(self::$pool) < 1) {
-            $db_port = Config::get('DB_PORT');
-            if (is_numeric($db_port)) {
-                $port = (int) $db_port;
-                self::addHost(
-                    Config::get('DB_SERVER'),
-                    Config::get('DB_NAME'),
-                    Config::get('DB_USER'),
-                    Config::get('DB_PASS'),
-                    'default',
-                    $port
-                );
-            } else {
-                self::addHost(
-                    Config::get('DB_SERVER'),
-                    Config::get('DB_NAME'),
-                    Config::get('DB_USER'),
-                    Config::get('DB_PASS'),
-                    'default'
-                );
+            $defaults = DatabasePoolDefaults::tryFromConfig();
+            if ($defaults === null) {
+                throw new \LogicException('Database defaults are not configured (DB_SERVER missing).');
             }
+            self::addHost(
+                $defaults->server,
+                $defaults->databaseName,
+                $defaults->user,
+                $defaults->password,
+                'default',
+                $defaults->port
+            );
         }
         return self::getConnection('default');
     }
