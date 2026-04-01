@@ -14,7 +14,9 @@ define('MVC_VERSION', '4.4.0');
 /**
  * Empathy
  * @file            Empathy/Empathy.php
- * @description     Creates global object that initializes an Empathy application
+ * @description     Application kernel (dispatch, errors, autoload). YAML is merged into
+ *                  {@see Config} and boot data is supplied via {@see BootSnapshot} from
+ *                  {@see ConfigBootstrap::apply} before construction.
  * @author          Mike Whiting
  * @license         See LICENCE
  *
@@ -67,52 +69,23 @@ class Empathy
 
 
     /**
-     * Merge YAML config into {@see Config} (single source of truth).
-     *
-     * Legacy apps sometimes relied on {@see define()} for the bundled framework `config.yml`;
-     * that path is removed—use {@see Config::get} with the uppercased key instead.
-     *
-     * @param array<string, mixed> $config Configuration data
-     */
-    private function consumeConfig(array $config, string $configDir): void
-    {
-        foreach ($config as $index => &$item) {
-            // auto fix of doc root
-            if (!is_array($item) && $index === 'doc_root' && !file_exists($item)) {
-                $item = $configDir;
-            }
-
-            Config::store(strtoupper((string) $index), $item);
-        }
-        if (isset($config['boot_options'])) {
-            $this->bootOptions = $config['boot_options'];
-        }
-        if (isset($config['plugins'])) {
-            $this->plugins = $config['plugins'];
-        }
-    }
-
-    /**
      * Create application object.
-     * @param string $configDir the location of the application config file
      *
-     * @param boolean $persistentMode Whether the application is running in persistent mode.
-     * If true this means there could be many requests following initialization.
-     *
-     * @param array{0: array<string, mixed>, 1: array<string, mixed>} $loadedConfig
+     * @param array<string, mixed>       $bootOptions From {@see ConfigBootstrap::apply}.
+     * @param list<array<string, mixed>> $plugins     From {@see ConfigBootstrap::apply}.
      */
     public function __construct(
         private readonly string $configDir,
         private readonly bool $persistentMode,
-        private readonly array $loadedConfig,
+        array $bootOptions,
+        array $plugins,
         private readonly bool $loggingOn = false,
         private readonly ?LoggerInterface $logger = null,
     ) {
-        spl_autoload_register($this->loadClass(...));
+        $this->bootOptions = $bootOptions;
+        $this->plugins = $plugins;
 
-        [$appConfig, $globalConfig] = $this->loadedConfig;
-        $this->consumeConfig($appConfig, $this->configDir);
-        $this->consumeConfig($globalConfig, $this->configDir);
+        spl_autoload_register($this->loadClass(...));
 
         LogBridge::configure($this->loggingOn, $this->logger);
 

@@ -14,9 +14,7 @@ class Logging
 
     public function __construct(int $level = Logger::DEBUG, string $configDir = '')
     {
-        $docRoot = $configDir !== ''
-            ? ApplicationPaths::fromConfig($configDir)->docRoot
-            : null;
+        $docRoot = $configDir !== '' ? ApplicationPaths::fromConfig($configDir)->docRoot : null;
         if ($docRoot === null || $docRoot === '') {
             throw new InvalidArgumentException('Logging requires doc_root in application config (resolved DOC_ROOT is empty).');
         }

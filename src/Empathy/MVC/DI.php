@@ -58,6 +58,7 @@ class DI
             'systemMode' => $systemMode,
             'Spyc' => new Spyc(),
             'Empathy' => function (Container $c) {
+                $snapshot = ConfigBootstrap::apply($c->get('Config'), $c->get('configDir'));
                 $loggingOn = (bool) $c->get('LoggingOn');
                 $log = null;
                 if ($loggingOn) {
@@ -67,7 +68,8 @@ class DI
                 return new Empathy(
                     $c->get('configDir'),
                     $c->get('persistentMode'),
-                    $c->get('Config'),
+                    $snapshot->bootOptions,
+                    $snapshot->plugins,
                     $loggingOn,
                     $log
                 );
