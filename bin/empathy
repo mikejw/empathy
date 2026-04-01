@@ -596,11 +596,17 @@ $app_config = read_app_config();
 $config = read_global_config();
 $no_motd = ['get_elibs', 'get_elib_tables', 'gen_password'];
 
+$noConfig = true;
+
 if ($app_config !== false) {
     $boot = boot();
-    main();
-} else {
-    echo "No application config found.\n";
+    $noConfig = false;
+}
+
+main();
+
+if ($noConfig) {
+    echo "Warning: No application config found.\n";
 }
 
 
