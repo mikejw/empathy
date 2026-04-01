@@ -85,7 +85,7 @@ class Controller
         array $pluginWhitelist = []
     ) {
         DI::getContainer()->set('Controller', $this);
-        $this->pluginManager = DI::getContainer()->get('PluginManager');
+        $this->pluginManager = $this->boot->getPluginManager();
         $this->pluginManager->setController($this);
         $this->pluginManager->setOptions($pluginOptions);
         $this->pluginManager->setWhitelist($pluginWhitelist);
@@ -94,7 +94,7 @@ class Controller
             $this->presenter = $this->pluginManager->getView();
             $this->useSession = $useSession;
             $this->environment = $this->boot->getEnvironment();
-            $this->stash = DI::getContainer()->get('Stash');
+            $this->stash = $this->boot->getStash();
             $this->module = $_GET['module'] ?? null;
             $this->class = $_GET['class'] ?? null;
             $this->event = $_GET['event'] ?? null;
@@ -206,7 +206,7 @@ class Controller
      */
     public function redirect(string $endString = ''): void
     {
-        $proto = (\Empathy\MVC\Util\Misc::isSecure()) ? 'https' : 'http';
+        $proto = \Empathy\MVC\Util\Misc::isSecure($this->pluginManager) ? 'https' : 'http';
         if ($this->useSession) {
             Session::write();
         }

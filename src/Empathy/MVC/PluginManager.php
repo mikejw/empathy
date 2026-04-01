@@ -155,13 +155,9 @@ class PluginManager
             if (count(explode('\\', $name)) === 1) {
                 $name = 'Empathy\\MVC\\Plugin\\' . $name;
             }
-            try {
-                return DI::getContainer()->get($name);
-            } catch (\Exception $e) {
-                if ($e::class === \DI\Definition\Exception\InvalidDefinition::class) {
-                    continue;
-                } else {
-                    throw $e;
+            foreach ($this->plugins as $p) {
+                if ($p::class === $name) {
+                    return $p;
                 }
             }
         }

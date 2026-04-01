@@ -55,16 +55,21 @@ class Bootstrap
     private ?URI $uri = null;
 
     /**
-     * This property is used to contain a reference to
-     * the current instance of the web application.
-     */
-    private readonly Empathy $mvc;
-
-    /**
      * This property contains a reference to
      * the plugin manager object.
      */
     private PluginManager $pluginManager;
+
+    private Stash $stash;
+
+    /**
+     * Optional cache service (e.g. APCu) when registered in the container.
+     */
+    private readonly mixed $cacheService;
+
+    private readonly bool $sectionUriCacheEnabled;
+
+    private readonly bool $apcuDebug;
 
     /**
      * This value of this property is obtained
@@ -99,17 +104,62 @@ class Bootstrap
      * @param array<string, mixed>       $bootOptions boot options config
      * @param list<array<string, mixed>> $plugins     active plugin definition
      */
-    public function __construct(array $bootOptions, /**
-     * This property contains a data structure
-     * that contains the description of plugins to be initialized.
-     * Read from the application config.
-     */
-        private readonly array $plugins, Empathy $mvc)
-    {
-        $this->persistentMode = $mvc->getPersistentMode();
-        $this->mvc = $mvc;
-        $this->pluginManager = DI::getContainer()->get('PluginManager');
+    public function __construct(
+        array $bootOptions,
+        private readonly array $plugins,
+        private readonly Empathy $mvc,
+        PluginManager $pluginManager,
+        Stash $stash,
+        mixed $cacheService = null,
+        bool $sectionUriCacheEnabled = false,
+        bool $apcuDebug = false,
+    ) {
+        $this->persistentMode = $this->mvc->getPersistentMode();
+        $this->pluginManager = $pluginManager;
+        $this->stash = $stash;
+        $this->cacheService = $cacheService;
+        $this->sectionUriCacheEnabled = $sectionUriCacheEnabled;
+        $this->apcuDebug = $apcuDebug;
         $this->initBootOptions($bootOptions);
+    }
+
+    public function getPluginManager(): PluginManager
+    {
+        return $this->pluginManager;
+    }
+
+    public function getStash(): Stash
+    {
+        return $this->stash;
+    }
+
+    public function getController(): ?Controller
+    {
+        return $this->controller;
+    }
+
+    public function isApcuDebugEnabled(): bool
+    {
+        return $this->apcuDebug;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCacheService()
+    {
+        return $this->cacheService;
+    }
+
+    public function createUri(): URI
+    {
+        return new URI(
+            $this->getDefaultModule(),
+            $this->getDynamicModule(),
+            $this->getDynamicModuleDefaultURI(),
+            $this->cacheService,
+            $this->sectionUriCacheEnabled,
+        );
     }
 
 
@@ -157,10 +207,7 @@ class Bootstrap
      */
     public function dispatch($fake = false, $controller = null): void
     {
-        $uriService = DI::getContainer()->get('URI');
-        if (!$uriService instanceof URI) {
-            throw new Exception('DI URI service is missing or invalid');
-        }
+        $uriService = $this->createUri();
         $this->uri = $uriService;
 
         $error = $uriService->getError();
@@ -170,7 +217,6 @@ class Bootstrap
            && $this->dynamicModule) {
 
             // anticipate dispatched errors
-            $this->pluginManager = DI::getContainer()->get('PluginManager');
             $this->pluginManager->setOptions([PMOption::DefaultWhitelist]);
             $this->mvc->initPlugins();
 

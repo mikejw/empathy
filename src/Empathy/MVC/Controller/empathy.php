@@ -7,7 +7,6 @@ namespace Empathy\MVC\Controller;
 use Empathy\MVC\Bootstrap;
 use Empathy\MVC\Config;
 use Empathy\MVC\Controller as BaseController;
-use Empathy\MVC\DI;
 use Empathy\MVC\Entity;
 use Empathy\MVC\FileContentsCache;
 use Empathy\MVC\Model;
@@ -55,9 +54,7 @@ class empathy extends BaseController
     {
         $success = false;
 
-        if (
-            !DI::getContainer()->get('ApcuDebug')
-        ) {
+        if (!$this->boot->isApcuDebugEnabled()) {
             $this->redirect();
         } else {
             $success = FileContentsCache::clear();
@@ -68,7 +65,10 @@ class empathy extends BaseController
 
             // presume to clear memcache
             try {
-                $cache = DI::getContainer()->get('Cache')->clear();
+                $cache = $this->boot->getCacheService();
+                if (is_object($cache) && method_exists($cache, 'clear')) {
+                    $cache->clear();
+                }
             } catch (\Exception) {
                 // do nothing
             }

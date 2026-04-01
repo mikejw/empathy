@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Config;
-use Empathy\MVC\DI;
 use Empathy\MVC\Plugin as Plugin;
 use Empathy\MVC\RequestException;
 
@@ -52,8 +51,8 @@ class Subdomains extends Plugin implements PreDispatch
                             $this->config[$matches[1]]['boot_options']
                         );
                         Config::store('BOOT_OPTIONS', $newOptions);
-                        DI::getContainer()->get('Empathy')->setBootOptions($newOptions);
-                        DI::getContainer()->get('Bootstrap')->initBootOptions();
+                        $this->bootstrap->getMVC()->setBootOptions($newOptions);
+                        $this->bootstrap->initBootOptions();
                     }
                 }
             }

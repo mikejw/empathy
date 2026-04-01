@@ -23,7 +23,7 @@ final class EmpathyApp
 
         $container = DI::init($base_dir, true);
         $instance = $container->get('Empathy');
-        $instance->init();
+        $instance->init($container->get('Bootstrap'));
         $this->empathy = $instance;
     }
 
@@ -76,7 +76,7 @@ final class EmpathyApp
 
         DB::loadDefDBCreds();
 
-        $empathy->init();
+        $empathy->init($container->get('Bootstrap'));
 
         if (
             class_exists(\Empathy\ELib\User\CurrentUser::class) &&

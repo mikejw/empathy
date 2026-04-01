@@ -24,7 +24,7 @@ class SmartySSL extends Smarty
     {
         return (
             isset($this->config['force']) && $this->config['force'] ||
-            \Empathy\MVC\Util\Misc::isSecure()
+            \Empathy\MVC\Util\Misc::isSecure($this->manager)
         );
     }
 

@@ -31,10 +31,6 @@ class LogItem
 
     public function fire(): void
     {
-        $log = DI::getContainer()->get('LoggingOn') ? DI::getContainer()->get('Log') : false;
-        $level = $this->level;
-        if ($log !== false) {
-            $log->$level($this->msg, $this->context);
-        }
+        LogBridge::log($this->level, $this->msg, $this->context);
     }
 }

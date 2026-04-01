@@ -59,8 +59,13 @@ class URI
     private bool $cli_mode_detected = false;
     private string $internal_controller = 'empathy';
 
-    public function __construct(?string $default_module, private readonly ?string $dynamicModule, private readonly string $dynamicModuleDefaultURI = '')
-    {
+    public function __construct(
+        ?string $default_module,
+        private readonly ?string $dynamicModule,
+        private readonly string $dynamicModuleDefaultURI = '',
+        private readonly mixed $sectionResolveCache = null,
+        private readonly bool $sectionResolveCacheEnabled = false,
+    ) {
         if (isset($_SERVER['HTTP_HOST']) && !str_contains((string) Config::get('WEB_ROOT'), (string) $_SERVER['HTTP_HOST'])) {
             throw new SafeException('Host name mismatch.');
         }
@@ -292,7 +297,11 @@ class URI
         // code still needed to assert correct section path - else throw 404
         $this->error = 0;
 
-        $section = Model::load(SectionItemStandAlone::class);
+        $section = Model::load(
+            SectionItemStandAlone::class,
+            null,
+            [$this->sectionResolveCache, $this->sectionResolveCacheEnabled]
+        );
         $sectionId = -1;
 
         if ($this->dynamicModule === null || $this->dynamicModule === '') {

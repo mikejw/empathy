@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Config;
-use Empathy\MVC\DI;
 
 /**
  * Empathy Smarty Plugin
@@ -116,7 +115,7 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
     {
         // for default templates check test mode
         // derived from elibs plugin
-        if (DI::getContainer()->get('PluginManager')->eLibsTestMode()) {
+        if ($this->manager->eLibsTestMode()) {
             $empathy_dir = realpath(Config::get('DOC_ROOT').'/../');
         } else {
             $empathy_dir = Config::get('DOC_ROOT').'/vendor/mikejw/empathy';

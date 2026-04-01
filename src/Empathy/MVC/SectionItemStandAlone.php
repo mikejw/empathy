@@ -36,6 +36,12 @@ class SectionItemStandAlone extends Entity
 
     public static string $table = 'section_item';
 
+    public function __construct(
+        private readonly mixed $resolveUriCache = null,
+        private readonly bool $resolveUriCacheEnabled = false,
+    ) {
+        parent::__construct();
+    }
 
     /**
      * @return list<array<string, mixed>>
@@ -126,15 +132,9 @@ class SectionItemStandAlone extends Entity
      */
     public function resolveURI(?array $uri): int
     {
-        $cache = null;
-        $cacheEnabled = false;
-        try {
-            $cache = DI::getContainer()->get('Cache');
-            $cacheEnabled = DI::getContainer()->get('cacheEnabled');
-        } catch (\Exception) {
-            //
-        }
-        if ($cache && $cacheEnabled && $uri !== null) {
+        $cache = $this->resolveUriCache;
+        $cacheEnabled = $this->resolveUriCacheEnabled;
+        if ($cache !== null && $cacheEnabled && $uri !== null) {
             return $cache->cachedCallback(
                 'section_id_' . implode('_', $uri),
                 $this->doResolveURI(...),

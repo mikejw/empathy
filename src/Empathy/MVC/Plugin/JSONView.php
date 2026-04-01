@@ -6,7 +6,6 @@ namespace Empathy\MVC\Plugin;
 
 use Empathy\MVC\Bootstrap;
 use Empathy\MVC\Config;
-use Empathy\MVC\DI;
 use Empathy\MVC\PluginManager;
 use Empathy\MVC\RequestException;
 use Empathy\MVC\Testable;
@@ -117,7 +116,7 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
 
     public function onPreEvent(): void
     {
-        $module = DI::getContainer()->get('Controller')->getModule();
+        $module = $this->manager->getController()?->getModule();
 
         if ($this->config !== null) {
             if (count($this->config) === 1 && !isset($this->config[0])) {
@@ -132,7 +131,7 @@ class JSONView extends PresentationPlugin implements PreEvent, Presentation
                     $this->return_codes = $mod_conf['return_codes'] ?? \Empathy\MVC\Plugin\JSONView\ReturnCodes::class;
                     $this->prettyPrint = $mod_conf['pretty_print'] ?? false;
 
-                    DI::getContainer()->get('PluginManager')->setView($this);
+                    $this->manager->setView($this);
                 }
             }
         }

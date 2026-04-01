@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Empathy\MVC;
 
 use Exception;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 define('MVC_VERSION', '4.4.0');
@@ -100,14 +101,23 @@ class Empathy
      *
      * @param boolean $persistentMode Whether the application is running in persistent mode.
      * If true this means there could be many requests following initialization.
+     *
+     * @param array{0: array<string, mixed>, 1: array<string, mixed>} $loadedConfig
      */
-    public function __construct(string $configDir, private readonly bool $persistentMode = false)
-    {
+    public function __construct(
+        string $configDir,
+        private readonly bool $persistentMode,
+        private readonly array $loadedConfig,
+        private readonly bool $loggingOn = false,
+        private readonly ?LoggerInterface $logger = null,
+    ) {
         spl_autoload_register($this->loadClass(...));
 
-        [$appConfig, $globalConfig] = DI::getContainer()->get('Config');
+        [$appConfig, $globalConfig] = $this->loadedConfig;
         $this->consumeConfig($appConfig, $configDir);
         $this->consumeConfig($globalConfig, $configDir, true);
+
+        LogBridge::configure($this->loggingOn, $this->logger);
 
         if (
             isset($this->bootOptions['use_elib']) &&
@@ -182,7 +192,7 @@ class Empathy
             }
         }
         if ($fake) {
-            return DI::getContainer()->get('Controller');
+            return $boot->getController();
         }
         return null;
     }
@@ -424,9 +434,9 @@ class Empathy
         ($this->boot ?? throw new \LogicException('Empathy::init() must be called first.'))->initBootOptions();
     }
 
-    public function init(): void
+    public function init(?Bootstrap $bootstrap = null): void
     {
-        $this->boot = DI::getContainer()->get('Bootstrap');
+        $this->boot = $bootstrap ?? DI::getContainer()->get('Bootstrap');
         if (!$this->persistentMode) {
             $this->beginDispatch();
         }

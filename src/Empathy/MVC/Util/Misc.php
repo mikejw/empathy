@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Empathy\MVC\Util;
 
-use Empathy\MVC\DI;
+use Empathy\MVC\PluginManager;
 
 /**
  * Empathy Misc util
@@ -19,10 +19,10 @@ use Empathy\MVC\DI;
  */
 class Misc
 {
-    public static function isSecure(): bool
+    public static function isSecure(PluginManager $pluginManager): bool
     {
         try {
-            DI::getContainer()->get('PluginManager')->find(['SmartySSL']);
+            $pluginManager->find(['SmartySSL']);
         } catch (\Exception) {
             return false;
         }

@@ -24,5 +24,5 @@ if (false === @include('../vendor/autoload.php')) {
 } else {
     $container = Empathy\MVC\DI::init(realpath(dirname(__FILE__).'/../'));
     $empathy = $container->get('Empathy');
-    $empathy->init();
+    $empathy->init($container->get('Bootstrap'));
 }

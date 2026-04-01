@@ -20,7 +20,7 @@ class DI
     private static function loadConfig(string $configDir, ?Spyc $spyc = null): mixed
     {
         if (!$spyc instanceof \Spyc) {
-            $spyc = DI::getContainer()->get('Spyc');
+            $spyc = new Spyc();
         }
         $configFile = $configDir.'/config.yml';
         return FileContentsCache::cachedCallback($configFile, function ($data) use (&$spyc) {
@@ -46,26 +46,41 @@ class DI
             'persistentMode' => $persistentMode,
             'systemMode' => $systemMode,
             'Spyc' => new Spyc(),
-            'Empathy' => fn (Container $c) => new Empathy(
-                $c->get('configDir'),
-                $c->get('persistentMode')
-            ),
+            'Empathy' => function (Container $c) {
+                $loggingOn = (bool) $c->get('LoggingOn');
+                $log = null;
+                if ($loggingOn) {
+                    $log = $c->get('Log');
+                }
+
+                return new Empathy(
+                    $c->get('configDir'),
+                    $c->get('persistentMode'),
+                    $c->get('Config'),
+                    $loggingOn,
+                    $log
+                );
+            },
             'Bootstrap' => function (Container $c) {
                 $empathy = $c->get('Empathy');
+                $cache = $c->has('Cache') ? $c->get('Cache') : null;
+                $cacheEnabled = $c->has('cacheEnabled') ? (bool) $c->get('cacheEnabled') : false;
+
                 return new Bootstrap(
                     $empathy->getBootOptions(),
                     $empathy->getPlugins(),
-                    $empathy
+                    $empathy,
+                    $c->get('PluginManager'),
+                    $c->get('Stash'),
+                    $cache,
+                    $cacheEnabled,
+                    (bool) $c->get('ApcuDebug'),
                 );
             },
             'URI' => function (Container $c) {
-                $bootstrap = $c->get('Bootstrap');
-                return new URI(
-                    $bootstrap->getDefaultModule(),
-                    $bootstrap->getDynamicModule(),
-                    $bootstrap->getDynamicModuleDefaultURI()
-                );
+                return $c->get('Bootstrap')->createUri();
             },
+            'ApcuDebug' => false,
             'PluginManager' => new PluginManager(),
             'Stash' => fn (Container $c) => new Stash(),
             'Config' => function (Container $c) {
