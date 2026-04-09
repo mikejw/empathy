@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.4.1] - 2026-04-09
+
+### Fixed
+
+- Add getter
+
+
 ## [4.4.0] - 2026-03-31
 
 ### Changed

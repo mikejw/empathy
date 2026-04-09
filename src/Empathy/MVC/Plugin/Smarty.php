@@ -156,4 +156,9 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
     {
         $this->smarty->clear_all_assign();
     }
+
+    public function getSmarty(): \Smarty
+    {
+        return $this->smarty;
+    }
 }
