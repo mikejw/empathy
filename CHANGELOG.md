@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.4.2] - 2026-04-10
+
+### Fixed
+
+- Smarty modifiers
+
+
 ## [4.4.1] - 2026-04-09
 
 ### Fixed

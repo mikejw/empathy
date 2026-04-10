@@ -90,6 +90,16 @@ class Smarty extends PresentationPlugin implements PreDispatch, Presentation
             'preg_match',
             'preg_match'
         );
+        $this->smarty->registerPlugin(
+            'modifier',
+            'var_dump',
+            'var_dump'
+        );
+        $this->smarty->registerPlugin(
+            'modifier',
+            'trim',
+            'trim'
+        );
     }
 
     public function assign(string $name, mixed $data, bool $no_array = false): void
