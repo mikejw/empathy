@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.4.3] - 2026-04-12
+
+### Fixed
+
+- Add name validation
+
+
 ## [4.4.2] - 2026-04-10
 
 ### Fixed

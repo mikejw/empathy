@@ -25,6 +25,7 @@ class Validate
     public const USERNAME = 6;
     public const URL = 7;
     public const PASSWORD = 8;
+    public const NAME = 9;
 
     /** @var array<int|string, string> */
     private array $error = [];
@@ -35,7 +36,7 @@ class Validate
     private string $allowed_pw_pattern = "/[\"\-\s:,\'\+&\|!\(\)\{\}\[\]\^~\*\?;@£\$]/";
     // taken from https://stackoverflow.com/a/3809435
     private string $url_pattern = '|https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)|';
-
+    private string $name_pattern = "/^(?=.*\p{L})[\p{L} '’\-]+$/u";
     /**
      * Perform validation of data based on type spcified
      *
@@ -98,6 +99,11 @@ class Validate
                         $valid = false;
                     }
                     break;
+
+                case self::NAME:
+                    if (!preg_match($this->name_pattern, $data)) {
+                        $valid = false;
+                    }
                 default:
                     throw new \Exception('No valid validation type specified.');
             }
