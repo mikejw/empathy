@@ -104,6 +104,7 @@ class Validate
                     if (!preg_match($this->name_pattern, $data)) {
                         $valid = false;
                     }
+                    break;
                 default:
                     throw new \Exception('No valid validation type specified.');
             }
