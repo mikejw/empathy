@@ -14,6 +14,10 @@
       "title": "Understanding routing"
     },
     {
+      "file": "./docs/orm.md",
+      "title": "ORM / Storage"
+    },
+    {
       "file": "./docs/json-view-plugin.md",
       "title": "JSON View"
     }
