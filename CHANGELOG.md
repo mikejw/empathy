@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.4.5] - 2026-04-19
+
+### Fixed
+
+- Do PDO/ORM type coercion
+
+
 ## [4.4.4] - 2026-04-15
 
 ### Fixed

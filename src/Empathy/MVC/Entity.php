@@ -245,13 +245,184 @@ class Entity
             $row = $result->fetch();
             foreach ($row as $index => $value) {
                 if (!is_int($index) && in_array($index, $this->properties, true)) {
-                    $this->$index = $value;
+                    $this->$index = $this->coerceDatabaseValueForProperty((string) $index, $value);
                 }
             }
             return true;
         } else {
             return false;
         }
+    }
+
+    /**
+     * Align PDO / driver values with declared property types (e.g. DECIMAL as numeric string → float).
+     */
+    private function coerceDatabaseValueForProperty(string $property, mixed $value): mixed
+    {
+        try {
+            $refProp = new \ReflectionProperty($this, $property);
+        } catch (\ReflectionException) {
+            return $value;
+        }
+
+        $type = $refProp->getType();
+        if ($type === null) {
+            return $value;
+        }
+
+        if (\PHP_VERSION_ID >= 80100 && $type instanceof \ReflectionIntersectionType) {
+            return $value;
+        }
+
+        if ($type instanceof \ReflectionUnionType) {
+            return $this->coerceUnionTypeDatabaseValue($value, $type);
+        }
+
+        if ($type instanceof \ReflectionNamedType) {
+            return $this->coerceNamedTypeDatabaseValue($value, $type);
+        }
+
+        return $value;
+    }
+
+    private function coerceNamedTypeDatabaseValue(mixed $value, \ReflectionNamedType $type): mixed
+    {
+        if (!$type->isBuiltin()) {
+            return $value;
+        }
+
+        $name = $type->getName();
+        if ($name === 'float') {
+            if ($value === null) {
+                return $type->allowsNull() ? null : 0.0;
+            }
+            if ($value === '') {
+                return $type->allowsNull() ? null : 0.0;
+            }
+            if (is_float($value) || is_int($value)) {
+                return (float) $value;
+            }
+            if (is_string($value) && is_numeric($value)) {
+                return (float) $value;
+            }
+
+            return $value;
+        }
+
+        if ($name === 'bool') {
+            return $this->interpretDatabaseBoolishValue($value, $type->allowsNull());
+        }
+
+        if ($name === 'int') {
+            if ($value === null) {
+                return $type->allowsNull() ? null : 0;
+            }
+            if ($value === '') {
+                return $type->allowsNull() ? null : 0;
+            }
+            if (is_int($value)) {
+                return $value;
+            }
+            if (is_float($value) || is_string($value)) {
+                if (is_string($value) && !is_numeric($value)) {
+                    return $value;
+                }
+
+                return (int) $value;
+            }
+
+            return $value;
+        }
+
+        return $value;
+    }
+
+    private function coerceUnionTypeDatabaseValue(mixed $value, \ReflectionUnionType $type): mixed
+    {
+        if ($value === null) {
+            return $type->allowsNull() ? null : $value;
+        }
+
+        if (is_string($value) && ($value === 'DEFAULT' || $value === 'MYSQLTIME')) {
+            return $value;
+        }
+
+        $hasFloat = false;
+        $hasInt = false;
+        $hasBool = false;
+        foreach ($type->getTypes() as $member) {
+            if (!$member instanceof \ReflectionNamedType || !$member->isBuiltin()) {
+                continue;
+            }
+            if ($member->getName() === 'float') {
+                $hasFloat = true;
+            }
+            if ($member->getName() === 'int') {
+                $hasInt = true;
+            }
+            if ($member->getName() === 'bool') {
+                $hasBool = true;
+            }
+        }
+
+        if ($hasFloat && $value !== '' && (is_int($value) || is_float($value) || (is_string($value) && is_numeric($value)))) {
+            return (float) $value;
+        }
+
+        if ($hasInt && $value !== '' && (is_int($value) || is_float($value) || (is_string($value) && is_numeric($value)))) {
+            return (int) $value;
+        }
+
+        if ($hasBool) {
+            $asBool = $this->interpretDatabaseBoolishValue($value, $type->allowsNull());
+            if (is_bool($asBool) || ($asBool === null && $type->allowsNull())) {
+                return $asBool;
+            }
+        }
+
+        if ($value === '' && $type->allowsNull()) {
+            return null;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Map PDO / MySQL scalars (tinyint, "0"/"1", etc.) onto a PHP bool.
+     * Returns the original value when it cannot be interpreted as booleanish.
+     *
+     * @return bool|null|mixed
+     */
+    private function interpretDatabaseBoolishValue(mixed $value, bool $allowsNull): mixed
+    {
+        if ($value === null) {
+            return $allowsNull ? null : false;
+        }
+        if ($value === '') {
+            return $allowsNull ? null : false;
+        }
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value) || is_float($value)) {
+            return $value !== 0;
+        }
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        $t = strtolower(trim($value));
+        if (in_array($t, ['0', 'false', 'no', 'off', 'f', 'n'], true)) {
+            return false;
+        }
+        if (in_array($t, ['1', 'true', 'yes', 'on', 't', 'y'], true)) {
+            return true;
+        }
+        if (is_numeric($value)) {
+            return ((float) $value) != 0.0;
+        }
+
+        return $value;
     }
 
     /**
