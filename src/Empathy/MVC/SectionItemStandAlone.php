@@ -38,6 +38,24 @@ class SectionItemStandAlone extends Entity
 
 
     /**
+     * Convert a string into a URL-safe slug.
+     *
+     * @param string $text
+     * @return string
+     */
+    private function makeSlug(string $text): string
+    {
+        // Lowercase
+        $text = strtolower($text);
+
+        // Replace non-alphanumeric characters with hyphen
+        $text = preg_replace('/[^a-z0-9_-]+/', '-', $text);
+
+        // Trim leading/trailing hyphens
+        return trim($text, '-');
+    }
+
+    /**
      * @return list<array<string, mixed>>
      */
     public function getURIData(): array
@@ -74,21 +92,31 @@ class SectionItemStandAlone extends Entity
     }
 
     /**
+     * Find a section row by slug and parent ID.
+     *
      * @param list<array<string, mixed>> $rows
+     * @param string $slug
+     * @param int|string $parent_id
      *
      * @return array<string, mixed>
      */
     public function findSection(array $rows, string $slug, int|string $parent_id): array
     {
-        $matched = [];
         foreach ($rows as $row) {
-            $comp = str_replace(' ', '', strtolower((string) $row['label']));
-            if ($comp === $slug && $parent_id === $row['section_id']) {
-                $matched = $row;
-                break;
+            $label = (string) ($row['label'] ?? '');
+
+            $simpleSlug = str_replace(' ', '', strtolower($label));
+            $slugified = $this->makeSlug($label);
+
+            $parentMatches = (int)$parent_id === (int)($row['section_id'] ?? 0);
+            $slugMatches = $slug === $slugified || $slug === $simpleSlug;
+
+            if ($slugMatches && $parentMatches) {
+                return $row;
             }
         }
-        return $matched;
+
+        return []; // no match
     }
 
     /**

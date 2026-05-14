@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.4.6] - 2026-05-14
+
+### Fixed
+
+- Better standard-like ELib CMS site section slug handling
+
+
 ## [4.4.5] - 2026-04-19
 
 ### Fixed
