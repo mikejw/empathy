@@ -245,38 +245,135 @@ class URI
     {
         require_once(Config::get('DOC_ROOT').'/application/CustomController.php');
 
-        if (!(isset($_GET['class'])) && isset($_GET['module'])) {
+        if (!isset($_GET['class']) && isset($_GET['module'])) {
             $_GET['class'] = $_GET['module'];
-        }
-
-        if (isset($_GET['class'])) {
-            $this->controllerName = $_GET['class'];
-        }
-
-        if (!class_exists($this->buildControllerName($this->controllerName))) {
-            if (isset($_GET['class'])) {
-                $_GET['event'] = $_GET['class'];
-            }
-            $_GET['class'] = $_GET['module'];
-            $this->controllerName = $_GET['module'];
-        }
-
-        $this->controllerName = $this->buildControllerName($this->controllerName);
-
-        if ($this->error === 0 && !class_exists($this->controllerName)) {
-            $this->error = self::MISSING_CLASS_DEF;
         }
 
         $this->assertEventIsSet();
-        if ($this->error === 0) {
-            $controllerClass = $this->controllerName;
-            if (class_exists($controllerClass)) {
-                $r = new \ReflectionClass($controllerClass);
-                if (!$r->hasMethod($_GET['event'])) {
-                    $this->error = self::MISSING_EVENT_DEF;
-                }
+
+        $module = $_GET['module'] ?? $this->defaultModule ?? $this->internal_controller;
+        $class = $_GET['class'] ?? $module;
+        $event = $_GET['event'] ?? 'default_event';
+
+        $candidates = [];
+
+        // Existing direct interpretation.
+        //
+        // /terms
+        // module => terms
+        // class  => terms
+        // event  => default_event
+        //
+        // /user/login
+        // module => user
+        // class  => login
+        // event  => default_event
+        $candidates[] = [
+            'module' => $module,
+            'class' => $class,
+            'event' => $event,
+        ];
+
+        // Existing Empathy fallback.
+        //
+        // /user/login
+        // module => user
+        // class  => user
+        // event  => login
+        if ($class !== $module) {
+            $candidates[] = [
+                'module' => $module,
+                'class' => $module,
+                'event' => $class,
+            ];
+        }
+
+        // New default-module fallback for single-segment routes only.
+        //
+        // /terms
+        // module => front
+        // class  => terms
+        // event  => default_event
+        //
+        // then, if that fails:
+        //
+        // /terms
+        // module => front
+        // class  => front
+        // event  => terms
+        if ($this->shouldTryDefaultModuleFallback()) {
+            $segment = $this->uri[0];
+
+            $candidates[] = [
+                'module' => $this->defaultModule,
+                'class' => $segment,
+                'event' => 'default_event',
+            ];
+
+            $candidates[] = [
+                'module' => $this->defaultModule,
+                'class' => $this->defaultModule,
+                'event' => $segment,
+            ];
+        }
+
+        foreach ($candidates as $candidate) {
+            if ($this->applyControllerCandidate($candidate)) {
+                $this->error = 0;
+
+                return;
             }
         }
+
+        // Nothing matched. Restore the original interpretation so errors/logging
+        // remain understandable.
+        $_GET['module'] = $module;
+        $_GET['class'] = $class;
+        $_GET['event'] = $event;
+
+        $this->controllerName = $this->buildControllerName($class);
+
+        if (!class_exists($this->controllerName)) {
+            $this->error = self::MISSING_CLASS_DEF;
+
+            return;
+        }
+
+        $this->error = self::MISSING_EVENT_DEF;
+    }
+
+    private function shouldTryDefaultModuleFallback(): bool
+    {
+        return $this->defaultModule !== null
+            && count($this->uri) === 1
+            && isset($this->uri[0])
+            && $this->uri[0] !== $this->defaultModule;
+    }
+
+    /**
+     * @param array{module: string, class: string, event: string} $candidate
+     */
+    private function applyControllerCandidate(array $candidate): bool
+    {
+        $_GET['module'] = $candidate['module'];
+        $_GET['class'] = $candidate['class'];
+        $_GET['event'] = $candidate['event'];
+
+        $controllerClass = $this->buildControllerName($candidate['class']);
+
+        if (!class_exists($controllerClass)) {
+            return false;
+        }
+
+        $reflection = new \ReflectionClass($controllerClass);
+
+        if (!$reflection->hasMethod($candidate['event'])) {
+            return false;
+        }
+
+        $this->controllerName = $controllerClass;
+
+        return true;
     }
 
     public function assertEventIsSet(): void

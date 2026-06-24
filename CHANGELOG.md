@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.4.7] - 2026-06-24
+
+### Fixed
+
+- Better URI routing fallbacks
+
+
 ## [4.4.6] - 2026-05-14
 
 ### Fixed
